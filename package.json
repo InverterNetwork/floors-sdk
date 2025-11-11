@@ -1,6 +1,6 @@
 {
-  "name": "<pkg_name>",
-  "description": "<pkg_description>",
+  "name": "@floorsfi/core",
+  "description": "Core code shared between Floors Finance apps and pkgs",
   "version": "0.0.0",
   "license": "Apache-2.0",
   "sideEffects": false,
@@ -9,11 +9,6 @@
       "require": "./src/index.ts",
       "import": "./src/index.ts",
       "types": "./src/index.ts"
-    },
-    "./client": {
-      "require": "./src/client/index.ts",
-      "import": "./src/client/index.ts",
-      "types": "./src/client/index.ts"
     }
   },
   "files": [
@@ -71,10 +66,10 @@
     "tsc-files": "^1.1.4",
     "typescript-eslint": "^8.44.0"
   },
-  "homepage": "https://github.com/<github_username>/<pkg_name>",
-  "repository": "<github_username>/<pkg_name>",
+  "homepage": "https://github.com/InverterNetwork/@floorsfi/core",
+  "repository": "InverterNetwork/@floorsfi/core",
   "authors": [
-    "<github_username>"
+    "InverterNetwork"
   ],
   "keywords": [
     "npm",

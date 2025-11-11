@@ -14,14 +14,14 @@ Bun + Npm + Typescript + Standard Version + Flat Config Linting + Husky + Commit
 
 ## Summary
 
-This package contains < a template for devoloping for npm packages > for [<brand_name>](https://github.com/<github_username>).
+This package contains < a template for devoloping for npm packages > for [FloorsFinance](https://github.com/InverterNetwork).
 
 Check out the [Changelog](./CHANGELOG.md) to see what changed in the last releases.
 
 ## Install
 
 ```bash
-bun add <pkg_name>
+bun add @floorsfi/core
 ```
 
 Install Bun ( bun is the default package manager for this project ( its optional ) ):
@@ -72,12 +72,12 @@ bun type-check
 
 This package is licensed - see the [LICENSE](./LICENSE.md) file for details.
 
-[ci-image]: https://badgen.net/github/checks/<github_username>/<pkg_name>/main?label=ci
-[ci-url]: https://github.com/<github_username>/<pkg_name>/actions/workflows/ci.yaml
-[npm-url]: https://npmjs.org/package/<pkg_name>
-[twitter-url]: https://twitter.com/<x_username>
-[twitter-image]: https://img.shields.io/twitter/follow/<x_username>.svg?label=follow+<brand_name>
+[ci-image]: https://badgen.net/github/checks/InverterNetwork/@floorsfi/core/main?label=ci
+[ci-url]: https://github.com/InverterNetwork/@floorsfi/core/actions/workflows/ci.yaml
+[npm-url]: https://npmjs.org/package/@floorsfi/core
+[twitter-url]: https://twitter.com/FloorsFinance
+[twitter-image]: https://img.shields.io/twitter/follow/FloorsFinance.svg?label=follow+FloorsFinance
 [license-image]: https://img.shields.io/badge/License-Apache%20v2-blue
 [license-url]: ./LICENSE.md
-[npm-latest-image]: https://img.shields.io/npm/v/<pkg_name>/latest.svg
-[npm-downloads-image]: https://img.shields.io/npm/dm/<pkg_name>.svg
+[npm-latest-image]: https://img.shields.io/npm/v/@floorsfi/core/latest.svg
+[npm-downloads-image]: https://img.shields.io/npm/dm/@floorsfi/core.svg
