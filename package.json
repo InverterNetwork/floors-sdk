@@ -66,8 +66,8 @@
     "tsc-files": "^1.1.4",
     "typescript-eslint": "^8.44.0"
   },
-  "homepage": "https://github.com/InverterNetwork/@floorsfi/core",
-  "repository": "InverterNetwork/@floorsfi/core",
+  "homepage": "https://github.com/InverterNetwork/floors-core",
+  "repository": "InverterNetwork/floors-core",
   "authors": [
     "InverterNetwork"
   ],

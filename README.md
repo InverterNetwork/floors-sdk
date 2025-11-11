@@ -72,8 +72,8 @@ bun type-check
 
 This package is licensed - see the [LICENSE](./LICENSE.md) file for details.
 
-[ci-image]: https://badgen.net/github/checks/InverterNetwork/@floorsfi/core/main?label=ci
-[ci-url]: https://github.com/InverterNetwork/@floorsfi/core/actions/workflows/ci.yaml
+[ci-image]: https://badgen.net/github/checks/InverterNetwork/floors-core/main?label=ci
+[ci-url]: https://github.com/InverterNetwork/floors-core/actions/workflows/ci.yaml
 [npm-url]: https://npmjs.org/package/@floorsfi/core
 [twitter-url]: https://twitter.com/FloorsFinance
 [twitter-image]: https://img.shields.io/twitter/follow/FloorsFinance.svg?label=follow+FloorsFinance
