@@ -8,13 +8,31 @@
 
 </div>
 
-## 0xMEMO NPM package Template
+## Floor Markets Shared SDK
 
-Bun + Npm + Typescript + Standard Version + Flat Config Linting + Husky + Commit / Release Pipeline
+Type-safe bun-powered TypeScript SDK that bundles Floor Markets ABIs, GraphQL clients, and Effect HttpApi schemas for every Floors Finance app to reuse.
 
 ## Summary
 
-This package contains < a template for devoloping for npm packages > for [FloorsFinance](https://github.com/InverterNetwork).
+This package contains a shared TypeScript SDK used by the Floor Markets project. It bundles
+contract ABIs, a generated GraphQL client, Effect HttpApi schemas, and a client-only entry point
+with React hooks/providers so frontend consumers can access UI-friendly helpers without pulling
+server-only code.
+
+## Package Layout
+
+- `src/index.ts` exports the cross-platform entry point for the SDK and wires together the GraphQL
+  client, schema registry, and ABI helpers that other packages consume.
+- `src/client/index.ts` re-exports the client-safe React hooks and providers (built on top of the shared
+  schemas and GraphQL client) so UI packages can import them without server-only dependencies.
+- `src/abis/` hosts the TypeScript bindings for every Solidity contract (factory, module, token,
+  etc.) so downstream code can import them without regenerating ABIs.
+- `src/graphql/` contains the generated Envio client (`client.ts`), helper constants, subscription
+  manager, and the auto-generated `gen/` directory with runtime helpers plus the embedded
+  GraphQL schema.
+- `src/schemas/` defines the Effect HttpApi schemas (`auth.schema.ts`, `session.schema.ts`, user
+  collections, etc.) and re-exports them through `src/schemas/index.ts` for easy registration
+  inside `src/api.ts`.
 
 Check out the [Changelog](./CHANGELOG.md) to see what changed in the last releases.
 

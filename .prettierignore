@@ -2,3 +2,4 @@ node_modules
 dist
 build
 packages
+src/graphql/gen
