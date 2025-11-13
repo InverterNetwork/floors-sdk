@@ -12,6 +12,11 @@
       "require": "./src/index.ts",
       "import": "./src/index.ts",
       "types": "./src/index.ts"
+    },
+    "./graphql": {
+      "require": "./src/graphql/index.ts",
+      "import": "./src/graphql/index.ts",
+      "types": "./src/graphql/index.ts"
     }
   },
   "files": [
@@ -28,6 +33,7 @@
     "build:esm": "tsc --project ./tsconfig.esm.json && tsc-alias --outDir ./dist/esm && ts-add-js-extension --dir=dist/esm --showprogress=false",
     "build:types": "tsc --project ./tsconfig.types.json && tsc-alias --outDir ./dist/types",
     "clean": "rm -rf dist tsconfig.tsbuildinfo node_modules bun.lockb",
+    "compile:genql": "bunx genql --endpoint \"http://localhost:8080/v1/graphql\" --output src/graphql/gen && prettier --write src/graphql/gen/**/*.ts && eslint --fix src/graphql/gen/**/*.ts",
     "postinstall": "husky || true",
     "prepack": "pinst --disable",
     "package": "bun run build && npm pack",
@@ -52,12 +58,17 @@
     "effect": "^3.19.3"
   },
   "dependencies": {
+    "@urql/core": "^6.0.1",
     "debug": "^4.4.1",
-    "type-fest-4": "npm:type-fest@latest"
+    "graphql-ws": "^6.0.6",
+    "type-fest-4": "npm:type-fest@latest",
+    "uuid": "^13.0.0",
+    "wonka": "^6.3.5"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
+    "@genql/cli": "^6.3.3",
     "@types/bun": "^1.2.22",
     "@types/debug": "^4.1.12",
     "eslint-plugin-prettier": "^5.5.4",

@@ -4,6 +4,11 @@
       "require": "./dist/cjs/index.js",
       "import": "./dist/esm/index.js",
       "types": "./dist/types/index.d.ts"
+    },
+    "./graphql": {
+      "require": "./dist/cjs/graphql/index.js",
+      "import": "./dist/esm/graphql/index.js",
+      "types": "./dist/types/graphql/index.d.ts"
     }
   }
 }
