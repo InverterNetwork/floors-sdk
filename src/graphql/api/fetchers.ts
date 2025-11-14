@@ -1,9 +1,11 @@
 import { query } from '..'
 import type {
   AccountsQueryType,
+  GlobalStatsQueryType,
   MarketsQueryType,
   TCreditPositionData,
   TFloorAssetData,
+  TGlobalStats,
   TGraphQLAccount,
   TGraphQLLoan,
   TPlatformMetrics,
@@ -14,6 +16,8 @@ import type {
 import {
   accountsQuery,
   computePlatformMetrics,
+  globalStatsQuery,
+  mapGlobalStats,
   marketsQuery,
   platformMetricsQuery,
   tradesQuery,
@@ -50,6 +54,11 @@ export const buildAccountsQuery = (
 
 export const buildPlatformMetricsQuery = () => cloneQuery(platformMetricsQuery)
 
+export const buildGlobalStatsQuery = (args?: ExtendableQueryArgs<GlobalStatsQueryType>) => {
+  const selection = cloneQuery(globalStatsQuery)
+  return mergeFieldArgs(selection, 'GlobalStats', args)
+}
+
 export async function fetchMarkets(): Promise<TFloorAssetData[]> {
   const response = await query(buildMarketsQuery())
   const markets = response.Market ?? []
@@ -66,6 +75,12 @@ export async function fetchMarketById(id: string): Promise<TFloorAssetData | nul
 export async function fetchPlatformMetrics(): Promise<TPlatformMetrics> {
   const response = await query(buildPlatformMetricsQuery())
   return computePlatformMetrics(response)
+}
+
+export async function fetchGlobalStats(): Promise<TGlobalStats | null> {
+  const response = await query(buildGlobalStatsQuery())
+  const stats = (response.GlobalStats ?? [])[0]
+  return mapGlobalStats(stats)
 }
 
 export async function fetchTradesByMarket(marketId: string): Promise<TTradeData[]> {

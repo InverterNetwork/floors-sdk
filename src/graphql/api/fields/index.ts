@@ -1,5 +1,6 @@
 export * from './assets'
 export * from './credit'
+export * from './global-stats'
 export * from './platform'
 export * from './tokens'
 export * from './trades'

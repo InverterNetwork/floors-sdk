@@ -15,6 +15,11 @@ export const marketQueryKey = (marketId: string | null | undefined) =>
 export const platformMetricsQueryKey = ['platform-metrics'] as const
 
 /**
+ * @description Static query key for global statistics.
+ */
+export const globalStatsQueryKey = ['global-stats'] as const
+
+/**
  * @description Parameterized query key for trades scoped to a market.
  */
 export const marketTradesQueryKey = (marketId: string | null | undefined) =>

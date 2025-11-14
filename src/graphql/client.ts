@@ -23,6 +23,7 @@ export class Client {
 
     return new UrqlClient({
       url: url,
+      preferGetMethod: false,
       exchanges: [
         cacheExchange,
         fetchExchange,

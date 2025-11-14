@@ -34,6 +34,10 @@ export const marketsQuery = {
     isBuyOpen: true,
     isSellOpen: true,
     createdAt: true,
+    reserveToken: {
+      name: true,
+      symbol: true,
+    },
     lastUpdatedAt: true,
     lastTradeTimestamp: true,
     lastElevationTimestamp: true,
@@ -54,6 +58,7 @@ export const marketsQuery = {
       newPriceRaw: true,
       newPriceFormatted: true,
       timestamp: true,
+
       transactionHash: true,
       user_id: true,
     },
