@@ -62,11 +62,14 @@ export interface TPlatformMetrics {
   volume24h: number
   assetsCreated24h: number
   creditPositions: number
+  totalMarketCap: number
   // UI-specific
   displayTVL: string
   displayYield: string
+  displayMarketCap: string
   tvlChange24h: number
   yieldChange24h: number
+  marketCapChange24h: number
 }
 
 // Function to compute platform metrics from GraphQL data
@@ -81,6 +84,9 @@ export function computePlatformMetrics(data: PlatformMetricsQueryResultType): TP
     const price = parseFloat(market.currentPriceFormatted || market.currentPriceRaw || '0')
     return sum + supply * price
   }, 0)
+
+  // Calculate total market cap (same as TVL for fToken markets)
+  const totalMarketCap = totalValueLocked
 
   // Calculate 24h volume from trades
   const volume24h = markets.reduce((sum, market) => {
@@ -110,17 +116,33 @@ export function computePlatformMetrics(data: PlatformMetricsQueryResultType): TP
     )
   }, 0)
 
+  // Format large numbers with appropriate suffix
+  const formatLargeNumber = (value: number): string => {
+    if (value >= 1e9) {
+      return `$${(value / 1e9).toFixed(2)}B`
+    } else if (value >= 1e6) {
+      return `$${(value / 1e6).toFixed(1)}M`
+    } else if (value >= 1e3) {
+      return `$${(value / 1e3).toFixed(1)}K`
+    } else {
+      return `$${value.toFixed(2)}`
+    }
+  }
+
   return {
     totalValueLocked,
     totalYieldGenerated,
+    totalMarketCap,
     activeAssets: markets.length,
     totalUsers: accounts.length,
     volume24h,
     assetsCreated24h,
     creditPositions: loans.length,
-    displayTVL: `$${(totalValueLocked / 1e6).toFixed(2)}M`,
-    displayYield: `$${(totalYieldGenerated / 1e3).toFixed(1)}K`,
+    displayTVL: formatLargeNumber(totalValueLocked),
+    displayYield: formatLargeNumber(totalYieldGenerated),
+    displayMarketCap: formatLargeNumber(totalMarketCap),
     tvlChange24h: 8.7, // This would need historical data to calculate
     yieldChange24h: 12.3, // This would need historical data to calculate
+    marketCapChange24h: 3.4, // This would need historical data to calculate
   }
 }
