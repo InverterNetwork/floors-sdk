@@ -464,6 +464,11 @@ export default [
   },
   {
     type: 'error',
+    name: 'Module__InvalidArrayLength',
+    inputs: [],
+  },
+  {
+    type: 'error',
     name: 'Module__SplitterTreasury__FloorFeeTreasuryIsZeroAddress',
     inputs: [],
   },

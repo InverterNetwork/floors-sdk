@@ -432,7 +432,7 @@ export default [
     name: 'GovernorSet',
     inputs: [
       {
-        name: 'governor',
+        name: 'governor_',
         type: 'address',
         indexed: true,
         internalType: 'address',
@@ -504,19 +504,19 @@ export default [
     name: 'ModuleCreated',
     inputs: [
       {
-        name: 'orchestrator',
+        name: 'floor_',
         type: 'address',
         indexed: true,
         internalType: 'address',
       },
       {
-        name: 'module',
+        name: 'module_',
         type: 'address',
         indexed: true,
         internalType: 'address',
       },
       {
-        name: 'metadata',
+        name: 'metadata_',
         type: 'tuple',
         indexed: false,
         internalType: 'struct IModuleFactory_v1.Metadata',

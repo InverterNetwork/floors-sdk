@@ -39,6 +39,11 @@ export default [
         type: 'uint256',
         internalType: 'uint256',
       },
+      {
+        name: 'netAmountOut_',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
     ],
     stateMutability: 'nonpayable',
   },
@@ -60,6 +65,11 @@ export default [
     outputs: [
       {
         name: 'loanId_',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+      {
+        name: 'netAmountOut_',
         type: 'uint256',
         internalType: 'uint256',
       },
@@ -91,6 +101,11 @@ export default [
         name: 'loanIds_',
         type: 'uint256[]',
         internalType: 'uint256[]',
+      },
+      {
+        name: 'remainingCollateral_',
+        type: 'uint256',
+        internalType: 'uint256',
       },
     ],
     stateMutability: 'nonpayable',
@@ -125,6 +140,11 @@ export default [
         name: 'loanIds_',
         type: 'uint256[]',
         internalType: 'uint256[]',
+      },
+      {
+        name: 'remainingCollateral_',
+        type: 'uint256',
+        internalType: 'uint256',
       },
     ],
     stateMutability: 'nonpayable',
@@ -950,6 +970,11 @@ export default [
   {
     type: 'error',
     name: 'Module__InvalidAmount',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'Module__InvalidArrayLength',
     inputs: [],
   },
   {
