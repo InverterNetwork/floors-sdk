@@ -35,6 +35,7 @@ export const marketsQuery = {
     reserveToken: {
       name: true,
       symbol: true,
+      decimals: true,
     },
     issuanceToken: {
       name: true,
