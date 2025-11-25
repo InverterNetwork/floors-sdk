@@ -17,14 +17,15 @@ import {
   type TMarketMutationResult,
   type TMarketSellParams,
 } from '../../market'
+import { useFloors } from '../floors-context'
 import { marketQueryKey, marketsQueryKey } from '../query-keys'
 
-type UseMarketsQueryOptions<TData = TFloorAssetData[]> = Omit<
+export type UseMarketsQueryOptions<TData = TFloorAssetData[]> = Omit<
   UseQueryOptions<TFloorAssetData[], Error, TData, typeof marketsQueryKey>,
   'queryKey' | 'queryFn'
 >
 
-type UseMarketQueryOptions<TData = TFloorAssetData | null> = Omit<
+export type UseMarketQueryOptions<TData = TFloorAssetData | null> = Omit<
   UseQueryOptions<TFloorAssetData | null, Error, TData, ReturnType<typeof marketQueryKey>>,
   'queryKey' | 'queryFn'
 >
@@ -81,27 +82,25 @@ export const useMarketQuery = <TData = TFloorAssetData | null>(
 /**
  * @description Provides buy/sell/approve mutations backed by the pure Market class.
  */
-export const useMarketMutations = (
-  market: TFloorAssetData | null | undefined
-): UseMarketMutationsReturnType => {
+export const useMarketMutations = (): UseMarketMutationsReturnType => {
+  const floorsContext = useFloors()
+  const resolvedMarket = floorsContext.market.data ?? null
   const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()
   const walletAddress = walletClient?.account?.address as Address | undefined
 
   const marketClient = useMemo(() => {
-    if (!market || !publicClient) return null
+    if (!resolvedMarket || !publicClient) return null
     return new Market({
-      data: market,
+      data: resolvedMarket,
       publicClient,
       walletClient: walletClient ?? undefined,
     })
-  }, [market, publicClient, walletClient])
+  }, [resolvedMarket, publicClient, walletClient])
 
   const ensureMarket = useCallback(() => {
     if (!marketClient)
-      throw new Error(
-        'Market client unavailable. Provide market data and ensure wallet/network is ready.'
-      )
+      throw new Error('Market client unavailable. Wait for FloorsProvider market query to resolve.')
 
     return marketClient
   }, [marketClient])
