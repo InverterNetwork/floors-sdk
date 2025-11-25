@@ -2594,10 +2594,52 @@ input ModuleRegistry_stream_cursor_value_input {
 columns and relationships of "PreSaleContract"
 """
 type PreSaleContract {
+  """An array relationship"""
+  claims(
+    """distinct select on columns"""
+    distinct_on: [PresaleClaim_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [PresaleClaim_order_by!]
+
+    """filter the rows returned"""
+    where: PresaleClaim_bool_exp
+  ): [PresaleClaim!]!
+  commissionBpsJson: String
+
+  """An array relationship"""
+  configEvents(
+    """distinct select on columns"""
+    distinct_on: [PresaleConfigEvent_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [PresaleConfigEvent_order_by!]
+
+    """filter the rows returned"""
+    where: PresaleConfigEvent_bool_exp
+  ): [PresaleConfigEvent!]!
   createdAt: numeric!
+  currentState: Int!
   db_write_timestamp: timestamp
   endTime: numeric!
+  globalDepositCapFormatted: String!
+  globalDepositCapRaw: numeric!
   id: String!
+  lastUpdatedAt: numeric!
+  lendingFacility: String
+  market_id: String
   maxLeverage: numeric!
 
   """An array relationship"""
@@ -2617,12 +2659,17 @@ type PreSaleContract {
     """filter the rows returned"""
     where: PresaleParticipation_bool_exp
   ): [PresaleParticipation!]!
+  perAddressDepositCapFormatted: String!
+  perAddressDepositCapRaw: numeric!
+  priceBreakpointsJson: String
   purchaseToken_id: String!
   saleToken_id: String!
   startTime: numeric!
+  timeSafeguardTs: numeric
   totalParticipants: numeric!
   totalRaisedFormatted: String!
   totalRaisedRaw: numeric!
+  whitelistSize: numeric!
 }
 
 """
@@ -2632,34 +2679,62 @@ input PreSaleContract_bool_exp {
   _and: [PreSaleContract_bool_exp!]
   _not: PreSaleContract_bool_exp
   _or: [PreSaleContract_bool_exp!]
+  claims: PresaleClaim_bool_exp
+  commissionBpsJson: String_comparison_exp
+  configEvents: PresaleConfigEvent_bool_exp
   createdAt: numeric_comparison_exp
+  currentState: Int_comparison_exp
   db_write_timestamp: timestamp_comparison_exp
   endTime: numeric_comparison_exp
+  globalDepositCapFormatted: String_comparison_exp
+  globalDepositCapRaw: numeric_comparison_exp
   id: String_comparison_exp
+  lastUpdatedAt: numeric_comparison_exp
+  lendingFacility: String_comparison_exp
+  market_id: String_comparison_exp
   maxLeverage: numeric_comparison_exp
   participations: PresaleParticipation_bool_exp
+  perAddressDepositCapFormatted: String_comparison_exp
+  perAddressDepositCapRaw: numeric_comparison_exp
+  priceBreakpointsJson: String_comparison_exp
   purchaseToken_id: String_comparison_exp
   saleToken_id: String_comparison_exp
   startTime: numeric_comparison_exp
+  timeSafeguardTs: numeric_comparison_exp
   totalParticipants: numeric_comparison_exp
   totalRaisedFormatted: String_comparison_exp
   totalRaisedRaw: numeric_comparison_exp
+  whitelistSize: numeric_comparison_exp
 }
 
 """Ordering options when selecting data from "PreSaleContract"."""
 input PreSaleContract_order_by {
+  claims_aggregate: PresaleClaim_aggregate_order_by
+  commissionBpsJson: order_by
+  configEvents_aggregate: PresaleConfigEvent_aggregate_order_by
   createdAt: order_by
+  currentState: order_by
   db_write_timestamp: order_by
   endTime: order_by
+  globalDepositCapFormatted: order_by
+  globalDepositCapRaw: order_by
   id: order_by
+  lastUpdatedAt: order_by
+  lendingFacility: order_by
+  market_id: order_by
   maxLeverage: order_by
   participations_aggregate: PresaleParticipation_aggregate_order_by
+  perAddressDepositCapFormatted: order_by
+  perAddressDepositCapRaw: order_by
+  priceBreakpointsJson: order_by
   purchaseToken_id: order_by
   saleToken_id: order_by
   startTime: order_by
+  timeSafeguardTs: order_by
   totalParticipants: order_by
   totalRaisedFormatted: order_by
   totalRaisedRaw: order_by
+  whitelistSize: order_by
 }
 
 """
@@ -2667,7 +2742,13 @@ select columns of table "PreSaleContract"
 """
 enum PreSaleContract_select_column {
   """column name"""
+  commissionBpsJson
+
+  """column name"""
   createdAt
+
+  """column name"""
+  currentState
 
   """column name"""
   db_write_timestamp
@@ -2676,10 +2757,34 @@ enum PreSaleContract_select_column {
   endTime
 
   """column name"""
+  globalDepositCapFormatted
+
+  """column name"""
+  globalDepositCapRaw
+
+  """column name"""
   id
 
   """column name"""
+  lastUpdatedAt
+
+  """column name"""
+  lendingFacility
+
+  """column name"""
+  market_id
+
+  """column name"""
   maxLeverage
+
+  """column name"""
+  perAddressDepositCapFormatted
+
+  """column name"""
+  perAddressDepositCapRaw
+
+  """column name"""
+  priceBreakpointsJson
 
   """column name"""
   purchaseToken_id
@@ -2691,6 +2796,9 @@ enum PreSaleContract_select_column {
   startTime
 
   """column name"""
+  timeSafeguardTs
+
+  """column name"""
   totalParticipants
 
   """column name"""
@@ -2698,6 +2806,9 @@ enum PreSaleContract_select_column {
 
   """column name"""
   totalRaisedRaw
+
+  """column name"""
+  whitelistSize
 }
 
 """
@@ -2713,28 +2824,486 @@ input PreSaleContract_stream_cursor_input {
 
 """Initial value of the column from where the streaming should start"""
 input PreSaleContract_stream_cursor_value_input {
+  commissionBpsJson: String
   createdAt: numeric
+  currentState: Int
   db_write_timestamp: timestamp
   endTime: numeric
+  globalDepositCapFormatted: String
+  globalDepositCapRaw: numeric
   id: String
+  lastUpdatedAt: numeric
+  lendingFacility: String
+  market_id: String
   maxLeverage: numeric
+  perAddressDepositCapFormatted: String
+  perAddressDepositCapRaw: numeric
+  priceBreakpointsJson: String
   purchaseToken_id: String
   saleToken_id: String
   startTime: numeric
+  timeSafeguardTs: numeric
   totalParticipants: numeric
   totalRaisedFormatted: String
   totalRaisedRaw: numeric
+  whitelistSize: numeric
+}
+
+"""
+columns and relationships of "PresaleClaim"
+"""
+type PresaleClaim {
+  amountFormatted: String!
+  amountRaw: numeric!
+  claimType: presaleclaimtype!
+  db_write_timestamp: timestamp
+  id: String!
+  loanId: numeric
+  positionId: numeric
+  presale_id: String!
+  timestamp: numeric!
+  trancheIndex: numeric
+  transactionHash: String!
+}
+
+"""
+order by aggregate values of table "PresaleClaim"
+"""
+input PresaleClaim_aggregate_order_by {
+  avg: PresaleClaim_avg_order_by
+  count: order_by
+  max: PresaleClaim_max_order_by
+  min: PresaleClaim_min_order_by
+  stddev: PresaleClaim_stddev_order_by
+  stddev_pop: PresaleClaim_stddev_pop_order_by
+  stddev_samp: PresaleClaim_stddev_samp_order_by
+  sum: PresaleClaim_sum_order_by
+  var_pop: PresaleClaim_var_pop_order_by
+  var_samp: PresaleClaim_var_samp_order_by
+  variance: PresaleClaim_variance_order_by
+}
+
+"""
+order by avg() on columns of table "PresaleClaim"
+"""
+input PresaleClaim_avg_order_by {
+  amountRaw: order_by
+  loanId: order_by
+  positionId: order_by
+  timestamp: order_by
+  trancheIndex: order_by
+}
+
+"""
+Boolean expression to filter rows from the table "PresaleClaim". All fields are combined with a logical 'AND'.
+"""
+input PresaleClaim_bool_exp {
+  _and: [PresaleClaim_bool_exp!]
+  _not: PresaleClaim_bool_exp
+  _or: [PresaleClaim_bool_exp!]
+  amountFormatted: String_comparison_exp
+  amountRaw: numeric_comparison_exp
+  claimType: presaleclaimtype_comparison_exp
+  db_write_timestamp: timestamp_comparison_exp
+  id: String_comparison_exp
+  loanId: numeric_comparison_exp
+  positionId: numeric_comparison_exp
+  presale_id: String_comparison_exp
+  timestamp: numeric_comparison_exp
+  trancheIndex: numeric_comparison_exp
+  transactionHash: String_comparison_exp
+}
+
+"""
+order by max() on columns of table "PresaleClaim"
+"""
+input PresaleClaim_max_order_by {
+  amountFormatted: order_by
+  amountRaw: order_by
+  claimType: order_by
+  db_write_timestamp: order_by
+  id: order_by
+  loanId: order_by
+  positionId: order_by
+  presale_id: order_by
+  timestamp: order_by
+  trancheIndex: order_by
+  transactionHash: order_by
+}
+
+"""
+order by min() on columns of table "PresaleClaim"
+"""
+input PresaleClaim_min_order_by {
+  amountFormatted: order_by
+  amountRaw: order_by
+  claimType: order_by
+  db_write_timestamp: order_by
+  id: order_by
+  loanId: order_by
+  positionId: order_by
+  presale_id: order_by
+  timestamp: order_by
+  trancheIndex: order_by
+  transactionHash: order_by
+}
+
+"""Ordering options when selecting data from "PresaleClaim"."""
+input PresaleClaim_order_by {
+  amountFormatted: order_by
+  amountRaw: order_by
+  claimType: order_by
+  db_write_timestamp: order_by
+  id: order_by
+  loanId: order_by
+  positionId: order_by
+  presale_id: order_by
+  timestamp: order_by
+  trancheIndex: order_by
+  transactionHash: order_by
+}
+
+"""
+select columns of table "PresaleClaim"
+"""
+enum PresaleClaim_select_column {
+  """column name"""
+  amountFormatted
+
+  """column name"""
+  amountRaw
+
+  """column name"""
+  claimType
+
+  """column name"""
+  db_write_timestamp
+
+  """column name"""
+  id
+
+  """column name"""
+  loanId
+
+  """column name"""
+  positionId
+
+  """column name"""
+  presale_id
+
+  """column name"""
+  timestamp
+
+  """column name"""
+  trancheIndex
+
+  """column name"""
+  transactionHash
+}
+
+"""
+order by stddev() on columns of table "PresaleClaim"
+"""
+input PresaleClaim_stddev_order_by {
+  amountRaw: order_by
+  loanId: order_by
+  positionId: order_by
+  timestamp: order_by
+  trancheIndex: order_by
+}
+
+"""
+order by stddev_pop() on columns of table "PresaleClaim"
+"""
+input PresaleClaim_stddev_pop_order_by {
+  amountRaw: order_by
+  loanId: order_by
+  positionId: order_by
+  timestamp: order_by
+  trancheIndex: order_by
+}
+
+"""
+order by stddev_samp() on columns of table "PresaleClaim"
+"""
+input PresaleClaim_stddev_samp_order_by {
+  amountRaw: order_by
+  loanId: order_by
+  positionId: order_by
+  timestamp: order_by
+  trancheIndex: order_by
+}
+
+"""
+Streaming cursor of the table "PresaleClaim"
+"""
+input PresaleClaim_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: PresaleClaim_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input PresaleClaim_stream_cursor_value_input {
+  amountFormatted: String
+  amountRaw: numeric
+  claimType: presaleclaimtype
+  db_write_timestamp: timestamp
+  id: String
+  loanId: numeric
+  positionId: numeric
+  presale_id: String
+  timestamp: numeric
+  trancheIndex: numeric
+  transactionHash: String
+}
+
+"""
+order by sum() on columns of table "PresaleClaim"
+"""
+input PresaleClaim_sum_order_by {
+  amountRaw: order_by
+  loanId: order_by
+  positionId: order_by
+  timestamp: order_by
+  trancheIndex: order_by
+}
+
+"""
+order by var_pop() on columns of table "PresaleClaim"
+"""
+input PresaleClaim_var_pop_order_by {
+  amountRaw: order_by
+  loanId: order_by
+  positionId: order_by
+  timestamp: order_by
+  trancheIndex: order_by
+}
+
+"""
+order by var_samp() on columns of table "PresaleClaim"
+"""
+input PresaleClaim_var_samp_order_by {
+  amountRaw: order_by
+  loanId: order_by
+  positionId: order_by
+  timestamp: order_by
+  trancheIndex: order_by
+}
+
+"""
+order by variance() on columns of table "PresaleClaim"
+"""
+input PresaleClaim_variance_order_by {
+  amountRaw: order_by
+  loanId: order_by
+  positionId: order_by
+  timestamp: order_by
+  trancheIndex: order_by
+}
+
+"""
+columns and relationships of "PresaleConfigEvent"
+"""
+type PresaleConfigEvent {
+  db_write_timestamp: timestamp
+  eventType: presaleconfigeventtype!
+  id: String!
+  payloadJson: String!
+  presale_id: String!
+  timestamp: numeric!
+  transactionHash: String!
+}
+
+"""
+order by aggregate values of table "PresaleConfigEvent"
+"""
+input PresaleConfigEvent_aggregate_order_by {
+  avg: PresaleConfigEvent_avg_order_by
+  count: order_by
+  max: PresaleConfigEvent_max_order_by
+  min: PresaleConfigEvent_min_order_by
+  stddev: PresaleConfigEvent_stddev_order_by
+  stddev_pop: PresaleConfigEvent_stddev_pop_order_by
+  stddev_samp: PresaleConfigEvent_stddev_samp_order_by
+  sum: PresaleConfigEvent_sum_order_by
+  var_pop: PresaleConfigEvent_var_pop_order_by
+  var_samp: PresaleConfigEvent_var_samp_order_by
+  variance: PresaleConfigEvent_variance_order_by
+}
+
+"""
+order by avg() on columns of table "PresaleConfigEvent"
+"""
+input PresaleConfigEvent_avg_order_by {
+  timestamp: order_by
+}
+
+"""
+Boolean expression to filter rows from the table "PresaleConfigEvent". All fields are combined with a logical 'AND'.
+"""
+input PresaleConfigEvent_bool_exp {
+  _and: [PresaleConfigEvent_bool_exp!]
+  _not: PresaleConfigEvent_bool_exp
+  _or: [PresaleConfigEvent_bool_exp!]
+  db_write_timestamp: timestamp_comparison_exp
+  eventType: presaleconfigeventtype_comparison_exp
+  id: String_comparison_exp
+  payloadJson: String_comparison_exp
+  presale_id: String_comparison_exp
+  timestamp: numeric_comparison_exp
+  transactionHash: String_comparison_exp
+}
+
+"""
+order by max() on columns of table "PresaleConfigEvent"
+"""
+input PresaleConfigEvent_max_order_by {
+  db_write_timestamp: order_by
+  eventType: order_by
+  id: order_by
+  payloadJson: order_by
+  presale_id: order_by
+  timestamp: order_by
+  transactionHash: order_by
+}
+
+"""
+order by min() on columns of table "PresaleConfigEvent"
+"""
+input PresaleConfigEvent_min_order_by {
+  db_write_timestamp: order_by
+  eventType: order_by
+  id: order_by
+  payloadJson: order_by
+  presale_id: order_by
+  timestamp: order_by
+  transactionHash: order_by
+}
+
+"""Ordering options when selecting data from "PresaleConfigEvent"."""
+input PresaleConfigEvent_order_by {
+  db_write_timestamp: order_by
+  eventType: order_by
+  id: order_by
+  payloadJson: order_by
+  presale_id: order_by
+  timestamp: order_by
+  transactionHash: order_by
+}
+
+"""
+select columns of table "PresaleConfigEvent"
+"""
+enum PresaleConfigEvent_select_column {
+  """column name"""
+  db_write_timestamp
+
+  """column name"""
+  eventType
+
+  """column name"""
+  id
+
+  """column name"""
+  payloadJson
+
+  """column name"""
+  presale_id
+
+  """column name"""
+  timestamp
+
+  """column name"""
+  transactionHash
+}
+
+"""
+order by stddev() on columns of table "PresaleConfigEvent"
+"""
+input PresaleConfigEvent_stddev_order_by {
+  timestamp: order_by
+}
+
+"""
+order by stddev_pop() on columns of table "PresaleConfigEvent"
+"""
+input PresaleConfigEvent_stddev_pop_order_by {
+  timestamp: order_by
+}
+
+"""
+order by stddev_samp() on columns of table "PresaleConfigEvent"
+"""
+input PresaleConfigEvent_stddev_samp_order_by {
+  timestamp: order_by
+}
+
+"""
+Streaming cursor of the table "PresaleConfigEvent"
+"""
+input PresaleConfigEvent_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: PresaleConfigEvent_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input PresaleConfigEvent_stream_cursor_value_input {
+  db_write_timestamp: timestamp
+  eventType: presaleconfigeventtype
+  id: String
+  payloadJson: String
+  presale_id: String
+  timestamp: numeric
+  transactionHash: String
+}
+
+"""
+order by sum() on columns of table "PresaleConfigEvent"
+"""
+input PresaleConfigEvent_sum_order_by {
+  timestamp: order_by
+}
+
+"""
+order by var_pop() on columns of table "PresaleConfigEvent"
+"""
+input PresaleConfigEvent_var_pop_order_by {
+  timestamp: order_by
+}
+
+"""
+order by var_samp() on columns of table "PresaleConfigEvent"
+"""
+input PresaleConfigEvent_var_samp_order_by {
+  timestamp: order_by
+}
+
+"""
+order by variance() on columns of table "PresaleConfigEvent"
+"""
+input PresaleConfigEvent_variance_order_by {
+  timestamp: order_by
 }
 
 """
 columns and relationships of "PresaleParticipation"
 """
 type PresaleParticipation {
-  amountFormatted: String!
-  amountRaw: numeric!
   db_write_timestamp: timestamp
+  depositAmountFormatted: String!
+  depositAmountRaw: numeric!
   id: String!
   leverage: numeric!
+  loopCount: numeric
+  mintedAmountFormatted: String
+  mintedAmountRaw: numeric
+  positionId: numeric
   presale_id: String!
   timestamp: numeric!
   transactionHash: String!
@@ -2762,8 +3331,11 @@ input PresaleParticipation_aggregate_order_by {
 order by avg() on columns of table "PresaleParticipation"
 """
 input PresaleParticipation_avg_order_by {
-  amountRaw: order_by
+  depositAmountRaw: order_by
   leverage: order_by
+  loopCount: order_by
+  mintedAmountRaw: order_by
+  positionId: order_by
   timestamp: order_by
 }
 
@@ -2774,11 +3346,15 @@ input PresaleParticipation_bool_exp {
   _and: [PresaleParticipation_bool_exp!]
   _not: PresaleParticipation_bool_exp
   _or: [PresaleParticipation_bool_exp!]
-  amountFormatted: String_comparison_exp
-  amountRaw: numeric_comparison_exp
   db_write_timestamp: timestamp_comparison_exp
+  depositAmountFormatted: String_comparison_exp
+  depositAmountRaw: numeric_comparison_exp
   id: String_comparison_exp
   leverage: numeric_comparison_exp
+  loopCount: numeric_comparison_exp
+  mintedAmountFormatted: String_comparison_exp
+  mintedAmountRaw: numeric_comparison_exp
+  positionId: numeric_comparison_exp
   presale_id: String_comparison_exp
   timestamp: numeric_comparison_exp
   transactionHash: String_comparison_exp
@@ -2789,11 +3365,15 @@ input PresaleParticipation_bool_exp {
 order by max() on columns of table "PresaleParticipation"
 """
 input PresaleParticipation_max_order_by {
-  amountFormatted: order_by
-  amountRaw: order_by
   db_write_timestamp: order_by
+  depositAmountFormatted: order_by
+  depositAmountRaw: order_by
   id: order_by
   leverage: order_by
+  loopCount: order_by
+  mintedAmountFormatted: order_by
+  mintedAmountRaw: order_by
+  positionId: order_by
   presale_id: order_by
   timestamp: order_by
   transactionHash: order_by
@@ -2804,11 +3384,15 @@ input PresaleParticipation_max_order_by {
 order by min() on columns of table "PresaleParticipation"
 """
 input PresaleParticipation_min_order_by {
-  amountFormatted: order_by
-  amountRaw: order_by
   db_write_timestamp: order_by
+  depositAmountFormatted: order_by
+  depositAmountRaw: order_by
   id: order_by
   leverage: order_by
+  loopCount: order_by
+  mintedAmountFormatted: order_by
+  mintedAmountRaw: order_by
+  positionId: order_by
   presale_id: order_by
   timestamp: order_by
   transactionHash: order_by
@@ -2817,11 +3401,15 @@ input PresaleParticipation_min_order_by {
 
 """Ordering options when selecting data from "PresaleParticipation"."""
 input PresaleParticipation_order_by {
-  amountFormatted: order_by
-  amountRaw: order_by
   db_write_timestamp: order_by
+  depositAmountFormatted: order_by
+  depositAmountRaw: order_by
   id: order_by
   leverage: order_by
+  loopCount: order_by
+  mintedAmountFormatted: order_by
+  mintedAmountRaw: order_by
+  positionId: order_by
   presale_id: order_by
   timestamp: order_by
   transactionHash: order_by
@@ -2833,19 +3421,31 @@ select columns of table "PresaleParticipation"
 """
 enum PresaleParticipation_select_column {
   """column name"""
-  amountFormatted
-
-  """column name"""
-  amountRaw
-
-  """column name"""
   db_write_timestamp
+
+  """column name"""
+  depositAmountFormatted
+
+  """column name"""
+  depositAmountRaw
 
   """column name"""
   id
 
   """column name"""
   leverage
+
+  """column name"""
+  loopCount
+
+  """column name"""
+  mintedAmountFormatted
+
+  """column name"""
+  mintedAmountRaw
+
+  """column name"""
+  positionId
 
   """column name"""
   presale_id
@@ -2864,8 +3464,11 @@ enum PresaleParticipation_select_column {
 order by stddev() on columns of table "PresaleParticipation"
 """
 input PresaleParticipation_stddev_order_by {
-  amountRaw: order_by
+  depositAmountRaw: order_by
   leverage: order_by
+  loopCount: order_by
+  mintedAmountRaw: order_by
+  positionId: order_by
   timestamp: order_by
 }
 
@@ -2873,8 +3476,11 @@ input PresaleParticipation_stddev_order_by {
 order by stddev_pop() on columns of table "PresaleParticipation"
 """
 input PresaleParticipation_stddev_pop_order_by {
-  amountRaw: order_by
+  depositAmountRaw: order_by
   leverage: order_by
+  loopCount: order_by
+  mintedAmountRaw: order_by
+  positionId: order_by
   timestamp: order_by
 }
 
@@ -2882,8 +3488,11 @@ input PresaleParticipation_stddev_pop_order_by {
 order by stddev_samp() on columns of table "PresaleParticipation"
 """
 input PresaleParticipation_stddev_samp_order_by {
-  amountRaw: order_by
+  depositAmountRaw: order_by
   leverage: order_by
+  loopCount: order_by
+  mintedAmountRaw: order_by
+  positionId: order_by
   timestamp: order_by
 }
 
@@ -2900,11 +3509,15 @@ input PresaleParticipation_stream_cursor_input {
 
 """Initial value of the column from where the streaming should start"""
 input PresaleParticipation_stream_cursor_value_input {
-  amountFormatted: String
-  amountRaw: numeric
   db_write_timestamp: timestamp
+  depositAmountFormatted: String
+  depositAmountRaw: numeric
   id: String
   leverage: numeric
+  loopCount: numeric
+  mintedAmountFormatted: String
+  mintedAmountRaw: numeric
+  positionId: numeric
   presale_id: String
   timestamp: numeric
   transactionHash: String
@@ -2915,8 +3528,11 @@ input PresaleParticipation_stream_cursor_value_input {
 order by sum() on columns of table "PresaleParticipation"
 """
 input PresaleParticipation_sum_order_by {
-  amountRaw: order_by
+  depositAmountRaw: order_by
   leverage: order_by
+  loopCount: order_by
+  mintedAmountRaw: order_by
+  positionId: order_by
   timestamp: order_by
 }
 
@@ -2924,8 +3540,11 @@ input PresaleParticipation_sum_order_by {
 order by var_pop() on columns of table "PresaleParticipation"
 """
 input PresaleParticipation_var_pop_order_by {
-  amountRaw: order_by
+  depositAmountRaw: order_by
   leverage: order_by
+  loopCount: order_by
+  mintedAmountRaw: order_by
+  positionId: order_by
   timestamp: order_by
 }
 
@@ -2933,8 +3552,11 @@ input PresaleParticipation_var_pop_order_by {
 order by var_samp() on columns of table "PresaleParticipation"
 """
 input PresaleParticipation_var_samp_order_by {
-  amountRaw: order_by
+  depositAmountRaw: order_by
   leverage: order_by
+  loopCount: order_by
+  mintedAmountRaw: order_by
+  positionId: order_by
   timestamp: order_by
 }
 
@@ -2942,8 +3564,11 @@ input PresaleParticipation_var_samp_order_by {
 order by variance() on columns of table "PresaleParticipation"
 """
 input PresaleParticipation_variance_order_by {
-  amountRaw: order_by
+  depositAmountRaw: order_by
   leverage: order_by
+  loopCount: order_by
+  mintedAmountRaw: order_by
+  positionId: order_by
   timestamp: order_by
 }
 
@@ -4818,6 +5443,40 @@ input persisted_state_stream_cursor_value_input {
   schema_hash: String
 }
 
+scalar presaleclaimtype
+
+"""
+Boolean expression to compare columns of type "presaleclaimtype". All fields are combined with logical 'AND'.
+"""
+input presaleclaimtype_comparison_exp {
+  _eq: presaleclaimtype
+  _gt: presaleclaimtype
+  _gte: presaleclaimtype
+  _in: [presaleclaimtype!]
+  _is_null: Boolean
+  _lt: presaleclaimtype
+  _lte: presaleclaimtype
+  _neq: presaleclaimtype
+  _nin: [presaleclaimtype!]
+}
+
+scalar presaleconfigeventtype
+
+"""
+Boolean expression to compare columns of type "presaleconfigeventtype". All fields are combined with logical 'AND'.
+"""
+input presaleconfigeventtype_comparison_exp {
+  _eq: presaleconfigeventtype
+  _gt: presaleconfigeventtype
+  _gte: presaleconfigeventtype
+  _in: [presaleconfigeventtype!]
+  _is_null: Boolean
+  _lt: presaleconfigeventtype
+  _lte: presaleconfigeventtype
+  _neq: presaleconfigeventtype
+  _nin: [presaleconfigeventtype!]
+}
+
 type query_root {
   """
   fetch data from the table: "Account"
@@ -5123,6 +5782,54 @@ type query_root {
 
   """fetch data from the table: "PreSaleContract" using primary key columns"""
   PreSaleContract_by_pk(id: String!): PreSaleContract
+
+  """
+  fetch data from the table: "PresaleClaim"
+  """
+  PresaleClaim(
+    """distinct select on columns"""
+    distinct_on: [PresaleClaim_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [PresaleClaim_order_by!]
+
+    """filter the rows returned"""
+    where: PresaleClaim_bool_exp
+  ): [PresaleClaim!]!
+
+  """fetch data from the table: "PresaleClaim" using primary key columns"""
+  PresaleClaim_by_pk(id: String!): PresaleClaim
+
+  """
+  fetch data from the table: "PresaleConfigEvent"
+  """
+  PresaleConfigEvent(
+    """distinct select on columns"""
+    distinct_on: [PresaleConfigEvent_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [PresaleConfigEvent_order_by!]
+
+    """filter the rows returned"""
+    where: PresaleConfigEvent_bool_exp
+  ): [PresaleConfigEvent!]!
+
+  """
+  fetch data from the table: "PresaleConfigEvent" using primary key columns
+  """
+  PresaleConfigEvent_by_pk(id: String!): PresaleConfigEvent
 
   """
   fetch data from the table: "PresaleParticipation"
@@ -6084,6 +6791,82 @@ type subscription_root {
     """filter the rows returned"""
     where: PreSaleContract_bool_exp
   ): [PreSaleContract!]!
+
+  """
+  fetch data from the table: "PresaleClaim"
+  """
+  PresaleClaim(
+    """distinct select on columns"""
+    distinct_on: [PresaleClaim_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [PresaleClaim_order_by!]
+
+    """filter the rows returned"""
+    where: PresaleClaim_bool_exp
+  ): [PresaleClaim!]!
+
+  """fetch data from the table: "PresaleClaim" using primary key columns"""
+  PresaleClaim_by_pk(id: String!): PresaleClaim
+
+  """
+  fetch data from the table in a streaming manner: "PresaleClaim"
+  """
+  PresaleClaim_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [PresaleClaim_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: PresaleClaim_bool_exp
+  ): [PresaleClaim!]!
+
+  """
+  fetch data from the table: "PresaleConfigEvent"
+  """
+  PresaleConfigEvent(
+    """distinct select on columns"""
+    distinct_on: [PresaleConfigEvent_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [PresaleConfigEvent_order_by!]
+
+    """filter the rows returned"""
+    where: PresaleConfigEvent_bool_exp
+  ): [PresaleConfigEvent!]!
+
+  """
+  fetch data from the table: "PresaleConfigEvent" using primary key columns
+  """
+  PresaleConfigEvent_by_pk(id: String!): PresaleConfigEvent
+
+  """
+  fetch data from the table in a streaming manner: "PresaleConfigEvent"
+  """
+  PresaleConfigEvent_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [PresaleConfigEvent_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: PresaleConfigEvent_bool_exp
+  ): [PresaleConfigEvent!]!
 
   """
   fetch data from the table: "PresaleParticipation"

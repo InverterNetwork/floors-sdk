@@ -13,6 +13,8 @@ export type Scalars = {
     loanstatus: any,
     marketstatus: any,
     numeric: any,
+    presaleclaimtype: any,
+    presaleconfigeventtype: any,
     stakestatus: any,
     timestamp: any,
     timestamptz: any,
@@ -317,34 +319,92 @@ export type ModuleRegistry_select_column = 'authorizer' | 'createdAt' | 'creditF
 
 /** columns and relationships of "PreSaleContract" */
 export interface PreSaleContract {
+    /** An array relationship */
+    claims: PresaleClaim[]
+    commissionBpsJson: (Scalars['String'] | null)
+    /** An array relationship */
+    configEvents: PresaleConfigEvent[]
     createdAt: Scalars['numeric']
+    currentState: Scalars['Int']
     db_write_timestamp: (Scalars['timestamp'] | null)
     endTime: Scalars['numeric']
+    globalDepositCapFormatted: Scalars['String']
+    globalDepositCapRaw: Scalars['numeric']
     id: Scalars['String']
+    lastUpdatedAt: Scalars['numeric']
+    lendingFacility: (Scalars['String'] | null)
+    market_id: (Scalars['String'] | null)
     maxLeverage: Scalars['numeric']
     /** An array relationship */
     participations: PresaleParticipation[]
+    perAddressDepositCapFormatted: Scalars['String']
+    perAddressDepositCapRaw: Scalars['numeric']
+    priceBreakpointsJson: (Scalars['String'] | null)
     purchaseToken_id: Scalars['String']
     saleToken_id: Scalars['String']
     startTime: Scalars['numeric']
+    timeSafeguardTs: (Scalars['numeric'] | null)
     totalParticipants: Scalars['numeric']
     totalRaisedFormatted: Scalars['String']
     totalRaisedRaw: Scalars['numeric']
+    whitelistSize: Scalars['numeric']
     __typename: 'PreSaleContract'
 }
 
 
 /** select columns of table "PreSaleContract" */
-export type PreSaleContract_select_column = 'createdAt' | 'db_write_timestamp' | 'endTime' | 'id' | 'maxLeverage' | 'purchaseToken_id' | 'saleToken_id' | 'startTime' | 'totalParticipants' | 'totalRaisedFormatted' | 'totalRaisedRaw'
+export type PreSaleContract_select_column = 'commissionBpsJson' | 'createdAt' | 'currentState' | 'db_write_timestamp' | 'endTime' | 'globalDepositCapFormatted' | 'globalDepositCapRaw' | 'id' | 'lastUpdatedAt' | 'lendingFacility' | 'market_id' | 'maxLeverage' | 'perAddressDepositCapFormatted' | 'perAddressDepositCapRaw' | 'priceBreakpointsJson' | 'purchaseToken_id' | 'saleToken_id' | 'startTime' | 'timeSafeguardTs' | 'totalParticipants' | 'totalRaisedFormatted' | 'totalRaisedRaw' | 'whitelistSize'
+
+
+/** columns and relationships of "PresaleClaim" */
+export interface PresaleClaim {
+    amountFormatted: Scalars['String']
+    amountRaw: Scalars['numeric']
+    claimType: Scalars['presaleclaimtype']
+    db_write_timestamp: (Scalars['timestamp'] | null)
+    id: Scalars['String']
+    loanId: (Scalars['numeric'] | null)
+    positionId: (Scalars['numeric'] | null)
+    presale_id: Scalars['String']
+    timestamp: Scalars['numeric']
+    trancheIndex: (Scalars['numeric'] | null)
+    transactionHash: Scalars['String']
+    __typename: 'PresaleClaim'
+}
+
+
+/** select columns of table "PresaleClaim" */
+export type PresaleClaim_select_column = 'amountFormatted' | 'amountRaw' | 'claimType' | 'db_write_timestamp' | 'id' | 'loanId' | 'positionId' | 'presale_id' | 'timestamp' | 'trancheIndex' | 'transactionHash'
+
+
+/** columns and relationships of "PresaleConfigEvent" */
+export interface PresaleConfigEvent {
+    db_write_timestamp: (Scalars['timestamp'] | null)
+    eventType: Scalars['presaleconfigeventtype']
+    id: Scalars['String']
+    payloadJson: Scalars['String']
+    presale_id: Scalars['String']
+    timestamp: Scalars['numeric']
+    transactionHash: Scalars['String']
+    __typename: 'PresaleConfigEvent'
+}
+
+
+/** select columns of table "PresaleConfigEvent" */
+export type PresaleConfigEvent_select_column = 'db_write_timestamp' | 'eventType' | 'id' | 'payloadJson' | 'presale_id' | 'timestamp' | 'transactionHash'
 
 
 /** columns and relationships of "PresaleParticipation" */
 export interface PresaleParticipation {
-    amountFormatted: Scalars['String']
-    amountRaw: Scalars['numeric']
     db_write_timestamp: (Scalars['timestamp'] | null)
+    depositAmountFormatted: Scalars['String']
+    depositAmountRaw: Scalars['numeric']
     id: Scalars['String']
     leverage: Scalars['numeric']
+    loopCount: (Scalars['numeric'] | null)
+    mintedAmountFormatted: (Scalars['String'] | null)
+    mintedAmountRaw: (Scalars['numeric'] | null)
+    positionId: (Scalars['numeric'] | null)
     presale_id: Scalars['String']
     timestamp: Scalars['numeric']
     transactionHash: Scalars['String']
@@ -354,7 +414,7 @@ export interface PresaleParticipation {
 
 
 /** select columns of table "PresaleParticipation" */
-export type PresaleParticipation_select_column = 'amountFormatted' | 'amountRaw' | 'db_write_timestamp' | 'id' | 'leverage' | 'presale_id' | 'timestamp' | 'transactionHash' | 'user_id'
+export type PresaleParticipation_select_column = 'db_write_timestamp' | 'depositAmountFormatted' | 'depositAmountRaw' | 'id' | 'leverage' | 'loopCount' | 'mintedAmountFormatted' | 'mintedAmountRaw' | 'positionId' | 'presale_id' | 'timestamp' | 'transactionHash' | 'user_id'
 
 
 /** columns and relationships of "PriceCandle" */
@@ -639,6 +699,14 @@ export interface query_root {
     PreSaleContract: PreSaleContract[]
     /** fetch data from the table: "PreSaleContract" using primary key columns */
     PreSaleContract_by_pk: (PreSaleContract | null)
+    /** fetch data from the table: "PresaleClaim" */
+    PresaleClaim: PresaleClaim[]
+    /** fetch data from the table: "PresaleClaim" using primary key columns */
+    PresaleClaim_by_pk: (PresaleClaim | null)
+    /** fetch data from the table: "PresaleConfigEvent" */
+    PresaleConfigEvent: PresaleConfigEvent[]
+    /** fetch data from the table: "PresaleConfigEvent" using primary key columns */
+    PresaleConfigEvent_by_pk: (PresaleConfigEvent | null)
     /** fetch data from the table: "PresaleParticipation" */
     PresaleParticipation: PresaleParticipation[]
     /** fetch data from the table: "PresaleParticipation" using primary key columns */
@@ -797,6 +865,18 @@ export interface subscription_root {
     PreSaleContract_by_pk: (PreSaleContract | null)
     /** fetch data from the table in a streaming manner: "PreSaleContract" */
     PreSaleContract_stream: PreSaleContract[]
+    /** fetch data from the table: "PresaleClaim" */
+    PresaleClaim: PresaleClaim[]
+    /** fetch data from the table: "PresaleClaim" using primary key columns */
+    PresaleClaim_by_pk: (PresaleClaim | null)
+    /** fetch data from the table in a streaming manner: "PresaleClaim" */
+    PresaleClaim_stream: PresaleClaim[]
+    /** fetch data from the table: "PresaleConfigEvent" */
+    PresaleConfigEvent: PresaleConfigEvent[]
+    /** fetch data from the table: "PresaleConfigEvent" using primary key columns */
+    PresaleConfigEvent_by_pk: (PresaleConfigEvent | null)
+    /** fetch data from the table in a streaming manner: "PresaleConfigEvent" */
+    PresaleConfigEvent_stream: PresaleConfigEvent[]
     /** fetch data from the table: "PresaleParticipation" */
     PresaleParticipation: PresaleParticipation[]
     /** fetch data from the table: "PresaleParticipation" using primary key columns */
@@ -1721,10 +1801,41 @@ export interface ModuleRegistry_stream_cursor_value_input {authorizer?: (Scalars
 
 /** columns and relationships of "PreSaleContract" */
 export interface PreSaleContractGenqlSelection{
+    /** An array relationship */
+    claims?: (PresaleClaimGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (PresaleClaim_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (PresaleClaim_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (PresaleClaim_bool_exp | null)} })
+    commissionBpsJson?: boolean | number
+    /** An array relationship */
+    configEvents?: (PresaleConfigEventGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (PresaleConfigEvent_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (PresaleConfigEvent_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (PresaleConfigEvent_bool_exp | null)} })
     createdAt?: boolean | number
+    currentState?: boolean | number
     db_write_timestamp?: boolean | number
     endTime?: boolean | number
+    globalDepositCapFormatted?: boolean | number
+    globalDepositCapRaw?: boolean | number
     id?: boolean | number
+    lastUpdatedAt?: boolean | number
+    lendingFacility?: boolean | number
+    market_id?: boolean | number
     maxLeverage?: boolean | number
     /** An array relationship */
     participations?: (PresaleParticipationGenqlSelection & { __args?: {
@@ -1738,23 +1849,28 @@ export interface PreSaleContractGenqlSelection{
     order_by?: (PresaleParticipation_order_by[] | null), 
     /** filter the rows returned */
     where?: (PresaleParticipation_bool_exp | null)} })
+    perAddressDepositCapFormatted?: boolean | number
+    perAddressDepositCapRaw?: boolean | number
+    priceBreakpointsJson?: boolean | number
     purchaseToken_id?: boolean | number
     saleToken_id?: boolean | number
     startTime?: boolean | number
+    timeSafeguardTs?: boolean | number
     totalParticipants?: boolean | number
     totalRaisedFormatted?: boolean | number
     totalRaisedRaw?: boolean | number
+    whitelistSize?: boolean | number
     __typename?: boolean | number
     __scalar?: boolean | number
 }
 
 
 /** Boolean expression to filter rows from the table "PreSaleContract". All fields are combined with a logical 'AND'. */
-export interface PreSaleContract_bool_exp {_and?: (PreSaleContract_bool_exp[] | null),_not?: (PreSaleContract_bool_exp | null),_or?: (PreSaleContract_bool_exp[] | null),createdAt?: (numeric_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),endTime?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),maxLeverage?: (numeric_comparison_exp | null),participations?: (PresaleParticipation_bool_exp | null),purchaseToken_id?: (String_comparison_exp | null),saleToken_id?: (String_comparison_exp | null),startTime?: (numeric_comparison_exp | null),totalParticipants?: (numeric_comparison_exp | null),totalRaisedFormatted?: (String_comparison_exp | null),totalRaisedRaw?: (numeric_comparison_exp | null)}
+export interface PreSaleContract_bool_exp {_and?: (PreSaleContract_bool_exp[] | null),_not?: (PreSaleContract_bool_exp | null),_or?: (PreSaleContract_bool_exp[] | null),claims?: (PresaleClaim_bool_exp | null),commissionBpsJson?: (String_comparison_exp | null),configEvents?: (PresaleConfigEvent_bool_exp | null),createdAt?: (numeric_comparison_exp | null),currentState?: (Int_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),endTime?: (numeric_comparison_exp | null),globalDepositCapFormatted?: (String_comparison_exp | null),globalDepositCapRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),lendingFacility?: (String_comparison_exp | null),market_id?: (String_comparison_exp | null),maxLeverage?: (numeric_comparison_exp | null),participations?: (PresaleParticipation_bool_exp | null),perAddressDepositCapFormatted?: (String_comparison_exp | null),perAddressDepositCapRaw?: (numeric_comparison_exp | null),priceBreakpointsJson?: (String_comparison_exp | null),purchaseToken_id?: (String_comparison_exp | null),saleToken_id?: (String_comparison_exp | null),startTime?: (numeric_comparison_exp | null),timeSafeguardTs?: (numeric_comparison_exp | null),totalParticipants?: (numeric_comparison_exp | null),totalRaisedFormatted?: (String_comparison_exp | null),totalRaisedRaw?: (numeric_comparison_exp | null),whitelistSize?: (numeric_comparison_exp | null)}
 
 
 /** Ordering options when selecting data from "PreSaleContract". */
-export interface PreSaleContract_order_by {createdAt?: (order_by | null),db_write_timestamp?: (order_by | null),endTime?: (order_by | null),id?: (order_by | null),maxLeverage?: (order_by | null),participations_aggregate?: (PresaleParticipation_aggregate_order_by | null),purchaseToken_id?: (order_by | null),saleToken_id?: (order_by | null),startTime?: (order_by | null),totalParticipants?: (order_by | null),totalRaisedFormatted?: (order_by | null),totalRaisedRaw?: (order_by | null)}
+export interface PreSaleContract_order_by {claims_aggregate?: (PresaleClaim_aggregate_order_by | null),commissionBpsJson?: (order_by | null),configEvents_aggregate?: (PresaleConfigEvent_aggregate_order_by | null),createdAt?: (order_by | null),currentState?: (order_by | null),db_write_timestamp?: (order_by | null),endTime?: (order_by | null),globalDepositCapFormatted?: (order_by | null),globalDepositCapRaw?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),lendingFacility?: (order_by | null),market_id?: (order_by | null),maxLeverage?: (order_by | null),participations_aggregate?: (PresaleParticipation_aggregate_order_by | null),perAddressDepositCapFormatted?: (order_by | null),perAddressDepositCapRaw?: (order_by | null),priceBreakpointsJson?: (order_by | null),purchaseToken_id?: (order_by | null),saleToken_id?: (order_by | null),startTime?: (order_by | null),timeSafeguardTs?: (order_by | null),totalParticipants?: (order_by | null),totalRaisedFormatted?: (order_by | null),totalRaisedRaw?: (order_by | null),whitelistSize?: (order_by | null)}
 
 
 /** Streaming cursor of the table "PreSaleContract" */
@@ -1766,16 +1882,180 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface PreSaleContract_stream_cursor_value_input {createdAt?: (Scalars['numeric'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),endTime?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),maxLeverage?: (Scalars['numeric'] | null),purchaseToken_id?: (Scalars['String'] | null),saleToken_id?: (Scalars['String'] | null),startTime?: (Scalars['numeric'] | null),totalParticipants?: (Scalars['numeric'] | null),totalRaisedFormatted?: (Scalars['String'] | null),totalRaisedRaw?: (Scalars['numeric'] | null)}
+export interface PreSaleContract_stream_cursor_value_input {commissionBpsJson?: (Scalars['String'] | null),createdAt?: (Scalars['numeric'] | null),currentState?: (Scalars['Int'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),endTime?: (Scalars['numeric'] | null),globalDepositCapFormatted?: (Scalars['String'] | null),globalDepositCapRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),lendingFacility?: (Scalars['String'] | null),market_id?: (Scalars['String'] | null),maxLeverage?: (Scalars['numeric'] | null),perAddressDepositCapFormatted?: (Scalars['String'] | null),perAddressDepositCapRaw?: (Scalars['numeric'] | null),priceBreakpointsJson?: (Scalars['String'] | null),purchaseToken_id?: (Scalars['String'] | null),saleToken_id?: (Scalars['String'] | null),startTime?: (Scalars['numeric'] | null),timeSafeguardTs?: (Scalars['numeric'] | null),totalParticipants?: (Scalars['numeric'] | null),totalRaisedFormatted?: (Scalars['String'] | null),totalRaisedRaw?: (Scalars['numeric'] | null),whitelistSize?: (Scalars['numeric'] | null)}
+
+
+/** columns and relationships of "PresaleClaim" */
+export interface PresaleClaimGenqlSelection{
+    amountFormatted?: boolean | number
+    amountRaw?: boolean | number
+    claimType?: boolean | number
+    db_write_timestamp?: boolean | number
+    id?: boolean | number
+    loanId?: boolean | number
+    positionId?: boolean | number
+    presale_id?: boolean | number
+    timestamp?: boolean | number
+    trancheIndex?: boolean | number
+    transactionHash?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+
+/** order by aggregate values of table "PresaleClaim" */
+export interface PresaleClaim_aggregate_order_by {avg?: (PresaleClaim_avg_order_by | null),count?: (order_by | null),max?: (PresaleClaim_max_order_by | null),min?: (PresaleClaim_min_order_by | null),stddev?: (PresaleClaim_stddev_order_by | null),stddev_pop?: (PresaleClaim_stddev_pop_order_by | null),stddev_samp?: (PresaleClaim_stddev_samp_order_by | null),sum?: (PresaleClaim_sum_order_by | null),var_pop?: (PresaleClaim_var_pop_order_by | null),var_samp?: (PresaleClaim_var_samp_order_by | null),variance?: (PresaleClaim_variance_order_by | null)}
+
+
+/** order by avg() on columns of table "PresaleClaim" */
+export interface PresaleClaim_avg_order_by {amountRaw?: (order_by | null),loanId?: (order_by | null),positionId?: (order_by | null),timestamp?: (order_by | null),trancheIndex?: (order_by | null)}
+
+
+/** Boolean expression to filter rows from the table "PresaleClaim". All fields are combined with a logical 'AND'. */
+export interface PresaleClaim_bool_exp {_and?: (PresaleClaim_bool_exp[] | null),_not?: (PresaleClaim_bool_exp | null),_or?: (PresaleClaim_bool_exp[] | null),amountFormatted?: (String_comparison_exp | null),amountRaw?: (numeric_comparison_exp | null),claimType?: (presaleclaimtype_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),id?: (String_comparison_exp | null),loanId?: (numeric_comparison_exp | null),positionId?: (numeric_comparison_exp | null),presale_id?: (String_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),trancheIndex?: (numeric_comparison_exp | null),transactionHash?: (String_comparison_exp | null)}
+
+
+/** order by max() on columns of table "PresaleClaim" */
+export interface PresaleClaim_max_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),claimType?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),loanId?: (order_by | null),positionId?: (order_by | null),presale_id?: (order_by | null),timestamp?: (order_by | null),trancheIndex?: (order_by | null),transactionHash?: (order_by | null)}
+
+
+/** order by min() on columns of table "PresaleClaim" */
+export interface PresaleClaim_min_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),claimType?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),loanId?: (order_by | null),positionId?: (order_by | null),presale_id?: (order_by | null),timestamp?: (order_by | null),trancheIndex?: (order_by | null),transactionHash?: (order_by | null)}
+
+
+/** Ordering options when selecting data from "PresaleClaim". */
+export interface PresaleClaim_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),claimType?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),loanId?: (order_by | null),positionId?: (order_by | null),presale_id?: (order_by | null),timestamp?: (order_by | null),trancheIndex?: (order_by | null),transactionHash?: (order_by | null)}
+
+
+/** order by stddev() on columns of table "PresaleClaim" */
+export interface PresaleClaim_stddev_order_by {amountRaw?: (order_by | null),loanId?: (order_by | null),positionId?: (order_by | null),timestamp?: (order_by | null),trancheIndex?: (order_by | null)}
+
+
+/** order by stddev_pop() on columns of table "PresaleClaim" */
+export interface PresaleClaim_stddev_pop_order_by {amountRaw?: (order_by | null),loanId?: (order_by | null),positionId?: (order_by | null),timestamp?: (order_by | null),trancheIndex?: (order_by | null)}
+
+
+/** order by stddev_samp() on columns of table "PresaleClaim" */
+export interface PresaleClaim_stddev_samp_order_by {amountRaw?: (order_by | null),loanId?: (order_by | null),positionId?: (order_by | null),timestamp?: (order_by | null),trancheIndex?: (order_by | null)}
+
+
+/** Streaming cursor of the table "PresaleClaim" */
+export interface PresaleClaim_stream_cursor_input {
+/** Stream column input with initial value */
+initial_value: PresaleClaim_stream_cursor_value_input,
+/** cursor ordering */
+ordering?: (cursor_ordering | null)}
+
+
+/** Initial value of the column from where the streaming should start */
+export interface PresaleClaim_stream_cursor_value_input {amountFormatted?: (Scalars['String'] | null),amountRaw?: (Scalars['numeric'] | null),claimType?: (Scalars['presaleclaimtype'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),id?: (Scalars['String'] | null),loanId?: (Scalars['numeric'] | null),positionId?: (Scalars['numeric'] | null),presale_id?: (Scalars['String'] | null),timestamp?: (Scalars['numeric'] | null),trancheIndex?: (Scalars['numeric'] | null),transactionHash?: (Scalars['String'] | null)}
+
+
+/** order by sum() on columns of table "PresaleClaim" */
+export interface PresaleClaim_sum_order_by {amountRaw?: (order_by | null),loanId?: (order_by | null),positionId?: (order_by | null),timestamp?: (order_by | null),trancheIndex?: (order_by | null)}
+
+
+/** order by var_pop() on columns of table "PresaleClaim" */
+export interface PresaleClaim_var_pop_order_by {amountRaw?: (order_by | null),loanId?: (order_by | null),positionId?: (order_by | null),timestamp?: (order_by | null),trancheIndex?: (order_by | null)}
+
+
+/** order by var_samp() on columns of table "PresaleClaim" */
+export interface PresaleClaim_var_samp_order_by {amountRaw?: (order_by | null),loanId?: (order_by | null),positionId?: (order_by | null),timestamp?: (order_by | null),trancheIndex?: (order_by | null)}
+
+
+/** order by variance() on columns of table "PresaleClaim" */
+export interface PresaleClaim_variance_order_by {amountRaw?: (order_by | null),loanId?: (order_by | null),positionId?: (order_by | null),timestamp?: (order_by | null),trancheIndex?: (order_by | null)}
+
+
+/** columns and relationships of "PresaleConfigEvent" */
+export interface PresaleConfigEventGenqlSelection{
+    db_write_timestamp?: boolean | number
+    eventType?: boolean | number
+    id?: boolean | number
+    payloadJson?: boolean | number
+    presale_id?: boolean | number
+    timestamp?: boolean | number
+    transactionHash?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+
+/** order by aggregate values of table "PresaleConfigEvent" */
+export interface PresaleConfigEvent_aggregate_order_by {avg?: (PresaleConfigEvent_avg_order_by | null),count?: (order_by | null),max?: (PresaleConfigEvent_max_order_by | null),min?: (PresaleConfigEvent_min_order_by | null),stddev?: (PresaleConfigEvent_stddev_order_by | null),stddev_pop?: (PresaleConfigEvent_stddev_pop_order_by | null),stddev_samp?: (PresaleConfigEvent_stddev_samp_order_by | null),sum?: (PresaleConfigEvent_sum_order_by | null),var_pop?: (PresaleConfigEvent_var_pop_order_by | null),var_samp?: (PresaleConfigEvent_var_samp_order_by | null),variance?: (PresaleConfigEvent_variance_order_by | null)}
+
+
+/** order by avg() on columns of table "PresaleConfigEvent" */
+export interface PresaleConfigEvent_avg_order_by {timestamp?: (order_by | null)}
+
+
+/** Boolean expression to filter rows from the table "PresaleConfigEvent". All fields are combined with a logical 'AND'. */
+export interface PresaleConfigEvent_bool_exp {_and?: (PresaleConfigEvent_bool_exp[] | null),_not?: (PresaleConfigEvent_bool_exp | null),_or?: (PresaleConfigEvent_bool_exp[] | null),db_write_timestamp?: (timestamp_comparison_exp | null),eventType?: (presaleconfigeventtype_comparison_exp | null),id?: (String_comparison_exp | null),payloadJson?: (String_comparison_exp | null),presale_id?: (String_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),transactionHash?: (String_comparison_exp | null)}
+
+
+/** order by max() on columns of table "PresaleConfigEvent" */
+export interface PresaleConfigEvent_max_order_by {db_write_timestamp?: (order_by | null),eventType?: (order_by | null),id?: (order_by | null),payloadJson?: (order_by | null),presale_id?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null)}
+
+
+/** order by min() on columns of table "PresaleConfigEvent" */
+export interface PresaleConfigEvent_min_order_by {db_write_timestamp?: (order_by | null),eventType?: (order_by | null),id?: (order_by | null),payloadJson?: (order_by | null),presale_id?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null)}
+
+
+/** Ordering options when selecting data from "PresaleConfigEvent". */
+export interface PresaleConfigEvent_order_by {db_write_timestamp?: (order_by | null),eventType?: (order_by | null),id?: (order_by | null),payloadJson?: (order_by | null),presale_id?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null)}
+
+
+/** order by stddev() on columns of table "PresaleConfigEvent" */
+export interface PresaleConfigEvent_stddev_order_by {timestamp?: (order_by | null)}
+
+
+/** order by stddev_pop() on columns of table "PresaleConfigEvent" */
+export interface PresaleConfigEvent_stddev_pop_order_by {timestamp?: (order_by | null)}
+
+
+/** order by stddev_samp() on columns of table "PresaleConfigEvent" */
+export interface PresaleConfigEvent_stddev_samp_order_by {timestamp?: (order_by | null)}
+
+
+/** Streaming cursor of the table "PresaleConfigEvent" */
+export interface PresaleConfigEvent_stream_cursor_input {
+/** Stream column input with initial value */
+initial_value: PresaleConfigEvent_stream_cursor_value_input,
+/** cursor ordering */
+ordering?: (cursor_ordering | null)}
+
+
+/** Initial value of the column from where the streaming should start */
+export interface PresaleConfigEvent_stream_cursor_value_input {db_write_timestamp?: (Scalars['timestamp'] | null),eventType?: (Scalars['presaleconfigeventtype'] | null),id?: (Scalars['String'] | null),payloadJson?: (Scalars['String'] | null),presale_id?: (Scalars['String'] | null),timestamp?: (Scalars['numeric'] | null),transactionHash?: (Scalars['String'] | null)}
+
+
+/** order by sum() on columns of table "PresaleConfigEvent" */
+export interface PresaleConfigEvent_sum_order_by {timestamp?: (order_by | null)}
+
+
+/** order by var_pop() on columns of table "PresaleConfigEvent" */
+export interface PresaleConfigEvent_var_pop_order_by {timestamp?: (order_by | null)}
+
+
+/** order by var_samp() on columns of table "PresaleConfigEvent" */
+export interface PresaleConfigEvent_var_samp_order_by {timestamp?: (order_by | null)}
+
+
+/** order by variance() on columns of table "PresaleConfigEvent" */
+export interface PresaleConfigEvent_variance_order_by {timestamp?: (order_by | null)}
 
 
 /** columns and relationships of "PresaleParticipation" */
 export interface PresaleParticipationGenqlSelection{
-    amountFormatted?: boolean | number
-    amountRaw?: boolean | number
     db_write_timestamp?: boolean | number
+    depositAmountFormatted?: boolean | number
+    depositAmountRaw?: boolean | number
     id?: boolean | number
     leverage?: boolean | number
+    loopCount?: boolean | number
+    mintedAmountFormatted?: boolean | number
+    mintedAmountRaw?: boolean | number
+    positionId?: boolean | number
     presale_id?: boolean | number
     timestamp?: boolean | number
     transactionHash?: boolean | number
@@ -1790,35 +2070,35 @@ export interface PresaleParticipation_aggregate_order_by {avg?: (PresaleParticip
 
 
 /** order by avg() on columns of table "PresaleParticipation" */
-export interface PresaleParticipation_avg_order_by {amountRaw?: (order_by | null),leverage?: (order_by | null),timestamp?: (order_by | null)}
+export interface PresaleParticipation_avg_order_by {depositAmountRaw?: (order_by | null),leverage?: (order_by | null),loopCount?: (order_by | null),mintedAmountRaw?: (order_by | null),positionId?: (order_by | null),timestamp?: (order_by | null)}
 
 
 /** Boolean expression to filter rows from the table "PresaleParticipation". All fields are combined with a logical 'AND'. */
-export interface PresaleParticipation_bool_exp {_and?: (PresaleParticipation_bool_exp[] | null),_not?: (PresaleParticipation_bool_exp | null),_or?: (PresaleParticipation_bool_exp[] | null),amountFormatted?: (String_comparison_exp | null),amountRaw?: (numeric_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),id?: (String_comparison_exp | null),leverage?: (numeric_comparison_exp | null),presale_id?: (String_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),transactionHash?: (String_comparison_exp | null),user_id?: (String_comparison_exp | null)}
+export interface PresaleParticipation_bool_exp {_and?: (PresaleParticipation_bool_exp[] | null),_not?: (PresaleParticipation_bool_exp | null),_or?: (PresaleParticipation_bool_exp[] | null),db_write_timestamp?: (timestamp_comparison_exp | null),depositAmountFormatted?: (String_comparison_exp | null),depositAmountRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),leverage?: (numeric_comparison_exp | null),loopCount?: (numeric_comparison_exp | null),mintedAmountFormatted?: (String_comparison_exp | null),mintedAmountRaw?: (numeric_comparison_exp | null),positionId?: (numeric_comparison_exp | null),presale_id?: (String_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),transactionHash?: (String_comparison_exp | null),user_id?: (String_comparison_exp | null)}
 
 
 /** order by max() on columns of table "PresaleParticipation" */
-export interface PresaleParticipation_max_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),leverage?: (order_by | null),presale_id?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null)}
+export interface PresaleParticipation_max_order_by {db_write_timestamp?: (order_by | null),depositAmountFormatted?: (order_by | null),depositAmountRaw?: (order_by | null),id?: (order_by | null),leverage?: (order_by | null),loopCount?: (order_by | null),mintedAmountFormatted?: (order_by | null),mintedAmountRaw?: (order_by | null),positionId?: (order_by | null),presale_id?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null)}
 
 
 /** order by min() on columns of table "PresaleParticipation" */
-export interface PresaleParticipation_min_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),leverage?: (order_by | null),presale_id?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null)}
+export interface PresaleParticipation_min_order_by {db_write_timestamp?: (order_by | null),depositAmountFormatted?: (order_by | null),depositAmountRaw?: (order_by | null),id?: (order_by | null),leverage?: (order_by | null),loopCount?: (order_by | null),mintedAmountFormatted?: (order_by | null),mintedAmountRaw?: (order_by | null),positionId?: (order_by | null),presale_id?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null)}
 
 
 /** Ordering options when selecting data from "PresaleParticipation". */
-export interface PresaleParticipation_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),leverage?: (order_by | null),presale_id?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null)}
+export interface PresaleParticipation_order_by {db_write_timestamp?: (order_by | null),depositAmountFormatted?: (order_by | null),depositAmountRaw?: (order_by | null),id?: (order_by | null),leverage?: (order_by | null),loopCount?: (order_by | null),mintedAmountFormatted?: (order_by | null),mintedAmountRaw?: (order_by | null),positionId?: (order_by | null),presale_id?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null)}
 
 
 /** order by stddev() on columns of table "PresaleParticipation" */
-export interface PresaleParticipation_stddev_order_by {amountRaw?: (order_by | null),leverage?: (order_by | null),timestamp?: (order_by | null)}
+export interface PresaleParticipation_stddev_order_by {depositAmountRaw?: (order_by | null),leverage?: (order_by | null),loopCount?: (order_by | null),mintedAmountRaw?: (order_by | null),positionId?: (order_by | null),timestamp?: (order_by | null)}
 
 
 /** order by stddev_pop() on columns of table "PresaleParticipation" */
-export interface PresaleParticipation_stddev_pop_order_by {amountRaw?: (order_by | null),leverage?: (order_by | null),timestamp?: (order_by | null)}
+export interface PresaleParticipation_stddev_pop_order_by {depositAmountRaw?: (order_by | null),leverage?: (order_by | null),loopCount?: (order_by | null),mintedAmountRaw?: (order_by | null),positionId?: (order_by | null),timestamp?: (order_by | null)}
 
 
 /** order by stddev_samp() on columns of table "PresaleParticipation" */
-export interface PresaleParticipation_stddev_samp_order_by {amountRaw?: (order_by | null),leverage?: (order_by | null),timestamp?: (order_by | null)}
+export interface PresaleParticipation_stddev_samp_order_by {depositAmountRaw?: (order_by | null),leverage?: (order_by | null),loopCount?: (order_by | null),mintedAmountRaw?: (order_by | null),positionId?: (order_by | null),timestamp?: (order_by | null)}
 
 
 /** Streaming cursor of the table "PresaleParticipation" */
@@ -1830,23 +2110,23 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface PresaleParticipation_stream_cursor_value_input {amountFormatted?: (Scalars['String'] | null),amountRaw?: (Scalars['numeric'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),id?: (Scalars['String'] | null),leverage?: (Scalars['numeric'] | null),presale_id?: (Scalars['String'] | null),timestamp?: (Scalars['numeric'] | null),transactionHash?: (Scalars['String'] | null),user_id?: (Scalars['String'] | null)}
+export interface PresaleParticipation_stream_cursor_value_input {db_write_timestamp?: (Scalars['timestamp'] | null),depositAmountFormatted?: (Scalars['String'] | null),depositAmountRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),leverage?: (Scalars['numeric'] | null),loopCount?: (Scalars['numeric'] | null),mintedAmountFormatted?: (Scalars['String'] | null),mintedAmountRaw?: (Scalars['numeric'] | null),positionId?: (Scalars['numeric'] | null),presale_id?: (Scalars['String'] | null),timestamp?: (Scalars['numeric'] | null),transactionHash?: (Scalars['String'] | null),user_id?: (Scalars['String'] | null)}
 
 
 /** order by sum() on columns of table "PresaleParticipation" */
-export interface PresaleParticipation_sum_order_by {amountRaw?: (order_by | null),leverage?: (order_by | null),timestamp?: (order_by | null)}
+export interface PresaleParticipation_sum_order_by {depositAmountRaw?: (order_by | null),leverage?: (order_by | null),loopCount?: (order_by | null),mintedAmountRaw?: (order_by | null),positionId?: (order_by | null),timestamp?: (order_by | null)}
 
 
 /** order by var_pop() on columns of table "PresaleParticipation" */
-export interface PresaleParticipation_var_pop_order_by {amountRaw?: (order_by | null),leverage?: (order_by | null),timestamp?: (order_by | null)}
+export interface PresaleParticipation_var_pop_order_by {depositAmountRaw?: (order_by | null),leverage?: (order_by | null),loopCount?: (order_by | null),mintedAmountRaw?: (order_by | null),positionId?: (order_by | null),timestamp?: (order_by | null)}
 
 
 /** order by var_samp() on columns of table "PresaleParticipation" */
-export interface PresaleParticipation_var_samp_order_by {amountRaw?: (order_by | null),leverage?: (order_by | null),timestamp?: (order_by | null)}
+export interface PresaleParticipation_var_samp_order_by {depositAmountRaw?: (order_by | null),leverage?: (order_by | null),loopCount?: (order_by | null),mintedAmountRaw?: (order_by | null),positionId?: (order_by | null),timestamp?: (order_by | null)}
 
 
 /** order by variance() on columns of table "PresaleParticipation" */
-export interface PresaleParticipation_variance_order_by {amountRaw?: (order_by | null),leverage?: (order_by | null),timestamp?: (order_by | null)}
+export interface PresaleParticipation_variance_order_by {depositAmountRaw?: (order_by | null),leverage?: (order_by | null),loopCount?: (order_by | null),mintedAmountRaw?: (order_by | null),positionId?: (order_by | null),timestamp?: (order_by | null)}
 
 
 /** columns and relationships of "PriceCandle" */
@@ -2459,6 +2739,14 @@ ordering?: (cursor_ordering | null)}
 /** Initial value of the column from where the streaming should start */
 export interface persisted_state_stream_cursor_value_input {abi_files_hash?: (Scalars['String'] | null),config_hash?: (Scalars['String'] | null),envio_version?: (Scalars['String'] | null),handler_files_hash?: (Scalars['String'] | null),id?: (Scalars['Int'] | null),schema_hash?: (Scalars['String'] | null)}
 
+
+/** Boolean expression to compare columns of type "presaleclaimtype". All fields are combined with logical 'AND'. */
+export interface presaleclaimtype_comparison_exp {_eq?: (Scalars['presaleclaimtype'] | null),_gt?: (Scalars['presaleclaimtype'] | null),_gte?: (Scalars['presaleclaimtype'] | null),_in?: (Scalars['presaleclaimtype'][] | null),_is_null?: (Scalars['Boolean'] | null),_lt?: (Scalars['presaleclaimtype'] | null),_lte?: (Scalars['presaleclaimtype'] | null),_neq?: (Scalars['presaleclaimtype'] | null),_nin?: (Scalars['presaleclaimtype'][] | null)}
+
+
+/** Boolean expression to compare columns of type "presaleconfigeventtype". All fields are combined with logical 'AND'. */
+export interface presaleconfigeventtype_comparison_exp {_eq?: (Scalars['presaleconfigeventtype'] | null),_gt?: (Scalars['presaleconfigeventtype'] | null),_gte?: (Scalars['presaleconfigeventtype'] | null),_in?: (Scalars['presaleconfigeventtype'][] | null),_is_null?: (Scalars['Boolean'] | null),_lt?: (Scalars['presaleconfigeventtype'] | null),_lte?: (Scalars['presaleconfigeventtype'] | null),_neq?: (Scalars['presaleconfigeventtype'] | null),_nin?: (Scalars['presaleconfigeventtype'][] | null)}
+
 export interface query_rootGenqlSelection{
     /** fetch data from the table: "Account" */
     Account?: (AccountGenqlSelection & { __args?: {
@@ -2642,6 +2930,34 @@ export interface query_rootGenqlSelection{
     where?: (PreSaleContract_bool_exp | null)} })
     /** fetch data from the table: "PreSaleContract" using primary key columns */
     PreSaleContract_by_pk?: (PreSaleContractGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table: "PresaleClaim" */
+    PresaleClaim?: (PresaleClaimGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (PresaleClaim_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (PresaleClaim_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (PresaleClaim_bool_exp | null)} })
+    /** fetch data from the table: "PresaleClaim" using primary key columns */
+    PresaleClaim_by_pk?: (PresaleClaimGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table: "PresaleConfigEvent" */
+    PresaleConfigEvent?: (PresaleConfigEventGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (PresaleConfigEvent_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (PresaleConfigEvent_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (PresaleConfigEvent_bool_exp | null)} })
+    /** fetch data from the table: "PresaleConfigEvent" using primary key columns */
+    PresaleConfigEvent_by_pk?: (PresaleConfigEventGenqlSelection & { __args: {id: Scalars['String']} })
     /** fetch data from the table: "PresaleParticipation" */
     PresaleParticipation?: (PresaleParticipationGenqlSelection & { __args?: {
     /** distinct select on columns */
@@ -3166,6 +3482,50 @@ export interface subscription_rootGenqlSelection{
     cursor: (PreSaleContract_stream_cursor_input | null)[], 
     /** filter the rows returned */
     where?: (PreSaleContract_bool_exp | null)} })
+    /** fetch data from the table: "PresaleClaim" */
+    PresaleClaim?: (PresaleClaimGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (PresaleClaim_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (PresaleClaim_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (PresaleClaim_bool_exp | null)} })
+    /** fetch data from the table: "PresaleClaim" using primary key columns */
+    PresaleClaim_by_pk?: (PresaleClaimGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table in a streaming manner: "PresaleClaim" */
+    PresaleClaim_stream?: (PresaleClaimGenqlSelection & { __args: {
+    /** maximum number of rows returned in a single batch */
+    batch_size: Scalars['Int'], 
+    /** cursor to stream the results returned by the query */
+    cursor: (PresaleClaim_stream_cursor_input | null)[], 
+    /** filter the rows returned */
+    where?: (PresaleClaim_bool_exp | null)} })
+    /** fetch data from the table: "PresaleConfigEvent" */
+    PresaleConfigEvent?: (PresaleConfigEventGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (PresaleConfigEvent_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (PresaleConfigEvent_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (PresaleConfigEvent_bool_exp | null)} })
+    /** fetch data from the table: "PresaleConfigEvent" using primary key columns */
+    PresaleConfigEvent_by_pk?: (PresaleConfigEventGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table in a streaming manner: "PresaleConfigEvent" */
+    PresaleConfigEvent_stream?: (PresaleConfigEventGenqlSelection & { __args: {
+    /** maximum number of rows returned in a single batch */
+    batch_size: Scalars['Int'], 
+    /** cursor to stream the results returned by the query */
+    cursor: (PresaleConfigEvent_stream_cursor_input | null)[], 
+    /** filter the rows returned */
+    where?: (PresaleConfigEvent_bool_exp | null)} })
     /** fetch data from the table: "PresaleParticipation" */
     PresaleParticipation?: (PresaleParticipationGenqlSelection & { __args?: {
     /** distinct select on columns */
@@ -3576,6 +3936,22 @@ export type SubscriptionGenqlSelection = subscription_rootGenqlSelection
     
 
 
+    const PresaleClaim_possibleTypes: string[] = ['PresaleClaim']
+    export const isPresaleClaim = (obj?: { __typename?: any } | null): obj is PresaleClaim => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isPresaleClaim"')
+      return PresaleClaim_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const PresaleConfigEvent_possibleTypes: string[] = ['PresaleConfigEvent']
+    export const isPresaleConfigEvent = (obj?: { __typename?: any } | null): obj is PresaleConfigEvent => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isPresaleConfigEvent"')
+      return PresaleConfigEvent_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
     const PresaleParticipation_possibleTypes: string[] = ['PresaleParticipation']
     export const isPresaleParticipation = (obj?: { __typename?: any } | null): obj is PresaleParticipation => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isPresaleParticipation"')
@@ -3881,25 +4257,65 @@ export const enumModuleRegistrySelectColumn = {
 }
 
 export const enumPreSaleContractSelectColumn = {
+   commissionBpsJson: 'commissionBpsJson' as const,
    createdAt: 'createdAt' as const,
+   currentState: 'currentState' as const,
    db_write_timestamp: 'db_write_timestamp' as const,
    endTime: 'endTime' as const,
+   globalDepositCapFormatted: 'globalDepositCapFormatted' as const,
+   globalDepositCapRaw: 'globalDepositCapRaw' as const,
    id: 'id' as const,
+   lastUpdatedAt: 'lastUpdatedAt' as const,
+   lendingFacility: 'lendingFacility' as const,
+   market_id: 'market_id' as const,
    maxLeverage: 'maxLeverage' as const,
+   perAddressDepositCapFormatted: 'perAddressDepositCapFormatted' as const,
+   perAddressDepositCapRaw: 'perAddressDepositCapRaw' as const,
+   priceBreakpointsJson: 'priceBreakpointsJson' as const,
    purchaseToken_id: 'purchaseToken_id' as const,
    saleToken_id: 'saleToken_id' as const,
    startTime: 'startTime' as const,
+   timeSafeguardTs: 'timeSafeguardTs' as const,
    totalParticipants: 'totalParticipants' as const,
    totalRaisedFormatted: 'totalRaisedFormatted' as const,
-   totalRaisedRaw: 'totalRaisedRaw' as const
+   totalRaisedRaw: 'totalRaisedRaw' as const,
+   whitelistSize: 'whitelistSize' as const
+}
+
+export const enumPresaleClaimSelectColumn = {
+   amountFormatted: 'amountFormatted' as const,
+   amountRaw: 'amountRaw' as const,
+   claimType: 'claimType' as const,
+   db_write_timestamp: 'db_write_timestamp' as const,
+   id: 'id' as const,
+   loanId: 'loanId' as const,
+   positionId: 'positionId' as const,
+   presale_id: 'presale_id' as const,
+   timestamp: 'timestamp' as const,
+   trancheIndex: 'trancheIndex' as const,
+   transactionHash: 'transactionHash' as const
+}
+
+export const enumPresaleConfigEventSelectColumn = {
+   db_write_timestamp: 'db_write_timestamp' as const,
+   eventType: 'eventType' as const,
+   id: 'id' as const,
+   payloadJson: 'payloadJson' as const,
+   presale_id: 'presale_id' as const,
+   timestamp: 'timestamp' as const,
+   transactionHash: 'transactionHash' as const
 }
 
 export const enumPresaleParticipationSelectColumn = {
-   amountFormatted: 'amountFormatted' as const,
-   amountRaw: 'amountRaw' as const,
    db_write_timestamp: 'db_write_timestamp' as const,
+   depositAmountFormatted: 'depositAmountFormatted' as const,
+   depositAmountRaw: 'depositAmountRaw' as const,
    id: 'id' as const,
    leverage: 'leverage' as const,
+   loopCount: 'loopCount' as const,
+   mintedAmountFormatted: 'mintedAmountFormatted' as const,
+   mintedAmountRaw: 'mintedAmountRaw' as const,
+   positionId: 'positionId' as const,
    presale_id: 'presale_id' as const,
    timestamp: 'timestamp' as const,
    transactionHash: 'transactionHash' as const,
