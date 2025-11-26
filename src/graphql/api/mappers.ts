@@ -406,7 +406,7 @@ export function mapUserMarketPositionToDTO(
     marketId: position.market_id,
     lockedCollateral: toNumber(position.lockedCollateralFormatted),
     currentDebt: toNumber(position.totalDebtFormatted),
-    hasActiveLoop: position.presaleLeverage > 0n,
+    hasActiveLoop: position.presaleLeverage > BigInt(0),
     lastUpdated: new Date(toNumber(position.lastUpdatedAt) * 1000),
   }
 }
