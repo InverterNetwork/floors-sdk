@@ -17,6 +17,7 @@ import {
   useMarketsQuery,
   type UseMarketsQueryOptions,
 } from './hooks/markets'
+import { useUserMarketPositionQuery } from './hooks/positions'
 import type { UsePresalesQueryOptions } from './hooks/presales'
 import { usePresalesQuery } from './hooks/presales'
 
@@ -48,6 +49,12 @@ export const FloorsProvider = ({
   const marketsQuery = useMarketsQuery(marketsOptions)
   const marketQuery = useMarketQuery(selectedMarketId, marketOptions)
   const activeMarket = marketQuery.data
+  const presalesQuery = usePresalesQuery(presalesOptions)
+
+  // User position query - fetches collateral and debt data
+  const userPositionQuery = useUserMarketPositionQuery(walletAddress, selectedMarketId, {
+    staleTime: 30_000,
+  })
 
   const reserveTokenMetadata = useMemo<TTokenBalanceMetadata>(
     () => ({
@@ -100,11 +107,11 @@ export const FloorsProvider = ({
     }),
     [reserveTokenMetadata, reserveBalance, issuanceTokenMetadata, issuanceBalance]
   )
-  const presalesQuery = usePresalesQuery(presalesOptions)
 
   const { refetch: refetchMarkets } = marketsQuery
   const { refetch: refetchMarket } = marketQuery
   const { refetch: refetchPresales } = presalesQuery
+  const { refetch: refetchUserPosition } = userPositionQuery
 
   const refetchAll = useCallback(async () => {
     await queryClient.invalidateQueries({ refetchType: 'active' })
@@ -128,8 +135,19 @@ export const FloorsProvider = ({
       presales: async () => {
         await refetchPresales()
       },
+      userPosition: async () => {
+        await refetchUserPosition()
+      },
     }),
-    [refetchAll, refetchMarkets, refetchMarket, reserveBalance, issuanceBalance, refetchPresales]
+    [
+      refetchAll,
+      refetchMarkets,
+      refetchMarket,
+      reserveBalance,
+      issuanceBalance,
+      refetchPresales,
+      refetchUserPosition,
+    ]
   )
 
   const contextValue = useMemo(
@@ -140,9 +158,18 @@ export const FloorsProvider = ({
       selectedMarketId,
       setSelectedMarketId,
       balances,
+      userPosition: userPositionQuery,
       refetch,
     }),
-    [marketsQuery, marketQuery, presalesQuery, selectedMarketId, refetch]
+    [
+      marketsQuery,
+      marketQuery,
+      presalesQuery,
+      selectedMarketId,
+      balances,
+      userPositionQuery,
+      refetch,
+    ]
   )
 
   return <FloorsContext.Provider value={contextValue}>{children}</FloorsContext.Provider>

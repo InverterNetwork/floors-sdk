@@ -8,6 +8,7 @@ import type {
   TGraphQLMarket,
   TGraphQLPresale,
   TGraphQLTrade,
+  TGraphQLUserMarketPosition,
   TPresale,
   TTradeData,
   TUserAssetPosition,
@@ -380,4 +381,32 @@ export function buildCreditPositions(
       }
     })
     .filter(Boolean) as TCreditPositionData[]
+}
+
+/**
+ * @description User market position data for UI display
+ */
+export interface TUserMarketPositionData {
+  userId: string
+  marketId: string
+  lockedCollateral: number
+  currentDebt: number
+  hasActiveLoop: boolean
+  lastUpdated: Date
+}
+
+/**
+ * @description Maps GraphQL UserMarketPosition to client DTO
+ */
+export function mapUserMarketPositionToDTO(
+  position: TGraphQLUserMarketPosition
+): TUserMarketPositionData {
+  return {
+    userId: position.user_id,
+    marketId: position.market_id,
+    lockedCollateral: toNumber(position.lockedCollateralFormatted),
+    currentDebt: toNumber(position.totalDebtFormatted),
+    hasActiveLoop: position.presaleLeverage > 0n,
+    lastUpdated: new Date(toNumber(position.lastUpdatedAt) * 1000),
+  }
 }

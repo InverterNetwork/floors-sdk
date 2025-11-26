@@ -1,0 +1,30 @@
+import type { GraphQLQueryArgs, GraphQLQueryResult } from '../..'
+
+// GraphQL Query Args for UserMarketPosition
+export const userMarketPositionQuery = {
+  UserMarketPosition: {
+    __args: {
+      where: {
+        user_id: { _eq: '' },
+        market_id: { _eq: '' },
+      },
+    },
+    id: true,
+    user_id: true,
+    market_id: true,
+    totalDebtRaw: true,
+    totalDebtFormatted: true,
+    lockedCollateralRaw: true,
+    lockedCollateralFormatted: true,
+    presaleLeverage: true,
+    lastUpdatedAt: true,
+    db_write_timestamp: true,
+    __typename: true,
+  },
+} satisfies GraphQLQueryArgs
+
+export type UserMarketPositionQueryType = typeof userMarketPositionQuery
+export type UserMarketPositionQueryResultType = GraphQLQueryResult<UserMarketPositionQueryType>
+export type TGraphQLUserMarketPosition = NonNullable<
+  UserMarketPositionQueryResultType['UserMarketPosition']
+>[0]

@@ -8,6 +8,7 @@ import type {
   TGlobalStats,
   TGraphQLAccount,
   TGraphQLLoan,
+  TGraphQLUserMarketPosition,
   TPlatformMetrics,
   TPresale,
   TradesQueryType,
@@ -23,6 +24,7 @@ import {
   marketsQuery,
   platformMetricsQuery,
   tradesQuery,
+  userMarketPositionQuery,
 } from './fields'
 import {
   buildAccountUserPositions,
@@ -159,4 +161,23 @@ export async function fetchPresalesByMarket(marketId: string): Promise<TPresale[
   const response = await query(buildPresalesQuery({ where: { market_id: { _eq: marketId } } }))
   const presales = response.PreSaleContract ?? []
   return presales.map((presale) => mapPresaleToPresaleData(presale))
+}
+
+/**
+ * Fetch user market position (loan collateral and debt info)
+ */
+export async function fetchUserMarketPosition(
+  userAddress: string,
+  marketId: string
+): Promise<TGraphQLUserMarketPosition | null> {
+  const queryWithArgs = cloneQuery(userMarketPositionQuery)
+  queryWithArgs.UserMarketPosition.__args = {
+    where: {
+      user_id: { _eq: userAddress.toLowerCase() },
+      market_id: { _eq: marketId },
+    },
+  }
+
+  const response = await query(queryWithArgs)
+  return response.UserMarketPosition?.[0] ?? null
 }

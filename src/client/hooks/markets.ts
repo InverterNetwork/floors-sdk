@@ -13,8 +13,11 @@ import { fetchMarketById, fetchMarkets, type TFloorAssetData } from '../../graph
 import {
   Market,
   type TMarketApproveParams,
+  type TMarketBorrowParams,
+  type TMarketBuyAndBorrowParams,
   type TMarketBuyParams,
   type TMarketMutationResult,
+  type TMarketRepayParams,
   type TMarketSellParams,
 } from '../../market'
 import { useFloors } from '../floors-context'
@@ -35,10 +38,17 @@ type UseMarketMutationsReturnType = {
   sell: UseMutationResult<TMarketMutationResult, Error, TMarketSellParams>
   approveIssuance: UseMutationResult<TMarketMutationResult, Error, TMarketApproveParams>
   approveReserve: UseMutationResult<TMarketMutationResult, Error, TMarketApproveParams>
+  approveFTokenForCredit: UseMutationResult<TMarketMutationResult, Error, TMarketApproveParams>
+  borrow: UseMutationResult<TMarketMutationResult, Error, TMarketBorrowParams>
+  buyAndBorrow: UseMutationResult<TMarketMutationResult, Error, TMarketBuyAndBorrowParams>
+  repay: UseMutationResult<TMarketMutationResult, Error, TMarketRepayParams>
   previewBuy: UseMutationResult<bigint, Error, bigint>
   previewSell: UseMutationResult<bigint, Error, bigint>
   getIssuanceAllowance: UseMutationResult<bigint, Error, Address | undefined>
   getReserveAllowance: UseMutationResult<bigint, Error, Address | undefined>
+  getFTokenCreditAllowance: UseMutationResult<bigint, Error, Address | undefined>
+  getLoanToValueRatio: UseMutationResult<number, Error, void>
+  getBorrowingFeeRate: UseMutationResult<number, Error, void>
 }
 
 /**
@@ -173,14 +183,67 @@ export const useMarketMutations = (): UseMarketMutationsReturnType => {
       ensureMarket().getReserveTokenAllowance(ensureWalletAddress(owner)),
   })
 
+  // Credit Facility Mutations
+  const approveFTokenForCredit = useMutation({
+    mutationFn: (params: TMarketApproveParams) =>
+      ensureMarket().approveFTokenForCreditFacility(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+    },
+  })
+
+  const borrow = useMutation({
+    mutationFn: (params: TMarketBorrowParams) => ensureMarket().borrow(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+      await floorsContext.refetch.userPosition()
+    },
+  })
+
+  const buyAndBorrow = useMutation({
+    mutationFn: (params: TMarketBuyAndBorrowParams) => ensureMarket().buyAndBorrow(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+      await floorsContext.refetch.userPosition()
+    },
+  })
+
+  const repay = useMutation({
+    mutationFn: (params: TMarketRepayParams) => ensureMarket().repay(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+      await floorsContext.refetch.userPosition()
+    },
+  })
+
+  const getFTokenCreditAllowance = useMutation({
+    mutationFn: async (owner?: Address) =>
+      ensureMarket().getFTokenAllowanceForCreditFacility(ensureWalletAddress(owner)),
+  })
+
+  const getLoanToValueRatio = useMutation({
+    mutationFn: async () => ensureMarket().getLoanToValueRatio(),
+  })
+
+  const getBorrowingFeeRate = useMutation({
+    mutationFn: async () => ensureMarket().getBorrowingFeeRate(),
+  })
+
   return {
     buy,
     sell,
     approveIssuance,
     approveReserve,
+    approveFTokenForCredit,
+    borrow,
+    buyAndBorrow,
+    repay,
     previewBuy,
     previewSell,
     getIssuanceAllowance,
     getReserveAllowance,
+    getFTokenCreditAllowance,
+    getLoanToValueRatio,
+    getBorrowingFeeRate,
   }
 }

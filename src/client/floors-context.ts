@@ -6,6 +6,7 @@ import type { Address } from 'viem'
 import type { UseBalanceReturnType } from 'wagmi'
 
 import type { TFloorAssetData, TPresale } from '../graphql/api'
+import type { TUserMarketPositionData } from '../graphql/api/mappers'
 
 export type TTokenBalanceMetadata = {
   address: Address | null
@@ -31,6 +32,7 @@ export type TFloorsContextValue = {
 
   setSelectedMarketId: (marketId: string | null) => void
   balances: TFloorsTokenBalances
+  userPosition: UseQueryResult<TUserMarketPositionData | null, Error>
   refetch: {
     all: () => Promise<void>
     markets: () => Promise<void>
@@ -38,6 +40,7 @@ export type TFloorsContextValue = {
     reserveBalance: () => Promise<void>
     issuanceBalance: () => Promise<void>
     presales: () => Promise<void>
+    userPosition: () => Promise<void>
   }
 }
 

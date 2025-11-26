@@ -1,6 +1,7 @@
 export * from './global-stats'
 export * from './markets'
 export * from './platform'
+export * from './positions'
 export * from './presales'
 export * from './trades'
 export * from './users'

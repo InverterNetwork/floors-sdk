@@ -23,13 +23,13 @@ const typeMap = linkTypeMap(types as any)
 
 export interface Client {
   query<R extends query_rootGenqlSelection>(
-    request: R & { __name?: string },
+    request: R & { __name?: string }
   ): Promise<FieldsSelection<query_root, R>>
 }
 
 export const createClient = function (options?: ClientOptions): Client {
   return createClientOriginal({
-    url: 'http://localhost:8080/v1/graphql',
+    url: 'https://indexer.dev.hyperindex.xyz/1ddaa3b/v1/graphql',
 
     ...options,
     queryRoot: typeMap.Query!,
@@ -42,22 +42,22 @@ export const everything = {
   __scalar: true,
 }
 
-export type QueryResult<fields extends query_rootGenqlSelection> =
-  FieldsSelection<query_root, fields>
+export type QueryResult<fields extends query_rootGenqlSelection> = FieldsSelection<
+  query_root,
+  fields
+>
 export const generateQueryOp: (
-  fields: query_rootGenqlSelection & { __name?: string },
+  fields: query_rootGenqlSelection & { __name?: string }
 ) => GraphqlOperation = function (fields) {
   return generateGraphqlOperation('query', typeMap.Query!, fields as any)
 }
 
-export type SubscriptionResult<fields extends subscription_rootGenqlSelection> =
-  FieldsSelection<subscription_root, fields>
+export type SubscriptionResult<fields extends subscription_rootGenqlSelection> = FieldsSelection<
+  subscription_root,
+  fields
+>
 export const generateSubscriptionOp: (
-  fields: subscription_rootGenqlSelection & { __name?: string },
+  fields: subscription_rootGenqlSelection & { __name?: string }
 ) => GraphqlOperation = function (fields) {
-  return generateGraphqlOperation(
-    'subscription',
-    typeMap.Subscription!,
-    fields as any,
-  )
+  return generateGraphqlOperation('subscription', typeMap.Subscription!, fields as any)
 }
