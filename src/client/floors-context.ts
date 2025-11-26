@@ -2,18 +2,40 @@
 
 import type { UseQueryResult } from '@tanstack/react-query'
 import { createContext, useContext } from 'react'
+import type { Address } from 'viem'
+import type { UseBalanceReturnType } from 'wagmi'
 
 import type { TFloorAssetData } from '../graphql/api'
+
+export type TTokenBalanceMetadata = {
+  address: Address | null
+  symbol?: string
+  name?: string
+  decimals?: number
+  logoUrl?: string
+}
+
+export type TTokenBalanceContextValue = UseBalanceReturnType & {
+  token: TTokenBalanceMetadata
+}
+
+export type TFloorsTokenBalances = {
+  reserve: TTokenBalanceContextValue
+  issuance: TTokenBalanceContextValue
+}
 
 export type TFloorsContextValue = {
   markets: UseQueryResult<TFloorAssetData[], Error>
   market: UseQueryResult<TFloorAssetData | null, Error>
   selectedMarketId: string | null
   setSelectedMarketId: (marketId: string | null) => void
+  balances: TFloorsTokenBalances
   refetch: {
     all: () => Promise<void>
     markets: () => Promise<void>
     market: () => Promise<void>
+    reserveBalance: () => Promise<void>
+    issuanceBalance: () => Promise<void>
   }
 }
 

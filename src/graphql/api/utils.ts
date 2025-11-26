@@ -19,13 +19,19 @@ export const formatTokenAmount = (amount: number, symbol?: string): string => {
  * @param {number} amount - The numeric value to format.
  * @returns {string}
  */
-export const formatCurrency = (amount: number): string => {
+export const formatCurrency = (amount: number, compact?: boolean): string => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
+    ...(compact ? { notation: 'compact' } : {}),
   }).format(amount)
+}
+
+export const formatPercentage = (value: number): string => {
+  const sign = value >= 0 ? '+' : ''
+  return `${sign}${value.toFixed(1)}%`
 }
 
 /**

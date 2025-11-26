@@ -85,6 +85,13 @@ export const useMarketQuery = <TData = TFloorAssetData | null>(
 export const useMarketMutations = (): UseMarketMutationsReturnType => {
   const floorsContext = useFloors()
   const resolvedMarket = floorsContext.market.data ?? null
+  const {
+    refetch: {
+      market: refetchMarket,
+      reserveBalance: refetchReserveBalance,
+      issuanceBalance: refetchIssuanceBalance,
+    },
+  } = floorsContext
   const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()
   const walletAddress = walletClient?.account?.address as Address | undefined
@@ -116,20 +123,36 @@ export const useMarketMutations = (): UseMarketMutationsReturnType => {
     [walletAddress]
   )
 
+  const refetchAfterMutation = useCallback(async () => {
+    await Promise.allSettled([refetchMarket(), refetchReserveBalance(), refetchIssuanceBalance()])
+  }, [refetchIssuanceBalance, refetchMarket, refetchReserveBalance])
+
   const buy = useMutation({
     mutationFn: (params: TMarketBuyParams) => ensureMarket().buy(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+    },
   })
 
   const sell = useMutation({
     mutationFn: (params: TMarketSellParams) => ensureMarket().sell(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+    },
   })
 
   const approveIssuance = useMutation({
     mutationFn: (params: TMarketApproveParams) => ensureMarket().approveFToken(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+    },
   })
 
   const approveReserve = useMutation({
     mutationFn: (params: TMarketApproveParams) => ensureMarket().approveReserveToken(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+    },
   })
 
   const previewBuy = useMutation({
