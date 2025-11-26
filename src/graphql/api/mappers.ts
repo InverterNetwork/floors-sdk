@@ -6,7 +6,9 @@ import type {
   TGraphQLAccount,
   TGraphQLLoan,
   TGraphQLMarket,
+  TGraphQLPresale,
   TGraphQLTrade,
+  TPresale,
   TTradeData,
   TUserAssetPosition,
 } from './fields'
@@ -259,6 +261,78 @@ export function buildAccountUserPositions(
       }
     })
     .filter(Boolean) as TUserAssetPosition[]
+}
+
+export function mapPresaleToPresaleData(presale: TGraphQLPresale): TPresale {
+  const now = Date.now()
+  const startTime = toNumber(presale.startTime) * 1000
+  const endTime = toNumber(presale.endTime) * 1000
+  const totalRaised = toNumber(presale.totalRaisedFormatted || presale.totalRaisedRaw)
+  const globalDepositCap = toNumber(
+    presale.globalDepositCapFormatted || presale.globalDepositCapRaw
+  )
+  console.log('globalDepositCapFormatted', presale.globalDepositCapFormatted)
+  console.log('totalRaised', presale.totalRaisedRaw)
+  // Calculate progress
+  const progressPercent = globalDepositCap > 0 ? (totalRaised / globalDepositCap) * 100 : 0
+  console.log('progressPercent', progressPercent)
+  // Calculate time remaining
+  const timeRemaining = Math.max(0, endTime - now)
+
+  // Determine state
+  const isUpcoming = now < startTime
+  const isActive = now >= startTime && now < endTime && presale.currentState === 1
+  const isEnded = now >= endTime || presale.currentState !== 1
+
+  // Format time remaining
+  const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24))
+  const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+  const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60))
+  let timeRemainingFormatted = ''
+  if (days > 0) {
+    timeRemainingFormatted = `${days}d ${hours}h`
+  } else if (hours > 0) {
+    timeRemainingFormatted = `${hours}h ${minutes}m`
+  } else if (minutes > 0) {
+    timeRemainingFormatted = `${minutes}m`
+  } else {
+    timeRemainingFormatted = 'Ended'
+  }
+
+  // Calculate commission (using first commissionBps if array)
+  const commissionBps = Array.isArray(presale.commissionBps)
+    ? toNumber(presale.commissionBps[0])
+    : toNumber(presale.commissionBps)
+  const commissionRate = commissionBps / 10000
+  const commissionAmount = totalRaised * commissionRate
+  const commissionAmountFormatted = formatCurrency(commissionAmount)
+
+  // Calculate remaining capacity
+  const remainingCapacity = Math.max(0, globalDepositCap - totalRaised)
+  const remainingCapacityFormatted = formatCurrency(remainingCapacity)
+
+  // Calculate current price (use first price breakpoint if available)
+  const priceBreakpoints = presale.priceBreakpointsFlat
+    ? presale.priceBreakpointsFlat.map((p) => toNumber(p))
+    : []
+  const currentPrice = priceBreakpoints.length > 0 ? priceBreakpoints[0] : 0
+  const currentPriceFormatted = formatCurrency(currentPrice)
+
+  return {
+    ...presale,
+    progressPercent: Math.min(100, Math.max(0, progressPercent)),
+    timeRemaining,
+    isActive,
+    isEnded,
+    isUpcoming,
+    timeRemainingFormatted,
+    commissionAmount,
+    commissionAmountFormatted,
+    remainingCapacity,
+    remainingCapacityFormatted,
+    currentPrice,
+    currentPriceFormatted,
+  }
 }
 
 export function buildCreditPositions(

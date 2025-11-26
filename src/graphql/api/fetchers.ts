@@ -9,12 +9,14 @@ import type {
   TGraphQLAccount,
   TGraphQLLoan,
   TPlatformMetrics,
+  TPresale,
   TradesQueryType,
   TTradeData,
   TUserAssetPosition,
 } from './fields'
 import {
   accountsQuery,
+  buildPresalesQuery,
   computePlatformMetrics,
   globalStatsQuery,
   mapGlobalStats,
@@ -26,6 +28,7 @@ import {
   buildAccountUserPositions,
   buildCreditPositions,
   mapMarketToFloorAssetData,
+  mapPresaleToPresaleData,
   mapTradeToTradeData,
 } from './mappers'
 import type { ExtendableQueryArgs } from './utils'
@@ -128,4 +131,32 @@ export function buildCreditPositionsFromLoans(
   assets: TFloorAssetData[]
 ): TCreditPositionData[] {
   return buildCreditPositions(loans, assets)
+}
+
+/**
+ * Fetch all presales
+ */
+export async function fetchPresales(): Promise<TPresale[]> {
+  const response = await query(buildPresalesQuery())
+  const presales = response.PreSaleContract ?? []
+  return presales.map((presale) => mapPresaleToPresaleData(presale))
+}
+
+/**
+ * Fetch a single presale by ID
+ */
+export async function fetchPresaleById(id: string): Promise<TPresale | null> {
+  const response = await query(buildPresalesQuery({ where: { id: { _eq: id } } }))
+  const presale = (response.PreSaleContract ?? [])[0]
+  if (!presale) return null
+  return mapPresaleToPresaleData(presale)
+}
+
+/**
+ * Fetch presales by market ID
+ */
+export async function fetchPresalesByMarket(marketId: string): Promise<TPresale[]> {
+  const response = await query(buildPresalesQuery({ where: { market_id: { _eq: marketId } } }))
+  const presales = response.PreSaleContract ?? []
+  return presales.map((presale) => mapPresaleToPresaleData(presale))
 }

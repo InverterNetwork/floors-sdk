@@ -17,11 +17,14 @@ import {
   useMarketsQuery,
   type UseMarketsQueryOptions,
 } from './hooks/markets'
+import type { UsePresalesQueryOptions } from './hooks/presales'
+import { usePresalesQuery } from './hooks/presales'
 
 type FloorsProviderProps = {
   children: ReactNode
   marketsOptions?: UseMarketsQueryOptions
   marketOptions?: UseMarketQueryOptions
+  presalesOptions?: UsePresalesQueryOptions
 }
 
 const toAddress = (value?: string | null): Address | null => {
@@ -36,6 +39,7 @@ export const FloorsProvider = ({
   children,
   marketsOptions,
   marketOptions,
+  presalesOptions,
 }: FloorsProviderProps): ReactElement => {
   const queryClient = useQueryClient()
   const [selectedMarketId, setSelectedMarketId] = useState<string | null>(null)
@@ -96,9 +100,11 @@ export const FloorsProvider = ({
     }),
     [reserveTokenMetadata, reserveBalance, issuanceTokenMetadata, issuanceBalance]
   )
+  const presalesQuery = usePresalesQuery(presalesOptions)
 
   const { refetch: refetchMarkets } = marketsQuery
   const { refetch: refetchMarket } = marketQuery
+  const { refetch: refetchPresales } = presalesQuery
 
   const refetchAll = useCallback(async () => {
     await queryClient.invalidateQueries({ refetchType: 'active' })
@@ -119,20 +125,24 @@ export const FloorsProvider = ({
       issuanceBalance: async () => {
         await issuanceBalance.refetch()
       },
+      presales: async () => {
+        await refetchPresales()
+      },
     }),
-    [refetchAll, refetchMarkets, refetchMarket, reserveBalance, issuanceBalance]
+    [refetchAll, refetchMarkets, refetchMarket, reserveBalance, issuanceBalance, refetchPresales]
   )
 
   const contextValue = useMemo(
     () => ({
       markets: marketsQuery,
       market: marketQuery,
+      presales: presalesQuery,
       selectedMarketId,
       setSelectedMarketId,
       balances,
       refetch,
     }),
-    [marketsQuery, marketQuery, selectedMarketId, balances, refetch]
+    [marketsQuery, marketQuery, presalesQuery, selectedMarketId, refetch]
   )
 
   return <FloorsContext.Provider value={contextValue}>{children}</FloorsContext.Provider>

@@ -5,7 +5,7 @@ import { createContext, useContext } from 'react'
 import type { Address } from 'viem'
 import type { UseBalanceReturnType } from 'wagmi'
 
-import type { TFloorAssetData } from '../graphql/api'
+import type { TFloorAssetData, TPresale } from '../graphql/api'
 
 export type TTokenBalanceMetadata = {
   address: Address | null
@@ -23,11 +23,12 @@ export type TFloorsTokenBalances = {
   reserve: TTokenBalanceContextValue
   issuance: TTokenBalanceContextValue
 }
-
 export type TFloorsContextValue = {
   markets: UseQueryResult<TFloorAssetData[], Error>
   market: UseQueryResult<TFloorAssetData | null, Error>
+  presales: UseQueryResult<TPresale[], Error>
   selectedMarketId: string | null
+
   setSelectedMarketId: (marketId: string | null) => void
   balances: TFloorsTokenBalances
   refetch: {
@@ -36,6 +37,7 @@ export type TFloorsContextValue = {
     market: () => Promise<void>
     reserveBalance: () => Promise<void>
     issuanceBalance: () => Promise<void>
+    presales: () => Promise<void>
   }
 }
 

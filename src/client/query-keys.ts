@@ -36,3 +36,14 @@ export const userTradesQueryKey = (userId: string | null | undefined) =>
  */
 export const accountQueryKey = (accountId: string | null | undefined) =>
   ['account', accountId ?? ''] as const
+
+/**
+ * @description Static query key for presales collections.
+ */
+export const presalesQueryKey = ['presales'] as const
+
+/**
+ * @description Parameterized query key for a single presale.
+ */
+export const presaleQueryKey = (presaleId: string | null | undefined) =>
+  ['presale', presaleId ?? ''] as const
