@@ -38,7 +38,9 @@ export const useUserMarketPositionQuery = <TData = TUserMarketPositionData | nul
       const position = await fetchUserMarketPosition(userAddress, marketId)
       return position ? mapUserMarketPositionToDTO(position) : null
     },
-    staleTime: 30_000, // 30 seconds
+    staleTime: 0, // Always consider data stale to allow refetching
+    refetchOnMount: true, // Refetch when component mounts
+    refetchOnWindowFocus: true, // Refetch when window regains focus
     ...options,
     enabled,
   })

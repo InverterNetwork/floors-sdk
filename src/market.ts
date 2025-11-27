@@ -446,10 +446,9 @@ export class Market {
   }
 
   private static resolveCreditFacilityAddress(data: TFloorAssetData): Address | undefined {
-    // creditFacility field may not be available in GraphQL schema yet
-    // For now, return undefined - this will be populated when indexer is updated
+    // Credit facility address is fetched from ModuleRegistry via GraphQL
     const creditFacilityAddress = (data as any).creditFacility
-    if (!creditFacilityAddress || creditFacilityAddress === '') {
+    if (!creditFacilityAddress || creditFacilityAddress === '' || creditFacilityAddress === null) {
       return undefined
     }
     return creditFacilityAddress as Address

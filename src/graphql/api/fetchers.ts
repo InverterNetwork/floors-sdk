@@ -1,3 +1,5 @@
+import { getAddress } from 'viem'
+
 import { query } from '..'
 import type {
   AccountsQueryType,
@@ -74,7 +76,27 @@ export async function fetchMarketById(id: string): Promise<TFloorAssetData | nul
   const response = await query(buildMarketsQuery({ where: { id: { _eq: id } } }))
   const market = (response.Market ?? [])[0]
   if (!market) return null
-  return mapMarketToFloorAssetData(market)
+
+  // Fetch ModuleRegistry to get credit facility address
+  const registryResponse = await query({
+    ModuleRegistry_by_pk: {
+      __args: { id },
+      id: true,
+      creditFacility: true,
+      floor: true,
+      authorizer: true,
+      feeTreasury: true,
+      presale: true,
+      staking: true,
+      createdAt: true,
+      lastUpdatedAt: true,
+      __typename: true,
+    },
+  })
+
+  const moduleRegistry = registryResponse.ModuleRegistry_by_pk
+
+  return mapMarketToFloorAssetData(market, moduleRegistry)
 }
 
 export async function fetchPlatformMetrics(): Promise<TPlatformMetrics> {
@@ -170,14 +192,26 @@ export async function fetchUserMarketPosition(
   userAddress: string,
   marketId: string
 ): Promise<TGraphQLUserMarketPosition | null> {
-  const queryWithArgs = cloneQuery(userMarketPositionQuery)
-  queryWithArgs.UserMarketPosition.__args = {
-    where: {
-      user_id: { _eq: userAddress.toLowerCase() },
-      market_id: { _eq: marketId },
-    },
-  }
+  if (!userAddress || !marketId) return null
 
-  const response = await query(queryWithArgs)
-  return response.UserMarketPosition?.[0] ?? null
+  try {
+    // Normalize addresses to checksummed format (matches indexer storage)
+    // The indexer uses normalizeAddress which uses getAddress from viem
+    const normalizedUserAddress = getAddress(userAddress as `0x${string}`)
+    const normalizedMarketId = getAddress(marketId as `0x${string}`)
+
+    const queryWithArgs = cloneQuery(userMarketPositionQuery)
+    queryWithArgs.UserMarketPosition.__args = {
+      where: {
+        user_id: { _eq: normalizedUserAddress },
+        market_id: { _eq: normalizedMarketId },
+      },
+    }
+
+    const response = await query(queryWithArgs)
+    return response.UserMarketPosition?.[0] ?? null
+  } catch (error) {
+    console.error('Error fetching user market position:', error)
+    return null
+  }
 }

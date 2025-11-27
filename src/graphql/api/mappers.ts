@@ -15,7 +15,10 @@ import type {
 } from './fields'
 import { buildSegments, formatCurrency, formatTokenAmount, safePercentage, toNumber } from './utils'
 
-export function mapMarketToFloorAssetData(market: TGraphQLMarket): TFloorAssetData {
+export function mapMarketToFloorAssetData(
+  market: TGraphQLMarket,
+  moduleRegistry?: { creditFacility: string | null } | null
+): TFloorAssetData {
   const floorPrice = toNumber(market.floorPriceFormatted || market.floorPriceRaw)
   const marketPrice = toNumber(market.currentPriceFormatted || market.currentPriceRaw)
   const totalSupply = toNumber(market.totalSupplyFormatted || market.totalSupplyRaw)
@@ -146,6 +149,9 @@ export function mapMarketToFloorAssetData(market: TGraphQLMarket): TFloorAssetDa
 
   const segments = buildSegments(marketSupply, floorPrice, Math.max(totalSupply, 1))
 
+  // Extract credit facility address from ModuleRegistry
+  const creditFacilityAddress = moduleRegistry?.creditFacility ?? null
+
   return {
     ...market,
     name,
@@ -175,7 +181,9 @@ export function mapMarketToFloorAssetData(market: TGraphQLMarket): TFloorAssetDa
     nextFloorTarget: formatCurrency(
       floorPrice + Math.max(1, floorElevation.estimatedFloorIncrease)
     ),
-  }
+    // Add creditFacility address from ModuleRegistry
+    creditFacility: creditFacilityAddress,
+  } as TFloorAssetData & { creditFacility: string | null }
 }
 
 export function mapTradeToTradeData(trade: TGraphQLTrade): TTradeData {
@@ -272,11 +280,9 @@ export function mapPresaleToPresaleData(presale: TGraphQLPresale): TPresale {
   const globalDepositCap = toNumber(
     presale.globalDepositCapFormatted || presale.globalDepositCapRaw
   )
-  console.log('globalDepositCapFormatted', presale.globalDepositCapFormatted)
-  console.log('totalRaised', presale.totalRaisedRaw)
+
   // Calculate progress
   const progressPercent = globalDepositCap > 0 ? (totalRaised / globalDepositCap) * 100 : 0
-  console.log('progressPercent', progressPercent)
   // Calculate time remaining
   const timeRemaining = Math.max(0, endTime - now)
 

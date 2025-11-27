@@ -52,9 +52,7 @@ export const FloorsProvider = ({
   const presalesQuery = usePresalesQuery(presalesOptions)
 
   // User position query - fetches collateral and debt data
-  const userPositionQuery = useUserMarketPositionQuery(walletAddress, selectedMarketId, {
-    staleTime: 30_000,
-  })
+  const userPositionQuery = useUserMarketPositionQuery(walletAddress, selectedMarketId)
 
   const reserveTokenMetadata = useMemo<TTokenBalanceMetadata>(
     () => ({
