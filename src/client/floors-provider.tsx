@@ -19,7 +19,7 @@ import {
 } from './hooks/markets'
 import { useUserMarketPositionQuery } from './hooks/positions'
 import type { UsePresalesQueryOptions } from './hooks/presales'
-import { usePresalesQuery } from './hooks/presales'
+import { usePresaleQuery, usePresalesQuery } from './hooks/presales'
 
 type FloorsProviderProps = {
   children: ReactNode
@@ -44,12 +44,14 @@ export const FloorsProvider = ({
 }: FloorsProviderProps): ReactElement => {
   const queryClient = useQueryClient()
   const [selectedMarketId, setSelectedMarketId] = useState<string | null>(null)
+  const [selectedPresaleId, setSelectedPresaleId] = useState<string | null>(null)
   const { address: walletAddress } = useAccount()
 
   const marketsQuery = useMarketsQuery(marketsOptions)
   const marketQuery = useMarketQuery(selectedMarketId, marketOptions)
   const activeMarket = marketQuery.data
   const presalesQuery = usePresalesQuery(presalesOptions)
+  const presaleQuery = usePresaleQuery(selectedPresaleId, undefined)
 
   // User position query - fetches collateral and debt data
   const userPositionQuery = useUserMarketPositionQuery(walletAddress, selectedMarketId)
@@ -109,6 +111,7 @@ export const FloorsProvider = ({
   const { refetch: refetchMarkets } = marketsQuery
   const { refetch: refetchMarket } = marketQuery
   const { refetch: refetchPresales } = presalesQuery
+  const { refetch: refetchPresale } = presaleQuery
   const { refetch: refetchUserPosition } = userPositionQuery
 
   const refetchAll = useCallback(async () => {
@@ -133,6 +136,9 @@ export const FloorsProvider = ({
       presales: async () => {
         await refetchPresales()
       },
+      presale: async () => {
+        await refetchPresale()
+      },
       userPosition: async () => {
         await refetchUserPosition()
       },
@@ -144,6 +150,7 @@ export const FloorsProvider = ({
       reserveBalance,
       issuanceBalance,
       refetchPresales,
+      refetchPresale,
       refetchUserPosition,
     ]
   )
@@ -154,7 +161,10 @@ export const FloorsProvider = ({
       market: marketQuery,
       presales: presalesQuery,
       selectedMarketId,
+      selectedPresaleId,
       setSelectedMarketId,
+      presale: presaleQuery,
+      setSelectedPresaleId,
       balances,
       userPosition: userPositionQuery,
       refetch,
@@ -164,6 +174,7 @@ export const FloorsProvider = ({
       marketQuery,
       presalesQuery,
       selectedMarketId,
+      selectedPresaleId,
       balances,
       userPositionQuery,
       refetch,
@@ -183,6 +194,14 @@ export const useSetSelectedMarket = (marketId?: string | null): void => {
   useEffect(() => {
     setSelectedMarketId(marketId ?? null)
   }, [marketId, setSelectedMarketId])
+}
+
+export const useSetSelectedPresale = (presaleId?: string | null): void => {
+  const { setSelectedPresaleId } = useFloors()
+
+  useEffect(() => {
+    setSelectedPresaleId(presaleId ?? null)
+  }, [presaleId, setSelectedPresaleId])
 }
 
 export type {

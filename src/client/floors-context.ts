@@ -28,9 +28,11 @@ export type TFloorsContextValue = {
   markets: UseQueryResult<TFloorAssetData[], Error>
   market: UseQueryResult<TFloorAssetData | null, Error>
   presales: UseQueryResult<TPresale[], Error>
+  presale: UseQueryResult<TPresale | null, Error>
   selectedMarketId: string | null
-
+  selectedPresaleId: string | null
   setSelectedMarketId: (marketId: string | null) => void
+  setSelectedPresaleId: (presaleId: string | null) => void
   balances: TFloorsTokenBalances
   userPosition: UseQueryResult<TUserMarketPositionData | null, Error>
   refetch: {
@@ -40,6 +42,7 @@ export type TFloorsContextValue = {
     reserveBalance: () => Promise<void>
     issuanceBalance: () => Promise<void>
     presales: () => Promise<void>
+    presale: () => Promise<void>
     userPosition: () => Promise<void>
   }
 }

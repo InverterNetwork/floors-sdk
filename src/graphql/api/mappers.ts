@@ -1,4 +1,5 @@
 import { orderBy, sumBy } from 'lodash'
+import { formatUnits } from 'viem'
 
 import type {
   TCreditPositionData,
@@ -325,6 +326,19 @@ export function mapPresaleToPresaleData(presale: TGraphQLPresale): TPresale {
   const currentPrice = priceBreakpoints.length > 0 ? priceBreakpoints[0] : 0
   const currentPriceFormatted = formatCurrency(currentPrice)
 
+  // Format amounts for display using purchase token decimals
+  const purchaseTokenDecimals = presale.purchaseToken?.decimals ?? 18
+  const totalRaisedDisplay = formatTokenAmount(
+    Number.parseFloat(formatUnits(BigInt(presale.totalRaisedRaw || '0'), purchaseTokenDecimals)),
+    presale.purchaseToken?.symbol
+  )
+  const globalDepositCapDisplay = formatTokenAmount(
+    Number.parseFloat(
+      formatUnits(BigInt(presale.globalDepositCapRaw || '0'), purchaseTokenDecimals)
+    ),
+    presale.purchaseToken?.symbol
+  )
+
   return {
     ...presale,
     progressPercent: Math.min(100, Math.max(0, progressPercent)),
@@ -339,6 +353,8 @@ export function mapPresaleToPresaleData(presale: TGraphQLPresale): TPresale {
     remainingCapacityFormatted,
     currentPrice,
     currentPriceFormatted,
+    totalRaisedDisplay,
+    globalDepositCapDisplay,
   }
 }
 

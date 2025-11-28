@@ -1,4 +1,10 @@
-import { useQuery, type UseQueryOptions, type UseQueryResult } from '@tanstack/react-query'
+import {
+  useMutation,
+  type UseMutationResult,
+  useQuery,
+  type UseQueryOptions,
+  type UseQueryResult,
+} from '@tanstack/react-query'
 
 import {
   fetchPresaleById,
@@ -81,4 +87,179 @@ export const usePresalesByMarketQuery = <TData = TPresale[]>(
     enabled,
     staleTime,
   })
+}
+
+import { useCallback, useMemo } from 'react'
+import type { Address } from 'viem'
+import { usePublicClient, useWalletClient } from 'wagmi'
+
+import {
+  Presale,
+  type TPresaleApproveParams,
+  type TPresaleBuyParams,
+  type TPresaleBuyWithLeverageParams,
+  type TPresaleClaimParams,
+  type TPresaleMutationResult,
+} from '../../presale'
+import { useFloors } from '../floors-context'
+
+export type UsePresaleMutationsReturnType = {
+  buyPresale: UseMutationResult<TPresaleMutationResult, Error, TPresaleBuyParams>
+  buyPresaleWithLeverage: UseMutationResult<
+    TPresaleMutationResult,
+    Error,
+    TPresaleBuyWithLeverageParams
+  >
+  claimAll: UseMutationResult<TPresaleMutationResult, Error, TPresaleClaimParams>
+  approvePurchaseToken: UseMutationResult<TPresaleMutationResult, Error, TPresaleApproveParams>
+  getPurchaseTokenAllowance: UseMutationResult<bigint, Error, Address | undefined>
+  getPurchaseTokenBalance: UseMutationResult<bigint, Error, Address | undefined>
+  getPresaleState: UseMutationResult<number, Error, void>
+  isWhitelisted: UseMutationResult<boolean, Error, Address | undefined>
+  getDepositsBy: UseMutationResult<bigint, Error, Address | undefined>
+  getPositionsByOwner: UseMutationResult<bigint[], Error, Address | undefined>
+  getPosition: UseMutationResult<any, Error, bigint>
+  getPositionState: UseMutationResult<any, Error, bigint>
+  getBaseCommissionBps: UseMutationResult<bigint[], Error, void>
+  getPriceBreakpoints: UseMutationResult<bigint[][], Error, void>
+}
+
+/**
+ * @description Provides presale buy/claim/approve mutations and read queries backed by the pure Presale class.
+ */
+export const usePresaleMutations = (): UsePresaleMutationsReturnType => {
+  const floorsContext = useFloors()
+  const resolvedPresale = floorsContext.presale.data ?? null
+  const {
+    refetch: { presale: refetchPresale },
+  } = floorsContext
+  const publicClient = usePublicClient()
+  const { data: walletClient } = useWalletClient()
+  const walletAddress = walletClient?.account?.address as Address | undefined
+
+  const presaleClient = useMemo(() => {
+    if (!resolvedPresale || !publicClient) return null
+    return new Presale({
+      data: resolvedPresale,
+      publicClient,
+      walletClient: walletClient ?? undefined,
+    })
+  }, [resolvedPresale, publicClient, walletClient])
+
+  const ensurePresale = useCallback(() => {
+    if (!presaleClient)
+      throw new Error(
+        'Presale client unavailable. Wait for FloorsProvider presale query to resolve.'
+      )
+
+    return presaleClient
+  }, [presaleClient])
+
+  const ensureWalletAddress = useCallback(
+    (override?: Address) => {
+      const targetAddress = override ?? walletAddress
+      if (!targetAddress)
+        throw new Error('Wallet not connected. Please connect your wallet to continue.')
+
+      return targetAddress
+    },
+    [walletAddress]
+  )
+
+  const refetchAfterMutation = useCallback(async () => {
+    await Promise.allSettled([refetchPresale()])
+  }, [refetchPresale])
+
+  // Write mutations
+  const buyPresale = useMutation({
+    mutationFn: (params: TPresaleBuyParams) => ensurePresale().buyPresale(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+    },
+  })
+
+  const buyPresaleWithLeverage = useMutation({
+    mutationFn: (params: TPresaleBuyWithLeverageParams) =>
+      ensurePresale().buyPresaleWithLeverage(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+    },
+  })
+
+  const claimAll = useMutation({
+    mutationFn: (params: TPresaleClaimParams) => ensurePresale().claimAll(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+    },
+  })
+
+  const approvePurchaseToken = useMutation({
+    mutationFn: (params: TPresaleApproveParams) => ensurePresale().approvePurchaseToken(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+    },
+  })
+
+  // Read queries (using mutations for consistency with Market pattern)
+  const getPurchaseTokenAllowance = useMutation({
+    mutationFn: async (owner?: Address) =>
+      ensurePresale().getPurchaseTokenAllowance(ensureWalletAddress(owner)),
+  })
+
+  const getPurchaseTokenBalance = useMutation({
+    mutationFn: async (owner?: Address) =>
+      ensurePresale().getPurchaseTokenBalance(ensureWalletAddress(owner)),
+  })
+
+  const getPresaleState = useMutation({
+    mutationFn: async () => ensurePresale().getPresaleState(),
+  })
+
+  const isWhitelisted = useMutation({
+    mutationFn: async (userAddress?: Address) =>
+      ensurePresale().isWhitelisted(ensureWalletAddress(userAddress)),
+  })
+
+  const getDepositsBy = useMutation({
+    mutationFn: async (userAddress?: Address) =>
+      ensurePresale().getDepositsBy(ensureWalletAddress(userAddress)),
+  })
+
+  const getPositionsByOwner = useMutation({
+    mutationFn: async (ownerAddress?: Address) =>
+      ensurePresale().getPositionsByOwner(ensureWalletAddress(ownerAddress)),
+  })
+
+  const getPosition = useMutation({
+    mutationFn: async (positionId: bigint) => ensurePresale().getPosition(positionId),
+  })
+
+  const getPositionState = useMutation({
+    mutationFn: async (positionId: bigint) => ensurePresale().getPositionState(positionId),
+  })
+
+  const getBaseCommissionBps = useMutation({
+    mutationFn: async () => ensurePresale().getBaseCommissionBps(),
+  })
+
+  const getPriceBreakpoints = useMutation({
+    mutationFn: async () => ensurePresale().getPriceBreakpoints(),
+  })
+
+  return {
+    buyPresale,
+    buyPresaleWithLeverage,
+    claimAll,
+    approvePurchaseToken,
+    getPurchaseTokenAllowance,
+    getPurchaseTokenBalance,
+    getPresaleState,
+    isWhitelisted,
+    getDepositsBy,
+    getPositionsByOwner,
+    getPosition,
+    getPositionState,
+    getBaseCommissionBps,
+    getPriceBreakpoints,
+  }
 }

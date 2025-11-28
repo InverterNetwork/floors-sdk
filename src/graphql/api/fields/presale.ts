@@ -52,6 +52,40 @@ export const presaleQuery = {
     createdAt: true,
     commissionBps: true,
     authorizer: true,
+    participations: {
+      __args: {
+        order_by: [{ timestamp: 'desc' }],
+        limit: 100,
+      },
+      id: true,
+      user_id: true,
+      positionId: true,
+      depositAmountRaw: true,
+      depositAmountFormatted: true,
+      mintedAmountRaw: true,
+      mintedAmountFormatted: true,
+      loopCount: true,
+      leverage: true,
+      timestamp: true,
+      transactionHash: true,
+      __typename: true,
+    },
+    claims: {
+      __args: {
+        order_by: [{ timestamp: 'desc' }],
+        limit: 100,
+      },
+      id: true,
+      positionId: true,
+      claimType: true,
+      amountRaw: true,
+      amountFormatted: true,
+      trancheIndex: true,
+      loanId: true,
+      timestamp: true,
+      transactionHash: true,
+      __typename: true,
+    },
     __typename: true,
   },
 } satisfies GraphQLQueryArgs
@@ -98,6 +132,10 @@ export interface TComputedPresaleData {
   currentPrice: number
   // Current price formatted
   currentPriceFormatted: string
+  // Formatted total raised with token symbol (e.g., "20,168.77 USDC")
+  totalRaisedDisplay: string
+  // Formatted global deposit cap with token symbol (e.g., "1,000,000.00 USDC")
+  globalDepositCapDisplay: string
 }
 
 // Extended type that combines GraphQL Presale data with computed UI fields
