@@ -186,6 +186,107 @@ input Account_stream_cursor_value_input {
 }
 
 """
+columns and relationships of "AuthorizerContract"
+"""
+type AuthorizerContract {
+  createdAt: numeric!
+  db_write_timestamp: timestamp
+  floor: String!
+  id: String!
+  lastAssignedRoleId: numeric!
+  lastUpdatedAt: numeric!
+
+  """An array relationship"""
+  roles(
+    """distinct select on columns"""
+    distinct_on: [Role_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [Role_order_by!]
+
+    """filter the rows returned"""
+    where: Role_bool_exp
+  ): [Role!]!
+}
+
+"""
+Boolean expression to filter rows from the table "AuthorizerContract". All fields are combined with a logical 'AND'.
+"""
+input AuthorizerContract_bool_exp {
+  _and: [AuthorizerContract_bool_exp!]
+  _not: AuthorizerContract_bool_exp
+  _or: [AuthorizerContract_bool_exp!]
+  createdAt: numeric_comparison_exp
+  db_write_timestamp: timestamp_comparison_exp
+  floor: String_comparison_exp
+  id: String_comparison_exp
+  lastAssignedRoleId: numeric_comparison_exp
+  lastUpdatedAt: numeric_comparison_exp
+  roles: Role_bool_exp
+}
+
+"""Ordering options when selecting data from "AuthorizerContract"."""
+input AuthorizerContract_order_by {
+  createdAt: order_by
+  db_write_timestamp: order_by
+  floor: order_by
+  id: order_by
+  lastAssignedRoleId: order_by
+  lastUpdatedAt: order_by
+  roles_aggregate: Role_aggregate_order_by
+}
+
+"""
+select columns of table "AuthorizerContract"
+"""
+enum AuthorizerContract_select_column {
+  """column name"""
+  createdAt
+
+  """column name"""
+  db_write_timestamp
+
+  """column name"""
+  floor
+
+  """column name"""
+  id
+
+  """column name"""
+  lastAssignedRoleId
+
+  """column name"""
+  lastUpdatedAt
+}
+
+"""
+Streaming cursor of the table "AuthorizerContract"
+"""
+input AuthorizerContract_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: AuthorizerContract_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input AuthorizerContract_stream_cursor_value_input {
+  createdAt: numeric
+  db_write_timestamp: timestamp
+  floor: String
+  id: String
+  lastAssignedRoleId: numeric
+  lastUpdatedAt: numeric
+}
+
+"""
 Boolean expression to compare columns of type "Boolean". All fields are combined with logical 'AND'.
 """
 input Boolean_comparison_exp {
@@ -3576,6 +3677,649 @@ input PriceCandle_stream_cursor_value_input {
 }
 
 """
+columns and relationships of "Role"
+"""
+type Role {
+  adminRole: String
+  adminRoleName: String
+  authorizer_id: String!
+  createdAt: numeric!
+  db_write_timestamp: timestamp
+  id: String!
+  isAdminBurned: Boolean!
+  lastUpdatedAt: numeric!
+
+  """An array relationship"""
+  members(
+    """distinct select on columns"""
+    distinct_on: [RoleMember_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [RoleMember_order_by!]
+
+    """filter the rows returned"""
+    where: RoleMember_bool_exp
+  ): [RoleMember!]!
+  name: String
+
+  """An array relationship"""
+  permissions(
+    """distinct select on columns"""
+    distinct_on: [RolePermission_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [RolePermission_order_by!]
+
+    """filter the rows returned"""
+    where: RolePermission_bool_exp
+  ): [RolePermission!]!
+  roleId: String!
+}
+
+"""
+columns and relationships of "RoleMember"
+"""
+type RoleMember {
+  db_write_timestamp: timestamp
+  grantedAt: numeric!
+  grantedBy: String!
+  id: String!
+  member: String!
+  role_id: String!
+  transactionHash: String!
+}
+
+"""
+order by aggregate values of table "RoleMember"
+"""
+input RoleMember_aggregate_order_by {
+  avg: RoleMember_avg_order_by
+  count: order_by
+  max: RoleMember_max_order_by
+  min: RoleMember_min_order_by
+  stddev: RoleMember_stddev_order_by
+  stddev_pop: RoleMember_stddev_pop_order_by
+  stddev_samp: RoleMember_stddev_samp_order_by
+  sum: RoleMember_sum_order_by
+  var_pop: RoleMember_var_pop_order_by
+  var_samp: RoleMember_var_samp_order_by
+  variance: RoleMember_variance_order_by
+}
+
+"""
+order by avg() on columns of table "RoleMember"
+"""
+input RoleMember_avg_order_by {
+  grantedAt: order_by
+}
+
+"""
+Boolean expression to filter rows from the table "RoleMember". All fields are combined with a logical 'AND'.
+"""
+input RoleMember_bool_exp {
+  _and: [RoleMember_bool_exp!]
+  _not: RoleMember_bool_exp
+  _or: [RoleMember_bool_exp!]
+  db_write_timestamp: timestamp_comparison_exp
+  grantedAt: numeric_comparison_exp
+  grantedBy: String_comparison_exp
+  id: String_comparison_exp
+  member: String_comparison_exp
+  role_id: String_comparison_exp
+  transactionHash: String_comparison_exp
+}
+
+"""
+order by max() on columns of table "RoleMember"
+"""
+input RoleMember_max_order_by {
+  db_write_timestamp: order_by
+  grantedAt: order_by
+  grantedBy: order_by
+  id: order_by
+  member: order_by
+  role_id: order_by
+  transactionHash: order_by
+}
+
+"""
+order by min() on columns of table "RoleMember"
+"""
+input RoleMember_min_order_by {
+  db_write_timestamp: order_by
+  grantedAt: order_by
+  grantedBy: order_by
+  id: order_by
+  member: order_by
+  role_id: order_by
+  transactionHash: order_by
+}
+
+"""Ordering options when selecting data from "RoleMember"."""
+input RoleMember_order_by {
+  db_write_timestamp: order_by
+  grantedAt: order_by
+  grantedBy: order_by
+  id: order_by
+  member: order_by
+  role_id: order_by
+  transactionHash: order_by
+}
+
+"""
+select columns of table "RoleMember"
+"""
+enum RoleMember_select_column {
+  """column name"""
+  db_write_timestamp
+
+  """column name"""
+  grantedAt
+
+  """column name"""
+  grantedBy
+
+  """column name"""
+  id
+
+  """column name"""
+  member
+
+  """column name"""
+  role_id
+
+  """column name"""
+  transactionHash
+}
+
+"""
+order by stddev() on columns of table "RoleMember"
+"""
+input RoleMember_stddev_order_by {
+  grantedAt: order_by
+}
+
+"""
+order by stddev_pop() on columns of table "RoleMember"
+"""
+input RoleMember_stddev_pop_order_by {
+  grantedAt: order_by
+}
+
+"""
+order by stddev_samp() on columns of table "RoleMember"
+"""
+input RoleMember_stddev_samp_order_by {
+  grantedAt: order_by
+}
+
+"""
+Streaming cursor of the table "RoleMember"
+"""
+input RoleMember_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: RoleMember_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input RoleMember_stream_cursor_value_input {
+  db_write_timestamp: timestamp
+  grantedAt: numeric
+  grantedBy: String
+  id: String
+  member: String
+  role_id: String
+  transactionHash: String
+}
+
+"""
+order by sum() on columns of table "RoleMember"
+"""
+input RoleMember_sum_order_by {
+  grantedAt: order_by
+}
+
+"""
+order by var_pop() on columns of table "RoleMember"
+"""
+input RoleMember_var_pop_order_by {
+  grantedAt: order_by
+}
+
+"""
+order by var_samp() on columns of table "RoleMember"
+"""
+input RoleMember_var_samp_order_by {
+  grantedAt: order_by
+}
+
+"""
+order by variance() on columns of table "RoleMember"
+"""
+input RoleMember_variance_order_by {
+  grantedAt: order_by
+}
+
+"""
+columns and relationships of "RolePermission"
+"""
+type RolePermission {
+  addedAt: numeric!
+  db_write_timestamp: timestamp
+  id: String!
+  role_id: String!
+  selector: String!
+  selectorName: String!
+  target: String!
+  transactionHash: String!
+}
+
+"""
+order by aggregate values of table "RolePermission"
+"""
+input RolePermission_aggregate_order_by {
+  avg: RolePermission_avg_order_by
+  count: order_by
+  max: RolePermission_max_order_by
+  min: RolePermission_min_order_by
+  stddev: RolePermission_stddev_order_by
+  stddev_pop: RolePermission_stddev_pop_order_by
+  stddev_samp: RolePermission_stddev_samp_order_by
+  sum: RolePermission_sum_order_by
+  var_pop: RolePermission_var_pop_order_by
+  var_samp: RolePermission_var_samp_order_by
+  variance: RolePermission_variance_order_by
+}
+
+"""
+order by avg() on columns of table "RolePermission"
+"""
+input RolePermission_avg_order_by {
+  addedAt: order_by
+}
+
+"""
+Boolean expression to filter rows from the table "RolePermission". All fields are combined with a logical 'AND'.
+"""
+input RolePermission_bool_exp {
+  _and: [RolePermission_bool_exp!]
+  _not: RolePermission_bool_exp
+  _or: [RolePermission_bool_exp!]
+  addedAt: numeric_comparison_exp
+  db_write_timestamp: timestamp_comparison_exp
+  id: String_comparison_exp
+  role_id: String_comparison_exp
+  selector: String_comparison_exp
+  selectorName: String_comparison_exp
+  target: String_comparison_exp
+  transactionHash: String_comparison_exp
+}
+
+"""
+order by max() on columns of table "RolePermission"
+"""
+input RolePermission_max_order_by {
+  addedAt: order_by
+  db_write_timestamp: order_by
+  id: order_by
+  role_id: order_by
+  selector: order_by
+  selectorName: order_by
+  target: order_by
+  transactionHash: order_by
+}
+
+"""
+order by min() on columns of table "RolePermission"
+"""
+input RolePermission_min_order_by {
+  addedAt: order_by
+  db_write_timestamp: order_by
+  id: order_by
+  role_id: order_by
+  selector: order_by
+  selectorName: order_by
+  target: order_by
+  transactionHash: order_by
+}
+
+"""Ordering options when selecting data from "RolePermission"."""
+input RolePermission_order_by {
+  addedAt: order_by
+  db_write_timestamp: order_by
+  id: order_by
+  role_id: order_by
+  selector: order_by
+  selectorName: order_by
+  target: order_by
+  transactionHash: order_by
+}
+
+"""
+select columns of table "RolePermission"
+"""
+enum RolePermission_select_column {
+  """column name"""
+  addedAt
+
+  """column name"""
+  db_write_timestamp
+
+  """column name"""
+  id
+
+  """column name"""
+  role_id
+
+  """column name"""
+  selector
+
+  """column name"""
+  selectorName
+
+  """column name"""
+  target
+
+  """column name"""
+  transactionHash
+}
+
+"""
+order by stddev() on columns of table "RolePermission"
+"""
+input RolePermission_stddev_order_by {
+  addedAt: order_by
+}
+
+"""
+order by stddev_pop() on columns of table "RolePermission"
+"""
+input RolePermission_stddev_pop_order_by {
+  addedAt: order_by
+}
+
+"""
+order by stddev_samp() on columns of table "RolePermission"
+"""
+input RolePermission_stddev_samp_order_by {
+  addedAt: order_by
+}
+
+"""
+Streaming cursor of the table "RolePermission"
+"""
+input RolePermission_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: RolePermission_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input RolePermission_stream_cursor_value_input {
+  addedAt: numeric
+  db_write_timestamp: timestamp
+  id: String
+  role_id: String
+  selector: String
+  selectorName: String
+  target: String
+  transactionHash: String
+}
+
+"""
+order by sum() on columns of table "RolePermission"
+"""
+input RolePermission_sum_order_by {
+  addedAt: order_by
+}
+
+"""
+order by var_pop() on columns of table "RolePermission"
+"""
+input RolePermission_var_pop_order_by {
+  addedAt: order_by
+}
+
+"""
+order by var_samp() on columns of table "RolePermission"
+"""
+input RolePermission_var_samp_order_by {
+  addedAt: order_by
+}
+
+"""
+order by variance() on columns of table "RolePermission"
+"""
+input RolePermission_variance_order_by {
+  addedAt: order_by
+}
+
+"""
+order by aggregate values of table "Role"
+"""
+input Role_aggregate_order_by {
+  avg: Role_avg_order_by
+  count: order_by
+  max: Role_max_order_by
+  min: Role_min_order_by
+  stddev: Role_stddev_order_by
+  stddev_pop: Role_stddev_pop_order_by
+  stddev_samp: Role_stddev_samp_order_by
+  sum: Role_sum_order_by
+  var_pop: Role_var_pop_order_by
+  var_samp: Role_var_samp_order_by
+  variance: Role_variance_order_by
+}
+
+"""
+order by avg() on columns of table "Role"
+"""
+input Role_avg_order_by {
+  createdAt: order_by
+  lastUpdatedAt: order_by
+}
+
+"""
+Boolean expression to filter rows from the table "Role". All fields are combined with a logical 'AND'.
+"""
+input Role_bool_exp {
+  _and: [Role_bool_exp!]
+  _not: Role_bool_exp
+  _or: [Role_bool_exp!]
+  adminRole: String_comparison_exp
+  adminRoleName: String_comparison_exp
+  authorizer_id: String_comparison_exp
+  createdAt: numeric_comparison_exp
+  db_write_timestamp: timestamp_comparison_exp
+  id: String_comparison_exp
+  isAdminBurned: Boolean_comparison_exp
+  lastUpdatedAt: numeric_comparison_exp
+  members: RoleMember_bool_exp
+  name: String_comparison_exp
+  permissions: RolePermission_bool_exp
+  roleId: String_comparison_exp
+}
+
+"""
+order by max() on columns of table "Role"
+"""
+input Role_max_order_by {
+  adminRole: order_by
+  adminRoleName: order_by
+  authorizer_id: order_by
+  createdAt: order_by
+  db_write_timestamp: order_by
+  id: order_by
+  lastUpdatedAt: order_by
+  name: order_by
+  roleId: order_by
+}
+
+"""
+order by min() on columns of table "Role"
+"""
+input Role_min_order_by {
+  adminRole: order_by
+  adminRoleName: order_by
+  authorizer_id: order_by
+  createdAt: order_by
+  db_write_timestamp: order_by
+  id: order_by
+  lastUpdatedAt: order_by
+  name: order_by
+  roleId: order_by
+}
+
+"""Ordering options when selecting data from "Role"."""
+input Role_order_by {
+  adminRole: order_by
+  adminRoleName: order_by
+  authorizer_id: order_by
+  createdAt: order_by
+  db_write_timestamp: order_by
+  id: order_by
+  isAdminBurned: order_by
+  lastUpdatedAt: order_by
+  members_aggregate: RoleMember_aggregate_order_by
+  name: order_by
+  permissions_aggregate: RolePermission_aggregate_order_by
+  roleId: order_by
+}
+
+"""
+select columns of table "Role"
+"""
+enum Role_select_column {
+  """column name"""
+  adminRole
+
+  """column name"""
+  adminRoleName
+
+  """column name"""
+  authorizer_id
+
+  """column name"""
+  createdAt
+
+  """column name"""
+  db_write_timestamp
+
+  """column name"""
+  id
+
+  """column name"""
+  isAdminBurned
+
+  """column name"""
+  lastUpdatedAt
+
+  """column name"""
+  name
+
+  """column name"""
+  roleId
+}
+
+"""
+order by stddev() on columns of table "Role"
+"""
+input Role_stddev_order_by {
+  createdAt: order_by
+  lastUpdatedAt: order_by
+}
+
+"""
+order by stddev_pop() on columns of table "Role"
+"""
+input Role_stddev_pop_order_by {
+  createdAt: order_by
+  lastUpdatedAt: order_by
+}
+
+"""
+order by stddev_samp() on columns of table "Role"
+"""
+input Role_stddev_samp_order_by {
+  createdAt: order_by
+  lastUpdatedAt: order_by
+}
+
+"""
+Streaming cursor of the table "Role"
+"""
+input Role_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: Role_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input Role_stream_cursor_value_input {
+  adminRole: String
+  adminRoleName: String
+  authorizer_id: String
+  createdAt: numeric
+  db_write_timestamp: timestamp
+  id: String
+  isAdminBurned: Boolean
+  lastUpdatedAt: numeric
+  name: String
+  roleId: String
+}
+
+"""
+order by sum() on columns of table "Role"
+"""
+input Role_sum_order_by {
+  createdAt: order_by
+  lastUpdatedAt: order_by
+}
+
+"""
+order by var_pop() on columns of table "Role"
+"""
+input Role_var_pop_order_by {
+  createdAt: order_by
+  lastUpdatedAt: order_by
+}
+
+"""
+order by var_samp() on columns of table "Role"
+"""
+input Role_var_samp_order_by {
+  createdAt: order_by
+  lastUpdatedAt: order_by
+}
+
+"""
+order by variance() on columns of table "Role"
+"""
+input Role_variance_order_by {
+  createdAt: order_by
+  lastUpdatedAt: order_by
+}
+
+"""
 columns and relationships of "Stake"
 """
 type Stake {
@@ -5377,6 +6121,31 @@ type query_root {
   Account_by_pk(id: String!): Account
 
   """
+  fetch data from the table: "AuthorizerContract"
+  """
+  AuthorizerContract(
+    """distinct select on columns"""
+    distinct_on: [AuthorizerContract_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [AuthorizerContract_order_by!]
+
+    """filter the rows returned"""
+    where: AuthorizerContract_bool_exp
+  ): [AuthorizerContract!]!
+
+  """
+  fetch data from the table: "AuthorizerContract" using primary key columns
+  """
+  AuthorizerContract_by_pk(id: String!): AuthorizerContract
+
+  """
   fetch data from the table: "CreditFacilityContract"
   """
   CreditFacilityContract(
@@ -5728,6 +6497,75 @@ type query_root {
 
   """fetch data from the table: "PriceCandle" using primary key columns"""
   PriceCandle_by_pk(id: String!): PriceCandle
+
+  """
+  fetch data from the table: "Role"
+  """
+  Role(
+    """distinct select on columns"""
+    distinct_on: [Role_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [Role_order_by!]
+
+    """filter the rows returned"""
+    where: Role_bool_exp
+  ): [Role!]!
+
+  """
+  fetch data from the table: "RoleMember"
+  """
+  RoleMember(
+    """distinct select on columns"""
+    distinct_on: [RoleMember_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [RoleMember_order_by!]
+
+    """filter the rows returned"""
+    where: RoleMember_bool_exp
+  ): [RoleMember!]!
+
+  """fetch data from the table: "RoleMember" using primary key columns"""
+  RoleMember_by_pk(id: String!): RoleMember
+
+  """
+  fetch data from the table: "RolePermission"
+  """
+  RolePermission(
+    """distinct select on columns"""
+    distinct_on: [RolePermission_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [RolePermission_order_by!]
+
+    """filter the rows returned"""
+    where: RolePermission_bool_exp
+  ): [RolePermission!]!
+
+  """fetch data from the table: "RolePermission" using primary key columns"""
+  RolePermission_by_pk(id: String!): RolePermission
+
+  """fetch data from the table: "Role" using primary key columns"""
+  Role_by_pk(id: String!): Role
 
   """
   fetch data from the table: "Stake"
@@ -6191,6 +7029,45 @@ type subscription_root {
     """filter the rows returned"""
     where: Account_bool_exp
   ): [Account!]!
+
+  """
+  fetch data from the table: "AuthorizerContract"
+  """
+  AuthorizerContract(
+    """distinct select on columns"""
+    distinct_on: [AuthorizerContract_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [AuthorizerContract_order_by!]
+
+    """filter the rows returned"""
+    where: AuthorizerContract_bool_exp
+  ): [AuthorizerContract!]!
+
+  """
+  fetch data from the table: "AuthorizerContract" using primary key columns
+  """
+  AuthorizerContract_by_pk(id: String!): AuthorizerContract
+
+  """
+  fetch data from the table in a streaming manner: "AuthorizerContract"
+  """
+  AuthorizerContract_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [AuthorizerContract_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: AuthorizerContract_bool_exp
+  ): [AuthorizerContract!]!
 
   """
   fetch data from the table: "CreditFacilityContract"
@@ -6754,6 +7631,117 @@ type subscription_root {
     """filter the rows returned"""
     where: PriceCandle_bool_exp
   ): [PriceCandle!]!
+
+  """
+  fetch data from the table: "Role"
+  """
+  Role(
+    """distinct select on columns"""
+    distinct_on: [Role_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [Role_order_by!]
+
+    """filter the rows returned"""
+    where: Role_bool_exp
+  ): [Role!]!
+
+  """
+  fetch data from the table: "RoleMember"
+  """
+  RoleMember(
+    """distinct select on columns"""
+    distinct_on: [RoleMember_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [RoleMember_order_by!]
+
+    """filter the rows returned"""
+    where: RoleMember_bool_exp
+  ): [RoleMember!]!
+
+  """fetch data from the table: "RoleMember" using primary key columns"""
+  RoleMember_by_pk(id: String!): RoleMember
+
+  """
+  fetch data from the table in a streaming manner: "RoleMember"
+  """
+  RoleMember_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [RoleMember_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: RoleMember_bool_exp
+  ): [RoleMember!]!
+
+  """
+  fetch data from the table: "RolePermission"
+  """
+  RolePermission(
+    """distinct select on columns"""
+    distinct_on: [RolePermission_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [RolePermission_order_by!]
+
+    """filter the rows returned"""
+    where: RolePermission_bool_exp
+  ): [RolePermission!]!
+
+  """fetch data from the table: "RolePermission" using primary key columns"""
+  RolePermission_by_pk(id: String!): RolePermission
+
+  """
+  fetch data from the table in a streaming manner: "RolePermission"
+  """
+  RolePermission_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [RolePermission_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: RolePermission_bool_exp
+  ): [RolePermission!]!
+
+  """fetch data from the table: "Role" using primary key columns"""
+  Role_by_pk(id: String!): Role
+
+  """
+  fetch data from the table in a streaming manner: "Role"
+  """
+  Role_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [Role_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: Role_bool_exp
+  ): [Role!]!
 
   """
   fetch data from the table: "Stake"

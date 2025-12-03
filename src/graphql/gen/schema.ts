@@ -45,6 +45,24 @@ export interface Account {
 export type Account_select_column = 'db_write_timestamp' | 'id'
 
 
+/** columns and relationships of "AuthorizerContract" */
+export interface AuthorizerContract {
+    createdAt: Scalars['numeric']
+    db_write_timestamp: (Scalars['timestamp'] | null)
+    floor: Scalars['String']
+    id: Scalars['String']
+    lastAssignedRoleId: Scalars['numeric']
+    lastUpdatedAt: Scalars['numeric']
+    /** An array relationship */
+    roles: Role[]
+    __typename: 'AuthorizerContract'
+}
+
+
+/** select columns of table "AuthorizerContract" */
+export type AuthorizerContract_select_column = 'createdAt' | 'db_write_timestamp' | 'floor' | 'id' | 'lastAssignedRoleId' | 'lastUpdatedAt'
+
+
 /** columns and relationships of "CreditFacilityContract" */
 export interface CreditFacilityContract {
     borrowToken_id: Scalars['String']
@@ -431,6 +449,65 @@ export interface PriceCandle {
 export type PriceCandle_select_column = 'closeFormatted' | 'closeRaw' | 'db_write_timestamp' | 'highFormatted' | 'highRaw' | 'id' | 'lowFormatted' | 'lowRaw' | 'market_id' | 'openFormatted' | 'openRaw' | 'period' | 'timestamp' | 'trades' | 'volumeFormatted' | 'volumeRaw'
 
 
+/** columns and relationships of "Role" */
+export interface Role {
+    adminRole: (Scalars['String'] | null)
+    adminRoleName: (Scalars['String'] | null)
+    authorizer_id: Scalars['String']
+    createdAt: Scalars['numeric']
+    db_write_timestamp: (Scalars['timestamp'] | null)
+    id: Scalars['String']
+    isAdminBurned: Scalars['Boolean']
+    lastUpdatedAt: Scalars['numeric']
+    /** An array relationship */
+    members: RoleMember[]
+    name: (Scalars['String'] | null)
+    /** An array relationship */
+    permissions: RolePermission[]
+    roleId: Scalars['String']
+    __typename: 'Role'
+}
+
+
+/** columns and relationships of "RoleMember" */
+export interface RoleMember {
+    db_write_timestamp: (Scalars['timestamp'] | null)
+    grantedAt: Scalars['numeric']
+    grantedBy: Scalars['String']
+    id: Scalars['String']
+    member: Scalars['String']
+    role_id: Scalars['String']
+    transactionHash: Scalars['String']
+    __typename: 'RoleMember'
+}
+
+
+/** select columns of table "RoleMember" */
+export type RoleMember_select_column = 'db_write_timestamp' | 'grantedAt' | 'grantedBy' | 'id' | 'member' | 'role_id' | 'transactionHash'
+
+
+/** columns and relationships of "RolePermission" */
+export interface RolePermission {
+    addedAt: Scalars['numeric']
+    db_write_timestamp: (Scalars['timestamp'] | null)
+    id: Scalars['String']
+    role_id: Scalars['String']
+    selector: Scalars['String']
+    selectorName: Scalars['String']
+    target: Scalars['String']
+    transactionHash: Scalars['String']
+    __typename: 'RolePermission'
+}
+
+
+/** select columns of table "RolePermission" */
+export type RolePermission_select_column = 'addedAt' | 'db_write_timestamp' | 'id' | 'role_id' | 'selector' | 'selectorName' | 'target' | 'transactionHash'
+
+
+/** select columns of table "Role" */
+export type Role_select_column = 'adminRole' | 'adminRoleName' | 'authorizer_id' | 'createdAt' | 'db_write_timestamp' | 'id' | 'isAdminBurned' | 'lastUpdatedAt' | 'name' | 'roleId'
+
+
 /** columns and relationships of "Stake" */
 export interface Stake {
     amountFormatted: Scalars['String']
@@ -639,6 +716,10 @@ export interface query_root {
     Account: Account[]
     /** fetch data from the table: "Account" using primary key columns */
     Account_by_pk: (Account | null)
+    /** fetch data from the table: "AuthorizerContract" */
+    AuthorizerContract: AuthorizerContract[]
+    /** fetch data from the table: "AuthorizerContract" using primary key columns */
+    AuthorizerContract_by_pk: (AuthorizerContract | null)
     /** fetch data from the table: "CreditFacilityContract" */
     CreditFacilityContract: CreditFacilityContract[]
     /** fetch data from the table: "CreditFacilityContract" using primary key columns */
@@ -699,6 +780,18 @@ export interface query_root {
     PriceCandle: PriceCandle[]
     /** fetch data from the table: "PriceCandle" using primary key columns */
     PriceCandle_by_pk: (PriceCandle | null)
+    /** fetch data from the table: "Role" */
+    Role: Role[]
+    /** fetch data from the table: "RoleMember" */
+    RoleMember: RoleMember[]
+    /** fetch data from the table: "RoleMember" using primary key columns */
+    RoleMember_by_pk: (RoleMember | null)
+    /** fetch data from the table: "RolePermission" */
+    RolePermission: RolePermission[]
+    /** fetch data from the table: "RolePermission" using primary key columns */
+    RolePermission_by_pk: (RolePermission | null)
+    /** fetch data from the table: "Role" using primary key columns */
+    Role_by_pk: (Role | null)
     /** fetch data from the table: "Stake" */
     Stake: Stake[]
     /** fetch data from the table: "Stake" using primary key columns */
@@ -777,6 +870,12 @@ export interface subscription_root {
     Account_by_pk: (Account | null)
     /** fetch data from the table in a streaming manner: "Account" */
     Account_stream: Account[]
+    /** fetch data from the table: "AuthorizerContract" */
+    AuthorizerContract: AuthorizerContract[]
+    /** fetch data from the table: "AuthorizerContract" using primary key columns */
+    AuthorizerContract_by_pk: (AuthorizerContract | null)
+    /** fetch data from the table in a streaming manner: "AuthorizerContract" */
+    AuthorizerContract_stream: AuthorizerContract[]
     /** fetch data from the table: "CreditFacilityContract" */
     CreditFacilityContract: CreditFacilityContract[]
     /** fetch data from the table: "CreditFacilityContract" using primary key columns */
@@ -867,6 +966,24 @@ export interface subscription_root {
     PriceCandle_by_pk: (PriceCandle | null)
     /** fetch data from the table in a streaming manner: "PriceCandle" */
     PriceCandle_stream: PriceCandle[]
+    /** fetch data from the table: "Role" */
+    Role: Role[]
+    /** fetch data from the table: "RoleMember" */
+    RoleMember: RoleMember[]
+    /** fetch data from the table: "RoleMember" using primary key columns */
+    RoleMember_by_pk: (RoleMember | null)
+    /** fetch data from the table in a streaming manner: "RoleMember" */
+    RoleMember_stream: RoleMember[]
+    /** fetch data from the table: "RolePermission" */
+    RolePermission: RolePermission[]
+    /** fetch data from the table: "RolePermission" using primary key columns */
+    RolePermission_by_pk: (RolePermission | null)
+    /** fetch data from the table in a streaming manner: "RolePermission" */
+    RolePermission_stream: RolePermission[]
+    /** fetch data from the table: "Role" using primary key columns */
+    Role_by_pk: (Role | null)
+    /** fetch data from the table in a streaming manner: "Role" */
+    Role_stream: Role[]
     /** fetch data from the table: "Stake" */
     Stake: Stake[]
     /** fetch data from the table: "Stake" using primary key columns */
@@ -1039,6 +1156,51 @@ ordering?: (cursor_ordering | null)}
 
 /** Initial value of the column from where the streaming should start */
 export interface Account_stream_cursor_value_input {db_write_timestamp?: (Scalars['timestamp'] | null),id?: (Scalars['String'] | null)}
+
+
+/** columns and relationships of "AuthorizerContract" */
+export interface AuthorizerContractGenqlSelection{
+    createdAt?: boolean | number
+    db_write_timestamp?: boolean | number
+    floor?: boolean | number
+    id?: boolean | number
+    lastAssignedRoleId?: boolean | number
+    lastUpdatedAt?: boolean | number
+    /** An array relationship */
+    roles?: (RoleGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (Role_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (Role_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (Role_bool_exp | null)} })
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+
+/** Boolean expression to filter rows from the table "AuthorizerContract". All fields are combined with a logical 'AND'. */
+export interface AuthorizerContract_bool_exp {_and?: (AuthorizerContract_bool_exp[] | null),_not?: (AuthorizerContract_bool_exp | null),_or?: (AuthorizerContract_bool_exp[] | null),createdAt?: (numeric_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),floor?: (String_comparison_exp | null),id?: (String_comparison_exp | null),lastAssignedRoleId?: (numeric_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),roles?: (Role_bool_exp | null)}
+
+
+/** Ordering options when selecting data from "AuthorizerContract". */
+export interface AuthorizerContract_order_by {createdAt?: (order_by | null),db_write_timestamp?: (order_by | null),floor?: (order_by | null),id?: (order_by | null),lastAssignedRoleId?: (order_by | null),lastUpdatedAt?: (order_by | null),roles_aggregate?: (Role_aggregate_order_by | null)}
+
+
+/** Streaming cursor of the table "AuthorizerContract" */
+export interface AuthorizerContract_stream_cursor_input {
+/** Stream column input with initial value */
+initial_value: AuthorizerContract_stream_cursor_value_input,
+/** cursor ordering */
+ordering?: (cursor_ordering | null)}
+
+
+/** Initial value of the column from where the streaming should start */
+export interface AuthorizerContract_stream_cursor_value_input {createdAt?: (Scalars['numeric'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),floor?: (Scalars['String'] | null),id?: (Scalars['String'] | null),lastAssignedRoleId?: (Scalars['numeric'] | null),lastUpdatedAt?: (Scalars['numeric'] | null)}
 
 
 /** Boolean expression to compare columns of type "Boolean". All fields are combined with logical 'AND'. */
@@ -2076,6 +2238,268 @@ ordering?: (cursor_ordering | null)}
 export interface PriceCandle_stream_cursor_value_input {closeFormatted?: (Scalars['String'] | null),closeRaw?: (Scalars['numeric'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),highFormatted?: (Scalars['String'] | null),highRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),lowFormatted?: (Scalars['String'] | null),lowRaw?: (Scalars['numeric'] | null),market_id?: (Scalars['String'] | null),openFormatted?: (Scalars['String'] | null),openRaw?: (Scalars['numeric'] | null),period?: (Scalars['candleperiod'] | null),timestamp?: (Scalars['numeric'] | null),trades?: (Scalars['numeric'] | null),volumeFormatted?: (Scalars['String'] | null),volumeRaw?: (Scalars['numeric'] | null)}
 
 
+/** columns and relationships of "Role" */
+export interface RoleGenqlSelection{
+    adminRole?: boolean | number
+    adminRoleName?: boolean | number
+    authorizer_id?: boolean | number
+    createdAt?: boolean | number
+    db_write_timestamp?: boolean | number
+    id?: boolean | number
+    isAdminBurned?: boolean | number
+    lastUpdatedAt?: boolean | number
+    /** An array relationship */
+    members?: (RoleMemberGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (RoleMember_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (RoleMember_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (RoleMember_bool_exp | null)} })
+    name?: boolean | number
+    /** An array relationship */
+    permissions?: (RolePermissionGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (RolePermission_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (RolePermission_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (RolePermission_bool_exp | null)} })
+    roleId?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+
+/** columns and relationships of "RoleMember" */
+export interface RoleMemberGenqlSelection{
+    db_write_timestamp?: boolean | number
+    grantedAt?: boolean | number
+    grantedBy?: boolean | number
+    id?: boolean | number
+    member?: boolean | number
+    role_id?: boolean | number
+    transactionHash?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+
+/** order by aggregate values of table "RoleMember" */
+export interface RoleMember_aggregate_order_by {avg?: (RoleMember_avg_order_by | null),count?: (order_by | null),max?: (RoleMember_max_order_by | null),min?: (RoleMember_min_order_by | null),stddev?: (RoleMember_stddev_order_by | null),stddev_pop?: (RoleMember_stddev_pop_order_by | null),stddev_samp?: (RoleMember_stddev_samp_order_by | null),sum?: (RoleMember_sum_order_by | null),var_pop?: (RoleMember_var_pop_order_by | null),var_samp?: (RoleMember_var_samp_order_by | null),variance?: (RoleMember_variance_order_by | null)}
+
+
+/** order by avg() on columns of table "RoleMember" */
+export interface RoleMember_avg_order_by {grantedAt?: (order_by | null)}
+
+
+/** Boolean expression to filter rows from the table "RoleMember". All fields are combined with a logical 'AND'. */
+export interface RoleMember_bool_exp {_and?: (RoleMember_bool_exp[] | null),_not?: (RoleMember_bool_exp | null),_or?: (RoleMember_bool_exp[] | null),db_write_timestamp?: (timestamp_comparison_exp | null),grantedAt?: (numeric_comparison_exp | null),grantedBy?: (String_comparison_exp | null),id?: (String_comparison_exp | null),member?: (String_comparison_exp | null),role_id?: (String_comparison_exp | null),transactionHash?: (String_comparison_exp | null)}
+
+
+/** order by max() on columns of table "RoleMember" */
+export interface RoleMember_max_order_by {db_write_timestamp?: (order_by | null),grantedAt?: (order_by | null),grantedBy?: (order_by | null),id?: (order_by | null),member?: (order_by | null),role_id?: (order_by | null),transactionHash?: (order_by | null)}
+
+
+/** order by min() on columns of table "RoleMember" */
+export interface RoleMember_min_order_by {db_write_timestamp?: (order_by | null),grantedAt?: (order_by | null),grantedBy?: (order_by | null),id?: (order_by | null),member?: (order_by | null),role_id?: (order_by | null),transactionHash?: (order_by | null)}
+
+
+/** Ordering options when selecting data from "RoleMember". */
+export interface RoleMember_order_by {db_write_timestamp?: (order_by | null),grantedAt?: (order_by | null),grantedBy?: (order_by | null),id?: (order_by | null),member?: (order_by | null),role_id?: (order_by | null),transactionHash?: (order_by | null)}
+
+
+/** order by stddev() on columns of table "RoleMember" */
+export interface RoleMember_stddev_order_by {grantedAt?: (order_by | null)}
+
+
+/** order by stddev_pop() on columns of table "RoleMember" */
+export interface RoleMember_stddev_pop_order_by {grantedAt?: (order_by | null)}
+
+
+/** order by stddev_samp() on columns of table "RoleMember" */
+export interface RoleMember_stddev_samp_order_by {grantedAt?: (order_by | null)}
+
+
+/** Streaming cursor of the table "RoleMember" */
+export interface RoleMember_stream_cursor_input {
+/** Stream column input with initial value */
+initial_value: RoleMember_stream_cursor_value_input,
+/** cursor ordering */
+ordering?: (cursor_ordering | null)}
+
+
+/** Initial value of the column from where the streaming should start */
+export interface RoleMember_stream_cursor_value_input {db_write_timestamp?: (Scalars['timestamp'] | null),grantedAt?: (Scalars['numeric'] | null),grantedBy?: (Scalars['String'] | null),id?: (Scalars['String'] | null),member?: (Scalars['String'] | null),role_id?: (Scalars['String'] | null),transactionHash?: (Scalars['String'] | null)}
+
+
+/** order by sum() on columns of table "RoleMember" */
+export interface RoleMember_sum_order_by {grantedAt?: (order_by | null)}
+
+
+/** order by var_pop() on columns of table "RoleMember" */
+export interface RoleMember_var_pop_order_by {grantedAt?: (order_by | null)}
+
+
+/** order by var_samp() on columns of table "RoleMember" */
+export interface RoleMember_var_samp_order_by {grantedAt?: (order_by | null)}
+
+
+/** order by variance() on columns of table "RoleMember" */
+export interface RoleMember_variance_order_by {grantedAt?: (order_by | null)}
+
+
+/** columns and relationships of "RolePermission" */
+export interface RolePermissionGenqlSelection{
+    addedAt?: boolean | number
+    db_write_timestamp?: boolean | number
+    id?: boolean | number
+    role_id?: boolean | number
+    selector?: boolean | number
+    selectorName?: boolean | number
+    target?: boolean | number
+    transactionHash?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+
+/** order by aggregate values of table "RolePermission" */
+export interface RolePermission_aggregate_order_by {avg?: (RolePermission_avg_order_by | null),count?: (order_by | null),max?: (RolePermission_max_order_by | null),min?: (RolePermission_min_order_by | null),stddev?: (RolePermission_stddev_order_by | null),stddev_pop?: (RolePermission_stddev_pop_order_by | null),stddev_samp?: (RolePermission_stddev_samp_order_by | null),sum?: (RolePermission_sum_order_by | null),var_pop?: (RolePermission_var_pop_order_by | null),var_samp?: (RolePermission_var_samp_order_by | null),variance?: (RolePermission_variance_order_by | null)}
+
+
+/** order by avg() on columns of table "RolePermission" */
+export interface RolePermission_avg_order_by {addedAt?: (order_by | null)}
+
+
+/** Boolean expression to filter rows from the table "RolePermission". All fields are combined with a logical 'AND'. */
+export interface RolePermission_bool_exp {_and?: (RolePermission_bool_exp[] | null),_not?: (RolePermission_bool_exp | null),_or?: (RolePermission_bool_exp[] | null),addedAt?: (numeric_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),id?: (String_comparison_exp | null),role_id?: (String_comparison_exp | null),selector?: (String_comparison_exp | null),selectorName?: (String_comparison_exp | null),target?: (String_comparison_exp | null),transactionHash?: (String_comparison_exp | null)}
+
+
+/** order by max() on columns of table "RolePermission" */
+export interface RolePermission_max_order_by {addedAt?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),role_id?: (order_by | null),selector?: (order_by | null),selectorName?: (order_by | null),target?: (order_by | null),transactionHash?: (order_by | null)}
+
+
+/** order by min() on columns of table "RolePermission" */
+export interface RolePermission_min_order_by {addedAt?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),role_id?: (order_by | null),selector?: (order_by | null),selectorName?: (order_by | null),target?: (order_by | null),transactionHash?: (order_by | null)}
+
+
+/** Ordering options when selecting data from "RolePermission". */
+export interface RolePermission_order_by {addedAt?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),role_id?: (order_by | null),selector?: (order_by | null),selectorName?: (order_by | null),target?: (order_by | null),transactionHash?: (order_by | null)}
+
+
+/** order by stddev() on columns of table "RolePermission" */
+export interface RolePermission_stddev_order_by {addedAt?: (order_by | null)}
+
+
+/** order by stddev_pop() on columns of table "RolePermission" */
+export interface RolePermission_stddev_pop_order_by {addedAt?: (order_by | null)}
+
+
+/** order by stddev_samp() on columns of table "RolePermission" */
+export interface RolePermission_stddev_samp_order_by {addedAt?: (order_by | null)}
+
+
+/** Streaming cursor of the table "RolePermission" */
+export interface RolePermission_stream_cursor_input {
+/** Stream column input with initial value */
+initial_value: RolePermission_stream_cursor_value_input,
+/** cursor ordering */
+ordering?: (cursor_ordering | null)}
+
+
+/** Initial value of the column from where the streaming should start */
+export interface RolePermission_stream_cursor_value_input {addedAt?: (Scalars['numeric'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),id?: (Scalars['String'] | null),role_id?: (Scalars['String'] | null),selector?: (Scalars['String'] | null),selectorName?: (Scalars['String'] | null),target?: (Scalars['String'] | null),transactionHash?: (Scalars['String'] | null)}
+
+
+/** order by sum() on columns of table "RolePermission" */
+export interface RolePermission_sum_order_by {addedAt?: (order_by | null)}
+
+
+/** order by var_pop() on columns of table "RolePermission" */
+export interface RolePermission_var_pop_order_by {addedAt?: (order_by | null)}
+
+
+/** order by var_samp() on columns of table "RolePermission" */
+export interface RolePermission_var_samp_order_by {addedAt?: (order_by | null)}
+
+
+/** order by variance() on columns of table "RolePermission" */
+export interface RolePermission_variance_order_by {addedAt?: (order_by | null)}
+
+
+/** order by aggregate values of table "Role" */
+export interface Role_aggregate_order_by {avg?: (Role_avg_order_by | null),count?: (order_by | null),max?: (Role_max_order_by | null),min?: (Role_min_order_by | null),stddev?: (Role_stddev_order_by | null),stddev_pop?: (Role_stddev_pop_order_by | null),stddev_samp?: (Role_stddev_samp_order_by | null),sum?: (Role_sum_order_by | null),var_pop?: (Role_var_pop_order_by | null),var_samp?: (Role_var_samp_order_by | null),variance?: (Role_variance_order_by | null)}
+
+
+/** order by avg() on columns of table "Role" */
+export interface Role_avg_order_by {createdAt?: (order_by | null),lastUpdatedAt?: (order_by | null)}
+
+
+/** Boolean expression to filter rows from the table "Role". All fields are combined with a logical 'AND'. */
+export interface Role_bool_exp {_and?: (Role_bool_exp[] | null),_not?: (Role_bool_exp | null),_or?: (Role_bool_exp[] | null),adminRole?: (String_comparison_exp | null),adminRoleName?: (String_comparison_exp | null),authorizer_id?: (String_comparison_exp | null),createdAt?: (numeric_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),id?: (String_comparison_exp | null),isAdminBurned?: (Boolean_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),members?: (RoleMember_bool_exp | null),name?: (String_comparison_exp | null),permissions?: (RolePermission_bool_exp | null),roleId?: (String_comparison_exp | null)}
+
+
+/** order by max() on columns of table "Role" */
+export interface Role_max_order_by {adminRole?: (order_by | null),adminRoleName?: (order_by | null),authorizer_id?: (order_by | null),createdAt?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),name?: (order_by | null),roleId?: (order_by | null)}
+
+
+/** order by min() on columns of table "Role" */
+export interface Role_min_order_by {adminRole?: (order_by | null),adminRoleName?: (order_by | null),authorizer_id?: (order_by | null),createdAt?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),name?: (order_by | null),roleId?: (order_by | null)}
+
+
+/** Ordering options when selecting data from "Role". */
+export interface Role_order_by {adminRole?: (order_by | null),adminRoleName?: (order_by | null),authorizer_id?: (order_by | null),createdAt?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),isAdminBurned?: (order_by | null),lastUpdatedAt?: (order_by | null),members_aggregate?: (RoleMember_aggregate_order_by | null),name?: (order_by | null),permissions_aggregate?: (RolePermission_aggregate_order_by | null),roleId?: (order_by | null)}
+
+
+/** order by stddev() on columns of table "Role" */
+export interface Role_stddev_order_by {createdAt?: (order_by | null),lastUpdatedAt?: (order_by | null)}
+
+
+/** order by stddev_pop() on columns of table "Role" */
+export interface Role_stddev_pop_order_by {createdAt?: (order_by | null),lastUpdatedAt?: (order_by | null)}
+
+
+/** order by stddev_samp() on columns of table "Role" */
+export interface Role_stddev_samp_order_by {createdAt?: (order_by | null),lastUpdatedAt?: (order_by | null)}
+
+
+/** Streaming cursor of the table "Role" */
+export interface Role_stream_cursor_input {
+/** Stream column input with initial value */
+initial_value: Role_stream_cursor_value_input,
+/** cursor ordering */
+ordering?: (cursor_ordering | null)}
+
+
+/** Initial value of the column from where the streaming should start */
+export interface Role_stream_cursor_value_input {adminRole?: (Scalars['String'] | null),adminRoleName?: (Scalars['String'] | null),authorizer_id?: (Scalars['String'] | null),createdAt?: (Scalars['numeric'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),id?: (Scalars['String'] | null),isAdminBurned?: (Scalars['Boolean'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),name?: (Scalars['String'] | null),roleId?: (Scalars['String'] | null)}
+
+
+/** order by sum() on columns of table "Role" */
+export interface Role_sum_order_by {createdAt?: (order_by | null),lastUpdatedAt?: (order_by | null)}
+
+
+/** order by var_pop() on columns of table "Role" */
+export interface Role_var_pop_order_by {createdAt?: (order_by | null),lastUpdatedAt?: (order_by | null)}
+
+
+/** order by var_samp() on columns of table "Role" */
+export interface Role_var_samp_order_by {createdAt?: (order_by | null),lastUpdatedAt?: (order_by | null)}
+
+
+/** order by variance() on columns of table "Role" */
+export interface Role_variance_order_by {createdAt?: (order_by | null),lastUpdatedAt?: (order_by | null)}
+
+
 /** columns and relationships of "Stake" */
 export interface StakeGenqlSelection{
     amountFormatted?: boolean | number
@@ -2678,6 +3102,20 @@ export interface query_rootGenqlSelection{
     where?: (Account_bool_exp | null)} })
     /** fetch data from the table: "Account" using primary key columns */
     Account_by_pk?: (AccountGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table: "AuthorizerContract" */
+    AuthorizerContract?: (AuthorizerContractGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (AuthorizerContract_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (AuthorizerContract_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (AuthorizerContract_bool_exp | null)} })
+    /** fetch data from the table: "AuthorizerContract" using primary key columns */
+    AuthorizerContract_by_pk?: (AuthorizerContractGenqlSelection & { __args: {id: Scalars['String']} })
     /** fetch data from the table: "CreditFacilityContract" */
     CreditFacilityContract?: (CreditFacilityContractGenqlSelection & { __args?: {
     /** distinct select on columns */
@@ -2888,6 +3326,48 @@ export interface query_rootGenqlSelection{
     where?: (PriceCandle_bool_exp | null)} })
     /** fetch data from the table: "PriceCandle" using primary key columns */
     PriceCandle_by_pk?: (PriceCandleGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table: "Role" */
+    Role?: (RoleGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (Role_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (Role_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (Role_bool_exp | null)} })
+    /** fetch data from the table: "RoleMember" */
+    RoleMember?: (RoleMemberGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (RoleMember_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (RoleMember_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (RoleMember_bool_exp | null)} })
+    /** fetch data from the table: "RoleMember" using primary key columns */
+    RoleMember_by_pk?: (RoleMemberGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table: "RolePermission" */
+    RolePermission?: (RolePermissionGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (RolePermission_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (RolePermission_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (RolePermission_bool_exp | null)} })
+    /** fetch data from the table: "RolePermission" using primary key columns */
+    RolePermission_by_pk?: (RolePermissionGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table: "Role" using primary key columns */
+    Role_by_pk?: (RoleGenqlSelection & { __args: {id: Scalars['String']} })
     /** fetch data from the table: "Stake" */
     Stake?: (StakeGenqlSelection & { __args?: {
     /** distinct select on columns */
@@ -3120,6 +3600,28 @@ export interface subscription_rootGenqlSelection{
     cursor: (Account_stream_cursor_input | null)[], 
     /** filter the rows returned */
     where?: (Account_bool_exp | null)} })
+    /** fetch data from the table: "AuthorizerContract" */
+    AuthorizerContract?: (AuthorizerContractGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (AuthorizerContract_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (AuthorizerContract_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (AuthorizerContract_bool_exp | null)} })
+    /** fetch data from the table: "AuthorizerContract" using primary key columns */
+    AuthorizerContract_by_pk?: (AuthorizerContractGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table in a streaming manner: "AuthorizerContract" */
+    AuthorizerContract_stream?: (AuthorizerContractGenqlSelection & { __args: {
+    /** maximum number of rows returned in a single batch */
+    batch_size: Scalars['Int'], 
+    /** cursor to stream the results returned by the query */
+    cursor: (AuthorizerContract_stream_cursor_input | null)[], 
+    /** filter the rows returned */
+    where?: (AuthorizerContract_bool_exp | null)} })
     /** fetch data from the table: "CreditFacilityContract" */
     CreditFacilityContract?: (CreditFacilityContractGenqlSelection & { __args?: {
     /** distinct select on columns */
@@ -3450,6 +3952,72 @@ export interface subscription_rootGenqlSelection{
     cursor: (PriceCandle_stream_cursor_input | null)[], 
     /** filter the rows returned */
     where?: (PriceCandle_bool_exp | null)} })
+    /** fetch data from the table: "Role" */
+    Role?: (RoleGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (Role_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (Role_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (Role_bool_exp | null)} })
+    /** fetch data from the table: "RoleMember" */
+    RoleMember?: (RoleMemberGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (RoleMember_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (RoleMember_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (RoleMember_bool_exp | null)} })
+    /** fetch data from the table: "RoleMember" using primary key columns */
+    RoleMember_by_pk?: (RoleMemberGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table in a streaming manner: "RoleMember" */
+    RoleMember_stream?: (RoleMemberGenqlSelection & { __args: {
+    /** maximum number of rows returned in a single batch */
+    batch_size: Scalars['Int'], 
+    /** cursor to stream the results returned by the query */
+    cursor: (RoleMember_stream_cursor_input | null)[], 
+    /** filter the rows returned */
+    where?: (RoleMember_bool_exp | null)} })
+    /** fetch data from the table: "RolePermission" */
+    RolePermission?: (RolePermissionGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (RolePermission_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (RolePermission_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (RolePermission_bool_exp | null)} })
+    /** fetch data from the table: "RolePermission" using primary key columns */
+    RolePermission_by_pk?: (RolePermissionGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table in a streaming manner: "RolePermission" */
+    RolePermission_stream?: (RolePermissionGenqlSelection & { __args: {
+    /** maximum number of rows returned in a single batch */
+    batch_size: Scalars['Int'], 
+    /** cursor to stream the results returned by the query */
+    cursor: (RolePermission_stream_cursor_input | null)[], 
+    /** filter the rows returned */
+    where?: (RolePermission_bool_exp | null)} })
+    /** fetch data from the table: "Role" using primary key columns */
+    Role_by_pk?: (RoleGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table in a streaming manner: "Role" */
+    Role_stream?: (RoleGenqlSelection & { __args: {
+    /** maximum number of rows returned in a single batch */
+    batch_size: Scalars['Int'], 
+    /** cursor to stream the results returned by the query */
+    cursor: (Role_stream_cursor_input | null)[], 
+    /** filter the rows returned */
+    where?: (Role_bool_exp | null)} })
     /** fetch data from the table: "Stake" */
     Stake?: (StakeGenqlSelection & { __args?: {
     /** distinct select on columns */
@@ -3720,6 +4288,14 @@ export type SubscriptionGenqlSelection = subscription_rootGenqlSelection
     
 
 
+    const AuthorizerContract_possibleTypes: string[] = ['AuthorizerContract']
+    export const isAuthorizerContract = (obj?: { __typename?: any } | null): obj is AuthorizerContract => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isAuthorizerContract"')
+      return AuthorizerContract_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
     const CreditFacilityContract_possibleTypes: string[] = ['CreditFacilityContract']
     export const isCreditFacilityContract = (obj?: { __typename?: any } | null): obj is CreditFacilityContract => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isCreditFacilityContract"')
@@ -3840,6 +4416,30 @@ export type SubscriptionGenqlSelection = subscription_rootGenqlSelection
     
 
 
+    const Role_possibleTypes: string[] = ['Role']
+    export const isRole = (obj?: { __typename?: any } | null): obj is Role => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isRole"')
+      return Role_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const RoleMember_possibleTypes: string[] = ['RoleMember']
+    export const isRoleMember = (obj?: { __typename?: any } | null): obj is RoleMember => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isRoleMember"')
+      return RoleMember_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const RolePermission_possibleTypes: string[] = ['RolePermission']
+    export const isRolePermission = (obj?: { __typename?: any } | null): obj is RolePermission => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isRolePermission"')
+      return RolePermission_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
     const Stake_possibleTypes: string[] = ['Stake']
     export const isStake = (obj?: { __typename?: any } | null): obj is Stake => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isStake"')
@@ -3946,6 +4546,15 @@ export type SubscriptionGenqlSelection = subscription_rootGenqlSelection
 export const enumAccountSelectColumn = {
    db_write_timestamp: 'db_write_timestamp' as const,
    id: 'id' as const
+}
+
+export const enumAuthorizerContractSelectColumn = {
+   createdAt: 'createdAt' as const,
+   db_write_timestamp: 'db_write_timestamp' as const,
+   floor: 'floor' as const,
+   id: 'id' as const,
+   lastAssignedRoleId: 'lastAssignedRoleId' as const,
+   lastUpdatedAt: 'lastUpdatedAt' as const
 }
 
 export const enumCreditFacilityContractSelectColumn = {
@@ -4205,6 +4814,40 @@ export const enumPriceCandleSelectColumn = {
    trades: 'trades' as const,
    volumeFormatted: 'volumeFormatted' as const,
    volumeRaw: 'volumeRaw' as const
+}
+
+export const enumRoleMemberSelectColumn = {
+   db_write_timestamp: 'db_write_timestamp' as const,
+   grantedAt: 'grantedAt' as const,
+   grantedBy: 'grantedBy' as const,
+   id: 'id' as const,
+   member: 'member' as const,
+   role_id: 'role_id' as const,
+   transactionHash: 'transactionHash' as const
+}
+
+export const enumRolePermissionSelectColumn = {
+   addedAt: 'addedAt' as const,
+   db_write_timestamp: 'db_write_timestamp' as const,
+   id: 'id' as const,
+   role_id: 'role_id' as const,
+   selector: 'selector' as const,
+   selectorName: 'selectorName' as const,
+   target: 'target' as const,
+   transactionHash: 'transactionHash' as const
+}
+
+export const enumRoleSelectColumn = {
+   adminRole: 'adminRole' as const,
+   adminRoleName: 'adminRoleName' as const,
+   authorizer_id: 'authorizer_id' as const,
+   createdAt: 'createdAt' as const,
+   db_write_timestamp: 'db_write_timestamp' as const,
+   id: 'id' as const,
+   isAdminBurned: 'isAdminBurned' as const,
+   lastUpdatedAt: 'lastUpdatedAt' as const,
+   name: 'name' as const,
+   roleId: 'roleId' as const
 }
 
 export const enumStakeSelectColumn = {
