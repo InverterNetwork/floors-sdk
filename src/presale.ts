@@ -1,4 +1,4 @@
-import type { Address, Hash } from 'viem'
+import type { Address, TransactionReceipt } from 'viem'
 import { getAddress } from 'viem'
 
 import ERC20Issuance_v1 from './abis/ERC20Issuance_v1'
@@ -23,9 +23,7 @@ export interface TPresaleApproveParams {
   amount: bigint
 }
 
-export interface TPresaleMutationResult {
-  hash: Hash
-}
+export type TPresaleMutationResult = TransactionReceipt
 
 export interface TPresalePosition {
   owner: Address
@@ -270,7 +268,7 @@ export class Presale {
    * @param params Deposit amount
    * @returns Transaction hash and position details
    */
-  public async buyPresale({ depositAmount }: TPresaleBuyParams): Promise<TPresaleMutationResult> {
+  public async buyPresale({ depositAmount }: TPresaleBuyParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
     this.assertPositiveAmount(depositAmount)
 
@@ -300,7 +298,9 @@ export class Presale {
       account: accountAddress,
     })
 
-    return { hash }
+    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+    return receipt
   }
 
   /**
@@ -311,7 +311,7 @@ export class Presale {
   public async buyPresaleWithLeverage({
     depositAmount,
     leverageIndex,
-  }: TPresaleBuyWithLeverageParams): Promise<TPresaleMutationResult> {
+  }: TPresaleBuyWithLeverageParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
     this.assertPositiveAmount(depositAmount)
 
@@ -345,7 +345,8 @@ export class Presale {
       account: accountAddress,
     })
 
-    return { hash }
+    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+    return receipt
   }
 
   /**
@@ -353,7 +354,7 @@ export class Presale {
    * @param params Position ID
    * @returns Transaction hash
    */
-  public async claimAll({ positionId }: TPresaleClaimParams): Promise<TPresaleMutationResult> {
+  public async claimAll({ positionId }: TPresaleClaimParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
 
     const hash = await walletClient.writeContract({
@@ -364,7 +365,9 @@ export class Presale {
       account: this.getWalletAddress(walletClient),
     })
 
-    return { hash }
+    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+    return receipt
   }
 
   /**
@@ -374,7 +377,7 @@ export class Presale {
    */
   public async approvePurchaseToken({
     amount,
-  }: TPresaleApproveParams): Promise<TPresaleMutationResult> {
+  }: TPresaleApproveParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
     this.assertPositiveAmount(amount)
 
@@ -386,7 +389,9 @@ export class Presale {
       account: this.getWalletAddress(walletClient),
     })
 
-    return { hash }
+    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+    return receipt
   }
 
   // =========================================================================
