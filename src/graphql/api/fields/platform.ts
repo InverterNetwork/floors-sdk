@@ -63,10 +63,7 @@ export interface TPlatformMetrics {
   assetsCreated24h: number
   creditPositions: number
   totalMarketCap: number
-  // UI-specific
-  displayTVL: string
-  displayYield: string
-  displayMarketCap: string
+  // Change percentages (requires historical data)
   tvlChange24h: number
   yieldChange24h: number
   marketCapChange24h: number
@@ -116,19 +113,6 @@ export function computePlatformMetrics(data: PlatformMetricsQueryResultType): TP
     )
   }, 0)
 
-  // Format large numbers with appropriate suffix
-  const formatLargeNumber = (value: number): string => {
-    if (value >= 1e9) {
-      return `$${(value / 1e9).toFixed(2)}B`
-    } else if (value >= 1e6) {
-      return `$${(value / 1e6).toFixed(1)}M`
-    } else if (value >= 1e3) {
-      return `$${(value / 1e3).toFixed(1)}K`
-    } else {
-      return `$${value.toFixed(2)}`
-    }
-  }
-
   return {
     totalValueLocked,
     totalYieldGenerated,
@@ -138,9 +122,6 @@ export function computePlatformMetrics(data: PlatformMetricsQueryResultType): TP
     volume24h,
     assetsCreated24h,
     creditPositions: loans.length,
-    displayTVL: formatLargeNumber(totalValueLocked),
-    displayYield: formatLargeNumber(totalYieldGenerated),
-    displayMarketCap: formatLargeNumber(totalMarketCap),
     tvlChange24h: 8.7, // This would need historical data to calculate
     yieldChange24h: 12.3, // This would need historical data to calculate
     marketCapChange24h: 3.4, // This would need historical data to calculate

@@ -183,14 +183,10 @@ export interface TComputedCreditData {
   collateral: {
     amount: number
     value: number
-    displayAmount: string
-    displayValue: string
   }
   borrowed: {
     amount: number
     value: number
-    displayAmount: string
-    displayValue: string
   }
   creditRatio: number
   liquidationFree: boolean
@@ -198,9 +194,7 @@ export interface TComputedCreditData {
   healthFactor: number // Always > 1 due to floor price guarantee
   timeCreated: Date
   lastUpdated: Date
-  creditUtilizationPercent: string
   safetyMargin: number
-  estimatedLiquidationPrice: string // Always "Never" for Floor Markets
   loanStatus: 'healthy' | 'safe' | 'protected'
 }
 

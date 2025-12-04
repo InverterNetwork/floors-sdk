@@ -118,11 +118,10 @@ export interface TUserAssetPosition {
   unrealizedGains: number
   yieldEarned: number
   stakingRewards?: number
+
   // UI-specific
-  displayBalance: string
-  displayValue: string
-  displayGains: string
+
   floorProtectionAmount: string
   positionSize: 'small' | 'medium' | 'large'
-  appreciationRate: string
+  appreciationRate: number
 }

@@ -118,24 +118,12 @@ export interface TComputedPresaleData {
   isEnded: boolean
   // Is presale upcoming
   isUpcoming: boolean
-  // Formatted time remaining string
-  timeRemainingFormatted: string
   // Commission amount in purchase token
   commissionAmount: number
-  // Commission amount formatted
-  commissionAmountFormatted: string
   // Remaining capacity
   remainingCapacity: number
-  // Remaining capacity formatted
-  remainingCapacityFormatted: string
   // Current price per token
   currentPrice: number
-  // Current price formatted
-  currentPriceFormatted: string
-  // Formatted total raised with token symbol (e.g., "20,168.77 USDC")
-  totalRaisedDisplay: string
-  // Formatted global deposit cap with token symbol (e.g., "1,000,000.00 USDC")
-  globalDepositCapDisplay: string
 }
 
 // Extended type that combines GraphQL Presale data with computed UI fields

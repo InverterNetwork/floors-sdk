@@ -1,5 +1,4 @@
 import { orderBy, sumBy } from 'lodash'
-import { formatUnits } from 'viem'
 
 import type {
   TCreditPositionData,
@@ -14,7 +13,7 @@ import type {
   TTradeData,
   TUserAssetPosition,
 } from './fields'
-import { buildSegments, formatCurrency, formatTokenAmount, safePercentage, toNumber } from './utils'
+import { buildSegments, safePercentage, toNumber } from './utils'
 
 export function mapMarketToFloorAssetData(
   market: TGraphQLMarket,
@@ -145,9 +144,6 @@ export function mapMarketToFloorAssetData(
   const name = market.id ? `Floor Market ${market.id.slice(0, 6)}` : 'Floor Market'
   const symbol = market.id ? `FM${market.id.slice(2, 6).toUpperCase()}` : 'FMKT'
 
-  const displayFloorPrice = formatCurrency(floorPrice)
-  const displayMarketPrice = formatCurrency(marketPrice)
-
   const segments = buildSegments(marketSupply, floorPrice, Math.max(totalSupply, 1))
 
   // Extract credit facility address from ModuleRegistry
@@ -172,16 +168,7 @@ export function mapMarketToFloorAssetData(
     },
     segments,
     contractAddress: market.id,
-    displayFloorPrice,
-    displayMarketPrice,
-    staticBuyPrice: formatCurrency(pricing.staticBuyPrice),
-    staticSellPrice: formatCurrency(pricing.staticSellPrice),
-    floorElevationRate: `${floorElevation.estimatedFloorIncrease.toFixed(1)}%`,
     isFloorElevating: floorElevations.length > 0,
-    creditUtilizationPercent: `${(credit.creditUtilization * 100).toFixed(1)}%`,
-    nextFloorTarget: formatCurrency(
-      floorPrice + Math.max(1, floorElevation.estimatedFloorIncrease)
-    ),
     // Add creditFacility address from ModuleRegistry
     creditFacility: creditFacilityAddress,
   } as TFloorAssetData & { creditFacility: string | null }
@@ -211,11 +198,6 @@ export function mapTradeToTradeData(trade: TGraphQLTrade): TTradeData {
     timestampDate: new Date(toNumber(trade.timestamp) * 1000),
     gasUsed: 0,
     blockNumber: 0,
-    displayAmounts: {
-      input: formatCurrency(reserveAmount),
-      output: formatTokenAmount(tokenAmount, trade.market_id),
-      fee: formatCurrency(fee),
-    },
     status: 'confirmed',
   }
 }
@@ -250,9 +232,7 @@ export function buildAccountUserPositions(
       const currentValue = data.balance * asset.pricing.currentMarketPrice
       const floorValue = data.balance * asset.pricing.currentFloorPrice
       const unrealizedGains = currentValue - data.costBasis
-      const floorProtection = formatCurrency(floorValue)
       const appreciation = floorValue ? ((currentValue - floorValue) / floorValue) * 100 : 0
-      const displayBalance = formatTokenAmount(data.balance, asset.symbol)
       return {
         assetId: marketId,
         asset,
@@ -262,12 +242,8 @@ export function buildAccountUserPositions(
         floorProtectedValue: floorValue,
         unrealizedGains,
         yieldEarned: Math.max(0, unrealizedGains * 0.05),
-        displayBalance,
-        displayValue: formatCurrency(currentValue),
-        displayGains: formatCurrency(unrealizedGains),
-        floorProtectionAmount: floorProtection,
         positionSize: currentValue > 500000 ? 'large' : currentValue > 100000 ? 'medium' : 'small',
-        appreciationRate: `${appreciation.toFixed(1)}%`,
+        appreciationRate: appreciation,
       }
     })
     .filter(Boolean) as TUserAssetPosition[]
@@ -292,52 +268,21 @@ export function mapPresaleToPresaleData(presale: TGraphQLPresale): TPresale {
   const isActive = now >= startTime && now < endTime && presale.currentState === 1
   const isEnded = now >= endTime || presale.currentState !== 1
 
-  // Format time remaining
-  const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24))
-  const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-  const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60))
-  let timeRemainingFormatted = ''
-  if (days > 0) {
-    timeRemainingFormatted = `${days}d ${hours}h`
-  } else if (hours > 0) {
-    timeRemainingFormatted = `${hours}h ${minutes}m`
-  } else if (minutes > 0) {
-    timeRemainingFormatted = `${minutes}m`
-  } else {
-    timeRemainingFormatted = 'Ended'
-  }
-
   // Calculate commission (using first commissionBps if array)
   const commissionBps = Array.isArray(presale.commissionBps)
     ? toNumber(presale.commissionBps[0])
     : toNumber(presale.commissionBps)
   const commissionRate = commissionBps / 10000
   const commissionAmount = totalRaised * commissionRate
-  const commissionAmountFormatted = formatCurrency(commissionAmount)
 
   // Calculate remaining capacity
   const remainingCapacity = Math.max(0, globalDepositCap - totalRaised)
-  const remainingCapacityFormatted = formatCurrency(remainingCapacity)
 
   // Calculate current price (use first price breakpoint if available)
   const priceBreakpoints = presale.priceBreakpointsFlat
     ? presale.priceBreakpointsFlat.map((p) => toNumber(p))
     : []
   const currentPrice = priceBreakpoints.length > 0 ? priceBreakpoints[0] : 0
-  const currentPriceFormatted = formatCurrency(currentPrice)
-
-  // Format amounts for display using purchase token decimals
-  const purchaseTokenDecimals = presale.purchaseToken?.decimals ?? 18
-  const totalRaisedDisplay = formatTokenAmount(
-    Number.parseFloat(formatUnits(BigInt(presale.totalRaisedRaw || '0'), purchaseTokenDecimals)),
-    presale.purchaseToken?.symbol
-  )
-  const globalDepositCapDisplay = formatTokenAmount(
-    Number.parseFloat(
-      formatUnits(BigInt(presale.globalDepositCapRaw || '0'), purchaseTokenDecimals)
-    ),
-    presale.purchaseToken?.symbol
-  )
 
   return {
     ...presale,
@@ -346,15 +291,9 @@ export function mapPresaleToPresaleData(presale: TGraphQLPresale): TPresale {
     isActive,
     isEnded,
     isUpcoming,
-    timeRemainingFormatted,
     commissionAmount,
-    commissionAmountFormatted,
     remainingCapacity,
-    remainingCapacityFormatted,
     currentPrice,
-    currentPriceFormatted,
-    totalRaisedDisplay,
-    globalDepositCapDisplay,
   }
 }
 
@@ -379,14 +318,10 @@ export function buildCreditPositions(
         collateral: {
           amount: collateralAmount,
           value: collateralValue,
-          displayAmount: formatTokenAmount(collateralAmount, asset.symbol),
-          displayValue: formatCurrency(collateralValue),
         },
         borrowed: {
           amount: borrowAmount,
           value: borrowedValue,
-          displayAmount: formatTokenAmount(borrowAmount, asset.symbol),
-          displayValue: formatCurrency(borrowedValue),
         },
         creditRatio,
         liquidationFree: true,
@@ -396,9 +331,7 @@ export function buildCreditPositions(
         lastUpdated: loan.lastUpdatedAt
           ? new Date(toNumber(loan.lastUpdatedAt) * 1000)
           : new Date(),
-        creditUtilizationPercent: `${(creditRatio * 100).toFixed(1)}%`,
         safetyMargin: Math.max(0, 1 - creditRatio),
-        estimatedLiquidationPrice: 'Never',
         loanStatus: creditRatio > 0.8 ? 'protected' : creditRatio > 0.6 ? 'safe' : 'healthy',
       }
     })

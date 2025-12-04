@@ -224,14 +224,7 @@ export interface TComputedAssetData {
 
   // UI-specific fields (computed from GraphQL numeric values)
   contractAddress: string // Contract address of the asset
-  displayFloorPrice: string
-  displayMarketPrice: string
-  staticBuyPrice: string
-  staticSellPrice: string
-  floorElevationRate: string
   isFloorElevating: boolean
-  creditUtilizationPercent: string
-  nextFloorTarget: string
 }
 
 // Extended type that combines GraphQL Market data with computed UI fields

@@ -51,11 +51,6 @@ export interface TComputedTradeData {
   timestampDate: Date
   gasUsed: number
   blockNumber: number
-  displayAmounts: {
-    input: string
-    output: string
-    fee: string
-  }
   status: 'pending' | 'confirmed' | 'failed'
 }
 

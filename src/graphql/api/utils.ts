@@ -1,40 +1,6 @@
 import { clamp, cloneDeep, merge } from 'lodash'
 
 /**
- * @description Formats a raw token amount into a human-friendly string with optional symbol.
- * @param {number} amount - The numeric token amount to format.
- * @param {string} [symbol] - Optional token symbol to append.
- * @returns {string}
- */
-export const formatTokenAmount = (amount: number, symbol?: string): string => {
-  const formatted = new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(amount)
-  return symbol ? `${formatted} ${symbol}` : formatted
-}
-
-/**
- * @description Formats a numeric value as USD currency.
- * @param {number} amount - The numeric value to format.
- * @returns {string}
- */
-export const formatCurrency = (amount: number, compact?: boolean): string => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-    ...(compact ? { notation: 'compact' } : {}),
-  }).format(amount)
-}
-
-export const formatPercentage = (value: number): string => {
-  const sign = value >= 0 ? '+' : ''
-  return `${sign}${value.toFixed(1)}%`
-}
-
-/**
  * @description Converts various value types into numbers while guarding against invalid inputs.
  * @param {string | number | null | undefined} value
  * @returns {number}
