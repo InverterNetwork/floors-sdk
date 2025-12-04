@@ -1,4 +1,4 @@
-import type { Address, Hash } from 'viem'
+import type { Address, TransactionReceipt } from 'viem'
 
 import { CreditFacility_v1, ERC20Issuance_v1, Floor_v1 } from './abis'
 import type { TFloorAssetData } from './graphql/api'
@@ -33,9 +33,7 @@ export interface TMarketRepayParams {
   loanId: bigint
 }
 
-export interface TMarketMutationResult {
-  hash: Hash
-}
+export type TMarketMutationResult = TransactionReceipt
 
 interface MarketConstructorArgs {
   data: TFloorAssetData
@@ -139,7 +137,9 @@ export class Market {
       account: this.getWalletAddress(walletClient),
     })
 
-    return { hash }
+    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+    return receipt
   }
 
   public async sell({
@@ -152,20 +152,24 @@ export class Market {
 
     const accountAddress = this.getWalletAddress(walletClient)
 
-    const [balance, allowance] = await Promise.all([
-      this.publicClient.readContract({
-        address: this.issuanceTokenAddress,
-        abi: ERC20Issuance_v1,
-        functionName: 'balanceOf',
-        args: [accountAddress],
-      }),
-      this.publicClient.readContract({
-        address: this.issuanceTokenAddress,
-        abi: ERC20Issuance_v1,
-        functionName: 'allowance',
-        args: [accountAddress, this.address],
-      }),
-    ])
+    // Use multicall to fetch balance and allowance in a single request
+    const [balance, allowance] = await this.publicClient.multicall({
+      contracts: [
+        {
+          address: this.issuanceTokenAddress,
+          abi: ERC20Issuance_v1,
+          functionName: 'balanceOf',
+          args: [accountAddress],
+        },
+        {
+          address: this.issuanceTokenAddress,
+          abi: ERC20Issuance_v1,
+          functionName: 'allowance',
+          args: [accountAddress, this.address],
+        },
+      ],
+      allowFailure: false,
+    })
 
     if ((balance as bigint) < depositAmount) {
       throw new Error(
@@ -190,7 +194,9 @@ export class Market {
       account: accountAddress,
     })
 
-    return { hash }
+    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+    return receipt
   }
 
   public async approveFToken({ amount }: TMarketApproveParams): Promise<TMarketMutationResult> {
@@ -205,7 +211,9 @@ export class Market {
       account: this.getWalletAddress(walletClient),
     })
 
-    return { hash }
+    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+    return receipt
   }
 
   public async approveReserveToken({
@@ -222,7 +230,9 @@ export class Market {
       account: this.getWalletAddress(walletClient),
     })
 
-    return { hash }
+    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+    return receipt
   }
 
   /**
@@ -243,7 +253,9 @@ export class Market {
       account: this.getWalletAddress(walletClient),
     })
 
-    return { hash }
+    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+    return receipt
   }
 
   /**
@@ -265,7 +277,9 @@ export class Market {
       account: this.getWalletAddress(walletClient),
     })
 
-    return { hash }
+    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+    return receipt
   }
 
   /**
@@ -300,7 +314,9 @@ export class Market {
       account: this.getWalletAddress(walletClient),
     })
 
-    return { hash }
+    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+    return receipt
   }
 
   /**
@@ -322,7 +338,9 @@ export class Market {
       account: this.getWalletAddress(walletClient),
     })
 
-    return { hash }
+    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+    return receipt
   }
 
   /**
