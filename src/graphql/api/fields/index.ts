@@ -1,4 +1,5 @@
 export * from './assets'
+export * from './authorizer'
 export * from './credit'
 export * from './global-stats'
 export * from './platform'

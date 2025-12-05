@@ -1,12 +1,17 @@
 import { orderBy, sumBy } from 'lodash'
+import { getAddress } from 'viem'
 
 import type {
+  TAuthorizerRole,
+  TAuthorizerRoleMember,
+  TAuthorizerRolePermission,
   TCreditPositionData,
   TFloorAssetData,
   TGraphQLAccount,
   TGraphQLLoan,
   TGraphQLMarket,
   TGraphQLPresale,
+  TGraphQLRole,
   TGraphQLTrade,
   TGraphQLUserMarketPosition,
   TPresale,
@@ -364,4 +369,50 @@ export function mapUserMarketPositionToDTO(
     hasActiveLoop: position.presaleLeverage > BigInt(0),
     lastUpdated: new Date(toNumber(position.lastUpdatedAt) * 1000),
   }
+}
+
+export function mapRoleToAuthorizerRole(role: TGraphQLRole, userAddress?: string): TAuthorizerRole {
+  const normalizedUser = userAddress ? getAddress(userAddress as `0x${string}`) : undefined
+  const members: TAuthorizerRoleMember[] = (role.members ?? []).map((member) => ({
+    id: member.id,
+    address: getAddress(member.member as `0x${string}`),
+    grantedBy: getAddress(member.grantedBy as `0x${string}`),
+    grantedAt: new Date(toNumber(member.grantedAt) * 1000),
+    transactionHash: member.transactionHash,
+  }))
+
+  const permissions: TAuthorizerRolePermission[] = (role.permissions ?? []).map((permission) => ({
+    id: permission.id,
+    target: getAddress(permission.target as `0x${string}`),
+    selector: permission.selector,
+    selectorName: permission.selectorName,
+    addedAt: new Date(toNumber(permission.addedAt) * 1000),
+    transactionHash: permission.transactionHash,
+  }))
+
+  const isUserMember = Boolean(
+    normalizedUser && members.some((member) => member.address === normalizedUser)
+  )
+
+  return {
+    id: role.id,
+    roleId: role.roleId,
+    name: role.name ?? null,
+    adminRole: role.adminRole ?? null,
+    adminRoleName: role.adminRoleName ?? null,
+    isAdminBurned: role.isAdminBurned ?? false,
+    authorizerId: role.authorizer_id,
+    createdAt: new Date(toNumber(role.createdAt) * 1000),
+    lastUpdatedAt: new Date(toNumber(role.lastUpdatedAt) * 1000),
+    members,
+    permissions,
+    isUserMember,
+  }
+}
+
+export function mapRolesToAuthorizerRoles(
+  roles: TGraphQLRole[],
+  userAddress?: string
+): TAuthorizerRole[] {
+  return roles.map((role) => mapRoleToAuthorizerRole(role, userAddress))
 }

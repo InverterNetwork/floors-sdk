@@ -1,3 +1,4 @@
+export * from './authorizer'
 export * from './global-stats'
 export * from './markets'
 export * from './platform'

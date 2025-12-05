@@ -47,3 +47,11 @@ export const presalesQueryKey = ['presales'] as const
  */
 export const presaleQueryKey = (presaleId: string | null | undefined) =>
   ['presale', presaleId ?? ''] as const
+
+/**
+ * @description Parameterized query key for authorizer roles scoped to an authorizer.
+ */
+export const authorizerRolesQueryKey = (
+  authorizerId: string | null | undefined,
+  userAddress?: string | null
+) => ['authorizer-roles', authorizerId ?? '', userAddress ?? ''] as const

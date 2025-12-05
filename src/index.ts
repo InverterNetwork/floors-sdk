@@ -1,4 +1,5 @@
 export * from './abis'
+export * from './authorizer'
 export * from './market'
 export * from './presale'
 export * from './schemas'

@@ -5,6 +5,7 @@ import type {
   AccountsQueryType,
   GlobalStatsQueryType,
   MarketsQueryType,
+  TAuthorizerRole,
   TCreditPositionData,
   TFloorAssetData,
   TGlobalStats,
@@ -19,6 +20,7 @@ import type {
 } from './fields'
 import {
   accountsQuery,
+  buildAuthorizerRolesQuery,
   buildPresalesQuery,
   computePlatformMetrics,
   globalStatsQuery,
@@ -33,6 +35,7 @@ import {
   buildCreditPositions,
   mapMarketToFloorAssetData,
   mapPresaleToPresaleData,
+  mapRolesToAuthorizerRoles,
   mapTradeToTradeData,
 } from './mappers'
 import type { ExtendableQueryArgs } from './utils'
@@ -183,6 +186,23 @@ export async function fetchPresalesByMarket(marketId: string): Promise<TPresale[
   const response = await query(buildPresalesQuery({ where: { market_id: { _eq: marketId } } }))
   const presales = response.PreSaleContract ?? []
   return presales.map((presale) => mapPresaleToPresaleData(presale))
+}
+
+/**
+ * @description Fetch authorizer roles by authorizer ID
+ */
+export async function fetchAuthorizerRolesById(
+  authorizerId: string,
+  userAddress?: string
+): Promise<TAuthorizerRole[]> {
+  const normalizedAuthorizer = getAddress(authorizerId as `0x${string}`)
+  const response = await query(
+    buildAuthorizerRolesQuery({
+      where: { authorizer_id: { _eq: normalizedAuthorizer } },
+    })
+  )
+  const roles = response.Role ?? []
+  return mapRolesToAuthorizerRoles(roles, userAddress)
 }
 
 /**
