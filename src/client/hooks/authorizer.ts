@@ -8,7 +8,7 @@ import {
 } from '@tanstack/react-query'
 import { useCallback, useMemo } from 'react'
 import type { Address, Hex } from 'viem'
-import { usePublicClient, useWalletClient } from 'wagmi'
+import { useAccount, usePublicClient, useWalletClient } from 'wagmi'
 
 import { Authorizer, type TAuthorizerMutationResult } from '../../authorizer'
 import { fetchAuthorizerRolesById, type TAuthorizerRole } from '../../graphql/api'
@@ -88,12 +88,14 @@ export const useAuthorizerRolesQuery = <TData = TAuthorizerRole[]>(
   userAddress?: string | null,
   options?: UseAuthorizerRolesQueryOptions<TData>
 ): UseQueryResult<TData, Error> => {
+  const { address } = useAccount()
+  const resolvedUserAddress = userAddress ?? address
   const enabled = options?.enabled ?? Boolean(authorizerId)
   const staleTime = options?.staleTime ?? 30_000
 
   return useQuery({
     queryKey: authorizerRolesQueryKey(authorizerId, userAddress),
-    queryFn: () => fetchAuthorizerRolesById(authorizerId!, userAddress ?? undefined),
+    queryFn: () => fetchAuthorizerRolesById(authorizerId!, resolvedUserAddress ?? undefined),
     ...options,
     enabled,
     staleTime,
