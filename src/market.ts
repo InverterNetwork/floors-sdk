@@ -97,12 +97,27 @@ export class Market {
       throw new Error('Owner address is required to fetch allowance.')
     }
 
-    return (await this.publicClient.readContract({
-      address: this.issuanceTokenAddress,
-      abi: ERC20Issuance_v1,
-      functionName: 'allowance',
-      args: [ownerAddress, this.address],
-    })) as bigint
+    try {
+      // Check if contract exists
+      const code = await this.publicClient.getBytecode({ address: this.issuanceTokenAddress })
+      if (!code || code === '0x') {
+        return BigInt(0)
+      }
+
+      return (await this.publicClient.readContract({
+        address: this.issuanceTokenAddress,
+        abi: ERC20Issuance_v1,
+        functionName: 'allowance',
+        args: [ownerAddress, this.address],
+      })) as bigint
+    } catch (error) {
+      // Contract doesn't exist, doesn't implement ERC20, or RPC call failed
+      console.warn(
+        `Failed to get fToken allowance for ${ownerAddress} on ${this.issuanceTokenAddress}:`,
+        error
+      )
+      return BigInt(0)
+    }
   }
 
   public async getReserveTokenAllowance(ownerAddress: Address): Promise<bigint> {
@@ -110,12 +125,27 @@ export class Market {
       throw new Error('Owner address is required to fetch allowance.')
     }
 
-    return (await this.publicClient.readContract({
-      address: this.reserveTokenAddress,
-      abi: ERC20Issuance_v1,
-      functionName: 'allowance',
-      args: [ownerAddress, this.address],
-    })) as bigint
+    try {
+      // Check if contract exists
+      const code = await this.publicClient.getBytecode({ address: this.reserveTokenAddress })
+      if (!code || code === '0x') {
+        return BigInt(0)
+      }
+
+      return (await this.publicClient.readContract({
+        address: this.reserveTokenAddress,
+        abi: ERC20Issuance_v1,
+        functionName: 'allowance',
+        args: [ownerAddress, this.address],
+      })) as bigint
+    } catch (error) {
+      // Contract doesn't exist, doesn't implement ERC20, or RPC call failed
+      console.warn(
+        `Failed to get reserve token allowance for ${ownerAddress} on ${this.reserveTokenAddress}:`,
+        error
+      )
+      return BigInt(0)
+    }
   }
 
   public async buy({
@@ -136,7 +166,6 @@ export class Market {
       args: [depositAmount, minAmountOut],
       account: this.getWalletAddress(walletClient),
     })
-
     const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
 
     return receipt
@@ -300,17 +329,17 @@ export class Market {
     this.assertPositiveAmount(amount)
 
     if (leverage < 1) {
-      throw new Error('Leverage must be at least 1x')
+      throw new Error('Leverage must be at least 1')
     }
 
-    // Convert leverage to basis points (e.g., 2x = 20000)
-    const leverageBps = BigInt(Math.floor(leverage * 10000))
+    // Contract expects loop count (iterations), not BPS
+    const loops = BigInt(Math.floor(leverage))
 
     const hash = await walletClient.writeContract({
       address: creditFacility,
       abi: CreditFacility_v1,
       functionName: 'buyAndBorrow',
-      args: [amount, leverageBps, consolidate],
+      args: [amount, loops, consolidate],
       account: this.getWalletAddress(walletClient),
     })
 
@@ -378,6 +407,23 @@ export class Market {
   }
 
   /**
+   * @description Get the maximum allowed leverage multiplier (e.g., 5 = 5x)
+   * @returns Max leverage multiplier
+   */
+  public async getMaxLeverage(): Promise<number> {
+    const creditFacility = this.requireCreditFacility()
+
+    const maxLeverage = (await this.publicClient.readContract({
+      address: creditFacility,
+      abi: CreditFacility_v1,
+      functionName: 'getMaxLeverage',
+      args: [],
+    })) as bigint
+
+    return Number(maxLeverage)
+  }
+
+  /**
    * @description Get fToken allowance for the Credit Facility
    * @param ownerAddress Address of the token owner
    * @returns Allowance amount
@@ -420,6 +466,49 @@ export class Market {
       throw new Error('Wallet not connected. Please connect your wallet to continue.')
     }
     return this.walletClient
+  }
+
+  /**
+   * @description Approve reserve tokens for the Credit Facility to use as collateral (for looping)
+   */
+  public async approveReserveTokenForCreditFacility({
+    amount,
+  }: TMarketApproveParams): Promise<TMarketMutationResult> {
+    const walletClient = this.requireWalletClient()
+    const creditFacility = this.requireCreditFacility()
+    this.assertPositiveAmount(amount)
+
+    const hash = await walletClient.writeContract({
+      address: this.reserveTokenAddress,
+      abi: ERC20Issuance_v1,
+      functionName: 'approve',
+      args: [creditFacility, amount],
+      account: this.getWalletAddress(walletClient),
+    })
+
+    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+    return receipt
+  }
+
+  /**
+   * @description Get reserve token allowance for the Credit Facility
+   * @param ownerAddress Address of the token owner
+   * @returns Allowance amount
+   */
+  public async getReserveTokenAllowanceForCreditFacility(ownerAddress: Address): Promise<bigint> {
+    const creditFacility = this.requireCreditFacility()
+
+    if (!ownerAddress) {
+      throw new Error('Owner address is required to fetch allowance.')
+    }
+
+    return (await this.publicClient.readContract({
+      address: this.reserveTokenAddress,
+      abi: ERC20Issuance_v1,
+      functionName: 'allowance',
+      args: [ownerAddress, creditFacility],
+    })) as bigint
   }
 
   private requireCreditFacility(): Address {

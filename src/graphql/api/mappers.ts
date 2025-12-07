@@ -125,14 +125,52 @@ export function mapMarketToFloorAssetData(
     creditGrowthRate: 0.2,
   }
 
+  const volume24h = sumBy(
+    trades.filter((t) => toNumber(t.timestamp) * 1000 > Date.now() - 24 * 60 * 60 * 1000),
+    (trade) => toNumber(trade.reserveAmountFormatted || trade.reserveAmountRaw)
+  )
+  const volumeTotal = totalVolume
+
+  // APR Calculation
+  let floorAPR = 0
+  if (sortedElevations.length > 0) {
+    // Get recent elevations (up to 30)
+    const recentElevations = sortedElevations.slice(0, Math.min(30, sortedElevations.length))
+    // Calculate total price increase
+    const totalIncrease = recentElevations.reduce((sum, event) => {
+      const prev = toNumber(event.oldFloorPriceFormatted || event.oldFloorPriceRaw)
+      const next = toNumber(event.newFloorPriceFormatted || event.newFloorPriceRaw)
+      return sum + (next - prev)
+    }, 0)
+
+    // Time span
+    const firstEvent = recentElevations[recentElevations.length - 1]
+    const lastEvent = recentElevations[0]
+
+    if (firstEvent && lastEvent) {
+      const timeSpanDays =
+        (toNumber(lastEvent.timestamp) * 1000 - toNumber(firstEvent.timestamp) * 1000) /
+        (1000 * 60 * 60 * 24)
+
+      if (floorPrice > 0 && timeSpanDays > 0) {
+        // annualized
+        floorAPR = (totalIncrease / floorPrice) * (365 / timeSpanDays)
+      } else if (recentElevations.length === 1 && floorPrice > 0) {
+        // Single event fallback
+        floorAPR = totalIncrease / floorPrice
+      }
+    }
+  }
+
   const metrics = {
-    volume24h: totalVolume,
-    volumeTotal: totalVolume * 30,
+    volume24h,
+    volumeTotal, // Sum of all fetched trades (limit 100)
     transactionCount: trades.length,
-    holders: Math.max(100, trades.length * 4),
+    holders: new Set(trades.map((t) => t.user_id)).size,
     creditPositions: floorElevations.length,
     totalValueLocked: totalSupply * marketPrice,
     marketCap: marketSupply * marketPrice,
+    floorAPR,
   }
 
   const riskLevel: 'low' | 'medium' | 'high' =

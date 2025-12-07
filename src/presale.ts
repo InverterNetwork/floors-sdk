@@ -40,6 +40,11 @@ export interface TPresalePositionState {
   claimedTokens: bigint
 }
 
+export interface TPresalePositionWithState extends TPresalePosition {
+  positionId: bigint
+  state: TPresalePositionState
+}
+
 interface PresaleConstructorArgs {
   data: TPresale
   publicClient: PopPublicClient
@@ -257,6 +262,60 @@ export class Presale {
       functionName: 'balanceOf',
       args: [userAddress],
     })) as bigint
+  }
+
+  /**
+   * @description Get all positions with their states for a user
+   * @param ownerAddress User address
+   * @returns Array of positions with their claimable/locked/claimed state
+   * @note Uses multicall to batch all contract reads into a single RPC call
+   */
+  public async getPositionsWithState(ownerAddress: Address): Promise<TPresalePositionWithState[]> {
+    const positionIds = await this.getPositionsByOwner(ownerAddress)
+
+    if (positionIds.length === 0) return []
+
+    // Build multicall contracts array - 2 calls per position (getPosition + getPositionState)
+    const contracts = positionIds.flatMap((positionId) => [
+      {
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'getPosition' as const,
+        args: [positionId] as const,
+      },
+      {
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'getPositionState' as const,
+        args: [positionId] as const,
+      },
+    ])
+
+    const results = await this.publicClient.multicall({ contracts })
+
+    // Parse results - every 2 results = 1 position (getPosition, getPositionState)
+    const positions: TPresalePositionWithState[] = []
+    for (let i = 0; i < positionIds.length; i++) {
+      const positionResult = results[i * 2]
+      const stateResult = results[i * 2 + 1]
+
+      if (positionResult.status === 'success' && stateResult.status === 'success') {
+        const position = positionResult.result as TPresalePosition
+        const stateArray = stateResult.result as [bigint, bigint, bigint]
+
+        positions.push({
+          positionId: positionIds[i],
+          ...position,
+          state: {
+            claimableTokens: stateArray[0],
+            lockedTokens: stateArray[1],
+            claimedTokens: stateArray[2],
+          },
+        })
+      }
+    }
+
+    return positions
   }
 
   // =========================================================================

@@ -47,8 +47,11 @@ type UseMarketMutationsReturnType = {
   getIssuanceAllowance: UseMutationResult<bigint, Error, Address | undefined>
   getReserveAllowance: UseMutationResult<bigint, Error, Address | undefined>
   getFTokenCreditAllowance: UseMutationResult<bigint, Error, Address | undefined>
+  getReserveCreditAllowance: UseMutationResult<bigint, Error, Address | undefined>
   getLoanToValueRatio: UseMutationResult<number, Error, void>
   getBorrowingFeeRate: UseMutationResult<number, Error, void>
+  getMaxLeverage: UseMutationResult<number, Error, void>
+  approveReserveForCredit: UseMutationResult<TMarketMutationResult, Error, TMarketApproveParams>
 }
 
 /**
@@ -221,6 +224,20 @@ export const useMarketMutations = (): UseMarketMutationsReturnType => {
       ensureMarket().getFTokenAllowanceForCreditFacility(ensureWalletAddress(owner)),
   })
 
+  // New Mutations for Loop
+  const approveReserveForCredit = useMutation({
+    mutationFn: (params: TMarketApproveParams) =>
+      ensureMarket().approveReserveTokenForCreditFacility(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+    },
+  })
+
+  const getReserveCreditAllowance = useMutation({
+    mutationFn: async (owner?: Address) =>
+      ensureMarket().getReserveTokenAllowanceForCreditFacility(ensureWalletAddress(owner)),
+  })
+
   const getLoanToValueRatio = useMutation({
     mutationFn: async () => ensureMarket().getLoanToValueRatio(),
   })
@@ -229,12 +246,17 @@ export const useMarketMutations = (): UseMarketMutationsReturnType => {
     mutationFn: async () => ensureMarket().getBorrowingFeeRate(),
   })
 
+  const getMaxLeverage = useMutation({
+    mutationFn: async () => ensureMarket().getMaxLeverage(),
+  })
+
   return {
     buy,
     sell,
     approveIssuance,
     approveReserve,
     approveFTokenForCredit,
+    approveReserveForCredit,
     borrow,
     buyAndBorrow,
     repay,
@@ -243,7 +265,9 @@ export const useMarketMutations = (): UseMarketMutationsReturnType => {
     getIssuanceAllowance,
     getReserveAllowance,
     getFTokenCreditAllowance,
+    getReserveCreditAllowance,
     getLoanToValueRatio,
     getBorrowingFeeRate,
+    getMaxLeverage,
   }
 }

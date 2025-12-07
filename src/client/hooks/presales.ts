@@ -100,8 +100,41 @@ import {
   type TPresaleBuyWithLeverageParams,
   type TPresaleClaimParams,
   type TPresaleMutationResult,
+  type TPresalePositionWithState,
 } from '../../presale'
 import { useFloors } from '../floors-context'
+
+export type UsePresalePositionsQueryOptions = Omit<
+  UseQueryOptions<TPresalePositionWithState[], Error>,
+  'queryKey' | 'queryFn'
+>
+
+export const usePresalePositionsQuery = (
+  ownerAddress: Address | undefined,
+  options?: UsePresalePositionsQueryOptions
+): UseQueryResult<TPresalePositionWithState[], Error> => {
+  const { presale } = useFloors()
+  const publicClient = usePublicClient()
+
+  const presaleClient = useMemo(() => {
+    if (!presale.data || !publicClient) return null
+    return new Presale({ data: presale.data, publicClient })
+  }, [presale.data, publicClient])
+
+  const enabled = options?.enabled ?? Boolean(presaleClient && ownerAddress)
+
+  return useQuery({
+    queryKey: ['presale', presale.data?.id, 'positions', ownerAddress] as const,
+    queryFn: async () => {
+      if (!presaleClient || !ownerAddress) return []
+      return presaleClient.getPositionsWithState(ownerAddress)
+    },
+    staleTime: 30_000,
+    refetchOnWindowFocus: true,
+    ...options,
+    enabled,
+  })
+}
 
 export type UsePresaleMutationsReturnType = {
   buyPresale: UseMutationResult<TPresaleMutationResult, Error, TPresaleBuyParams>

@@ -202,6 +202,7 @@ export interface TComputedAssetData {
     creditPositions: number
     totalValueLocked: number
     marketCap: number
+    floorAPR: number
   }
 
   timestamps: {
