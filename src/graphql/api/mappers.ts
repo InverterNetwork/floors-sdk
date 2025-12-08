@@ -17,6 +17,7 @@ import type {
   TPresale,
   TTradeData,
   TUserAssetPosition,
+  TUserLoanData,
 } from './fields'
 import { buildSegments, safePercentage, toNumber } from './utils'
 
@@ -216,7 +217,7 @@ export function mapMarketToFloorAssetData(
     // Add addresses from ModuleRegistry
     creditFacility: creditFacilityAddress,
     authorizer: authorizerAddress,
-  } as TFloorAssetData & { creditFacility: string | null; authorizer: string | null }
+  }
 }
 
 export function mapTradeToTradeData(trade: TGraphQLTrade): TTradeData {
@@ -455,4 +456,42 @@ export function mapRolesToAuthorizerRoles(
   userAddress?: string
 ): TAuthorizerRole[] {
   return roles.map((role) => mapRoleToAuthorizerRole(role, userAddress))
+}
+
+/**
+ * @description Maps GraphQL Loan to UI-friendly loan data
+ */
+export function mapLoanToUserLoanData(loan: TGraphQLLoan): TUserLoanData {
+  // Extract numeric loan ID from the composite ID (format: facilityAddress-loanIndex)
+  const loanIdParts = loan.id.split('-')
+  const loanIndex = loanIdParts.length > 1 ? BigInt(loanIdParts[1]) : BigInt(0)
+
+  return {
+    id: loan.id,
+    loanId: loanIndex,
+    borrowerId: loan.borrower_id,
+    marketId: loan.market_id,
+    lockedCollateral: toNumber(loan.lockedCollateralFormatted || loan.lockedCollateralRaw),
+    lockedCollateralRaw: loan.lockedCollateralRaw?.toString() ?? '0',
+    borrowAmount: toNumber(loan.borrowAmountFormatted || loan.borrowAmountRaw),
+    borrowAmountRaw: loan.borrowAmountRaw?.toString() ?? '0',
+    remainingDebt: toNumber(loan.remainingDebtFormatted || loan.remainingDebtRaw),
+    remainingDebtRaw: loan.remainingDebtRaw?.toString() ?? '0',
+    originationFee: toNumber(loan.originationFeeFormatted || loan.originationFeeRaw),
+    floorPriceAtBorrow: toNumber(loan.floorPriceAtBorrowFormatted || loan.floorPriceAtBorrowRaw),
+    status: loan.status as 'ACTIVE' | 'REPAID' | 'DEFAULTED',
+    openedAt: new Date(toNumber(loan.openedAt) * 1000),
+    closedAt: loan.closedAt ? new Date(toNumber(loan.closedAt) * 1000) : null,
+    lastUpdatedAt: loan.lastUpdatedAt
+      ? new Date(toNumber(loan.lastUpdatedAt) * 1000)
+      : new Date(toNumber(loan.openedAt) * 1000),
+    transactionHash: loan.transactionHash,
+  }
+}
+
+/**
+ * @description Maps array of GraphQL Loans to UI-friendly loan data
+ */
+export function mapLoansToUserLoanData(loans: TGraphQLLoan[]): TUserLoanData[] {
+  return loans.map(mapLoanToUserLoanData)
 }

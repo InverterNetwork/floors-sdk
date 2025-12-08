@@ -55,3 +55,17 @@ export const authorizerRolesQueryKey = (
   authorizerId: string | null | undefined,
   userAddress?: string | null
 ) => ['authorizer-roles', authorizerId ?? '', userAddress ?? ''] as const
+
+/**
+ * @description Parameterized query key for user loans scoped to a market.
+ */
+export const userLoansQueryKey = (
+  userAddress: string | null | undefined,
+  marketId: string | null | undefined
+) => ['user-loans', userAddress?.toLowerCase() ?? '', marketId ?? ''] as const
+
+/**
+ * @description Parameterized query key for all user loans across all markets.
+ */
+export const allUserLoansQueryKey = (userAddress: string | null | undefined) =>
+  ['user-loans', 'all', userAddress?.toLowerCase() ?? ''] as const

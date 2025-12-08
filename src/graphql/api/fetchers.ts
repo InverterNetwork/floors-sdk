@@ -4,6 +4,7 @@ import { query } from '..'
 import type {
   AccountsQueryType,
   GlobalStatsQueryType,
+  LoansQueryType,
   MarketsQueryType,
   TAuthorizerRole,
   TCreditPositionData,
@@ -24,6 +25,7 @@ import {
   buildPresalesQuery,
   computePlatformMetrics,
   globalStatsQuery,
+  loansQuery,
   mapGlobalStats,
   marketsQuery,
   platformMetricsQuery,
@@ -67,6 +69,11 @@ export const buildPlatformMetricsQuery = () => cloneQuery(platformMetricsQuery)
 export const buildGlobalStatsQuery = (args?: ExtendableQueryArgs<GlobalStatsQueryType>) => {
   const selection = cloneQuery(globalStatsQuery)
   return mergeFieldArgs(selection, 'GlobalStats', args)
+}
+
+export const buildLoansQuery = (args?: ExtendableQueryArgs<LoansQueryType['Loan']['__args']>) => {
+  const selection = cloneQuery(loansQuery)
+  return mergeFieldArgs(selection, 'Loan', args)
 }
 
 export async function fetchMarkets(): Promise<TFloorAssetData[]> {
@@ -233,5 +240,69 @@ export async function fetchUserMarketPosition(
   } catch (error) {
     console.error('Error fetching user market position:', error)
     return null
+  }
+}
+
+/**
+ * Fetch user's active loans for a specific market
+ * @param userAddress - The user's wallet address
+ * @param marketId - The market ID to filter loans by
+ * @returns Array of active loans for the user in that market
+ */
+export async function fetchUserLoans(
+  userAddress: string,
+  marketId: string
+): Promise<TGraphQLLoan[]> {
+  if (!userAddress || !marketId) return []
+
+  try {
+    const normalizedUserAddress = getAddress(userAddress as `0x${string}`)
+    const normalizedMarketId = getAddress(marketId as `0x${string}`)
+
+    const response = await query(
+      buildLoansQuery({
+        where: {
+          borrower_id: { _eq: normalizedUserAddress },
+          market_id: { _eq: normalizedMarketId },
+          status: { _neq: 'REPAID' },
+        },
+        // Oldest first for repay priority
+        order_by: [{ openedAt: 'asc' }] as unknown as [{ openedAt: 'desc' }],
+      })
+    )
+
+    return response.Loan ?? []
+  } catch (error) {
+    console.error('Error fetching user loans:', error)
+    return []
+  }
+}
+
+/**
+ * Fetch all loans for a user across all markets
+ * @param userAddress - The user's wallet address
+ * @returns Array of all active loans for the user
+ */
+export async function fetchAllUserLoans(userAddress: string): Promise<TGraphQLLoan[]> {
+  if (!userAddress) return []
+
+  try {
+    const normalizedUserAddress = getAddress(userAddress as `0x${string}`)
+
+    const response = await query(
+      buildLoansQuery({
+        where: {
+          borrower_id: { _eq: normalizedUserAddress },
+          status: { _neq: 'REPAID' },
+        },
+        // Oldest first
+        order_by: [{ openedAt: 'asc' }] as unknown as [{ openedAt: 'desc' }],
+      })
+    )
+
+    return response.Loan ?? []
+  } catch (error) {
+    console.error('Error fetching all user loans:', error)
+    return []
   }
 }

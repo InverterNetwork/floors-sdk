@@ -200,3 +200,26 @@ export interface TComputedCreditData {
 
 // Extended type that combines GraphQL Loan data with computed UI fields
 export interface TCreditPositionData extends TGraphQLLoan, TComputedCreditData {}
+
+/**
+ * UI-friendly loan data for repay form
+ */
+export interface TUserLoanData {
+  id: string
+  loanId: bigint
+  borrowerId: string
+  marketId: string
+  lockedCollateral: number
+  lockedCollateralRaw: string
+  borrowAmount: number
+  borrowAmountRaw: string
+  remainingDebt: number
+  remainingDebtRaw: string
+  originationFee: number
+  floorPriceAtBorrow: number
+  status: 'ACTIVE' | 'REPAID' | 'DEFAULTED'
+  openedAt: Date
+  closedAt: Date | null
+  lastUpdatedAt: Date
+  transactionHash: string
+}

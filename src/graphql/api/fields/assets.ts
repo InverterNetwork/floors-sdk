@@ -235,4 +235,7 @@ export interface TFloorAssetData extends TGraphQLMarket, TComputedAssetData {
   name?: string
   symbol?: string
   description?: string
+  // Module addresses from ModuleRegistry
+  creditFacility?: string | null
+  authorizer?: string | null
 }
