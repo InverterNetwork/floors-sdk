@@ -22,7 +22,7 @@ import { buildSegments, safePercentage, toNumber } from './utils'
 
 export function mapMarketToFloorAssetData(
   market: TGraphQLMarket,
-  moduleRegistry?: { creditFacility: string | null } | null
+  moduleRegistry?: { creditFacility: string | null; authorizer: string | null } | null
 ): TFloorAssetData {
   const floorPrice = toNumber(market.floorPriceFormatted || market.floorPriceRaw)
   const marketPrice = toNumber(market.currentPriceFormatted || market.currentPriceRaw)
@@ -189,8 +189,9 @@ export function mapMarketToFloorAssetData(
 
   const segments = buildSegments(marketSupply, floorPrice, Math.max(totalSupply, 1))
 
-  // Extract credit facility address from ModuleRegistry
+  // Extract addresses from ModuleRegistry
   const creditFacilityAddress = moduleRegistry?.creditFacility ?? null
+  const authorizerAddress = moduleRegistry?.authorizer ?? null
 
   return {
     ...market,
@@ -212,9 +213,10 @@ export function mapMarketToFloorAssetData(
     segments,
     contractAddress: market.id,
     isFloorElevating: floorElevations.length > 0,
-    // Add creditFacility address from ModuleRegistry
+    // Add addresses from ModuleRegistry
     creditFacility: creditFacilityAddress,
-  } as TFloorAssetData & { creditFacility: string | null }
+    authorizer: authorizerAddress,
+  } as TFloorAssetData & { creditFacility: string | null; authorizer: string | null }
 }
 
 export function mapTradeToTradeData(trade: TGraphQLTrade): TTradeData {
