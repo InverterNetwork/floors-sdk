@@ -275,47 +275,95 @@ export class Presale {
 
     if (positionIds.length === 0) return []
 
-    // Build multicall contracts array - 2 calls per position (getPosition + getPositionState)
-    const contracts = positionIds.flatMap((positionId) => [
-      {
-        address: this.address,
-        abi: Presale_v1,
-        functionName: 'getPosition' as const,
-        args: [positionId] as const,
-      },
-      {
-        address: this.address,
-        abi: Presale_v1,
-        functionName: 'getPositionState' as const,
-        args: [positionId] as const,
-      },
-    ])
+    // Try multicall first, fallback to individual calls if multicall3 not available (e.g., Anvil)
+    try {
+      // Build multicall contracts array - 2 calls per position (getPosition + getPositionState)
+      const contracts = positionIds.flatMap((positionId) => [
+        {
+          address: this.address,
+          abi: Presale_v1,
+          functionName: 'getPosition' as const,
+          args: [positionId] as const,
+        },
+        {
+          address: this.address,
+          abi: Presale_v1,
+          functionName: 'getPositionState' as const,
+          args: [positionId] as const,
+        },
+      ])
 
-    const results = await this.publicClient.multicall({ contracts })
+      const results = await this.publicClient.multicall({ contracts })
 
-    // Parse results - every 2 results = 1 position (getPosition, getPositionState)
-    const positions: TPresalePositionWithState[] = []
-    for (let i = 0; i < positionIds.length; i++) {
-      const positionResult = results[i * 2]
-      const stateResult = results[i * 2 + 1]
+      // Parse results - every 2 results = 1 position (getPosition, getPositionState)
+      const positions: TPresalePositionWithState[] = []
+      for (let i = 0; i < positionIds.length; i++) {
+        const positionResult = results[i * 2]
+        const stateResult = results[i * 2 + 1]
 
-      if (positionResult.status === 'success' && stateResult.status === 'success') {
-        const position = positionResult.result as TPresalePosition
-        const stateArray = stateResult.result as [bigint, bigint, bigint]
+        if (positionResult.status === 'success' && stateResult.status === 'success') {
+          const position = positionResult.result as TPresalePosition
+          const stateArray = stateResult.result as [bigint, bigint, bigint]
 
-        positions.push({
-          positionId: positionIds[i],
-          ...position,
-          state: {
-            claimableTokens: stateArray[0],
-            lockedTokens: stateArray[1],
-            claimedTokens: stateArray[2],
-          },
-        })
+          positions.push({
+            positionId: positionIds[i],
+            ...position,
+            state: {
+              claimableTokens: stateArray[0],
+              lockedTokens: stateArray[1],
+              claimedTokens: stateArray[2],
+            },
+          })
+        }
       }
-    }
 
-    return positions
+      return positions
+    } catch (error) {
+      // Fallback to individual calls if multicall fails (e.g., Anvil without multicall3)
+      if (
+        error instanceof Error &&
+        (error.message.includes('multicall') || error.message.includes('multicall3'))
+      ) {
+        const positions: TPresalePositionWithState[] = []
+
+        for (const positionId of positionIds) {
+          try {
+            const [position, stateArray] = await Promise.all([
+              this.publicClient.readContract({
+                address: this.address,
+                abi: Presale_v1,
+                functionName: 'getPosition',
+                args: [positionId],
+              }) as Promise<TPresalePosition>,
+              this.publicClient.readContract({
+                address: this.address,
+                abi: Presale_v1,
+                functionName: 'getPositionState',
+                args: [positionId],
+              }) as Promise<[bigint, bigint, bigint]>,
+            ])
+
+            positions.push({
+              positionId,
+              ...position,
+              state: {
+                claimableTokens: stateArray[0],
+                lockedTokens: stateArray[1],
+                claimedTokens: stateArray[2],
+              },
+            })
+          } catch (positionError) {
+            // Skip failed positions but continue with others
+            console.warn(`Failed to fetch position ${positionId}:`, positionError)
+          }
+        }
+
+        return positions
+      }
+
+      // Re-throw if it's not a multicall error
+      throw error
+    }
   }
 
   // =========================================================================
