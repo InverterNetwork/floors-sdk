@@ -72,3 +72,12 @@ export const mergeFieldArgs = <T extends Record<string, unknown>, K extends keyo
   target.__args = merge({}, target.__args, overrides)
   return selection
 }
+/**
+ * @description Calculates the premium rate between market price and floor price.
+ * @param {number} marketPrice
+ * @param {number} floorPrice
+ * @returns {number}
+ */
+export const calculatePremiumRate = (marketPrice: number, floorPrice: number) => {
+  return ((marketPrice - floorPrice) / floorPrice) * 100
+}
