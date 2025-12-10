@@ -953,6 +953,87 @@ input FloorElevation_variance_order_by {
 }
 
 """
+columns and relationships of "GlobalRegistry"
+"""
+type GlobalRegistry {
+  createdAt: numeric!
+  db_write_timestamp: timestamp
+  floorFactoryAddress: String!
+  id: String!
+  lastUpdatedAt: numeric!
+  moduleFactoryAddress: String!
+}
+
+"""
+Boolean expression to filter rows from the table "GlobalRegistry". All fields are combined with a logical 'AND'.
+"""
+input GlobalRegistry_bool_exp {
+  _and: [GlobalRegistry_bool_exp!]
+  _not: GlobalRegistry_bool_exp
+  _or: [GlobalRegistry_bool_exp!]
+  createdAt: numeric_comparison_exp
+  db_write_timestamp: timestamp_comparison_exp
+  floorFactoryAddress: String_comparison_exp
+  id: String_comparison_exp
+  lastUpdatedAt: numeric_comparison_exp
+  moduleFactoryAddress: String_comparison_exp
+}
+
+"""Ordering options when selecting data from "GlobalRegistry"."""
+input GlobalRegistry_order_by {
+  createdAt: order_by
+  db_write_timestamp: order_by
+  floorFactoryAddress: order_by
+  id: order_by
+  lastUpdatedAt: order_by
+  moduleFactoryAddress: order_by
+}
+
+"""
+select columns of table "GlobalRegistry"
+"""
+enum GlobalRegistry_select_column {
+  """column name"""
+  createdAt
+
+  """column name"""
+  db_write_timestamp
+
+  """column name"""
+  floorFactoryAddress
+
+  """column name"""
+  id
+
+  """column name"""
+  lastUpdatedAt
+
+  """column name"""
+  moduleFactoryAddress
+}
+
+"""
+Streaming cursor of the table "GlobalRegistry"
+"""
+input GlobalRegistry_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: GlobalRegistry_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input GlobalRegistry_stream_cursor_value_input {
+  createdAt: numeric
+  db_write_timestamp: timestamp
+  floorFactoryAddress: String
+  id: String
+  lastUpdatedAt: numeric
+  moduleFactoryAddress: String
+}
+
+"""
 columns and relationships of "GlobalStats"
 """
 type GlobalStats {
@@ -6217,6 +6298,29 @@ type query_root {
   FloorElevation_by_pk(id: String!): FloorElevation
 
   """
+  fetch data from the table: "GlobalRegistry"
+  """
+  GlobalRegistry(
+    """distinct select on columns"""
+    distinct_on: [GlobalRegistry_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [GlobalRegistry_order_by!]
+
+    """filter the rows returned"""
+    where: GlobalRegistry_bool_exp
+  ): [GlobalRegistry!]!
+
+  """fetch data from the table: "GlobalRegistry" using primary key columns"""
+  GlobalRegistry_by_pk(id: String!): GlobalRegistry
+
+  """
   fetch data from the table: "GlobalStats"
   """
   GlobalStats(
@@ -7181,6 +7285,43 @@ type subscription_root {
     """filter the rows returned"""
     where: FloorElevation_bool_exp
   ): [FloorElevation!]!
+
+  """
+  fetch data from the table: "GlobalRegistry"
+  """
+  GlobalRegistry(
+    """distinct select on columns"""
+    distinct_on: [GlobalRegistry_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [GlobalRegistry_order_by!]
+
+    """filter the rows returned"""
+    where: GlobalRegistry_bool_exp
+  ): [GlobalRegistry!]!
+
+  """fetch data from the table: "GlobalRegistry" using primary key columns"""
+  GlobalRegistry_by_pk(id: String!): GlobalRegistry
+
+  """
+  fetch data from the table in a streaming manner: "GlobalRegistry"
+  """
+  GlobalRegistry_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [GlobalRegistry_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: GlobalRegistry_bool_exp
+  ): [GlobalRegistry!]!
 
   """
   fetch data from the table: "GlobalStats"

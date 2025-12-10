@@ -7,189 +7,190 @@ export default {
         27,
         44,
         57,
-        60,
-        71,
-        87,
-        101,
+        63,
+        66,
+        77,
+        93,
         107,
-        116,
-        129,
+        113,
+        122,
         135,
         141,
-        151,
-        168,
-        181,
-        192,
-        209,
-        225,
-        242,
-        255,
-        258,
+        147,
+        157,
+        174,
+        187,
+        198,
+        215,
+        231,
+        248,
+        261,
         264,
-        274,
-        291,
-        301,
-        306,
-        309,
-        311,
+        270,
+        280,
+        297,
+        307,
+        312,
         315,
+        317,
         321,
         327,
-        330,
         333,
-        335,
-        337,
-        340,
-        344,
-        347,
-        352,
-        355,
-        357,
-        359,
-        361
+        336,
+        339,
+        341,
+        343,
+        346,
+        350,
+        353,
+        358,
+        361,
+        363,
+        365,
+        367
     ],
     "types": {
         "Account": {
             "db_write_timestamp": [
-                357
+                363
             ],
             "id": [
-                258
+                264
             ],
             "loans": [
-                63,
+                69,
                 {
                     "distinct_on": [
-                        87,
+                        93,
                         "[Loan_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        86,
+                        92,
                         "[Loan_order_by!]"
                     ],
                     "where": [
-                        83
+                        89
                     ]
                 }
             ],
             "marketsCreated": [
-                97,
+                103,
                 {
                     "distinct_on": [
-                        116,
+                        122,
                         "[Market_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        115,
+                        121,
                         "[Market_order_by!]"
                     ],
                     "where": [
-                        112
+                        118
                     ]
                 }
             ],
             "presaleParticipations": [
-                161,
+                167,
                 {
                     "distinct_on": [
-                        168,
+                        174,
                         "[PresaleParticipation_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        167,
+                        173,
                         "[PresaleParticipation_order_by!]"
                     ],
                     "where": [
-                        164
+                        170
                     ]
                 }
             ],
             "stakes": [
-                235,
+                241,
                 {
                     "distinct_on": [
-                        242,
+                        248,
                         "[Stake_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        241,
+                        247,
                         "[Stake_order_by!]"
                     ],
                     "where": [
-                        238
+                        244
                     ]
                 }
             ],
             "trades": [
-                267,
+                273,
                 {
                     "distinct_on": [
-                        274,
+                        280,
                         "[Trade_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        273,
+                        279,
                         "[Trade_order_by!]"
                     ],
                     "where": [
-                        270
+                        276
                     ]
                 }
             ],
             "userMarketPositions": [
-                284,
+                290,
                 {
                     "distinct_on": [
-                        291,
+                        297,
                         "[UserMarketPosition_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        290,
+                        296,
                         "[UserMarketPosition_order_by!]"
                     ],
                     "where": [
-                        287
+                        293
                     ]
                 }
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Account_bool_exp": {
@@ -203,60 +204,60 @@ export default {
                 1
             ],
             "db_write_timestamp": [
-                358
+                364
             ],
             "id": [
-                260
+                266
             ],
             "loans": [
-                83
+                89
             ],
             "marketsCreated": [
-                112
+                118
             ],
             "presaleParticipations": [
-                164
+                170
             ],
             "stakes": [
-                238
+                244
             ],
             "trades": [
-                270
+                276
             ],
             "userMarketPositions": [
-                287
+                293
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Account_order_by": {
             "db_write_timestamp": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "loans_aggregate": [
-                81
+                87
             ],
             "marketsCreated_aggregate": [
-                110
+                116
             ],
             "presaleParticipations_aggregate": [
-                162
+                168
             ],
             "stakes_aggregate": [
-                236
+                242
             ],
             "trades_aggregate": [
-                268
+                274
             ],
             "userMarketPositions_aggregate": [
-                285
+                291
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Account_select_column": {},
@@ -265,66 +266,66 @@ export default {
                 5
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Account_stream_cursor_value_input": {
             "db_write_timestamp": [
-                357
+                363
             ],
             "id": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "AuthorizerContract": {
             "createdAt": [
-                337
+                343
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "floor": [
-                258
+                264
             ],
             "id": [
-                258
+                264
             ],
             "lastAssignedRoleId": [
-                337
+                343
             ],
             "lastUpdatedAt": [
-                337
+                343
             ],
             "roles": [
-                184,
+                190,
                 {
                     "distinct_on": [
-                        225,
+                        231,
                         "[Role_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        224,
+                        230,
                         "[Role_order_by!]"
                     ],
                     "where": [
-                        221
+                        227
                     ]
                 }
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "AuthorizerContract_bool_exp": {
@@ -338,54 +339,54 @@ export default {
                 7
             ],
             "createdAt": [
-                339
+                345
             ],
             "db_write_timestamp": [
-                358
+                364
             ],
             "floor": [
-                260
+                266
             ],
             "id": [
-                260
+                266
             ],
             "lastAssignedRoleId": [
-                339
+                345
             ],
             "lastUpdatedAt": [
-                339
+                345
             ],
             "roles": [
-                221
+                227
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "AuthorizerContract_order_by": {
             "createdAt": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "floor": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "lastAssignedRoleId": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "roles_aggregate": [
-                219
+                225
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "AuthorizerContract_select_column": {},
@@ -394,33 +395,33 @@ export default {
                 11
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "AuthorizerContract_stream_cursor_value_input": {
             "createdAt": [
-                337
+                343
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "floor": [
-                258
+                264
             ],
             "id": [
-                258
+                264
             ],
             "lastAssignedRoleId": [
-                337
+                343
             ],
             "lastUpdatedAt": [
-                337
+                343
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Boolean": {},
@@ -453,76 +454,76 @@ export default {
                 12
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "CreditFacilityContract": {
             "borrowToken_id": [
-                258
+                264
             ],
             "collateralToken_id": [
-                258
+                264
             ],
             "createdAt": [
-                337
+                343
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "id": [
-                258
+                264
             ],
             "lastUpdatedAt": [
-                337
+                343
             ],
             "loans": [
-                63,
+                69,
                 {
                     "distinct_on": [
-                        87,
+                        93,
                         "[Loan_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        86,
+                        92,
                         "[Loan_order_by!]"
                     ],
                     "where": [
-                        83
+                        89
                     ]
                 }
             ],
             "market_id": [
-                258
+                264
             ],
             "totalDebtFormatted": [
-                258
+                264
             ],
             "totalDebtRaw": [
-                337
+                343
             ],
             "totalLoans": [
-                337
+                343
             ],
             "totalLockedCollateralFormatted": [
-                258
+                264
             ],
             "totalLockedCollateralRaw": [
-                337
+                343
             ],
             "totalVolumeFormatted": [
-                258
+                264
             ],
             "totalVolumeRaw": [
-                337
+                343
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "CreditFacilityContract_bool_exp": {
@@ -536,102 +537,102 @@ export default {
                 15
             ],
             "borrowToken_id": [
-                260
+                266
             ],
             "collateralToken_id": [
-                260
+                266
             ],
             "createdAt": [
-                339
+                345
             ],
             "db_write_timestamp": [
-                358
+                364
             ],
             "id": [
-                260
+                266
             ],
             "lastUpdatedAt": [
-                339
+                345
             ],
             "loans": [
-                83
+                89
             ],
             "market_id": [
-                260
+                266
             ],
             "totalDebtFormatted": [
-                260
+                266
             ],
             "totalDebtRaw": [
-                339
+                345
             ],
             "totalLoans": [
-                339
+                345
             ],
             "totalLockedCollateralFormatted": [
-                260
+                266
             ],
             "totalLockedCollateralRaw": [
-                339
+                345
             ],
             "totalVolumeFormatted": [
-                260
+                266
             ],
             "totalVolumeRaw": [
-                339
+                345
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "CreditFacilityContract_order_by": {
             "borrowToken_id": [
-                340
+                346
             ],
             "collateralToken_id": [
-                340
+                346
             ],
             "createdAt": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "loans_aggregate": [
-                81
+                87
             ],
             "market_id": [
-                340
+                346
             ],
             "totalDebtFormatted": [
-                340
+                346
             ],
             "totalDebtRaw": [
-                340
+                346
             ],
             "totalLoans": [
-                340
+                346
             ],
             "totalLockedCollateralFormatted": [
-                340
+                346
             ],
             "totalLockedCollateralRaw": [
-                340
+                346
             ],
             "totalVolumeFormatted": [
-                340
+                346
             ],
             "totalVolumeRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "CreditFacilityContract_select_column": {},
@@ -640,95 +641,95 @@ export default {
                 19
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "CreditFacilityContract_stream_cursor_value_input": {
             "borrowToken_id": [
-                258
+                264
             ],
             "collateralToken_id": [
-                258
+                264
             ],
             "createdAt": [
-                337
+                343
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "id": [
-                258
+                264
             ],
             "lastUpdatedAt": [
-                337
+                343
             ],
             "market_id": [
-                258
+                264
             ],
             "totalDebtFormatted": [
-                258
+                264
             ],
             "totalDebtRaw": [
-                337
+                343
             ],
             "totalLoans": [
-                337
+                343
             ],
             "totalLockedCollateralFormatted": [
-                258
+                264
             ],
             "totalLockedCollateralRaw": [
-                337
+                343
             ],
             "totalVolumeFormatted": [
-                258
+                264
             ],
             "totalVolumeRaw": [
-                337
+                343
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FeeDistribution": {
             "db_write_timestamp": [
-                357
+                363
             ],
             "floorAmountFormatted": [
-                258
+                264
             ],
             "floorAmountRaw": [
-                337
+                343
             ],
             "id": [
-                258
+                264
             ],
             "market_id": [
-                258
+                264
             ],
             "stakingAmountFormatted": [
-                258
+                264
             ],
             "stakingAmountRaw": [
-                337
+                343
             ],
             "timestamp": [
-                337
+                343
             ],
             "transactionHash": [
-                258
+                264
             ],
             "treasuryAmountFormatted": [
-                258
+                264
             ],
             "treasuryAmountRaw": [
-                337
+                343
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FeeDistribution_aggregate_order_by": {
@@ -736,7 +737,7 @@ export default {
                 22
             ],
             "count": [
-                340
+                346
             ],
             "max": [
                 24
@@ -766,24 +767,24 @@ export default {
                 36
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FeeDistribution_avg_order_by": {
             "floorAmountRaw": [
-                340
+                346
             ],
             "stakingAmountRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "treasuryAmountRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FeeDistribution_bool_exp": {
@@ -797,206 +798,206 @@ export default {
                 23
             ],
             "db_write_timestamp": [
-                358
+                364
             ],
             "floorAmountFormatted": [
-                260
+                266
             ],
             "floorAmountRaw": [
-                339
+                345
             ],
             "id": [
-                260
+                266
             ],
             "market_id": [
-                260
+                266
             ],
             "stakingAmountFormatted": [
-                260
+                266
             ],
             "stakingAmountRaw": [
-                339
+                345
             ],
             "timestamp": [
-                339
+                345
             ],
             "transactionHash": [
-                260
+                266
             ],
             "treasuryAmountFormatted": [
-                260
+                266
             ],
             "treasuryAmountRaw": [
-                339
+                345
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FeeDistribution_max_order_by": {
             "db_write_timestamp": [
-                340
+                346
             ],
             "floorAmountFormatted": [
-                340
+                346
             ],
             "floorAmountRaw": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "market_id": [
-                340
+                346
             ],
             "stakingAmountFormatted": [
-                340
+                346
             ],
             "stakingAmountRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "treasuryAmountFormatted": [
-                340
+                346
             ],
             "treasuryAmountRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FeeDistribution_min_order_by": {
             "db_write_timestamp": [
-                340
+                346
             ],
             "floorAmountFormatted": [
-                340
+                346
             ],
             "floorAmountRaw": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "market_id": [
-                340
+                346
             ],
             "stakingAmountFormatted": [
-                340
+                346
             ],
             "stakingAmountRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "treasuryAmountFormatted": [
-                340
+                346
             ],
             "treasuryAmountRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FeeDistribution_order_by": {
             "db_write_timestamp": [
-                340
+                346
             ],
             "floorAmountFormatted": [
-                340
+                346
             ],
             "floorAmountRaw": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "market_id": [
-                340
+                346
             ],
             "stakingAmountFormatted": [
-                340
+                346
             ],
             "stakingAmountRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "treasuryAmountFormatted": [
-                340
+                346
             ],
             "treasuryAmountRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FeeDistribution_select_column": {},
         "FeeDistribution_stddev_order_by": {
             "floorAmountRaw": [
-                340
+                346
             ],
             "stakingAmountRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "treasuryAmountRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FeeDistribution_stddev_pop_order_by": {
             "floorAmountRaw": [
-                340
+                346
             ],
             "stakingAmountRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "treasuryAmountRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FeeDistribution_stddev_samp_order_by": {
             "floorAmountRaw": [
-                340
+                346
             ],
             "stakingAmountRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "treasuryAmountRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FeeDistribution_stream_cursor_input": {
@@ -1004,154 +1005,154 @@ export default {
                 32
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FeeDistribution_stream_cursor_value_input": {
             "db_write_timestamp": [
-                357
+                363
             ],
             "floorAmountFormatted": [
-                258
+                264
             ],
             "floorAmountRaw": [
-                337
+                343
             ],
             "id": [
-                258
+                264
             ],
             "market_id": [
-                258
+                264
             ],
             "stakingAmountFormatted": [
-                258
+                264
             ],
             "stakingAmountRaw": [
-                337
+                343
             ],
             "timestamp": [
-                337
+                343
             ],
             "transactionHash": [
-                258
+                264
             ],
             "treasuryAmountFormatted": [
-                258
+                264
             ],
             "treasuryAmountRaw": [
-                337
+                343
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FeeDistribution_sum_order_by": {
             "floorAmountRaw": [
-                340
+                346
             ],
             "stakingAmountRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "treasuryAmountRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FeeDistribution_var_pop_order_by": {
             "floorAmountRaw": [
-                340
+                346
             ],
             "stakingAmountRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "treasuryAmountRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FeeDistribution_var_samp_order_by": {
             "floorAmountRaw": [
-                340
+                346
             ],
             "stakingAmountRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "treasuryAmountRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FeeDistribution_variance_order_by": {
             "floorAmountRaw": [
-                340
+                346
             ],
             "stakingAmountRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "treasuryAmountRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FloorElevation": {
             "db_write_timestamp": [
-                357
+                363
             ],
             "deployedAmountFormatted": [
-                258
+                264
             ],
             "deployedAmountRaw": [
-                337
+                343
             ],
             "id": [
-                258
+                264
             ],
             "market_id": [
-                258
+                264
             ],
             "newFloorPriceFormatted": [
-                258
+                264
             ],
             "newFloorPriceRaw": [
-                337
+                343
             ],
             "oldFloorPriceFormatted": [
-                258
+                264
             ],
             "oldFloorPriceRaw": [
-                337
+                343
             ],
             "timestamp": [
-                337
+                343
             ],
             "transactionHash": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FloorElevation_aggregate_order_by": {
@@ -1159,7 +1160,7 @@ export default {
                 39
             ],
             "count": [
-                340
+                346
             ],
             "max": [
                 41
@@ -1189,24 +1190,24 @@ export default {
                 53
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FloorElevation_avg_order_by": {
             "deployedAmountRaw": [
-                340
+                346
             ],
             "newFloorPriceRaw": [
-                340
+                346
             ],
             "oldFloorPriceRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FloorElevation_bool_exp": {
@@ -1220,206 +1221,206 @@ export default {
                 40
             ],
             "db_write_timestamp": [
-                358
+                364
             ],
             "deployedAmountFormatted": [
-                260
+                266
             ],
             "deployedAmountRaw": [
-                339
+                345
             ],
             "id": [
-                260
+                266
             ],
             "market_id": [
-                260
+                266
             ],
             "newFloorPriceFormatted": [
-                260
+                266
             ],
             "newFloorPriceRaw": [
-                339
+                345
             ],
             "oldFloorPriceFormatted": [
-                260
+                266
             ],
             "oldFloorPriceRaw": [
-                339
+                345
             ],
             "timestamp": [
-                339
+                345
             ],
             "transactionHash": [
-                260
+                266
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FloorElevation_max_order_by": {
             "db_write_timestamp": [
-                340
+                346
             ],
             "deployedAmountFormatted": [
-                340
+                346
             ],
             "deployedAmountRaw": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "market_id": [
-                340
+                346
             ],
             "newFloorPriceFormatted": [
-                340
+                346
             ],
             "newFloorPriceRaw": [
-                340
+                346
             ],
             "oldFloorPriceFormatted": [
-                340
+                346
             ],
             "oldFloorPriceRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FloorElevation_min_order_by": {
             "db_write_timestamp": [
-                340
+                346
             ],
             "deployedAmountFormatted": [
-                340
+                346
             ],
             "deployedAmountRaw": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "market_id": [
-                340
+                346
             ],
             "newFloorPriceFormatted": [
-                340
+                346
             ],
             "newFloorPriceRaw": [
-                340
+                346
             ],
             "oldFloorPriceFormatted": [
-                340
+                346
             ],
             "oldFloorPriceRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FloorElevation_order_by": {
             "db_write_timestamp": [
-                340
+                346
             ],
             "deployedAmountFormatted": [
-                340
+                346
             ],
             "deployedAmountRaw": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "market_id": [
-                340
+                346
             ],
             "newFloorPriceFormatted": [
-                340
+                346
             ],
             "newFloorPriceRaw": [
-                340
+                346
             ],
             "oldFloorPriceFormatted": [
-                340
+                346
             ],
             "oldFloorPriceRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FloorElevation_select_column": {},
         "FloorElevation_stddev_order_by": {
             "deployedAmountRaw": [
-                340
+                346
             ],
             "newFloorPriceRaw": [
-                340
+                346
             ],
             "oldFloorPriceRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FloorElevation_stddev_pop_order_by": {
             "deployedAmountRaw": [
-                340
+                346
             ],
             "newFloorPriceRaw": [
-                340
+                346
             ],
             "oldFloorPriceRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FloorElevation_stddev_samp_order_by": {
             "deployedAmountRaw": [
-                340
+                346
             ],
             "newFloorPriceRaw": [
-                340
+                346
             ],
             "oldFloorPriceRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FloorElevation_stream_cursor_input": {
@@ -1427,157 +1428,142 @@ export default {
                 49
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FloorElevation_stream_cursor_value_input": {
             "db_write_timestamp": [
-                357
+                363
             ],
             "deployedAmountFormatted": [
-                258
+                264
             ],
             "deployedAmountRaw": [
-                337
+                343
             ],
             "id": [
-                258
+                264
             ],
             "market_id": [
-                258
+                264
             ],
             "newFloorPriceFormatted": [
-                258
+                264
             ],
             "newFloorPriceRaw": [
-                337
+                343
             ],
             "oldFloorPriceFormatted": [
-                258
+                264
             ],
             "oldFloorPriceRaw": [
-                337
+                343
             ],
             "timestamp": [
-                337
+                343
             ],
             "transactionHash": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FloorElevation_sum_order_by": {
             "deployedAmountRaw": [
-                340
+                346
             ],
             "newFloorPriceRaw": [
-                340
+                346
             ],
             "oldFloorPriceRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FloorElevation_var_pop_order_by": {
             "deployedAmountRaw": [
-                340
+                346
             ],
             "newFloorPriceRaw": [
-                340
+                346
             ],
             "oldFloorPriceRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FloorElevation_var_samp_order_by": {
             "deployedAmountRaw": [
-                340
+                346
             ],
             "newFloorPriceRaw": [
-                340
+                346
             ],
             "oldFloorPriceRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "FloorElevation_variance_order_by": {
             "deployedAmountRaw": [
-                340
+                346
             ],
             "newFloorPriceRaw": [
-                340
+                346
             ],
             "oldFloorPriceRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
-        "GlobalStats": {
-            "activeMarkets": [
-                337
+        "GlobalRegistry": {
+            "createdAt": [
+                343
             ],
             "db_write_timestamp": [
-                357
+                363
+            ],
+            "floorFactoryAddress": [
+                264
             ],
             "id": [
-                258
+                264
             ],
             "lastUpdatedAt": [
-                337
+                343
             ],
-            "totalLockedCollateralFormatted": [
-                258
-            ],
-            "totalLockedCollateralRaw": [
-                337
-            ],
-            "totalMarkets": [
-                337
-            ],
-            "totalOutstandingDebtFormatted": [
-                258
-            ],
-            "totalOutstandingDebtRaw": [
-                337
-            ],
-            "totalVolumeFormatted": [
-                258
-            ],
-            "totalVolumeRaw": [
-                337
+            "moduleFactoryAddress": [
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
-        "GlobalStats_bool_exp": {
+        "GlobalRegistry_bool_exp": {
             "_and": [
                 55
             ],
@@ -1587,1313 +1573,1441 @@ export default {
             "_or": [
                 55
             ],
-            "activeMarkets": [
-                339
+            "createdAt": [
+                345
             ],
             "db_write_timestamp": [
-                358
+                364
+            ],
+            "floorFactoryAddress": [
+                266
             ],
             "id": [
-                260
+                266
             ],
             "lastUpdatedAt": [
-                339
+                345
             ],
-            "totalLockedCollateralFormatted": [
-                260
-            ],
-            "totalLockedCollateralRaw": [
-                339
-            ],
-            "totalMarkets": [
-                339
-            ],
-            "totalOutstandingDebtFormatted": [
-                260
-            ],
-            "totalOutstandingDebtRaw": [
-                339
-            ],
-            "totalVolumeFormatted": [
-                260
-            ],
-            "totalVolumeRaw": [
-                339
+            "moduleFactoryAddress": [
+                266
             ],
             "__typename": [
-                258
+                264
+            ]
+        },
+        "GlobalRegistry_order_by": {
+            "createdAt": [
+                346
+            ],
+            "db_write_timestamp": [
+                346
+            ],
+            "floorFactoryAddress": [
+                346
+            ],
+            "id": [
+                346
+            ],
+            "lastUpdatedAt": [
+                346
+            ],
+            "moduleFactoryAddress": [
+                346
+            ],
+            "__typename": [
+                264
+            ]
+        },
+        "GlobalRegistry_select_column": {},
+        "GlobalRegistry_stream_cursor_input": {
+            "initial_value": [
+                59
+            ],
+            "ordering": [
+                317
+            ],
+            "__typename": [
+                264
+            ]
+        },
+        "GlobalRegistry_stream_cursor_value_input": {
+            "createdAt": [
+                343
+            ],
+            "db_write_timestamp": [
+                363
+            ],
+            "floorFactoryAddress": [
+                264
+            ],
+            "id": [
+                264
+            ],
+            "lastUpdatedAt": [
+                343
+            ],
+            "moduleFactoryAddress": [
+                264
+            ],
+            "__typename": [
+                264
+            ]
+        },
+        "GlobalStats": {
+            "activeMarkets": [
+                343
+            ],
+            "db_write_timestamp": [
+                363
+            ],
+            "id": [
+                264
+            ],
+            "lastUpdatedAt": [
+                343
+            ],
+            "totalLockedCollateralFormatted": [
+                264
+            ],
+            "totalLockedCollateralRaw": [
+                343
+            ],
+            "totalMarkets": [
+                343
+            ],
+            "totalOutstandingDebtFormatted": [
+                264
+            ],
+            "totalOutstandingDebtRaw": [
+                343
+            ],
+            "totalVolumeFormatted": [
+                264
+            ],
+            "totalVolumeRaw": [
+                343
+            ],
+            "__typename": [
+                264
+            ]
+        },
+        "GlobalStats_bool_exp": {
+            "_and": [
+                61
+            ],
+            "_not": [
+                61
+            ],
+            "_or": [
+                61
+            ],
+            "activeMarkets": [
+                345
+            ],
+            "db_write_timestamp": [
+                364
+            ],
+            "id": [
+                266
+            ],
+            "lastUpdatedAt": [
+                345
+            ],
+            "totalLockedCollateralFormatted": [
+                266
+            ],
+            "totalLockedCollateralRaw": [
+                345
+            ],
+            "totalMarkets": [
+                345
+            ],
+            "totalOutstandingDebtFormatted": [
+                266
+            ],
+            "totalOutstandingDebtRaw": [
+                345
+            ],
+            "totalVolumeFormatted": [
+                266
+            ],
+            "totalVolumeRaw": [
+                345
+            ],
+            "__typename": [
+                264
             ]
         },
         "GlobalStats_order_by": {
             "activeMarkets": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "totalLockedCollateralFormatted": [
-                340
+                346
             ],
             "totalLockedCollateralRaw": [
-                340
+                346
             ],
             "totalMarkets": [
-                340
+                346
             ],
             "totalOutstandingDebtFormatted": [
-                340
+                346
             ],
             "totalOutstandingDebtRaw": [
-                340
+                346
             ],
             "totalVolumeFormatted": [
-                340
+                346
             ],
             "totalVolumeRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "GlobalStats_select_column": {},
         "GlobalStats_stream_cursor_input": {
             "initial_value": [
-                59
+                65
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "GlobalStats_stream_cursor_value_input": {
             "activeMarkets": [
-                337
+                343
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "id": [
-                258
+                264
             ],
             "lastUpdatedAt": [
-                337
+                343
             ],
             "totalLockedCollateralFormatted": [
-                258
+                264
             ],
             "totalLockedCollateralRaw": [
-                337
+                343
             ],
             "totalMarkets": [
-                337
+                343
             ],
             "totalOutstandingDebtFormatted": [
-                258
+                264
             ],
             "totalOutstandingDebtRaw": [
-                337
+                343
             ],
             "totalVolumeFormatted": [
-                258
+                264
             ],
             "totalVolumeRaw": [
-                337
+                343
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Int": {},
         "Int_array_comparison_exp": {
             "_contained_in": [
-                60
+                66
             ],
             "_contains": [
-                60
+                66
             ],
             "_eq": [
-                60
+                66
             ],
             "_gt": [
-                60
+                66
             ],
             "_gte": [
-                60
+                66
             ],
             "_in": [
-                60
+                66
             ],
             "_is_null": [
                 12
             ],
             "_lt": [
-                60
+                66
             ],
             "_lte": [
-                60
+                66
             ],
             "_neq": [
-                60
+                66
             ],
             "_nin": [
-                60
+                66
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Int_comparison_exp": {
             "_eq": [
-                60
+                66
             ],
             "_gt": [
-                60
+                66
             ],
             "_gte": [
-                60
+                66
             ],
             "_in": [
-                60
+                66
             ],
             "_is_null": [
                 12
             ],
             "_lt": [
-                60
+                66
             ],
             "_lte": [
-                60
+                66
             ],
             "_neq": [
-                60
+                66
             ],
             "_nin": [
-                60
+                66
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Loan": {
             "borrowAmountFormatted": [
-                258
+                264
             ],
             "borrowAmountRaw": [
-                337
+                343
             ],
             "borrower_id": [
-                258
+                264
             ],
             "closedAt": [
-                337
+                343
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "facility_id": [
-                258
+                264
             ],
             "floorPriceAtBorrowFormatted": [
-                258
+                264
             ],
             "floorPriceAtBorrowRaw": [
-                337
+                343
             ],
             "id": [
-                258
+                264
             ],
             "lastUpdatedAt": [
-                337
+                343
             ],
             "lockedCollateralFormatted": [
-                258
+                264
             ],
             "lockedCollateralRaw": [
-                337
+                343
             ],
             "market_id": [
-                258
+                264
             ],
             "openedAt": [
-                337
+                343
             ],
             "originationFeeFormatted": [
-                258
+                264
             ],
             "originationFeeRaw": [
-                337
+                343
             ],
             "remainingDebtFormatted": [
-                258
+                264
             ],
             "remainingDebtRaw": [
-                337
+                343
             ],
             "status": [
-                333
+                339
             ],
             "statusHistory": [
-                64,
+                70,
                 {
                     "distinct_on": [
-                        71,
+                        77,
                         "[LoanStatusHistory_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        70,
+                        76,
                         "[LoanStatusHistory_order_by!]"
                     ],
                     "where": [
-                        67
+                        73
                     ]
                 }
             ],
             "transactionHash": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "LoanStatusHistory": {
             "db_write_timestamp": [
-                357
+                363
             ],
             "id": [
-                258
+                264
             ],
             "loan_id": [
-                258
+                264
             ],
             "lockedCollateralFormatted": [
-                258
+                264
             ],
             "lockedCollateralRaw": [
-                337
+                343
             ],
             "remainingDebtFormatted": [
-                258
+                264
             ],
             "remainingDebtRaw": [
-                337
+                343
             ],
             "status": [
-                333
+                339
             ],
             "timestamp": [
-                337
+                343
             ],
             "transactionHash": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "LoanStatusHistory_aggregate_order_by": {
             "avg": [
-                66
-            ],
-            "count": [
-                340
-            ],
-            "max": [
-                68
-            ],
-            "min": [
-                69
-            ],
-            "stddev": [
                 72
             ],
-            "stddev_pop": [
-                73
+            "count": [
+                346
             ],
-            "stddev_samp": [
+            "max": [
                 74
             ],
-            "sum": [
-                77
+            "min": [
+                75
             ],
-            "var_pop": [
+            "stddev": [
                 78
             ],
-            "var_samp": [
+            "stddev_pop": [
                 79
             ],
-            "variance": [
+            "stddev_samp": [
                 80
             ],
+            "sum": [
+                83
+            ],
+            "var_pop": [
+                84
+            ],
+            "var_samp": [
+                85
+            ],
+            "variance": [
+                86
+            ],
             "__typename": [
-                258
+                264
             ]
         },
         "LoanStatusHistory_avg_order_by": {
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "remainingDebtRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "LoanStatusHistory_bool_exp": {
             "_and": [
-                67
+                73
             ],
             "_not": [
-                67
+                73
             ],
             "_or": [
-                67
+                73
             ],
             "db_write_timestamp": [
-                358
+                364
             ],
             "id": [
-                260
+                266
             ],
             "loan_id": [
-                260
+                266
             ],
             "lockedCollateralFormatted": [
-                260
+                266
             ],
             "lockedCollateralRaw": [
-                339
+                345
             ],
             "remainingDebtFormatted": [
-                260
+                266
             ],
             "remainingDebtRaw": [
-                339
+                345
             ],
             "status": [
-                334
+                340
             ],
             "timestamp": [
-                339
+                345
             ],
             "transactionHash": [
-                260
+                266
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "LoanStatusHistory_max_order_by": {
             "db_write_timestamp": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "loan_id": [
-                340
+                346
             ],
             "lockedCollateralFormatted": [
-                340
+                346
             ],
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "remainingDebtFormatted": [
-                340
+                346
             ],
             "remainingDebtRaw": [
-                340
+                346
             ],
             "status": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "LoanStatusHistory_min_order_by": {
             "db_write_timestamp": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "loan_id": [
-                340
+                346
             ],
             "lockedCollateralFormatted": [
-                340
+                346
             ],
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "remainingDebtFormatted": [
-                340
+                346
             ],
             "remainingDebtRaw": [
-                340
+                346
             ],
             "status": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "LoanStatusHistory_order_by": {
             "db_write_timestamp": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "loan_id": [
-                340
+                346
             ],
             "lockedCollateralFormatted": [
-                340
+                346
             ],
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "remainingDebtFormatted": [
-                340
+                346
             ],
             "remainingDebtRaw": [
-                340
+                346
             ],
             "status": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "LoanStatusHistory_select_column": {},
         "LoanStatusHistory_stddev_order_by": {
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "remainingDebtRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "LoanStatusHistory_stddev_pop_order_by": {
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "remainingDebtRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "LoanStatusHistory_stddev_samp_order_by": {
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "remainingDebtRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "LoanStatusHistory_stream_cursor_input": {
             "initial_value": [
-                76
+                82
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "LoanStatusHistory_stream_cursor_value_input": {
             "db_write_timestamp": [
-                357
+                363
             ],
             "id": [
-                258
+                264
             ],
             "loan_id": [
-                258
+                264
             ],
             "lockedCollateralFormatted": [
-                258
+                264
             ],
             "lockedCollateralRaw": [
-                337
+                343
             ],
             "remainingDebtFormatted": [
-                258
+                264
             ],
             "remainingDebtRaw": [
-                337
+                343
             ],
             "status": [
-                333
+                339
             ],
             "timestamp": [
-                337
+                343
             ],
             "transactionHash": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "LoanStatusHistory_sum_order_by": {
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "remainingDebtRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "LoanStatusHistory_var_pop_order_by": {
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "remainingDebtRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "LoanStatusHistory_var_samp_order_by": {
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "remainingDebtRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "LoanStatusHistory_variance_order_by": {
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "remainingDebtRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Loan_aggregate_order_by": {
             "avg": [
-                82
-            ],
-            "count": [
-                340
-            ],
-            "max": [
-                84
-            ],
-            "min": [
-                85
-            ],
-            "stddev": [
                 88
             ],
-            "stddev_pop": [
-                89
+            "count": [
+                346
             ],
-            "stddev_samp": [
+            "max": [
                 90
             ],
-            "sum": [
-                93
+            "min": [
+                91
             ],
-            "var_pop": [
+            "stddev": [
                 94
             ],
-            "var_samp": [
+            "stddev_pop": [
                 95
             ],
-            "variance": [
+            "stddev_samp": [
                 96
             ],
+            "sum": [
+                99
+            ],
+            "var_pop": [
+                100
+            ],
+            "var_samp": [
+                101
+            ],
+            "variance": [
+                102
+            ],
             "__typename": [
-                258
+                264
             ]
         },
         "Loan_avg_order_by": {
             "borrowAmountRaw": [
-                340
+                346
             ],
             "closedAt": [
-                340
+                346
             ],
             "floorPriceAtBorrowRaw": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "openedAt": [
-                340
+                346
             ],
             "originationFeeRaw": [
-                340
+                346
             ],
             "remainingDebtRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Loan_bool_exp": {
             "_and": [
-                83
+                89
             ],
             "_not": [
-                83
+                89
             ],
             "_or": [
-                83
+                89
             ],
             "borrowAmountFormatted": [
-                260
+                266
             ],
             "borrowAmountRaw": [
-                339
+                345
             ],
             "borrower_id": [
-                260
+                266
             ],
             "closedAt": [
-                339
+                345
             ],
             "db_write_timestamp": [
-                358
+                364
             ],
             "facility_id": [
-                260
+                266
             ],
             "floorPriceAtBorrowFormatted": [
-                260
+                266
             ],
             "floorPriceAtBorrowRaw": [
-                339
+                345
             ],
             "id": [
-                260
+                266
             ],
             "lastUpdatedAt": [
-                339
+                345
             ],
             "lockedCollateralFormatted": [
-                260
+                266
             ],
             "lockedCollateralRaw": [
-                339
+                345
             ],
             "market_id": [
-                260
+                266
             ],
             "openedAt": [
-                339
+                345
             ],
             "originationFeeFormatted": [
-                260
+                266
             ],
             "originationFeeRaw": [
-                339
+                345
             ],
             "remainingDebtFormatted": [
-                260
+                266
             ],
             "remainingDebtRaw": [
-                339
+                345
             ],
             "status": [
-                334
+                340
             ],
             "statusHistory": [
-                67
+                73
             ],
             "transactionHash": [
-                260
+                266
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Loan_max_order_by": {
             "borrowAmountFormatted": [
-                340
+                346
             ],
             "borrowAmountRaw": [
-                340
+                346
             ],
             "borrower_id": [
-                340
+                346
             ],
             "closedAt": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "facility_id": [
-                340
+                346
             ],
             "floorPriceAtBorrowFormatted": [
-                340
+                346
             ],
             "floorPriceAtBorrowRaw": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "lockedCollateralFormatted": [
-                340
+                346
             ],
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "market_id": [
-                340
+                346
             ],
             "openedAt": [
-                340
+                346
             ],
             "originationFeeFormatted": [
-                340
+                346
             ],
             "originationFeeRaw": [
-                340
+                346
             ],
             "remainingDebtFormatted": [
-                340
+                346
             ],
             "remainingDebtRaw": [
-                340
+                346
             ],
             "status": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Loan_min_order_by": {
             "borrowAmountFormatted": [
-                340
+                346
             ],
             "borrowAmountRaw": [
-                340
+                346
             ],
             "borrower_id": [
-                340
+                346
             ],
             "closedAt": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "facility_id": [
-                340
+                346
             ],
             "floorPriceAtBorrowFormatted": [
-                340
+                346
             ],
             "floorPriceAtBorrowRaw": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "lockedCollateralFormatted": [
-                340
+                346
             ],
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "market_id": [
-                340
+                346
             ],
             "openedAt": [
-                340
+                346
             ],
             "originationFeeFormatted": [
-                340
+                346
             ],
             "originationFeeRaw": [
-                340
+                346
             ],
             "remainingDebtFormatted": [
-                340
+                346
             ],
             "remainingDebtRaw": [
-                340
+                346
             ],
             "status": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Loan_order_by": {
             "borrowAmountFormatted": [
-                340
+                346
             ],
             "borrowAmountRaw": [
-                340
+                346
             ],
             "borrower_id": [
-                340
+                346
             ],
             "closedAt": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "facility_id": [
-                340
+                346
             ],
             "floorPriceAtBorrowFormatted": [
-                340
+                346
             ],
             "floorPriceAtBorrowRaw": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "lockedCollateralFormatted": [
-                340
+                346
             ],
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "market_id": [
-                340
+                346
             ],
             "openedAt": [
-                340
+                346
             ],
             "originationFeeFormatted": [
-                340
+                346
             ],
             "originationFeeRaw": [
-                340
+                346
             ],
             "remainingDebtFormatted": [
-                340
+                346
             ],
             "remainingDebtRaw": [
-                340
+                346
             ],
             "status": [
-                340
+                346
             ],
             "statusHistory_aggregate": [
-                65
+                71
             ],
             "transactionHash": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Loan_select_column": {},
         "Loan_stddev_order_by": {
             "borrowAmountRaw": [
-                340
+                346
             ],
             "closedAt": [
-                340
+                346
             ],
             "floorPriceAtBorrowRaw": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "openedAt": [
-                340
+                346
             ],
             "originationFeeRaw": [
-                340
+                346
             ],
             "remainingDebtRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Loan_stddev_pop_order_by": {
             "borrowAmountRaw": [
-                340
+                346
             ],
             "closedAt": [
-                340
+                346
             ],
             "floorPriceAtBorrowRaw": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "openedAt": [
-                340
+                346
             ],
             "originationFeeRaw": [
-                340
+                346
             ],
             "remainingDebtRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Loan_stddev_samp_order_by": {
             "borrowAmountRaw": [
-                340
+                346
             ],
             "closedAt": [
-                340
+                346
             ],
             "floorPriceAtBorrowRaw": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "openedAt": [
-                340
+                346
             ],
             "originationFeeRaw": [
-                340
+                346
             ],
             "remainingDebtRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Loan_stream_cursor_input": {
             "initial_value": [
-                92
+                98
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Loan_stream_cursor_value_input": {
             "borrowAmountFormatted": [
-                258
+                264
             ],
             "borrowAmountRaw": [
-                337
+                343
             ],
             "borrower_id": [
-                258
+                264
             ],
             "closedAt": [
-                337
+                343
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "facility_id": [
-                258
+                264
             ],
             "floorPriceAtBorrowFormatted": [
-                258
+                264
             ],
             "floorPriceAtBorrowRaw": [
-                337
+                343
             ],
             "id": [
-                258
+                264
             ],
             "lastUpdatedAt": [
-                337
+                343
             ],
             "lockedCollateralFormatted": [
-                258
+                264
             ],
             "lockedCollateralRaw": [
-                337
+                343
             ],
             "market_id": [
-                258
+                264
             ],
             "openedAt": [
-                337
+                343
             ],
             "originationFeeFormatted": [
-                258
+                264
             ],
             "originationFeeRaw": [
-                337
+                343
             ],
             "remainingDebtFormatted": [
-                258
+                264
             ],
             "remainingDebtRaw": [
-                337
+                343
             ],
             "status": [
-                333
+                339
             ],
             "transactionHash": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Loan_sum_order_by": {
             "borrowAmountRaw": [
-                340
+                346
             ],
             "closedAt": [
-                340
+                346
             ],
             "floorPriceAtBorrowRaw": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "openedAt": [
-                340
+                346
             ],
             "originationFeeRaw": [
-                340
+                346
             ],
             "remainingDebtRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Loan_var_pop_order_by": {
             "borrowAmountRaw": [
-                340
+                346
             ],
             "closedAt": [
-                340
+                346
             ],
             "floorPriceAtBorrowRaw": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "openedAt": [
-                340
+                346
             ],
             "originationFeeRaw": [
-                340
+                346
             ],
             "remainingDebtRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Loan_var_samp_order_by": {
             "borrowAmountRaw": [
-                340
+                346
             ],
             "closedAt": [
-                340
+                346
             ],
             "floorPriceAtBorrowRaw": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "openedAt": [
-                340
+                346
             ],
             "originationFeeRaw": [
-                340
+                346
             ],
             "remainingDebtRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Loan_variance_order_by": {
             "borrowAmountRaw": [
-                340
+                346
             ],
             "closedAt": [
-                340
+                346
             ],
             "floorPriceAtBorrowRaw": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "openedAt": [
-                340
+                346
             ],
             "originationFeeRaw": [
-                340
+                346
             ],
             "remainingDebtRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Market": {
             "buyFeeBps": [
-                337
+                343
             ],
             "createdAt": [
-                337
+                343
             ],
             "creator_id": [
-                258
+                264
             ],
             "currentPriceFormatted": [
-                258
+                264
             ],
             "currentPriceRaw": [
-                337
+                343
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "factory_id": [
-                258
+                264
             ],
             "feeDistributions": [
                 20,
@@ -2903,10 +3017,10 @@ export default {
                         "[FeeDistribution_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
                         26,
@@ -2925,10 +3039,10 @@ export default {
                         "[FloorElevation_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
                         43,
@@ -2940,25 +3054,25 @@ export default {
                 }
             ],
             "floorPriceFormatted": [
-                258
+                264
             ],
             "floorPriceRaw": [
-                337
+                343
             ],
             "floorSupplyFormatted": [
-                258
+                264
             ],
             "floorSupplyRaw": [
-                337
+                343
             ],
             "id": [
-                258
+                264
             ],
             "initialFloorPriceFormatted": [
-                258
+                264
             ],
             "initialFloorPriceRaw": [
-                337
+                343
             ],
             "isBuyOpen": [
                 12
@@ -2967,573 +3081,573 @@ export default {
                 12
             ],
             "issuanceToken": [
-                261
+                267
             ],
             "issuanceToken_id": [
-                258
+                264
             ],
             "lastElevationTimestamp": [
-                337
+                343
             ],
             "lastTradeTimestamp": [
-                337
+                343
             ],
             "lastUpdatedAt": [
-                337
+                343
             ],
             "marketSupplyFormatted": [
-                258
+                264
             ],
             "marketSupplyRaw": [
-                337
+                343
             ],
             "maxLTV": [
-                337
+                343
             ],
             "reserveToken": [
-                261
+                267
             ],
             "reserveToken_id": [
-                258
+                264
             ],
             "sellFeeBps": [
-                337
+                343
             ],
             "status": [
-                335
+                341
             ],
             "totalSupplyFormatted": [
-                258
+                264
             ],
             "totalSupplyRaw": [
-                337
+                343
             ],
             "trades": [
-                267,
+                273,
                 {
                     "distinct_on": [
-                        274,
+                        280,
                         "[Trade_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        273,
+                        279,
                         "[Trade_order_by!]"
                     ],
                     "where": [
-                        270
+                        276
                     ]
                 }
             ],
             "tradingFeeBps": [
-                337
+                343
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "MarketRollingStats": {
             "averagePriceFormatted": [
-                258
+                264
             ],
             "averagePriceRaw": [
-                337
+                343
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "id": [
-                258
+                264
             ],
             "lastUpdatedAt": [
-                337
+                343
             ],
             "market_id": [
-                258
+                264
             ],
             "tradeCount": [
-                337
+                343
             ],
             "volumeFormatted": [
-                258
+                264
             ],
             "volumeRaw": [
-                337
+                343
             ],
             "windowSeconds": [
-                60
+                66
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "MarketRollingStats_bool_exp": {
             "_and": [
-                99
+                105
             ],
             "_not": [
-                99
+                105
             ],
             "_or": [
-                99
+                105
             ],
             "averagePriceFormatted": [
-                260
+                266
             ],
             "averagePriceRaw": [
-                339
+                345
             ],
             "db_write_timestamp": [
-                358
+                364
             ],
             "id": [
-                260
+                266
             ],
             "lastUpdatedAt": [
-                339
+                345
             ],
             "market_id": [
-                260
+                266
             ],
             "tradeCount": [
-                339
+                345
             ],
             "volumeFormatted": [
-                260
+                266
             ],
             "volumeRaw": [
-                339
+                345
             ],
             "windowSeconds": [
-                62
+                68
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "MarketRollingStats_order_by": {
             "averagePriceFormatted": [
-                340
+                346
             ],
             "averagePriceRaw": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "market_id": [
-                340
+                346
             ],
             "tradeCount": [
-                340
+                346
             ],
             "volumeFormatted": [
-                340
+                346
             ],
             "volumeRaw": [
-                340
+                346
             ],
             "windowSeconds": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "MarketRollingStats_select_column": {},
         "MarketRollingStats_stream_cursor_input": {
             "initial_value": [
-                103
+                109
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "MarketRollingStats_stream_cursor_value_input": {
             "averagePriceFormatted": [
-                258
+                264
             ],
             "averagePriceRaw": [
-                337
+                343
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "id": [
-                258
+                264
             ],
             "lastUpdatedAt": [
-                337
+                343
             ],
             "market_id": [
-                258
+                264
             ],
             "tradeCount": [
-                337
+                343
             ],
             "volumeFormatted": [
-                258
+                264
             ],
             "volumeRaw": [
-                337
+                343
             ],
             "windowSeconds": [
-                60
+                66
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "MarketSnapshot": {
             "db_write_timestamp": [
-                357
+                363
             ],
             "floorPriceFormatted": [
-                258
+                264
             ],
             "floorPriceRaw": [
-                337
+                343
             ],
             "id": [
-                258
+                264
             ],
             "marketSupplyFormatted": [
-                258
+                264
             ],
             "marketSupplyRaw": [
-                337
+                343
             ],
             "market_id": [
-                258
+                264
             ],
             "priceFormatted": [
-                258
+                264
             ],
             "priceRaw": [
-                337
+                343
             ],
             "timestamp": [
-                337
+                343
             ],
             "totalSupplyFormatted": [
-                258
+                264
             ],
             "totalSupplyRaw": [
-                337
+                343
             ],
             "trades24h": [
-                337
+                343
             ],
             "volume24hFormatted": [
-                258
+                264
             ],
             "volume24hRaw": [
-                337
+                343
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "MarketSnapshot_bool_exp": {
             "_and": [
-                105
+                111
             ],
             "_not": [
-                105
+                111
             ],
             "_or": [
-                105
+                111
             ],
             "db_write_timestamp": [
-                358
+                364
             ],
             "floorPriceFormatted": [
-                260
+                266
             ],
             "floorPriceRaw": [
-                339
+                345
             ],
             "id": [
-                260
+                266
             ],
             "marketSupplyFormatted": [
-                260
+                266
             ],
             "marketSupplyRaw": [
-                339
+                345
             ],
             "market_id": [
-                260
+                266
             ],
             "priceFormatted": [
-                260
+                266
             ],
             "priceRaw": [
-                339
+                345
             ],
             "timestamp": [
-                339
+                345
             ],
             "totalSupplyFormatted": [
-                260
+                266
             ],
             "totalSupplyRaw": [
-                339
+                345
             ],
             "trades24h": [
-                339
+                345
             ],
             "volume24hFormatted": [
-                260
+                266
             ],
             "volume24hRaw": [
-                339
+                345
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "MarketSnapshot_order_by": {
             "db_write_timestamp": [
-                340
+                346
             ],
             "floorPriceFormatted": [
-                340
+                346
             ],
             "floorPriceRaw": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "marketSupplyFormatted": [
-                340
+                346
             ],
             "marketSupplyRaw": [
-                340
+                346
             ],
             "market_id": [
-                340
+                346
             ],
             "priceFormatted": [
-                340
+                346
             ],
             "priceRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "totalSupplyFormatted": [
-                340
+                346
             ],
             "totalSupplyRaw": [
-                340
+                346
             ],
             "trades24h": [
-                340
+                346
             ],
             "volume24hFormatted": [
-                340
+                346
             ],
             "volume24hRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "MarketSnapshot_select_column": {},
         "MarketSnapshot_stream_cursor_input": {
             "initial_value": [
-                109
+                115
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "MarketSnapshot_stream_cursor_value_input": {
             "db_write_timestamp": [
-                357
+                363
             ],
             "floorPriceFormatted": [
-                258
+                264
             ],
             "floorPriceRaw": [
-                337
+                343
             ],
             "id": [
-                258
+                264
             ],
             "marketSupplyFormatted": [
-                258
+                264
             ],
             "marketSupplyRaw": [
-                337
+                343
             ],
             "market_id": [
-                258
+                264
             ],
             "priceFormatted": [
-                258
+                264
             ],
             "priceRaw": [
-                337
+                343
             ],
             "timestamp": [
-                337
+                343
             ],
             "totalSupplyFormatted": [
-                258
+                264
             ],
             "totalSupplyRaw": [
-                337
+                343
             ],
             "trades24h": [
-                337
+                343
             ],
             "volume24hFormatted": [
-                258
+                264
             ],
             "volume24hRaw": [
-                337
+                343
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Market_aggregate_order_by": {
             "avg": [
-                111
-            ],
-            "count": [
-                340
-            ],
-            "max": [
-                113
-            ],
-            "min": [
-                114
-            ],
-            "stddev": [
                 117
             ],
-            "stddev_pop": [
-                118
+            "count": [
+                346
             ],
-            "stddev_samp": [
+            "max": [
                 119
             ],
-            "sum": [
-                122
+            "min": [
+                120
             ],
-            "var_pop": [
+            "stddev": [
                 123
             ],
-            "var_samp": [
+            "stddev_pop": [
                 124
             ],
-            "variance": [
+            "stddev_samp": [
                 125
             ],
+            "sum": [
+                128
+            ],
+            "var_pop": [
+                129
+            ],
+            "var_samp": [
+                130
+            ],
+            "variance": [
+                131
+            ],
             "__typename": [
-                258
+                264
             ]
         },
         "Market_avg_order_by": {
             "buyFeeBps": [
-                340
+                346
             ],
             "createdAt": [
-                340
+                346
             ],
             "currentPriceRaw": [
-                340
+                346
             ],
             "floorPriceRaw": [
-                340
+                346
             ],
             "floorSupplyRaw": [
-                340
+                346
             ],
             "initialFloorPriceRaw": [
-                340
+                346
             ],
             "lastElevationTimestamp": [
-                340
+                346
             ],
             "lastTradeTimestamp": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "marketSupplyRaw": [
-                340
+                346
             ],
             "maxLTV": [
-                340
+                346
             ],
             "sellFeeBps": [
-                340
+                346
             ],
             "totalSupplyRaw": [
-                340
+                346
             ],
             "tradingFeeBps": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Market_bool_exp": {
             "_and": [
-                112
+                118
             ],
             "_not": [
-                112
+                118
             ],
             "_or": [
-                112
+                118
             ],
             "buyFeeBps": [
-                339
+                345
             ],
             "createdAt": [
-                339
+                345
             ],
             "creator_id": [
-                260
+                266
             ],
             "currentPriceFormatted": [
-                260
+                266
             ],
             "currentPriceRaw": [
-                339
+                345
             ],
             "db_write_timestamp": [
-                358
+                364
             ],
             "factory_id": [
-                260
+                266
             ],
             "feeDistributions": [
                 23
@@ -3542,25 +3656,25 @@ export default {
                 40
             ],
             "floorPriceFormatted": [
-                260
+                266
             ],
             "floorPriceRaw": [
-                339
+                345
             ],
             "floorSupplyFormatted": [
-                260
+                266
             ],
             "floorSupplyRaw": [
-                339
+                345
             ],
             "id": [
-                260
+                266
             ],
             "initialFloorPriceFormatted": [
-                260
+                266
             ],
             "initialFloorPriceRaw": [
-                339
+                345
             ],
             "isBuyOpen": [
                 13
@@ -3569,250 +3683,250 @@ export default {
                 13
             ],
             "issuanceToken": [
-                262
+                268
             ],
             "issuanceToken_id": [
-                260
+                266
             ],
             "lastElevationTimestamp": [
-                339
+                345
             ],
             "lastTradeTimestamp": [
-                339
+                345
             ],
             "lastUpdatedAt": [
-                339
+                345
             ],
             "marketSupplyFormatted": [
-                260
+                266
             ],
             "marketSupplyRaw": [
-                339
+                345
             ],
             "maxLTV": [
-                339
+                345
             ],
             "reserveToken": [
-                262
+                268
             ],
             "reserveToken_id": [
-                260
+                266
             ],
             "sellFeeBps": [
-                339
+                345
             ],
             "status": [
-                336
+                342
             ],
             "totalSupplyFormatted": [
-                260
+                266
             ],
             "totalSupplyRaw": [
-                339
+                345
             ],
             "trades": [
-                270
+                276
             ],
             "tradingFeeBps": [
-                339
+                345
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Market_max_order_by": {
             "buyFeeBps": [
-                340
+                346
             ],
             "createdAt": [
-                340
+                346
             ],
             "creator_id": [
-                340
+                346
             ],
             "currentPriceFormatted": [
-                340
+                346
             ],
             "currentPriceRaw": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "factory_id": [
-                340
+                346
             ],
             "floorPriceFormatted": [
-                340
+                346
             ],
             "floorPriceRaw": [
-                340
+                346
             ],
             "floorSupplyFormatted": [
-                340
+                346
             ],
             "floorSupplyRaw": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "initialFloorPriceFormatted": [
-                340
+                346
             ],
             "initialFloorPriceRaw": [
-                340
+                346
             ],
             "issuanceToken_id": [
-                340
+                346
             ],
             "lastElevationTimestamp": [
-                340
+                346
             ],
             "lastTradeTimestamp": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "marketSupplyFormatted": [
-                340
+                346
             ],
             "marketSupplyRaw": [
-                340
+                346
             ],
             "maxLTV": [
-                340
+                346
             ],
             "reserveToken_id": [
-                340
+                346
             ],
             "sellFeeBps": [
-                340
+                346
             ],
             "status": [
-                340
+                346
             ],
             "totalSupplyFormatted": [
-                340
+                346
             ],
             "totalSupplyRaw": [
-                340
+                346
             ],
             "tradingFeeBps": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Market_min_order_by": {
             "buyFeeBps": [
-                340
+                346
             ],
             "createdAt": [
-                340
+                346
             ],
             "creator_id": [
-                340
+                346
             ],
             "currentPriceFormatted": [
-                340
+                346
             ],
             "currentPriceRaw": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "factory_id": [
-                340
+                346
             ],
             "floorPriceFormatted": [
-                340
+                346
             ],
             "floorPriceRaw": [
-                340
+                346
             ],
             "floorSupplyFormatted": [
-                340
+                346
             ],
             "floorSupplyRaw": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "initialFloorPriceFormatted": [
-                340
+                346
             ],
             "initialFloorPriceRaw": [
-                340
+                346
             ],
             "issuanceToken_id": [
-                340
+                346
             ],
             "lastElevationTimestamp": [
-                340
+                346
             ],
             "lastTradeTimestamp": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "marketSupplyFormatted": [
-                340
+                346
             ],
             "marketSupplyRaw": [
-                340
+                346
             ],
             "maxLTV": [
-                340
+                346
             ],
             "reserveToken_id": [
-                340
+                346
             ],
             "sellFeeBps": [
-                340
+                346
             ],
             "status": [
-                340
+                346
             ],
             "totalSupplyFormatted": [
-                340
+                346
             ],
             "totalSupplyRaw": [
-                340
+                346
             ],
             "tradingFeeBps": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Market_order_by": {
             "buyFeeBps": [
-                340
+                346
             ],
             "createdAt": [
-                340
+                346
             ],
             "creator_id": [
-                340
+                346
             ],
             "currentPriceFormatted": [
-                340
+                346
             ],
             "currentPriceRaw": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "factory_id": [
-                340
+                346
             ],
             "feeDistributions_aggregate": [
                 21
@@ -3821,279 +3935,279 @@ export default {
                 38
             ],
             "floorPriceFormatted": [
-                340
+                346
             ],
             "floorPriceRaw": [
-                340
+                346
             ],
             "floorSupplyFormatted": [
-                340
+                346
             ],
             "floorSupplyRaw": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "initialFloorPriceFormatted": [
-                340
+                346
             ],
             "initialFloorPriceRaw": [
-                340
+                346
             ],
             "isBuyOpen": [
-                340
+                346
             ],
             "isSellOpen": [
-                340
+                346
             ],
             "issuanceToken": [
-                263
+                269
             ],
             "issuanceToken_id": [
-                340
+                346
             ],
             "lastElevationTimestamp": [
-                340
+                346
             ],
             "lastTradeTimestamp": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "marketSupplyFormatted": [
-                340
+                346
             ],
             "marketSupplyRaw": [
-                340
+                346
             ],
             "maxLTV": [
-                340
+                346
             ],
             "reserveToken": [
-                263
+                269
             ],
             "reserveToken_id": [
-                340
+                346
             ],
             "sellFeeBps": [
-                340
+                346
             ],
             "status": [
-                340
+                346
             ],
             "totalSupplyFormatted": [
-                340
+                346
             ],
             "totalSupplyRaw": [
-                340
+                346
             ],
             "trades_aggregate": [
-                268
+                274
             ],
             "tradingFeeBps": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Market_select_column": {},
         "Market_stddev_order_by": {
             "buyFeeBps": [
-                340
+                346
             ],
             "createdAt": [
-                340
+                346
             ],
             "currentPriceRaw": [
-                340
+                346
             ],
             "floorPriceRaw": [
-                340
+                346
             ],
             "floorSupplyRaw": [
-                340
+                346
             ],
             "initialFloorPriceRaw": [
-                340
+                346
             ],
             "lastElevationTimestamp": [
-                340
+                346
             ],
             "lastTradeTimestamp": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "marketSupplyRaw": [
-                340
+                346
             ],
             "maxLTV": [
-                340
+                346
             ],
             "sellFeeBps": [
-                340
+                346
             ],
             "totalSupplyRaw": [
-                340
+                346
             ],
             "tradingFeeBps": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Market_stddev_pop_order_by": {
             "buyFeeBps": [
-                340
+                346
             ],
             "createdAt": [
-                340
+                346
             ],
             "currentPriceRaw": [
-                340
+                346
             ],
             "floorPriceRaw": [
-                340
+                346
             ],
             "floorSupplyRaw": [
-                340
+                346
             ],
             "initialFloorPriceRaw": [
-                340
+                346
             ],
             "lastElevationTimestamp": [
-                340
+                346
             ],
             "lastTradeTimestamp": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "marketSupplyRaw": [
-                340
+                346
             ],
             "maxLTV": [
-                340
+                346
             ],
             "sellFeeBps": [
-                340
+                346
             ],
             "totalSupplyRaw": [
-                340
+                346
             ],
             "tradingFeeBps": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Market_stddev_samp_order_by": {
             "buyFeeBps": [
-                340
+                346
             ],
             "createdAt": [
-                340
+                346
             ],
             "currentPriceRaw": [
-                340
+                346
             ],
             "floorPriceRaw": [
-                340
+                346
             ],
             "floorSupplyRaw": [
-                340
+                346
             ],
             "initialFloorPriceRaw": [
-                340
+                346
             ],
             "lastElevationTimestamp": [
-                340
+                346
             ],
             "lastTradeTimestamp": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "marketSupplyRaw": [
-                340
+                346
             ],
             "maxLTV": [
-                340
+                346
             ],
             "sellFeeBps": [
-                340
+                346
             ],
             "totalSupplyRaw": [
-                340
+                346
             ],
             "tradingFeeBps": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Market_stream_cursor_input": {
             "initial_value": [
-                121
+                127
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Market_stream_cursor_value_input": {
             "buyFeeBps": [
-                337
+                343
             ],
             "createdAt": [
-                337
+                343
             ],
             "creator_id": [
-                258
+                264
             ],
             "currentPriceFormatted": [
-                258
+                264
             ],
             "currentPriceRaw": [
-                337
+                343
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "factory_id": [
-                258
+                264
             ],
             "floorPriceFormatted": [
-                258
+                264
             ],
             "floorPriceRaw": [
-                337
+                343
             ],
             "floorSupplyFormatted": [
-                258
+                264
             ],
             "floorSupplyRaw": [
-                337
+                343
             ],
             "id": [
-                258
+                264
             ],
             "initialFloorPriceFormatted": [
-                258
+                264
             ],
             "initialFloorPriceRaw": [
-                337
+                343
             ],
             "isBuyOpen": [
                 12
@@ -4102,6343 +4216,6343 @@ export default {
                 12
             ],
             "issuanceToken_id": [
-                258
+                264
             ],
             "lastElevationTimestamp": [
-                337
+                343
             ],
             "lastTradeTimestamp": [
-                337
+                343
             ],
             "lastUpdatedAt": [
-                337
+                343
             ],
             "marketSupplyFormatted": [
-                258
+                264
             ],
             "marketSupplyRaw": [
-                337
+                343
             ],
             "maxLTV": [
-                337
+                343
             ],
             "reserveToken_id": [
-                258
+                264
             ],
             "sellFeeBps": [
-                337
+                343
             ],
             "status": [
-                335
+                341
             ],
             "totalSupplyFormatted": [
-                258
+                264
             ],
             "totalSupplyRaw": [
-                337
+                343
             ],
             "tradingFeeBps": [
-                337
+                343
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Market_sum_order_by": {
             "buyFeeBps": [
-                340
+                346
             ],
             "createdAt": [
-                340
+                346
             ],
             "currentPriceRaw": [
-                340
+                346
             ],
             "floorPriceRaw": [
-                340
+                346
             ],
             "floorSupplyRaw": [
-                340
+                346
             ],
             "initialFloorPriceRaw": [
-                340
+                346
             ],
             "lastElevationTimestamp": [
-                340
+                346
             ],
             "lastTradeTimestamp": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "marketSupplyRaw": [
-                340
+                346
             ],
             "maxLTV": [
-                340
+                346
             ],
             "sellFeeBps": [
-                340
+                346
             ],
             "totalSupplyRaw": [
-                340
+                346
             ],
             "tradingFeeBps": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Market_var_pop_order_by": {
             "buyFeeBps": [
-                340
+                346
             ],
             "createdAt": [
-                340
+                346
             ],
             "currentPriceRaw": [
-                340
+                346
             ],
             "floorPriceRaw": [
-                340
+                346
             ],
             "floorSupplyRaw": [
-                340
+                346
             ],
             "initialFloorPriceRaw": [
-                340
+                346
             ],
             "lastElevationTimestamp": [
-                340
+                346
             ],
             "lastTradeTimestamp": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "marketSupplyRaw": [
-                340
+                346
             ],
             "maxLTV": [
-                340
+                346
             ],
             "sellFeeBps": [
-                340
+                346
             ],
             "totalSupplyRaw": [
-                340
+                346
             ],
             "tradingFeeBps": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Market_var_samp_order_by": {
             "buyFeeBps": [
-                340
+                346
             ],
             "createdAt": [
-                340
+                346
             ],
             "currentPriceRaw": [
-                340
+                346
             ],
             "floorPriceRaw": [
-                340
+                346
             ],
             "floorSupplyRaw": [
-                340
+                346
             ],
             "initialFloorPriceRaw": [
-                340
+                346
             ],
             "lastElevationTimestamp": [
-                340
+                346
             ],
             "lastTradeTimestamp": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "marketSupplyRaw": [
-                340
+                346
             ],
             "maxLTV": [
-                340
+                346
             ],
             "sellFeeBps": [
-                340
+                346
             ],
             "totalSupplyRaw": [
-                340
+                346
             ],
             "tradingFeeBps": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Market_variance_order_by": {
             "buyFeeBps": [
-                340
+                346
             ],
             "createdAt": [
-                340
+                346
             ],
             "currentPriceRaw": [
-                340
+                346
             ],
             "floorPriceRaw": [
-                340
+                346
             ],
             "floorSupplyRaw": [
-                340
+                346
             ],
             "initialFloorPriceRaw": [
-                340
+                346
             ],
             "lastElevationTimestamp": [
-                340
+                346
             ],
             "lastTradeTimestamp": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "marketSupplyRaw": [
-                340
+                346
             ],
             "maxLTV": [
-                340
+                346
             ],
             "sellFeeBps": [
-                340
+                346
             ],
             "totalSupplyRaw": [
-                340
+                346
             ],
             "tradingFeeBps": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "ModuleAddress": {
             "createdAt": [
-                337
+                343
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "id": [
-                258
+                264
             ],
             "lastUpdatedAt": [
-                337
+                343
             ],
             "market_id": [
-                258
+                264
             ],
             "moduleType": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "ModuleAddress_bool_exp": {
             "_and": [
-                127
+                133
             ],
             "_not": [
-                127
+                133
             ],
             "_or": [
-                127
+                133
             ],
             "createdAt": [
-                339
+                345
             ],
             "db_write_timestamp": [
-                358
+                364
             ],
             "id": [
-                260
+                266
             ],
             "lastUpdatedAt": [
-                339
+                345
             ],
             "market_id": [
-                260
+                266
             ],
             "moduleType": [
-                260
+                266
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "ModuleAddress_order_by": {
             "createdAt": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "market_id": [
-                340
+                346
             ],
             "moduleType": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "ModuleAddress_select_column": {},
         "ModuleAddress_stream_cursor_input": {
             "initial_value": [
-                131
+                137
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "ModuleAddress_stream_cursor_value_input": {
             "createdAt": [
-                337
+                343
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "id": [
-                258
+                264
             ],
             "lastUpdatedAt": [
-                337
+                343
             ],
             "market_id": [
-                258
+                264
             ],
             "moduleType": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "ModuleRegistry": {
             "authorizer": [
-                258
+                264
             ],
             "createdAt": [
-                337
+                343
             ],
             "creditFacility": [
-                258
+                264
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "feeTreasury": [
-                258
+                264
             ],
             "floor": [
-                258
+                264
             ],
             "id": [
-                258
+                264
             ],
             "lastUpdatedAt": [
-                337
+                343
             ],
             "presale": [
-                258
+                264
             ],
             "staking": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "ModuleRegistry_bool_exp": {
             "_and": [
-                133
+                139
             ],
             "_not": [
-                133
+                139
             ],
             "_or": [
-                133
+                139
             ],
             "authorizer": [
-                260
+                266
             ],
             "createdAt": [
-                339
+                345
             ],
             "creditFacility": [
-                260
+                266
             ],
             "db_write_timestamp": [
-                358
+                364
             ],
             "feeTreasury": [
-                260
+                266
             ],
             "floor": [
-                260
+                266
             ],
             "id": [
-                260
+                266
             ],
             "lastUpdatedAt": [
-                339
+                345
             ],
             "presale": [
-                260
+                266
             ],
             "staking": [
-                260
+                266
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "ModuleRegistry_order_by": {
             "authorizer": [
-                340
+                346
             ],
             "createdAt": [
-                340
+                346
             ],
             "creditFacility": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "feeTreasury": [
-                340
+                346
             ],
             "floor": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "presale": [
-                340
+                346
             ],
             "staking": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "ModuleRegistry_select_column": {},
         "ModuleRegistry_stream_cursor_input": {
             "initial_value": [
-                137
+                143
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "ModuleRegistry_stream_cursor_value_input": {
             "authorizer": [
-                258
+                264
             ],
             "createdAt": [
-                337
+                343
             ],
             "creditFacility": [
-                258
+                264
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "feeTreasury": [
-                258
+                264
             ],
             "floor": [
-                258
+                264
             ],
             "id": [
-                258
+                264
             ],
             "lastUpdatedAt": [
-                337
+                343
             ],
             "presale": [
-                258
+                264
             ],
             "staking": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PreSaleContract": {
             "authorizer": [
-                258
+                264
             ],
             "claims": [
-                144,
+                150,
                 {
                     "distinct_on": [
-                        151,
+                        157,
                         "[PresaleClaim_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        150,
+                        156,
                         "[PresaleClaim_order_by!]"
                     ],
                     "where": [
-                        147
+                        153
                     ]
                 }
             ],
             "commissionBps": [
-                337
+                343
             ],
             "createdAt": [
-                337
+                343
             ],
             "currentState": [
-                60
+                66
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "endTime": [
-                337
+                343
             ],
             "feeTreasury": [
-                258
+                264
             ],
             "globalDepositCapFormatted": [
-                258
+                264
             ],
             "globalDepositCapRaw": [
-                337
+                343
             ],
             "id": [
-                258
+                264
             ],
             "lastUpdatedAt": [
-                337
+                343
             ],
             "lendingFacility": [
-                258
+                264
             ],
             "market_id": [
-                258
+                264
             ],
             "maxLeverage": [
-                337
+                343
             ],
             "participations": [
-                161,
+                167,
                 {
                     "distinct_on": [
-                        168,
+                        174,
                         "[PresaleParticipation_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        167,
+                        173,
                         "[PresaleParticipation_order_by!]"
                     ],
                     "where": [
-                        164
+                        170
                     ]
                 }
             ],
             "perAddressDepositCapFormatted": [
-                258
+                264
             ],
             "perAddressDepositCapRaw": [
-                337
+                343
             ],
             "priceBreakpointOffsets": [
-                60
+                66
             ],
             "priceBreakpointsFlat": [
-                337
+                343
             ],
             "purchaseToken": [
-                261
+                267
             ],
             "purchaseToken_id": [
-                258
+                264
             ],
             "saleToken": [
-                261
+                267
             ],
             "saleToken_id": [
-                258
+                264
             ],
             "startTime": [
-                337
+                343
             ],
             "timeSafeguardTs": [
-                337
+                343
             ],
             "totalParticipants": [
-                337
+                343
             ],
             "totalRaisedFormatted": [
-                258
+                264
             ],
             "totalRaisedRaw": [
-                337
+                343
             ],
             "whitelistSize": [
-                337
+                343
             ],
             "whitelistedAddresses": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PreSaleContract_bool_exp": {
             "_and": [
-                139
+                145
             ],
             "_not": [
-                139
+                145
             ],
             "_or": [
-                139
+                145
             ],
             "authorizer": [
-                260
+                266
             ],
             "claims": [
-                147
+                153
             ],
             "commissionBps": [
-                338
+                344
             ],
             "createdAt": [
-                339
+                345
             ],
             "currentState": [
-                62
+                68
             ],
             "db_write_timestamp": [
-                358
+                364
             ],
             "endTime": [
-                339
+                345
             ],
             "feeTreasury": [
-                260
+                266
             ],
             "globalDepositCapFormatted": [
-                260
+                266
             ],
             "globalDepositCapRaw": [
-                339
+                345
             ],
             "id": [
-                260
+                266
             ],
             "lastUpdatedAt": [
-                339
+                345
             ],
             "lendingFacility": [
-                260
+                266
             ],
             "market_id": [
-                260
+                266
             ],
             "maxLeverage": [
-                339
+                345
             ],
             "participations": [
-                164
+                170
             ],
             "perAddressDepositCapFormatted": [
-                260
+                266
             ],
             "perAddressDepositCapRaw": [
-                339
+                345
             ],
             "priceBreakpointOffsets": [
-                61
+                67
             ],
             "priceBreakpointsFlat": [
-                338
+                344
             ],
             "purchaseToken": [
-                262
+                268
             ],
             "purchaseToken_id": [
-                260
+                266
             ],
             "saleToken": [
-                262
+                268
             ],
             "saleToken_id": [
-                260
+                266
             ],
             "startTime": [
-                339
+                345
             ],
             "timeSafeguardTs": [
-                339
+                345
             ],
             "totalParticipants": [
-                339
+                345
             ],
             "totalRaisedFormatted": [
-                260
+                266
             ],
             "totalRaisedRaw": [
-                339
+                345
             ],
             "whitelistSize": [
-                339
+                345
             ],
             "whitelistedAddresses": [
-                259
+                265
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PreSaleContract_order_by": {
             "authorizer": [
-                340
+                346
             ],
             "claims_aggregate": [
-                145
+                151
             ],
             "commissionBps": [
-                340
+                346
             ],
             "createdAt": [
-                340
+                346
             ],
             "currentState": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "endTime": [
-                340
+                346
             ],
             "feeTreasury": [
-                340
+                346
             ],
             "globalDepositCapFormatted": [
-                340
+                346
             ],
             "globalDepositCapRaw": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "lendingFacility": [
-                340
+                346
             ],
             "market_id": [
-                340
+                346
             ],
             "maxLeverage": [
-                340
+                346
             ],
             "participations_aggregate": [
-                162
+                168
             ],
             "perAddressDepositCapFormatted": [
-                340
+                346
             ],
             "perAddressDepositCapRaw": [
-                340
+                346
             ],
             "priceBreakpointOffsets": [
-                340
+                346
             ],
             "priceBreakpointsFlat": [
-                340
+                346
             ],
             "purchaseToken": [
-                263
+                269
             ],
             "purchaseToken_id": [
-                340
+                346
             ],
             "saleToken": [
-                263
+                269
             ],
             "saleToken_id": [
-                340
+                346
             ],
             "startTime": [
-                340
+                346
             ],
             "timeSafeguardTs": [
-                340
+                346
             ],
             "totalParticipants": [
-                340
+                346
             ],
             "totalRaisedFormatted": [
-                340
+                346
             ],
             "totalRaisedRaw": [
-                340
+                346
             ],
             "whitelistSize": [
-                340
+                346
             ],
             "whitelistedAddresses": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PreSaleContract_select_column": {},
         "PreSaleContract_stream_cursor_input": {
             "initial_value": [
-                143
+                149
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PreSaleContract_stream_cursor_value_input": {
             "authorizer": [
-                258
+                264
             ],
             "commissionBps": [
-                337
+                343
             ],
             "createdAt": [
-                337
+                343
             ],
             "currentState": [
-                60
+                66
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "endTime": [
-                337
+                343
             ],
             "feeTreasury": [
-                258
+                264
             ],
             "globalDepositCapFormatted": [
-                258
+                264
             ],
             "globalDepositCapRaw": [
-                337
+                343
             ],
             "id": [
-                258
+                264
             ],
             "lastUpdatedAt": [
-                337
+                343
             ],
             "lendingFacility": [
-                258
+                264
             ],
             "market_id": [
-                258
+                264
             ],
             "maxLeverage": [
-                337
+                343
             ],
             "perAddressDepositCapFormatted": [
-                258
+                264
             ],
             "perAddressDepositCapRaw": [
-                337
+                343
             ],
             "priceBreakpointOffsets": [
-                60
+                66
             ],
             "priceBreakpointsFlat": [
-                337
+                343
             ],
             "purchaseToken_id": [
-                258
+                264
             ],
             "saleToken_id": [
-                258
+                264
             ],
             "startTime": [
-                337
+                343
             ],
             "timeSafeguardTs": [
-                337
+                343
             ],
             "totalParticipants": [
-                337
+                343
             ],
             "totalRaisedFormatted": [
-                258
+                264
             ],
             "totalRaisedRaw": [
-                337
+                343
             ],
             "whitelistSize": [
-                337
+                343
             ],
             "whitelistedAddresses": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleClaim": {
             "amountFormatted": [
-                258
+                264
             ],
             "amountRaw": [
-                337
+                343
             ],
             "claimType": [
-                347
+                353
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "id": [
-                258
+                264
             ],
             "loanId": [
-                337
+                343
             ],
             "positionId": [
-                337
+                343
             ],
             "presale_id": [
-                258
+                264
             ],
             "timestamp": [
-                337
+                343
             ],
             "trancheIndex": [
-                337
+                343
             ],
             "transactionHash": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleClaim_aggregate_order_by": {
             "avg": [
-                146
-            ],
-            "count": [
-                340
-            ],
-            "max": [
-                148
-            ],
-            "min": [
-                149
-            ],
-            "stddev": [
                 152
             ],
-            "stddev_pop": [
-                153
+            "count": [
+                346
             ],
-            "stddev_samp": [
+            "max": [
                 154
             ],
-            "sum": [
-                157
+            "min": [
+                155
             ],
-            "var_pop": [
+            "stddev": [
                 158
             ],
-            "var_samp": [
+            "stddev_pop": [
                 159
             ],
-            "variance": [
+            "stddev_samp": [
                 160
             ],
+            "sum": [
+                163
+            ],
+            "var_pop": [
+                164
+            ],
+            "var_samp": [
+                165
+            ],
+            "variance": [
+                166
+            ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleClaim_avg_order_by": {
             "amountRaw": [
-                340
+                346
             ],
             "loanId": [
-                340
+                346
             ],
             "positionId": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "trancheIndex": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleClaim_bool_exp": {
             "_and": [
-                147
+                153
             ],
             "_not": [
-                147
+                153
             ],
             "_or": [
-                147
+                153
             ],
             "amountFormatted": [
-                260
+                266
             ],
             "amountRaw": [
-                339
+                345
             ],
             "claimType": [
-                348
+                354
             ],
             "db_write_timestamp": [
-                358
+                364
             ],
             "id": [
-                260
+                266
             ],
             "loanId": [
-                339
+                345
             ],
             "positionId": [
-                339
+                345
             ],
             "presale_id": [
-                260
+                266
             ],
             "timestamp": [
-                339
+                345
             ],
             "trancheIndex": [
-                339
+                345
             ],
             "transactionHash": [
-                260
+                266
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleClaim_max_order_by": {
             "amountFormatted": [
-                340
+                346
             ],
             "amountRaw": [
-                340
+                346
             ],
             "claimType": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "loanId": [
-                340
+                346
             ],
             "positionId": [
-                340
+                346
             ],
             "presale_id": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "trancheIndex": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleClaim_min_order_by": {
             "amountFormatted": [
-                340
+                346
             ],
             "amountRaw": [
-                340
+                346
             ],
             "claimType": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "loanId": [
-                340
+                346
             ],
             "positionId": [
-                340
+                346
             ],
             "presale_id": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "trancheIndex": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleClaim_order_by": {
             "amountFormatted": [
-                340
+                346
             ],
             "amountRaw": [
-                340
+                346
             ],
             "claimType": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "loanId": [
-                340
+                346
             ],
             "positionId": [
-                340
+                346
             ],
             "presale_id": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "trancheIndex": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleClaim_select_column": {},
         "PresaleClaim_stddev_order_by": {
             "amountRaw": [
-                340
+                346
             ],
             "loanId": [
-                340
+                346
             ],
             "positionId": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "trancheIndex": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleClaim_stddev_pop_order_by": {
             "amountRaw": [
-                340
+                346
             ],
             "loanId": [
-                340
+                346
             ],
             "positionId": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "trancheIndex": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleClaim_stddev_samp_order_by": {
             "amountRaw": [
-                340
+                346
             ],
             "loanId": [
-                340
+                346
             ],
             "positionId": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "trancheIndex": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleClaim_stream_cursor_input": {
             "initial_value": [
-                156
+                162
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleClaim_stream_cursor_value_input": {
             "amountFormatted": [
-                258
+                264
             ],
             "amountRaw": [
-                337
+                343
             ],
             "claimType": [
-                347
+                353
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "id": [
-                258
+                264
             ],
             "loanId": [
-                337
+                343
             ],
             "positionId": [
-                337
+                343
             ],
             "presale_id": [
-                258
+                264
             ],
             "timestamp": [
-                337
+                343
             ],
             "trancheIndex": [
-                337
+                343
             ],
             "transactionHash": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleClaim_sum_order_by": {
             "amountRaw": [
-                340
+                346
             ],
             "loanId": [
-                340
+                346
             ],
             "positionId": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "trancheIndex": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleClaim_var_pop_order_by": {
             "amountRaw": [
-                340
+                346
             ],
             "loanId": [
-                340
+                346
             ],
             "positionId": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "trancheIndex": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleClaim_var_samp_order_by": {
             "amountRaw": [
-                340
+                346
             ],
             "loanId": [
-                340
+                346
             ],
             "positionId": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "trancheIndex": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleClaim_variance_order_by": {
             "amountRaw": [
-                340
+                346
             ],
             "loanId": [
-                340
+                346
             ],
             "positionId": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "trancheIndex": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleParticipation": {
             "db_write_timestamp": [
-                357
+                363
             ],
             "depositAmountFormatted": [
-                258
+                264
             ],
             "depositAmountRaw": [
-                337
+                343
             ],
             "id": [
-                258
+                264
             ],
             "leverage": [
-                337
+                343
             ],
             "loopCount": [
-                337
+                343
             ],
             "mintedAmountFormatted": [
-                258
+                264
             ],
             "mintedAmountRaw": [
-                337
+                343
             ],
             "positionId": [
-                337
+                343
             ],
             "presale_id": [
-                258
+                264
             ],
             "timestamp": [
-                337
+                343
             ],
             "transactionHash": [
-                258
+                264
             ],
             "user_id": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleParticipation_aggregate_order_by": {
             "avg": [
-                163
-            ],
-            "count": [
-                340
-            ],
-            "max": [
-                165
-            ],
-            "min": [
-                166
-            ],
-            "stddev": [
                 169
             ],
-            "stddev_pop": [
-                170
+            "count": [
+                346
             ],
-            "stddev_samp": [
+            "max": [
                 171
             ],
-            "sum": [
-                174
+            "min": [
+                172
             ],
-            "var_pop": [
+            "stddev": [
                 175
             ],
-            "var_samp": [
+            "stddev_pop": [
                 176
             ],
-            "variance": [
+            "stddev_samp": [
                 177
             ],
+            "sum": [
+                180
+            ],
+            "var_pop": [
+                181
+            ],
+            "var_samp": [
+                182
+            ],
+            "variance": [
+                183
+            ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleParticipation_avg_order_by": {
             "depositAmountRaw": [
-                340
+                346
             ],
             "leverage": [
-                340
+                346
             ],
             "loopCount": [
-                340
+                346
             ],
             "mintedAmountRaw": [
-                340
+                346
             ],
             "positionId": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleParticipation_bool_exp": {
             "_and": [
-                164
+                170
             ],
             "_not": [
-                164
+                170
             ],
             "_or": [
-                164
+                170
             ],
             "db_write_timestamp": [
-                358
+                364
             ],
             "depositAmountFormatted": [
-                260
+                266
             ],
             "depositAmountRaw": [
-                339
+                345
             ],
             "id": [
-                260
+                266
             ],
             "leverage": [
-                339
+                345
             ],
             "loopCount": [
-                339
+                345
             ],
             "mintedAmountFormatted": [
-                260
+                266
             ],
             "mintedAmountRaw": [
-                339
+                345
             ],
             "positionId": [
-                339
+                345
             ],
             "presale_id": [
-                260
+                266
             ],
             "timestamp": [
-                339
+                345
             ],
             "transactionHash": [
-                260
+                266
             ],
             "user_id": [
-                260
+                266
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleParticipation_max_order_by": {
             "db_write_timestamp": [
-                340
+                346
             ],
             "depositAmountFormatted": [
-                340
+                346
             ],
             "depositAmountRaw": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "leverage": [
-                340
+                346
             ],
             "loopCount": [
-                340
+                346
             ],
             "mintedAmountFormatted": [
-                340
+                346
             ],
             "mintedAmountRaw": [
-                340
+                346
             ],
             "positionId": [
-                340
+                346
             ],
             "presale_id": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "user_id": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleParticipation_min_order_by": {
             "db_write_timestamp": [
-                340
+                346
             ],
             "depositAmountFormatted": [
-                340
+                346
             ],
             "depositAmountRaw": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "leverage": [
-                340
+                346
             ],
             "loopCount": [
-                340
+                346
             ],
             "mintedAmountFormatted": [
-                340
+                346
             ],
             "mintedAmountRaw": [
-                340
+                346
             ],
             "positionId": [
-                340
+                346
             ],
             "presale_id": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "user_id": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleParticipation_order_by": {
             "db_write_timestamp": [
-                340
+                346
             ],
             "depositAmountFormatted": [
-                340
+                346
             ],
             "depositAmountRaw": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "leverage": [
-                340
+                346
             ],
             "loopCount": [
-                340
+                346
             ],
             "mintedAmountFormatted": [
-                340
+                346
             ],
             "mintedAmountRaw": [
-                340
+                346
             ],
             "positionId": [
-                340
+                346
             ],
             "presale_id": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "user_id": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleParticipation_select_column": {},
         "PresaleParticipation_stddev_order_by": {
             "depositAmountRaw": [
-                340
+                346
             ],
             "leverage": [
-                340
+                346
             ],
             "loopCount": [
-                340
+                346
             ],
             "mintedAmountRaw": [
-                340
+                346
             ],
             "positionId": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleParticipation_stddev_pop_order_by": {
             "depositAmountRaw": [
-                340
+                346
             ],
             "leverage": [
-                340
+                346
             ],
             "loopCount": [
-                340
+                346
             ],
             "mintedAmountRaw": [
-                340
+                346
             ],
             "positionId": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleParticipation_stddev_samp_order_by": {
             "depositAmountRaw": [
-                340
+                346
             ],
             "leverage": [
-                340
+                346
             ],
             "loopCount": [
-                340
+                346
             ],
             "mintedAmountRaw": [
-                340
+                346
             ],
             "positionId": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleParticipation_stream_cursor_input": {
             "initial_value": [
-                173
+                179
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleParticipation_stream_cursor_value_input": {
             "db_write_timestamp": [
-                357
+                363
             ],
             "depositAmountFormatted": [
-                258
+                264
             ],
             "depositAmountRaw": [
-                337
+                343
             ],
             "id": [
-                258
+                264
             ],
             "leverage": [
-                337
+                343
             ],
             "loopCount": [
-                337
+                343
             ],
             "mintedAmountFormatted": [
-                258
+                264
             ],
             "mintedAmountRaw": [
-                337
+                343
             ],
             "positionId": [
-                337
+                343
             ],
             "presale_id": [
-                258
+                264
             ],
             "timestamp": [
-                337
+                343
             ],
             "transactionHash": [
-                258
+                264
             ],
             "user_id": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleParticipation_sum_order_by": {
             "depositAmountRaw": [
-                340
+                346
             ],
             "leverage": [
-                340
+                346
             ],
             "loopCount": [
-                340
+                346
             ],
             "mintedAmountRaw": [
-                340
+                346
             ],
             "positionId": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleParticipation_var_pop_order_by": {
             "depositAmountRaw": [
-                340
+                346
             ],
             "leverage": [
-                340
+                346
             ],
             "loopCount": [
-                340
+                346
             ],
             "mintedAmountRaw": [
-                340
+                346
             ],
             "positionId": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleParticipation_var_samp_order_by": {
             "depositAmountRaw": [
-                340
+                346
             ],
             "leverage": [
-                340
+                346
             ],
             "loopCount": [
-                340
+                346
             ],
             "mintedAmountRaw": [
-                340
+                346
             ],
             "positionId": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PresaleParticipation_variance_order_by": {
             "depositAmountRaw": [
-                340
+                346
             ],
             "leverage": [
-                340
+                346
             ],
             "loopCount": [
-                340
+                346
             ],
             "mintedAmountRaw": [
-                340
+                346
             ],
             "positionId": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PriceCandle": {
             "closeFormatted": [
-                258
+                264
             ],
             "closeRaw": [
-                337
+                343
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "highFormatted": [
-                258
+                264
             ],
             "highRaw": [
-                337
+                343
             ],
             "id": [
-                258
+                264
             ],
             "lowFormatted": [
-                258
+                264
             ],
             "lowRaw": [
-                337
+                343
             ],
             "market_id": [
-                258
+                264
             ],
             "openFormatted": [
-                258
+                264
             ],
             "openRaw": [
-                337
+                343
             ],
             "period": [
-                301
+                307
             ],
             "timestamp": [
-                337
+                343
             ],
             "trades": [
-                337
+                343
             ],
             "volumeFormatted": [
-                258
+                264
             ],
             "volumeRaw": [
-                337
+                343
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PriceCandle_bool_exp": {
             "_and": [
-                179
+                185
             ],
             "_not": [
-                179
+                185
             ],
             "_or": [
-                179
+                185
             ],
             "closeFormatted": [
-                260
+                266
             ],
             "closeRaw": [
-                339
+                345
             ],
             "db_write_timestamp": [
-                358
+                364
             ],
             "highFormatted": [
-                260
+                266
             ],
             "highRaw": [
-                339
+                345
             ],
             "id": [
-                260
+                266
             ],
             "lowFormatted": [
-                260
+                266
             ],
             "lowRaw": [
-                339
+                345
             ],
             "market_id": [
-                260
+                266
             ],
             "openFormatted": [
-                260
+                266
             ],
             "openRaw": [
-                339
+                345
             ],
             "period": [
-                302
+                308
             ],
             "timestamp": [
-                339
+                345
             ],
             "trades": [
-                339
+                345
             ],
             "volumeFormatted": [
-                260
+                266
             ],
             "volumeRaw": [
-                339
+                345
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PriceCandle_order_by": {
             "closeFormatted": [
-                340
+                346
             ],
             "closeRaw": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "highFormatted": [
-                340
+                346
             ],
             "highRaw": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "lowFormatted": [
-                340
+                346
             ],
             "lowRaw": [
-                340
+                346
             ],
             "market_id": [
-                340
+                346
             ],
             "openFormatted": [
-                340
+                346
             ],
             "openRaw": [
-                340
+                346
             ],
             "period": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "trades": [
-                340
+                346
             ],
             "volumeFormatted": [
-                340
+                346
             ],
             "volumeRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PriceCandle_select_column": {},
         "PriceCandle_stream_cursor_input": {
             "initial_value": [
-                183
+                189
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "PriceCandle_stream_cursor_value_input": {
             "closeFormatted": [
-                258
+                264
             ],
             "closeRaw": [
-                337
+                343
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "highFormatted": [
-                258
+                264
             ],
             "highRaw": [
-                337
+                343
             ],
             "id": [
-                258
+                264
             ],
             "lowFormatted": [
-                258
+                264
             ],
             "lowRaw": [
-                337
+                343
             ],
             "market_id": [
-                258
+                264
             ],
             "openFormatted": [
-                258
+                264
             ],
             "openRaw": [
-                337
+                343
             ],
             "period": [
-                301
+                307
             ],
             "timestamp": [
-                337
+                343
             ],
             "trades": [
-                337
+                343
             ],
             "volumeFormatted": [
-                258
+                264
             ],
             "volumeRaw": [
-                337
+                343
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Role": {
             "adminRole": [
-                258
+                264
             ],
             "adminRoleName": [
-                258
+                264
             ],
             "authorizer_id": [
-                258
+                264
             ],
             "createdAt": [
-                337
+                343
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "id": [
-                258
+                264
             ],
             "isAdminBurned": [
                 12
             ],
             "lastUpdatedAt": [
-                337
+                343
             ],
             "members": [
-                185,
+                191,
                 {
                     "distinct_on": [
-                        192,
+                        198,
                         "[RoleMember_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        191,
+                        197,
                         "[RoleMember_order_by!]"
                     ],
                     "where": [
-                        188
+                        194
                     ]
                 }
             ],
             "name": [
-                258
+                264
             ],
             "permissions": [
-                202,
+                208,
                 {
                     "distinct_on": [
-                        209,
+                        215,
                         "[RolePermission_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        208,
+                        214,
                         "[RolePermission_order_by!]"
                     ],
                     "where": [
-                        205
+                        211
                     ]
                 }
             ],
             "roleId": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RoleMember": {
             "db_write_timestamp": [
-                357
+                363
             ],
             "grantedAt": [
-                337
+                343
             ],
             "grantedBy": [
-                258
+                264
             ],
             "id": [
-                258
+                264
             ],
             "member": [
-                258
+                264
             ],
             "role_id": [
-                258
+                264
             ],
             "transactionHash": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RoleMember_aggregate_order_by": {
             "avg": [
-                187
-            ],
-            "count": [
-                340
-            ],
-            "max": [
-                189
-            ],
-            "min": [
-                190
-            ],
-            "stddev": [
                 193
             ],
-            "stddev_pop": [
-                194
+            "count": [
+                346
             ],
-            "stddev_samp": [
+            "max": [
                 195
             ],
-            "sum": [
-                198
+            "min": [
+                196
             ],
-            "var_pop": [
+            "stddev": [
                 199
             ],
-            "var_samp": [
+            "stddev_pop": [
                 200
             ],
-            "variance": [
+            "stddev_samp": [
                 201
             ],
+            "sum": [
+                204
+            ],
+            "var_pop": [
+                205
+            ],
+            "var_samp": [
+                206
+            ],
+            "variance": [
+                207
+            ],
             "__typename": [
-                258
+                264
             ]
         },
         "RoleMember_avg_order_by": {
             "grantedAt": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RoleMember_bool_exp": {
             "_and": [
-                188
+                194
             ],
             "_not": [
-                188
+                194
             ],
             "_or": [
-                188
+                194
             ],
             "db_write_timestamp": [
-                358
+                364
             ],
             "grantedAt": [
-                339
+                345
             ],
             "grantedBy": [
-                260
+                266
             ],
             "id": [
-                260
+                266
             ],
             "member": [
-                260
+                266
             ],
             "role_id": [
-                260
+                266
             ],
             "transactionHash": [
-                260
+                266
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RoleMember_max_order_by": {
             "db_write_timestamp": [
-                340
+                346
             ],
             "grantedAt": [
-                340
+                346
             ],
             "grantedBy": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "member": [
-                340
+                346
             ],
             "role_id": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RoleMember_min_order_by": {
             "db_write_timestamp": [
-                340
+                346
             ],
             "grantedAt": [
-                340
+                346
             ],
             "grantedBy": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "member": [
-                340
+                346
             ],
             "role_id": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RoleMember_order_by": {
             "db_write_timestamp": [
-                340
+                346
             ],
             "grantedAt": [
-                340
+                346
             ],
             "grantedBy": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "member": [
-                340
+                346
             ],
             "role_id": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RoleMember_select_column": {},
         "RoleMember_stddev_order_by": {
             "grantedAt": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RoleMember_stddev_pop_order_by": {
             "grantedAt": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RoleMember_stddev_samp_order_by": {
             "grantedAt": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RoleMember_stream_cursor_input": {
             "initial_value": [
-                197
+                203
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RoleMember_stream_cursor_value_input": {
             "db_write_timestamp": [
-                357
+                363
             ],
             "grantedAt": [
-                337
+                343
             ],
             "grantedBy": [
-                258
+                264
             ],
             "id": [
-                258
+                264
             ],
             "member": [
-                258
+                264
             ],
             "role_id": [
-                258
+                264
             ],
             "transactionHash": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RoleMember_sum_order_by": {
             "grantedAt": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RoleMember_var_pop_order_by": {
             "grantedAt": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RoleMember_var_samp_order_by": {
             "grantedAt": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RoleMember_variance_order_by": {
             "grantedAt": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RolePermission": {
             "addedAt": [
-                337
+                343
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "id": [
-                258
+                264
             ],
             "role_id": [
-                258
+                264
             ],
             "selector": [
-                258
+                264
             ],
             "selectorName": [
-                258
+                264
             ],
             "target": [
-                258
+                264
             ],
             "transactionHash": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RolePermission_aggregate_order_by": {
             "avg": [
-                204
-            ],
-            "count": [
-                340
-            ],
-            "max": [
-                206
-            ],
-            "min": [
-                207
-            ],
-            "stddev": [
                 210
             ],
-            "stddev_pop": [
-                211
+            "count": [
+                346
             ],
-            "stddev_samp": [
+            "max": [
                 212
             ],
-            "sum": [
-                215
+            "min": [
+                213
             ],
-            "var_pop": [
+            "stddev": [
                 216
             ],
-            "var_samp": [
+            "stddev_pop": [
                 217
             ],
-            "variance": [
+            "stddev_samp": [
                 218
             ],
+            "sum": [
+                221
+            ],
+            "var_pop": [
+                222
+            ],
+            "var_samp": [
+                223
+            ],
+            "variance": [
+                224
+            ],
             "__typename": [
-                258
+                264
             ]
         },
         "RolePermission_avg_order_by": {
             "addedAt": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RolePermission_bool_exp": {
             "_and": [
-                205
+                211
             ],
             "_not": [
-                205
+                211
             ],
             "_or": [
-                205
+                211
             ],
             "addedAt": [
-                339
+                345
             ],
             "db_write_timestamp": [
-                358
+                364
             ],
             "id": [
-                260
+                266
             ],
             "role_id": [
-                260
+                266
             ],
             "selector": [
-                260
+                266
             ],
             "selectorName": [
-                260
+                266
             ],
             "target": [
-                260
+                266
             ],
             "transactionHash": [
-                260
+                266
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RolePermission_max_order_by": {
             "addedAt": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "role_id": [
-                340
+                346
             ],
             "selector": [
-                340
+                346
             ],
             "selectorName": [
-                340
+                346
             ],
             "target": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RolePermission_min_order_by": {
             "addedAt": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "role_id": [
-                340
+                346
             ],
             "selector": [
-                340
+                346
             ],
             "selectorName": [
-                340
+                346
             ],
             "target": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RolePermission_order_by": {
             "addedAt": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "role_id": [
-                340
+                346
             ],
             "selector": [
-                340
+                346
             ],
             "selectorName": [
-                340
+                346
             ],
             "target": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RolePermission_select_column": {},
         "RolePermission_stddev_order_by": {
             "addedAt": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RolePermission_stddev_pop_order_by": {
             "addedAt": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RolePermission_stddev_samp_order_by": {
             "addedAt": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RolePermission_stream_cursor_input": {
             "initial_value": [
-                214
+                220
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RolePermission_stream_cursor_value_input": {
             "addedAt": [
-                337
+                343
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "id": [
-                258
+                264
             ],
             "role_id": [
-                258
+                264
             ],
             "selector": [
-                258
+                264
             ],
             "selectorName": [
-                258
+                264
             ],
             "target": [
-                258
+                264
             ],
             "transactionHash": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RolePermission_sum_order_by": {
             "addedAt": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RolePermission_var_pop_order_by": {
             "addedAt": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RolePermission_var_samp_order_by": {
             "addedAt": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "RolePermission_variance_order_by": {
             "addedAt": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Role_aggregate_order_by": {
             "avg": [
-                220
-            ],
-            "count": [
-                340
-            ],
-            "max": [
-                222
-            ],
-            "min": [
-                223
-            ],
-            "stddev": [
                 226
             ],
-            "stddev_pop": [
-                227
+            "count": [
+                346
             ],
-            "stddev_samp": [
+            "max": [
                 228
             ],
-            "sum": [
-                231
+            "min": [
+                229
             ],
-            "var_pop": [
+            "stddev": [
                 232
             ],
-            "var_samp": [
+            "stddev_pop": [
                 233
             ],
-            "variance": [
+            "stddev_samp": [
                 234
             ],
+            "sum": [
+                237
+            ],
+            "var_pop": [
+                238
+            ],
+            "var_samp": [
+                239
+            ],
+            "variance": [
+                240
+            ],
             "__typename": [
-                258
+                264
             ]
         },
         "Role_avg_order_by": {
             "createdAt": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Role_bool_exp": {
             "_and": [
-                221
+                227
             ],
             "_not": [
-                221
+                227
             ],
             "_or": [
-                221
+                227
             ],
             "adminRole": [
-                260
+                266
             ],
             "adminRoleName": [
-                260
+                266
             ],
             "authorizer_id": [
-                260
+                266
             ],
             "createdAt": [
-                339
+                345
             ],
             "db_write_timestamp": [
-                358
+                364
             ],
             "id": [
-                260
+                266
             ],
             "isAdminBurned": [
                 13
             ],
             "lastUpdatedAt": [
-                339
+                345
             ],
             "members": [
-                188
+                194
             ],
             "name": [
-                260
+                266
             ],
             "permissions": [
-                205
+                211
             ],
             "roleId": [
-                260
+                266
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Role_max_order_by": {
             "adminRole": [
-                340
+                346
             ],
             "adminRoleName": [
-                340
+                346
             ],
             "authorizer_id": [
-                340
+                346
             ],
             "createdAt": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "name": [
-                340
+                346
             ],
             "roleId": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Role_min_order_by": {
             "adminRole": [
-                340
+                346
             ],
             "adminRoleName": [
-                340
+                346
             ],
             "authorizer_id": [
-                340
+                346
             ],
             "createdAt": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "name": [
-                340
+                346
             ],
             "roleId": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Role_order_by": {
             "adminRole": [
-                340
+                346
             ],
             "adminRoleName": [
-                340
+                346
             ],
             "authorizer_id": [
-                340
+                346
             ],
             "createdAt": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "isAdminBurned": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "members_aggregate": [
-                186
+                192
             ],
             "name": [
-                340
+                346
             ],
             "permissions_aggregate": [
-                203
+                209
             ],
             "roleId": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Role_select_column": {},
         "Role_stddev_order_by": {
             "createdAt": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Role_stddev_pop_order_by": {
             "createdAt": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Role_stddev_samp_order_by": {
             "createdAt": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Role_stream_cursor_input": {
             "initial_value": [
-                230
+                236
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Role_stream_cursor_value_input": {
             "adminRole": [
-                258
+                264
             ],
             "adminRoleName": [
-                258
+                264
             ],
             "authorizer_id": [
-                258
+                264
             ],
             "createdAt": [
-                337
+                343
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "id": [
-                258
+                264
             ],
             "isAdminBurned": [
                 12
             ],
             "lastUpdatedAt": [
-                337
+                343
             ],
             "name": [
-                258
+                264
             ],
             "roleId": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Role_sum_order_by": {
             "createdAt": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Role_var_pop_order_by": {
             "createdAt": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Role_var_samp_order_by": {
             "createdAt": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Role_variance_order_by": {
             "createdAt": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Stake": {
             "amountFormatted": [
-                258
+                264
             ],
             "amountRaw": [
-                337
+                343
             ],
             "contract_id": [
-                258
+                264
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "id": [
-                258
+                264
             ],
             "lockDuration": [
-                337
+                343
             ],
             "status": [
-                355
+                361
             ],
             "timestamp": [
-                337
+                343
             ],
             "transactionHash": [
-                258
+                264
             ],
             "user_id": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Stake_aggregate_order_by": {
             "avg": [
-                237
-            ],
-            "count": [
-                340
-            ],
-            "max": [
-                239
-            ],
-            "min": [
-                240
-            ],
-            "stddev": [
                 243
             ],
-            "stddev_pop": [
-                244
+            "count": [
+                346
             ],
-            "stddev_samp": [
+            "max": [
                 245
             ],
-            "sum": [
-                248
+            "min": [
+                246
             ],
-            "var_pop": [
+            "stddev": [
                 249
             ],
-            "var_samp": [
+            "stddev_pop": [
                 250
             ],
-            "variance": [
+            "stddev_samp": [
                 251
             ],
+            "sum": [
+                254
+            ],
+            "var_pop": [
+                255
+            ],
+            "var_samp": [
+                256
+            ],
+            "variance": [
+                257
+            ],
             "__typename": [
-                258
+                264
             ]
         },
         "Stake_avg_order_by": {
             "amountRaw": [
-                340
+                346
             ],
             "lockDuration": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Stake_bool_exp": {
             "_and": [
-                238
+                244
             ],
             "_not": [
-                238
+                244
             ],
             "_or": [
-                238
+                244
             ],
             "amountFormatted": [
-                260
+                266
             ],
             "amountRaw": [
-                339
+                345
             ],
             "contract_id": [
-                260
+                266
             ],
             "db_write_timestamp": [
-                358
+                364
             ],
             "id": [
-                260
+                266
             ],
             "lockDuration": [
-                339
+                345
             ],
             "status": [
-                356
+                362
             ],
             "timestamp": [
-                339
+                345
             ],
             "transactionHash": [
-                260
+                266
             ],
             "user_id": [
-                260
+                266
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Stake_max_order_by": {
             "amountFormatted": [
-                340
+                346
             ],
             "amountRaw": [
-                340
+                346
             ],
             "contract_id": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "lockDuration": [
-                340
+                346
             ],
             "status": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "user_id": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Stake_min_order_by": {
             "amountFormatted": [
-                340
+                346
             ],
             "amountRaw": [
-                340
+                346
             ],
             "contract_id": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "lockDuration": [
-                340
+                346
             ],
             "status": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "user_id": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Stake_order_by": {
             "amountFormatted": [
-                340
+                346
             ],
             "amountRaw": [
-                340
+                346
             ],
             "contract_id": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "lockDuration": [
-                340
+                346
             ],
             "status": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "user_id": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Stake_select_column": {},
         "Stake_stddev_order_by": {
             "amountRaw": [
-                340
+                346
             ],
             "lockDuration": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Stake_stddev_pop_order_by": {
             "amountRaw": [
-                340
+                346
             ],
             "lockDuration": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Stake_stddev_samp_order_by": {
             "amountRaw": [
-                340
+                346
             ],
             "lockDuration": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Stake_stream_cursor_input": {
             "initial_value": [
-                247
+                253
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Stake_stream_cursor_value_input": {
             "amountFormatted": [
-                258
+                264
             ],
             "amountRaw": [
-                337
+                343
             ],
             "contract_id": [
-                258
+                264
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "id": [
-                258
+                264
             ],
             "lockDuration": [
-                337
+                343
             ],
             "status": [
-                355
+                361
             ],
             "timestamp": [
-                337
+                343
             ],
             "transactionHash": [
-                258
+                264
             ],
             "user_id": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Stake_sum_order_by": {
             "amountRaw": [
-                340
+                346
             ],
             "lockDuration": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Stake_var_pop_order_by": {
             "amountRaw": [
-                340
+                346
             ],
             "lockDuration": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Stake_var_samp_order_by": {
             "amountRaw": [
-                340
+                346
             ],
             "lockDuration": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Stake_variance_order_by": {
             "amountRaw": [
-                340
+                346
             ],
             "lockDuration": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "StakingContract": {
             "createdAt": [
-                337
+                343
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "id": [
-                258
+                264
             ],
             "rewardToken_id": [
-                258
+                264
             ],
             "stakes": [
-                235,
+                241,
                 {
                     "distinct_on": [
-                        242,
+                        248,
                         "[Stake_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        241,
+                        247,
                         "[Stake_order_by!]"
                     ],
                     "where": [
-                        238
+                        244
                     ]
                 }
             ],
             "stakingToken_id": [
-                258
+                264
             ],
             "totalRewardsFormatted": [
-                258
+                264
             ],
             "totalRewardsRaw": [
-                337
+                343
             ],
             "totalStakedFormatted": [
-                258
+                264
             ],
             "totalStakedRaw": [
-                337
+                343
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "StakingContract_bool_exp": {
             "_and": [
-                253
+                259
             ],
             "_not": [
-                253
+                259
             ],
             "_or": [
-                253
+                259
             ],
             "createdAt": [
-                339
+                345
             ],
             "db_write_timestamp": [
-                358
+                364
             ],
             "id": [
-                260
+                266
             ],
             "rewardToken_id": [
-                260
+                266
             ],
             "stakes": [
-                238
+                244
             ],
             "stakingToken_id": [
-                260
+                266
             ],
             "totalRewardsFormatted": [
-                260
+                266
             ],
             "totalRewardsRaw": [
-                339
+                345
             ],
             "totalStakedFormatted": [
-                260
+                266
             ],
             "totalStakedRaw": [
-                339
+                345
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "StakingContract_order_by": {
             "createdAt": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "rewardToken_id": [
-                340
+                346
             ],
             "stakes_aggregate": [
-                236
+                242
             ],
             "stakingToken_id": [
-                340
+                346
             ],
             "totalRewardsFormatted": [
-                340
+                346
             ],
             "totalRewardsRaw": [
-                340
+                346
             ],
             "totalStakedFormatted": [
-                340
+                346
             ],
             "totalStakedRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "StakingContract_select_column": {},
         "StakingContract_stream_cursor_input": {
             "initial_value": [
-                257
+                263
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "StakingContract_stream_cursor_value_input": {
             "createdAt": [
-                337
+                343
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "id": [
-                258
+                264
             ],
             "rewardToken_id": [
-                258
+                264
             ],
             "stakingToken_id": [
-                258
+                264
             ],
             "totalRewardsFormatted": [
-                258
+                264
             ],
             "totalRewardsRaw": [
-                337
+                343
             ],
             "totalStakedFormatted": [
-                258
+                264
             ],
             "totalStakedRaw": [
-                337
+                343
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "String": {},
         "String_array_comparison_exp": {
             "_contained_in": [
-                258
+                264
             ],
             "_contains": [
-                258
+                264
             ],
             "_eq": [
-                258
+                264
             ],
             "_gt": [
-                258
+                264
             ],
             "_gte": [
-                258
+                264
             ],
             "_in": [
-                258
+                264
             ],
             "_is_null": [
                 12
             ],
             "_lt": [
-                258
+                264
             ],
             "_lte": [
-                258
+                264
             ],
             "_neq": [
-                258
+                264
             ],
             "_nin": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "String_comparison_exp": {
             "_eq": [
-                258
+                264
             ],
             "_gt": [
-                258
+                264
             ],
             "_gte": [
-                258
+                264
             ],
             "_ilike": [
-                258
+                264
             ],
             "_in": [
-                258
+                264
             ],
             "_iregex": [
-                258
+                264
             ],
             "_is_null": [
                 12
             ],
             "_like": [
-                258
+                264
             ],
             "_lt": [
-                258
+                264
             ],
             "_lte": [
-                258
+                264
             ],
             "_neq": [
-                258
+                264
             ],
             "_nilike": [
-                258
+                264
             ],
             "_nin": [
-                258
+                264
             ],
             "_niregex": [
-                258
+                264
             ],
             "_nlike": [
-                258
+                264
             ],
             "_nregex": [
-                258
+                264
             ],
             "_nsimilar": [
-                258
+                264
             ],
             "_regex": [
-                258
+                264
             ],
             "_similar": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Token": {
             "db_write_timestamp": [
-                357
+                363
             ],
             "decimals": [
-                60
+                66
             ],
             "id": [
-                258
+                264
             ],
             "maxSupplyFormatted": [
-                258
+                264
             ],
             "maxSupplyRaw": [
-                337
+                343
             ],
             "name": [
-                258
+                264
             ],
             "symbol": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Token_bool_exp": {
             "_and": [
-                262
+                268
             ],
             "_not": [
-                262
+                268
             ],
             "_or": [
-                262
+                268
             ],
             "db_write_timestamp": [
-                358
+                364
             ],
             "decimals": [
-                62
+                68
             ],
             "id": [
-                260
+                266
             ],
             "maxSupplyFormatted": [
-                260
+                266
             ],
             "maxSupplyRaw": [
-                339
+                345
             ],
             "name": [
-                260
+                266
             ],
             "symbol": [
-                260
+                266
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Token_order_by": {
             "db_write_timestamp": [
-                340
+                346
             ],
             "decimals": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "maxSupplyFormatted": [
-                340
+                346
             ],
             "maxSupplyRaw": [
-                340
+                346
             ],
             "name": [
-                340
+                346
             ],
             "symbol": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Token_select_column": {},
         "Token_stream_cursor_input": {
             "initial_value": [
-                266
+                272
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Token_stream_cursor_value_input": {
             "db_write_timestamp": [
-                357
+                363
             ],
             "decimals": [
-                60
+                66
             ],
             "id": [
-                258
+                264
             ],
             "maxSupplyFormatted": [
-                258
+                264
             ],
             "maxSupplyRaw": [
-                337
+                343
             ],
             "name": [
-                258
+                264
             ],
             "symbol": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Trade": {
             "db_write_timestamp": [
-                357
+                363
             ],
             "feeFormatted": [
-                258
+                264
             ],
             "feeRaw": [
-                337
+                343
             ],
             "id": [
-                258
+                264
             ],
             "market_id": [
-                258
+                264
             ],
             "newPriceFormatted": [
-                258
+                264
             ],
             "newPriceRaw": [
-                337
+                343
             ],
             "reserveAmountFormatted": [
-                258
+                264
             ],
             "reserveAmountRaw": [
-                337
+                343
             ],
             "timestamp": [
-                337
+                343
             ],
             "tokenAmountFormatted": [
-                258
+                264
             ],
             "tokenAmountRaw": [
-                337
+                343
             ],
             "tradeType": [
-                361
+                367
             ],
             "transactionHash": [
-                258
+                264
             ],
             "user_id": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Trade_aggregate_order_by": {
             "avg": [
-                269
-            ],
-            "count": [
-                340
-            ],
-            "max": [
-                271
-            ],
-            "min": [
-                272
-            ],
-            "stddev": [
                 275
             ],
-            "stddev_pop": [
-                276
+            "count": [
+                346
             ],
-            "stddev_samp": [
+            "max": [
                 277
             ],
-            "sum": [
-                280
+            "min": [
+                278
             ],
-            "var_pop": [
+            "stddev": [
                 281
             ],
-            "var_samp": [
+            "stddev_pop": [
                 282
             ],
-            "variance": [
+            "stddev_samp": [
                 283
             ],
+            "sum": [
+                286
+            ],
+            "var_pop": [
+                287
+            ],
+            "var_samp": [
+                288
+            ],
+            "variance": [
+                289
+            ],
             "__typename": [
-                258
+                264
             ]
         },
         "Trade_avg_order_by": {
             "feeRaw": [
-                340
+                346
             ],
             "newPriceRaw": [
-                340
+                346
             ],
             "reserveAmountRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "tokenAmountRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Trade_bool_exp": {
             "_and": [
-                270
+                276
             ],
             "_not": [
-                270
+                276
             ],
             "_or": [
-                270
+                276
             ],
             "db_write_timestamp": [
-                358
+                364
             ],
             "feeFormatted": [
-                260
+                266
             ],
             "feeRaw": [
-                339
+                345
             ],
             "id": [
-                260
+                266
             ],
             "market_id": [
-                260
+                266
             ],
             "newPriceFormatted": [
-                260
+                266
             ],
             "newPriceRaw": [
-                339
+                345
             ],
             "reserveAmountFormatted": [
-                260
+                266
             ],
             "reserveAmountRaw": [
-                339
+                345
             ],
             "timestamp": [
-                339
+                345
             ],
             "tokenAmountFormatted": [
-                260
+                266
             ],
             "tokenAmountRaw": [
-                339
+                345
             ],
             "tradeType": [
-                362
+                368
             ],
             "transactionHash": [
-                260
+                266
             ],
             "user_id": [
-                260
+                266
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Trade_max_order_by": {
             "db_write_timestamp": [
-                340
+                346
             ],
             "feeFormatted": [
-                340
+                346
             ],
             "feeRaw": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "market_id": [
-                340
+                346
             ],
             "newPriceFormatted": [
-                340
+                346
             ],
             "newPriceRaw": [
-                340
+                346
             ],
             "reserveAmountFormatted": [
-                340
+                346
             ],
             "reserveAmountRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "tokenAmountFormatted": [
-                340
+                346
             ],
             "tokenAmountRaw": [
-                340
+                346
             ],
             "tradeType": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "user_id": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Trade_min_order_by": {
             "db_write_timestamp": [
-                340
+                346
             ],
             "feeFormatted": [
-                340
+                346
             ],
             "feeRaw": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "market_id": [
-                340
+                346
             ],
             "newPriceFormatted": [
-                340
+                346
             ],
             "newPriceRaw": [
-                340
+                346
             ],
             "reserveAmountFormatted": [
-                340
+                346
             ],
             "reserveAmountRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "tokenAmountFormatted": [
-                340
+                346
             ],
             "tokenAmountRaw": [
-                340
+                346
             ],
             "tradeType": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "user_id": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Trade_order_by": {
             "db_write_timestamp": [
-                340
+                346
             ],
             "feeFormatted": [
-                340
+                346
             ],
             "feeRaw": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "market_id": [
-                340
+                346
             ],
             "newPriceFormatted": [
-                340
+                346
             ],
             "newPriceRaw": [
-                340
+                346
             ],
             "reserveAmountFormatted": [
-                340
+                346
             ],
             "reserveAmountRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "tokenAmountFormatted": [
-                340
+                346
             ],
             "tokenAmountRaw": [
-                340
+                346
             ],
             "tradeType": [
-                340
+                346
             ],
             "transactionHash": [
-                340
+                346
             ],
             "user_id": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Trade_select_column": {},
         "Trade_stddev_order_by": {
             "feeRaw": [
-                340
+                346
             ],
             "newPriceRaw": [
-                340
+                346
             ],
             "reserveAmountRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "tokenAmountRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Trade_stddev_pop_order_by": {
             "feeRaw": [
-                340
+                346
             ],
             "newPriceRaw": [
-                340
+                346
             ],
             "reserveAmountRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "tokenAmountRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Trade_stddev_samp_order_by": {
             "feeRaw": [
-                340
+                346
             ],
             "newPriceRaw": [
-                340
+                346
             ],
             "reserveAmountRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "tokenAmountRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Trade_stream_cursor_input": {
             "initial_value": [
-                279
+                285
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Trade_stream_cursor_value_input": {
             "db_write_timestamp": [
-                357
+                363
             ],
             "feeFormatted": [
-                258
+                264
             ],
             "feeRaw": [
-                337
+                343
             ],
             "id": [
-                258
+                264
             ],
             "market_id": [
-                258
+                264
             ],
             "newPriceFormatted": [
-                258
+                264
             ],
             "newPriceRaw": [
-                337
+                343
             ],
             "reserveAmountFormatted": [
-                258
+                264
             ],
             "reserveAmountRaw": [
-                337
+                343
             ],
             "timestamp": [
-                337
+                343
             ],
             "tokenAmountFormatted": [
-                258
+                264
             ],
             "tokenAmountRaw": [
-                337
+                343
             ],
             "tradeType": [
-                361
+                367
             ],
             "transactionHash": [
-                258
+                264
             ],
             "user_id": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Trade_sum_order_by": {
             "feeRaw": [
-                340
+                346
             ],
             "newPriceRaw": [
-                340
+                346
             ],
             "reserveAmountRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "tokenAmountRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Trade_var_pop_order_by": {
             "feeRaw": [
-                340
+                346
             ],
             "newPriceRaw": [
-                340
+                346
             ],
             "reserveAmountRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "tokenAmountRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Trade_var_samp_order_by": {
             "feeRaw": [
-                340
+                346
             ],
             "newPriceRaw": [
-                340
+                346
             ],
             "reserveAmountRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "tokenAmountRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Trade_variance_order_by": {
             "feeRaw": [
-                340
+                346
             ],
             "newPriceRaw": [
-                340
+                346
             ],
             "reserveAmountRaw": [
-                340
+                346
             ],
             "timestamp": [
-                340
+                346
             ],
             "tokenAmountRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "UserMarketPosition": {
             "claimableRewardsFormatted": [
-                258
+                264
             ],
             "claimableRewardsRaw": [
-                337
+                343
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "id": [
-                258
+                264
             ],
             "lastUpdatedAt": [
-                337
+                343
             ],
             "lockedCollateralFormatted": [
-                258
+                264
             ],
             "lockedCollateralRaw": [
-                337
+                343
             ],
             "market_id": [
-                258
+                264
             ],
             "netFTokenChangeFormatted": [
-                258
+                264
             ],
             "netFTokenChangeRaw": [
-                337
+                343
             ],
             "presaleDepositFormatted": [
-                258
+                264
             ],
             "presaleDepositRaw": [
-                337
+                343
             ],
             "presaleLeverage": [
-                337
+                343
             ],
             "stakedAmountFormatted": [
-                258
+                264
             ],
             "stakedAmountRaw": [
-                337
+                343
             ],
             "totalDebtFormatted": [
-                258
+                264
             ],
             "totalDebtRaw": [
-                337
+                343
             ],
             "user_id": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "UserMarketPosition_aggregate_order_by": {
             "avg": [
-                286
-            ],
-            "count": [
-                340
-            ],
-            "max": [
-                288
-            ],
-            "min": [
-                289
-            ],
-            "stddev": [
                 292
             ],
-            "stddev_pop": [
-                293
+            "count": [
+                346
             ],
-            "stddev_samp": [
+            "max": [
                 294
             ],
-            "sum": [
-                297
+            "min": [
+                295
             ],
-            "var_pop": [
+            "stddev": [
                 298
             ],
-            "var_samp": [
+            "stddev_pop": [
                 299
             ],
-            "variance": [
+            "stddev_samp": [
                 300
             ],
+            "sum": [
+                303
+            ],
+            "var_pop": [
+                304
+            ],
+            "var_samp": [
+                305
+            ],
+            "variance": [
+                306
+            ],
             "__typename": [
-                258
+                264
             ]
         },
         "UserMarketPosition_avg_order_by": {
             "claimableRewardsRaw": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "netFTokenChangeRaw": [
-                340
+                346
             ],
             "presaleDepositRaw": [
-                340
+                346
             ],
             "presaleLeverage": [
-                340
+                346
             ],
             "stakedAmountRaw": [
-                340
+                346
             ],
             "totalDebtRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "UserMarketPosition_bool_exp": {
             "_and": [
-                287
+                293
             ],
             "_not": [
-                287
+                293
             ],
             "_or": [
-                287
+                293
             ],
             "claimableRewardsFormatted": [
-                260
+                266
             ],
             "claimableRewardsRaw": [
-                339
+                345
             ],
             "db_write_timestamp": [
-                358
+                364
             ],
             "id": [
-                260
+                266
             ],
             "lastUpdatedAt": [
-                339
+                345
             ],
             "lockedCollateralFormatted": [
-                260
+                266
             ],
             "lockedCollateralRaw": [
-                339
+                345
             ],
             "market_id": [
-                260
+                266
             ],
             "netFTokenChangeFormatted": [
-                260
+                266
             ],
             "netFTokenChangeRaw": [
-                339
+                345
             ],
             "presaleDepositFormatted": [
-                260
+                266
             ],
             "presaleDepositRaw": [
-                339
+                345
             ],
             "presaleLeverage": [
-                339
+                345
             ],
             "stakedAmountFormatted": [
-                260
+                266
             ],
             "stakedAmountRaw": [
-                339
+                345
             ],
             "totalDebtFormatted": [
-                260
+                266
             ],
             "totalDebtRaw": [
-                339
+                345
             ],
             "user_id": [
-                260
+                266
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "UserMarketPosition_max_order_by": {
             "claimableRewardsFormatted": [
-                340
+                346
             ],
             "claimableRewardsRaw": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "lockedCollateralFormatted": [
-                340
+                346
             ],
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "market_id": [
-                340
+                346
             ],
             "netFTokenChangeFormatted": [
-                340
+                346
             ],
             "netFTokenChangeRaw": [
-                340
+                346
             ],
             "presaleDepositFormatted": [
-                340
+                346
             ],
             "presaleDepositRaw": [
-                340
+                346
             ],
             "presaleLeverage": [
-                340
+                346
             ],
             "stakedAmountFormatted": [
-                340
+                346
             ],
             "stakedAmountRaw": [
-                340
+                346
             ],
             "totalDebtFormatted": [
-                340
+                346
             ],
             "totalDebtRaw": [
-                340
+                346
             ],
             "user_id": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "UserMarketPosition_min_order_by": {
             "claimableRewardsFormatted": [
-                340
+                346
             ],
             "claimableRewardsRaw": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "lockedCollateralFormatted": [
-                340
+                346
             ],
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "market_id": [
-                340
+                346
             ],
             "netFTokenChangeFormatted": [
-                340
+                346
             ],
             "netFTokenChangeRaw": [
-                340
+                346
             ],
             "presaleDepositFormatted": [
-                340
+                346
             ],
             "presaleDepositRaw": [
-                340
+                346
             ],
             "presaleLeverage": [
-                340
+                346
             ],
             "stakedAmountFormatted": [
-                340
+                346
             ],
             "stakedAmountRaw": [
-                340
+                346
             ],
             "totalDebtFormatted": [
-                340
+                346
             ],
             "totalDebtRaw": [
-                340
+                346
             ],
             "user_id": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "UserMarketPosition_order_by": {
             "claimableRewardsFormatted": [
-                340
+                346
             ],
             "claimableRewardsRaw": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "lockedCollateralFormatted": [
-                340
+                346
             ],
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "market_id": [
-                340
+                346
             ],
             "netFTokenChangeFormatted": [
-                340
+                346
             ],
             "netFTokenChangeRaw": [
-                340
+                346
             ],
             "presaleDepositFormatted": [
-                340
+                346
             ],
             "presaleDepositRaw": [
-                340
+                346
             ],
             "presaleLeverage": [
-                340
+                346
             ],
             "stakedAmountFormatted": [
-                340
+                346
             ],
             "stakedAmountRaw": [
-                340
+                346
             ],
             "totalDebtFormatted": [
-                340
+                346
             ],
             "totalDebtRaw": [
-                340
+                346
             ],
             "user_id": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "UserMarketPosition_select_column": {},
         "UserMarketPosition_stddev_order_by": {
             "claimableRewardsRaw": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "netFTokenChangeRaw": [
-                340
+                346
             ],
             "presaleDepositRaw": [
-                340
+                346
             ],
             "presaleLeverage": [
-                340
+                346
             ],
             "stakedAmountRaw": [
-                340
+                346
             ],
             "totalDebtRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "UserMarketPosition_stddev_pop_order_by": {
             "claimableRewardsRaw": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "netFTokenChangeRaw": [
-                340
+                346
             ],
             "presaleDepositRaw": [
-                340
+                346
             ],
             "presaleLeverage": [
-                340
+                346
             ],
             "stakedAmountRaw": [
-                340
+                346
             ],
             "totalDebtRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "UserMarketPosition_stddev_samp_order_by": {
             "claimableRewardsRaw": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "netFTokenChangeRaw": [
-                340
+                346
             ],
             "presaleDepositRaw": [
-                340
+                346
             ],
             "presaleLeverage": [
-                340
+                346
             ],
             "stakedAmountRaw": [
-                340
+                346
             ],
             "totalDebtRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "UserMarketPosition_stream_cursor_input": {
             "initial_value": [
-                296
+                302
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "UserMarketPosition_stream_cursor_value_input": {
             "claimableRewardsFormatted": [
-                258
+                264
             ],
             "claimableRewardsRaw": [
-                337
+                343
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "id": [
-                258
+                264
             ],
             "lastUpdatedAt": [
-                337
+                343
             ],
             "lockedCollateralFormatted": [
-                258
+                264
             ],
             "lockedCollateralRaw": [
-                337
+                343
             ],
             "market_id": [
-                258
+                264
             ],
             "netFTokenChangeFormatted": [
-                258
+                264
             ],
             "netFTokenChangeRaw": [
-                337
+                343
             ],
             "presaleDepositFormatted": [
-                258
+                264
             ],
             "presaleDepositRaw": [
-                337
+                343
             ],
             "presaleLeverage": [
-                337
+                343
             ],
             "stakedAmountFormatted": [
-                258
+                264
             ],
             "stakedAmountRaw": [
-                337
+                343
             ],
             "totalDebtFormatted": [
-                258
+                264
             ],
             "totalDebtRaw": [
-                337
+                343
             ],
             "user_id": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "UserMarketPosition_sum_order_by": {
             "claimableRewardsRaw": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "netFTokenChangeRaw": [
-                340
+                346
             ],
             "presaleDepositRaw": [
-                340
+                346
             ],
             "presaleLeverage": [
-                340
+                346
             ],
             "stakedAmountRaw": [
-                340
+                346
             ],
             "totalDebtRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "UserMarketPosition_var_pop_order_by": {
             "claimableRewardsRaw": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "netFTokenChangeRaw": [
-                340
+                346
             ],
             "presaleDepositRaw": [
-                340
+                346
             ],
             "presaleLeverage": [
-                340
+                346
             ],
             "stakedAmountRaw": [
-                340
+                346
             ],
             "totalDebtRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "UserMarketPosition_var_samp_order_by": {
             "claimableRewardsRaw": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "netFTokenChangeRaw": [
-                340
+                346
             ],
             "presaleDepositRaw": [
-                340
+                346
             ],
             "presaleLeverage": [
-                340
+                346
             ],
             "stakedAmountRaw": [
-                340
+                346
             ],
             "totalDebtRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "UserMarketPosition_variance_order_by": {
             "claimableRewardsRaw": [
-                340
+                346
             ],
             "lastUpdatedAt": [
-                340
+                346
             ],
             "lockedCollateralRaw": [
-                340
+                346
             ],
             "netFTokenChangeRaw": [
-                340
+                346
             ],
             "presaleDepositRaw": [
-                340
+                346
             ],
             "presaleLeverage": [
-                340
+                346
             ],
             "stakedAmountRaw": [
-                340
+                346
             ],
             "totalDebtRaw": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "candleperiod": {},
         "candleperiod_comparison_exp": {
             "_eq": [
-                301
+                307
             ],
             "_gt": [
-                301
+                307
             ],
             "_gte": [
-                301
+                307
             ],
             "_in": [
-                301
+                307
             ],
             "_is_null": [
                 12
             ],
             "_lt": [
-                301
+                307
             ],
             "_lte": [
-                301
+                307
             ],
             "_neq": [
-                301
+                307
             ],
             "_nin": [
-                301
+                307
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "chain_metadata": {
             "block_height": [
-                60
+                66
             ],
             "chain_id": [
-                60
+                66
             ],
             "end_block": [
-                60
+                66
             ],
             "first_event_block_number": [
-                60
+                66
             ],
             "is_hyper_sync": [
                 12
             ],
             "latest_fetched_block_number": [
-                60
+                66
             ],
             "latest_processed_block": [
-                60
+                66
             ],
             "num_batches_fetched": [
-                60
+                66
             ],
             "num_events_processed": [
-                60
+                66
             ],
             "start_block": [
-                60
+                66
             ],
             "timestamp_caught_up_to_head_or_endblock": [
-                359
+                365
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "chain_metadata_bool_exp": {
             "_and": [
-                304
+                310
             ],
             "_not": [
-                304
+                310
             ],
             "_or": [
-                304
+                310
             ],
             "block_height": [
-                62
+                68
             ],
             "chain_id": [
-                62
+                68
             ],
             "end_block": [
-                62
+                68
             ],
             "first_event_block_number": [
-                62
+                68
             ],
             "is_hyper_sync": [
                 13
             ],
             "latest_fetched_block_number": [
-                62
+                68
             ],
             "latest_processed_block": [
-                62
+                68
             ],
             "num_batches_fetched": [
-                62
+                68
             ],
             "num_events_processed": [
-                62
+                68
             ],
             "start_block": [
-                62
+                68
             ],
             "timestamp_caught_up_to_head_or_endblock": [
-                360
+                366
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "chain_metadata_order_by": {
             "block_height": [
-                340
+                346
             ],
             "chain_id": [
-                340
+                346
             ],
             "end_block": [
-                340
+                346
             ],
             "first_event_block_number": [
-                340
+                346
             ],
             "is_hyper_sync": [
-                340
+                346
             ],
             "latest_fetched_block_number": [
-                340
+                346
             ],
             "latest_processed_block": [
-                340
+                346
             ],
             "num_batches_fetched": [
-                340
+                346
             ],
             "num_events_processed": [
-                340
+                346
             ],
             "start_block": [
-                340
+                346
             ],
             "timestamp_caught_up_to_head_or_endblock": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "chain_metadata_select_column": {},
         "chain_metadata_stream_cursor_input": {
             "initial_value": [
-                308
+                314
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "chain_metadata_stream_cursor_value_input": {
             "block_height": [
-                60
+                66
             ],
             "chain_id": [
-                60
+                66
             ],
             "end_block": [
-                60
+                66
             ],
             "first_event_block_number": [
-                60
+                66
             ],
             "is_hyper_sync": [
                 12
             ],
             "latest_fetched_block_number": [
-                60
+                66
             ],
             "latest_processed_block": [
-                60
+                66
             ],
             "num_batches_fetched": [
-                60
+                66
             ],
             "num_events_processed": [
-                60
+                66
             ],
             "start_block": [
-                60
+                66
             ],
             "timestamp_caught_up_to_head_or_endblock": [
-                359
+                365
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "contract_type": {},
         "contract_type_comparison_exp": {
             "_eq": [
-                309
+                315
             ],
             "_gt": [
-                309
+                315
             ],
             "_gte": [
-                309
+                315
             ],
             "_in": [
-                309
+                315
             ],
             "_is_null": [
                 12
             ],
             "_lt": [
-                309
+                315
             ],
             "_lte": [
-                309
+                315
             ],
             "_neq": [
-                309
+                315
             ],
             "_nin": [
-                309
+                315
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "cursor_ordering": {},
         "dynamic_contract_registry": {
             "chain_id": [
-                60
+                66
             ],
             "contract_address": [
-                258
+                264
             ],
             "contract_type": [
-                309
+                315
             ],
             "id": [
-                258
+                264
             ],
             "registering_event_block_number": [
-                60
+                66
             ],
             "registering_event_block_timestamp": [
-                60
+                66
             ],
             "registering_event_contract_name": [
-                258
+                264
             ],
             "registering_event_log_index": [
-                60
+                66
             ],
             "registering_event_name": [
-                258
+                264
             ],
             "registering_event_src_address": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "dynamic_contract_registry_bool_exp": {
             "_and": [
-                313
+                319
             ],
             "_not": [
-                313
+                319
             ],
             "_or": [
-                313
+                319
             ],
             "chain_id": [
-                62
+                68
             ],
             "contract_address": [
-                260
+                266
             ],
             "contract_type": [
-                310
+                316
             ],
             "id": [
-                260
+                266
             ],
             "registering_event_block_number": [
-                62
+                68
             ],
             "registering_event_block_timestamp": [
-                62
+                68
             ],
             "registering_event_contract_name": [
-                260
+                266
             ],
             "registering_event_log_index": [
-                62
+                68
             ],
             "registering_event_name": [
-                260
+                266
             ],
             "registering_event_src_address": [
-                260
+                266
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "dynamic_contract_registry_order_by": {
             "chain_id": [
-                340
+                346
             ],
             "contract_address": [
-                340
+                346
             ],
             "contract_type": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "registering_event_block_number": [
-                340
+                346
             ],
             "registering_event_block_timestamp": [
-                340
+                346
             ],
             "registering_event_contract_name": [
-                340
+                346
             ],
             "registering_event_log_index": [
-                340
+                346
             ],
             "registering_event_name": [
-                340
+                346
             ],
             "registering_event_src_address": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "dynamic_contract_registry_select_column": {},
         "dynamic_contract_registry_stream_cursor_input": {
             "initial_value": [
-                317
+                323
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "dynamic_contract_registry_stream_cursor_value_input": {
             "chain_id": [
-                60
+                66
             ],
             "contract_address": [
-                258
+                264
             ],
             "contract_type": [
-                309
+                315
             ],
             "id": [
-                258
+                264
             ],
             "registering_event_block_number": [
-                60
+                66
             ],
             "registering_event_block_timestamp": [
-                60
+                66
             ],
             "registering_event_contract_name": [
-                258
+                264
             ],
             "registering_event_log_index": [
-                60
+                66
             ],
             "registering_event_name": [
-                258
+                264
             ],
             "registering_event_src_address": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "end_of_block_range_scanned_data": {
             "block_hash": [
-                258
+                264
             ],
             "block_number": [
-                60
+                66
             ],
             "chain_id": [
-                60
+                66
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "end_of_block_range_scanned_data_bool_exp": {
             "_and": [
-                319
+                325
             ],
             "_not": [
-                319
+                325
             ],
             "_or": [
-                319
+                325
             ],
             "block_hash": [
-                260
+                266
             ],
             "block_number": [
-                62
+                68
             ],
             "chain_id": [
-                62
+                68
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "end_of_block_range_scanned_data_order_by": {
             "block_hash": [
-                340
+                346
             ],
             "block_number": [
-                340
+                346
             ],
             "chain_id": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "end_of_block_range_scanned_data_select_column": {},
         "end_of_block_range_scanned_data_stream_cursor_input": {
             "initial_value": [
-                323
+                329
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "end_of_block_range_scanned_data_stream_cursor_value_input": {
             "block_hash": [
-                258
+                264
             ],
             "block_number": [
-                60
+                66
             ],
             "chain_id": [
-                60
+                66
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "event_sync_state": {
             "block_number": [
-                60
+                66
             ],
             "block_timestamp": [
-                60
+                66
             ],
             "chain_id": [
-                60
+                66
             ],
             "is_pre_registering_dynamic_contracts": [
                 12
             ],
             "log_index": [
-                60
+                66
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "event_sync_state_bool_exp": {
             "_and": [
-                325
+                331
             ],
             "_not": [
-                325
+                331
             ],
             "_or": [
-                325
+                331
             ],
             "block_number": [
-                62
+                68
             ],
             "block_timestamp": [
-                62
+                68
             ],
             "chain_id": [
-                62
+                68
             ],
             "is_pre_registering_dynamic_contracts": [
                 13
             ],
             "log_index": [
-                62
+                68
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "event_sync_state_order_by": {
             "block_number": [
-                340
+                346
             ],
             "block_timestamp": [
-                340
+                346
             ],
             "chain_id": [
-                340
+                346
             ],
             "is_pre_registering_dynamic_contracts": [
-                340
+                346
             ],
             "log_index": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "event_sync_state_select_column": {},
         "event_sync_state_stream_cursor_input": {
             "initial_value": [
-                329
+                335
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "event_sync_state_stream_cursor_value_input": {
             "block_number": [
-                60
+                66
             ],
             "block_timestamp": [
-                60
+                66
             ],
             "chain_id": [
-                60
+                66
             ],
             "is_pre_registering_dynamic_contracts": [
                 12
             ],
             "log_index": [
-                60
+                66
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "jsonb": {},
         "jsonb_cast_exp": {
             "String": [
-                260
+                266
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "jsonb_comparison_exp": {
             "_cast": [
-                331
+                337
             ],
             "_contained_in": [
-                330
+                336
             ],
             "_contains": [
-                330
+                336
             ],
             "_eq": [
-                330
+                336
             ],
             "_gt": [
-                330
+                336
             ],
             "_gte": [
-                330
+                336
             ],
             "_has_key": [
-                258
+                264
             ],
             "_has_keys_all": [
-                258
+                264
             ],
             "_has_keys_any": [
-                258
+                264
             ],
             "_in": [
-                330
+                336
             ],
             "_is_null": [
                 12
             ],
             "_lt": [
-                330
+                336
             ],
             "_lte": [
-                330
+                336
             ],
             "_neq": [
-                330
+                336
             ],
             "_nin": [
-                330
+                336
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "loanstatus": {},
         "loanstatus_comparison_exp": {
             "_eq": [
-                333
+                339
             ],
             "_gt": [
-                333
+                339
             ],
             "_gte": [
-                333
+                339
             ],
             "_in": [
-                333
+                339
             ],
             "_is_null": [
                 12
             ],
             "_lt": [
-                333
+                339
             ],
             "_lte": [
-                333
+                339
             ],
             "_neq": [
-                333
+                339
             ],
             "_nin": [
-                333
+                339
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "marketstatus": {},
         "marketstatus_comparison_exp": {
             "_eq": [
-                335
+                341
             ],
             "_gt": [
-                335
+                341
             ],
             "_gte": [
-                335
+                341
             ],
             "_in": [
-                335
+                341
             ],
             "_is_null": [
                 12
             ],
             "_lt": [
-                335
+                341
             ],
             "_lte": [
-                335
+                341
             ],
             "_neq": [
-                335
+                341
             ],
             "_nin": [
-                335
+                341
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "numeric": {},
         "numeric_array_comparison_exp": {
             "_contained_in": [
-                337
+                343
             ],
             "_contains": [
-                337
+                343
             ],
             "_eq": [
-                337
+                343
             ],
             "_gt": [
-                337
+                343
             ],
             "_gte": [
-                337
+                343
             ],
             "_in": [
-                337
+                343
             ],
             "_is_null": [
                 12
             ],
             "_lt": [
-                337
+                343
             ],
             "_lte": [
-                337
+                343
             ],
             "_neq": [
-                337
+                343
             ],
             "_nin": [
-                337
+                343
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "numeric_comparison_exp": {
             "_eq": [
-                337
+                343
             ],
             "_gt": [
-                337
+                343
             ],
             "_gte": [
-                337
+                343
             ],
             "_in": [
-                337
+                343
             ],
             "_is_null": [
                 12
             ],
             "_lt": [
-                337
+                343
             ],
             "_lte": [
-                337
+                343
             ],
             "_neq": [
-                337
+                343
             ],
             "_nin": [
-                337
+                343
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "order_by": {},
         "persisted_state": {
             "abi_files_hash": [
-                258
+                264
             ],
             "config_hash": [
-                258
+                264
             ],
             "envio_version": [
-                258
+                264
             ],
             "handler_files_hash": [
-                258
+                264
             ],
             "id": [
-                60
+                66
             ],
             "schema_hash": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "persisted_state_bool_exp": {
             "_and": [
-                342
+                348
             ],
             "_not": [
-                342
+                348
             ],
             "_or": [
-                342
+                348
             ],
             "abi_files_hash": [
-                260
+                266
             ],
             "config_hash": [
-                260
+                266
             ],
             "envio_version": [
-                260
+                266
             ],
             "handler_files_hash": [
-                260
+                266
             ],
             "id": [
-                62
+                68
             ],
             "schema_hash": [
-                260
+                266
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "persisted_state_order_by": {
             "abi_files_hash": [
-                340
+                346
             ],
             "config_hash": [
-                340
+                346
             ],
             "envio_version": [
-                340
+                346
             ],
             "handler_files_hash": [
-                340
+                346
             ],
             "id": [
-                340
+                346
             ],
             "schema_hash": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "persisted_state_select_column": {},
         "persisted_state_stream_cursor_input": {
             "initial_value": [
-                346
+                352
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "persisted_state_stream_cursor_value_input": {
             "abi_files_hash": [
-                258
+                264
             ],
             "config_hash": [
-                258
+                264
             ],
             "envio_version": [
-                258
+                264
             ],
             "handler_files_hash": [
-                258
+                264
             ],
             "id": [
-                60
+                66
             ],
             "schema_hash": [
-                258
+                264
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "presaleclaimtype": {},
         "presaleclaimtype_comparison_exp": {
             "_eq": [
-                347
+                353
             ],
             "_gt": [
-                347
+                353
             ],
             "_gte": [
-                347
+                353
             ],
             "_in": [
-                347
+                353
             ],
             "_is_null": [
                 12
             ],
             "_lt": [
-                347
+                353
             ],
             "_lte": [
-                347
+                353
             ],
             "_neq": [
-                347
+                353
             ],
             "_nin": [
-                347
+                353
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "raw_events": {
             "block_fields": [
-                330,
+                336,
                 {
                     "path": [
-                        258
+                        264
                     ]
                 }
             ],
             "block_hash": [
-                258
+                264
             ],
             "block_number": [
-                60
+                66
             ],
             "block_timestamp": [
-                60
+                66
             ],
             "chain_id": [
-                60
+                66
             ],
             "contract_name": [
-                258
+                264
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "event_id": [
-                337
+                343
             ],
             "event_name": [
-                258
+                264
             ],
             "log_index": [
-                60
+                66
             ],
             "params": [
-                330,
+                336,
                 {
                     "path": [
-                        258
+                        264
                     ]
                 }
             ],
             "serial": [
-                60
+                66
             ],
             "src_address": [
-                258
+                264
             ],
             "transaction_fields": [
-                330,
+                336,
                 {
                     "path": [
-                        258
+                        264
                     ]
                 }
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "raw_events_bool_exp": {
             "_and": [
-                350
+                356
             ],
             "_not": [
-                350
+                356
             ],
             "_or": [
-                350
+                356
             ],
             "block_fields": [
-                332
+                338
             ],
             "block_hash": [
-                260
+                266
             ],
             "block_number": [
-                62
+                68
             ],
             "block_timestamp": [
-                62
+                68
             ],
             "chain_id": [
-                62
+                68
             ],
             "contract_name": [
-                260
+                266
             ],
             "db_write_timestamp": [
-                358
+                364
             ],
             "event_id": [
-                339
+                345
             ],
             "event_name": [
-                260
+                266
             ],
             "log_index": [
-                62
+                68
             ],
             "params": [
-                332
+                338
             ],
             "serial": [
-                62
+                68
             ],
             "src_address": [
-                260
+                266
             ],
             "transaction_fields": [
-                332
+                338
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "raw_events_order_by": {
             "block_fields": [
-                340
+                346
             ],
             "block_hash": [
-                340
+                346
             ],
             "block_number": [
-                340
+                346
             ],
             "block_timestamp": [
-                340
+                346
             ],
             "chain_id": [
-                340
+                346
             ],
             "contract_name": [
-                340
+                346
             ],
             "db_write_timestamp": [
-                340
+                346
             ],
             "event_id": [
-                340
+                346
             ],
             "event_name": [
-                340
+                346
             ],
             "log_index": [
-                340
+                346
             ],
             "params": [
-                340
+                346
             ],
             "serial": [
-                340
+                346
             ],
             "src_address": [
-                340
+                346
             ],
             "transaction_fields": [
-                340
+                346
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "raw_events_select_column": {},
         "raw_events_stream_cursor_input": {
             "initial_value": [
-                354
+                360
             ],
             "ordering": [
-                311
+                317
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "raw_events_stream_cursor_value_input": {
             "block_fields": [
-                330
+                336
             ],
             "block_hash": [
-                258
+                264
             ],
             "block_number": [
-                60
+                66
             ],
             "block_timestamp": [
-                60
+                66
             ],
             "chain_id": [
-                60
+                66
             ],
             "contract_name": [
-                258
+                264
             ],
             "db_write_timestamp": [
-                357
+                363
             ],
             "event_id": [
-                337
+                343
             ],
             "event_name": [
-                258
+                264
             ],
             "log_index": [
-                60
+                66
             ],
             "params": [
-                330
+                336
             ],
             "serial": [
-                60
+                66
             ],
             "src_address": [
-                258
+                264
             ],
             "transaction_fields": [
-                330
+                336
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "stakestatus": {},
         "stakestatus_comparison_exp": {
             "_eq": [
-                355
+                361
             ],
             "_gt": [
-                355
+                361
             ],
             "_gte": [
-                355
+                361
             ],
             "_in": [
-                355
+                361
             ],
             "_is_null": [
                 12
             ],
             "_lt": [
-                355
+                361
             ],
             "_lte": [
-                355
+                361
             ],
             "_neq": [
-                355
+                361
             ],
             "_nin": [
-                355
+                361
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "timestamp": {},
         "timestamp_comparison_exp": {
             "_eq": [
-                357
+                363
             ],
             "_gt": [
-                357
+                363
             ],
             "_gte": [
-                357
+                363
             ],
             "_in": [
-                357
+                363
             ],
             "_is_null": [
                 12
             ],
             "_lt": [
-                357
+                363
             ],
             "_lte": [
-                357
+                363
             ],
             "_neq": [
-                357
+                363
             ],
             "_nin": [
-                357
+                363
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "timestamptz": {},
         "timestamptz_comparison_exp": {
             "_eq": [
-                359
+                365
             ],
             "_gt": [
-                359
+                365
             ],
             "_gte": [
-                359
+                365
             ],
             "_in": [
-                359
+                365
             ],
             "_is_null": [
                 12
             ],
             "_lt": [
-                359
+                365
             ],
             "_lte": [
-                359
+                365
             ],
             "_neq": [
-                359
+                365
             ],
             "_nin": [
-                359
+                365
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "tradetype": {},
         "tradetype_comparison_exp": {
             "_eq": [
-                361
+                367
             ],
             "_gt": [
-                361
+                367
             ],
             "_gte": [
-                361
+                367
             ],
             "_in": [
-                361
+                367
             ],
             "_is_null": [
                 12
             ],
             "_lt": [
-                361
+                367
             ],
             "_lte": [
-                361
+                367
             ],
             "_neq": [
-                361
+                367
             ],
             "_nin": [
-                361
+                367
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Query": {
@@ -10450,10 +10564,10 @@ export default {
                         "[Account_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
                         2,
@@ -10468,7 +10582,7 @@ export default {
                 0,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
@@ -10481,10 +10595,10 @@ export default {
                         "[AuthorizerContract_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
                         8,
@@ -10499,7 +10613,7 @@ export default {
                 6,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
@@ -10512,10 +10626,10 @@ export default {
                         "[CreditFacilityContract_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
                         16,
@@ -10530,7 +10644,7 @@ export default {
                 14,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
@@ -10543,10 +10657,10 @@ export default {
                         "[FeeDistribution_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
                         26,
@@ -10561,7 +10675,7 @@ export default {
                 20,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
@@ -10574,10 +10688,10 @@ export default {
                         "[FloorElevation_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
                         43,
@@ -10592,823 +10706,854 @@ export default {
                 37,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
-            "GlobalStats": [
+            "GlobalRegistry": [
                 54,
                 {
                     "distinct_on": [
                         57,
-                        "[GlobalStats_select_column!]"
+                        "[GlobalRegistry_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
                         56,
-                        "[GlobalStats_order_by!]"
+                        "[GlobalRegistry_order_by!]"
                     ],
                     "where": [
                         55
                     ]
                 }
             ],
-            "GlobalStats_by_pk": [
+            "GlobalRegistry_by_pk": [
                 54,
                 {
                     "id": [
-                        258,
+                        264,
+                        "String!"
+                    ]
+                }
+            ],
+            "GlobalStats": [
+                60,
+                {
+                    "distinct_on": [
+                        63,
+                        "[GlobalStats_select_column!]"
+                    ],
+                    "limit": [
+                        66
+                    ],
+                    "offset": [
+                        66
+                    ],
+                    "order_by": [
+                        62,
+                        "[GlobalStats_order_by!]"
+                    ],
+                    "where": [
+                        61
+                    ]
+                }
+            ],
+            "GlobalStats_by_pk": [
+                60,
+                {
+                    "id": [
+                        264,
                         "String!"
                     ]
                 }
             ],
             "Loan": [
-                63,
+                69,
                 {
                     "distinct_on": [
-                        87,
+                        93,
                         "[Loan_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        86,
+                        92,
                         "[Loan_order_by!]"
                     ],
                     "where": [
-                        83
+                        89
                     ]
                 }
             ],
             "LoanStatusHistory": [
-                64,
+                70,
                 {
                     "distinct_on": [
-                        71,
+                        77,
                         "[LoanStatusHistory_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        70,
+                        76,
                         "[LoanStatusHistory_order_by!]"
                     ],
                     "where": [
-                        67
+                        73
                     ]
                 }
             ],
             "LoanStatusHistory_by_pk": [
-                64,
+                70,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "Loan_by_pk": [
-                63,
+                69,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "Market": [
-                97,
+                103,
                 {
                     "distinct_on": [
-                        116,
+                        122,
                         "[Market_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        115,
+                        121,
                         "[Market_order_by!]"
                     ],
                     "where": [
-                        112
+                        118
                     ]
                 }
             ],
             "MarketRollingStats": [
-                98,
-                {
-                    "distinct_on": [
-                        101,
-                        "[MarketRollingStats_select_column!]"
-                    ],
-                    "limit": [
-                        60
-                    ],
-                    "offset": [
-                        60
-                    ],
-                    "order_by": [
-                        100,
-                        "[MarketRollingStats_order_by!]"
-                    ],
-                    "where": [
-                        99
-                    ]
-                }
-            ],
-            "MarketRollingStats_by_pk": [
-                98,
-                {
-                    "id": [
-                        258,
-                        "String!"
-                    ]
-                }
-            ],
-            "MarketSnapshot": [
                 104,
                 {
                     "distinct_on": [
                         107,
-                        "[MarketSnapshot_select_column!]"
+                        "[MarketRollingStats_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
                         106,
-                        "[MarketSnapshot_order_by!]"
+                        "[MarketRollingStats_order_by!]"
                     ],
                     "where": [
                         105
                     ]
                 }
             ],
-            "MarketSnapshot_by_pk": [
+            "MarketRollingStats_by_pk": [
                 104,
                 {
                     "id": [
-                        258,
+                        264,
+                        "String!"
+                    ]
+                }
+            ],
+            "MarketSnapshot": [
+                110,
+                {
+                    "distinct_on": [
+                        113,
+                        "[MarketSnapshot_select_column!]"
+                    ],
+                    "limit": [
+                        66
+                    ],
+                    "offset": [
+                        66
+                    ],
+                    "order_by": [
+                        112,
+                        "[MarketSnapshot_order_by!]"
+                    ],
+                    "where": [
+                        111
+                    ]
+                }
+            ],
+            "MarketSnapshot_by_pk": [
+                110,
+                {
+                    "id": [
+                        264,
                         "String!"
                     ]
                 }
             ],
             "Market_by_pk": [
-                97,
+                103,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "ModuleAddress": [
-                126,
-                {
-                    "distinct_on": [
-                        129,
-                        "[ModuleAddress_select_column!]"
-                    ],
-                    "limit": [
-                        60
-                    ],
-                    "offset": [
-                        60
-                    ],
-                    "order_by": [
-                        128,
-                        "[ModuleAddress_order_by!]"
-                    ],
-                    "where": [
-                        127
-                    ]
-                }
-            ],
-            "ModuleAddress_by_pk": [
-                126,
-                {
-                    "id": [
-                        258,
-                        "String!"
-                    ]
-                }
-            ],
-            "ModuleRegistry": [
                 132,
                 {
                     "distinct_on": [
                         135,
-                        "[ModuleRegistry_select_column!]"
+                        "[ModuleAddress_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
                         134,
-                        "[ModuleRegistry_order_by!]"
+                        "[ModuleAddress_order_by!]"
                     ],
                     "where": [
                         133
                     ]
                 }
             ],
-            "ModuleRegistry_by_pk": [
+            "ModuleAddress_by_pk": [
                 132,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
-            "PreSaleContract": [
+            "ModuleRegistry": [
                 138,
                 {
                     "distinct_on": [
                         141,
-                        "[PreSaleContract_select_column!]"
+                        "[ModuleRegistry_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
                         140,
-                        "[PreSaleContract_order_by!]"
+                        "[ModuleRegistry_order_by!]"
                     ],
                     "where": [
                         139
                     ]
                 }
             ],
-            "PreSaleContract_by_pk": [
+            "ModuleRegistry_by_pk": [
                 138,
                 {
                     "id": [
-                        258,
+                        264,
+                        "String!"
+                    ]
+                }
+            ],
+            "PreSaleContract": [
+                144,
+                {
+                    "distinct_on": [
+                        147,
+                        "[PreSaleContract_select_column!]"
+                    ],
+                    "limit": [
+                        66
+                    ],
+                    "offset": [
+                        66
+                    ],
+                    "order_by": [
+                        146,
+                        "[PreSaleContract_order_by!]"
+                    ],
+                    "where": [
+                        145
+                    ]
+                }
+            ],
+            "PreSaleContract_by_pk": [
+                144,
+                {
+                    "id": [
+                        264,
                         "String!"
                     ]
                 }
             ],
             "PresaleClaim": [
-                144,
+                150,
                 {
                     "distinct_on": [
-                        151,
+                        157,
                         "[PresaleClaim_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        150,
+                        156,
                         "[PresaleClaim_order_by!]"
                     ],
                     "where": [
-                        147
+                        153
                     ]
                 }
             ],
             "PresaleClaim_by_pk": [
-                144,
+                150,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "PresaleParticipation": [
-                161,
+                167,
                 {
                     "distinct_on": [
-                        168,
+                        174,
                         "[PresaleParticipation_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        167,
+                        173,
                         "[PresaleParticipation_order_by!]"
                     ],
                     "where": [
-                        164
+                        170
                     ]
                 }
             ],
             "PresaleParticipation_by_pk": [
-                161,
+                167,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "PriceCandle": [
-                178,
+                184,
                 {
                     "distinct_on": [
-                        181,
+                        187,
                         "[PriceCandle_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        180,
+                        186,
                         "[PriceCandle_order_by!]"
                     ],
                     "where": [
-                        179
+                        185
                     ]
                 }
             ],
             "PriceCandle_by_pk": [
-                178,
+                184,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "Role": [
-                184,
+                190,
                 {
                     "distinct_on": [
-                        225,
+                        231,
                         "[Role_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        224,
+                        230,
                         "[Role_order_by!]"
                     ],
                     "where": [
-                        221
+                        227
                     ]
                 }
             ],
             "RoleMember": [
-                185,
+                191,
                 {
                     "distinct_on": [
-                        192,
+                        198,
                         "[RoleMember_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        191,
+                        197,
                         "[RoleMember_order_by!]"
                     ],
                     "where": [
-                        188
+                        194
                     ]
                 }
             ],
             "RoleMember_by_pk": [
-                185,
+                191,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "RolePermission": [
-                202,
+                208,
                 {
                     "distinct_on": [
-                        209,
+                        215,
                         "[RolePermission_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        208,
+                        214,
                         "[RolePermission_order_by!]"
                     ],
                     "where": [
-                        205
+                        211
                     ]
                 }
             ],
             "RolePermission_by_pk": [
-                202,
+                208,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "Role_by_pk": [
-                184,
+                190,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "Stake": [
-                235,
+                241,
                 {
                     "distinct_on": [
-                        242,
+                        248,
                         "[Stake_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        241,
+                        247,
                         "[Stake_order_by!]"
                     ],
                     "where": [
-                        238
+                        244
                     ]
                 }
             ],
             "Stake_by_pk": [
-                235,
+                241,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "StakingContract": [
-                252,
+                258,
                 {
                     "distinct_on": [
-                        255,
+                        261,
                         "[StakingContract_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        254,
+                        260,
                         "[StakingContract_order_by!]"
                     ],
                     "where": [
-                        253
+                        259
                     ]
                 }
             ],
             "StakingContract_by_pk": [
-                252,
+                258,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "Token": [
-                261,
+                267,
                 {
                     "distinct_on": [
-                        264,
+                        270,
                         "[Token_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        263,
+                        269,
                         "[Token_order_by!]"
                     ],
                     "where": [
-                        262
+                        268
                     ]
                 }
             ],
             "Token_by_pk": [
-                261,
+                267,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "Trade": [
-                267,
+                273,
                 {
                     "distinct_on": [
-                        274,
+                        280,
                         "[Trade_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        273,
+                        279,
                         "[Trade_order_by!]"
                     ],
                     "where": [
-                        270
+                        276
                     ]
                 }
             ],
             "Trade_by_pk": [
-                267,
+                273,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "UserMarketPosition": [
-                284,
+                290,
                 {
                     "distinct_on": [
-                        291,
+                        297,
                         "[UserMarketPosition_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        290,
+                        296,
                         "[UserMarketPosition_order_by!]"
                     ],
                     "where": [
-                        287
+                        293
                     ]
                 }
             ],
             "UserMarketPosition_by_pk": [
-                284,
+                290,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "chain_metadata": [
-                303,
+                309,
                 {
                     "distinct_on": [
-                        306,
+                        312,
                         "[chain_metadata_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        305,
+                        311,
                         "[chain_metadata_order_by!]"
                     ],
                     "where": [
-                        304
+                        310
                     ]
                 }
             ],
             "chain_metadata_by_pk": [
-                303,
+                309,
                 {
                     "chain_id": [
-                        60,
+                        66,
                         "Int!"
                     ]
                 }
             ],
             "dynamic_contract_registry": [
-                312,
-                {
-                    "distinct_on": [
-                        315,
-                        "[dynamic_contract_registry_select_column!]"
-                    ],
-                    "limit": [
-                        60
-                    ],
-                    "offset": [
-                        60
-                    ],
-                    "order_by": [
-                        314,
-                        "[dynamic_contract_registry_order_by!]"
-                    ],
-                    "where": [
-                        313
-                    ]
-                }
-            ],
-            "dynamic_contract_registry_by_pk": [
-                312,
-                {
-                    "id": [
-                        258,
-                        "String!"
-                    ]
-                }
-            ],
-            "end_of_block_range_scanned_data": [
                 318,
                 {
                     "distinct_on": [
                         321,
-                        "[end_of_block_range_scanned_data_select_column!]"
+                        "[dynamic_contract_registry_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
                         320,
-                        "[end_of_block_range_scanned_data_order_by!]"
+                        "[dynamic_contract_registry_order_by!]"
                     ],
                     "where": [
                         319
                     ]
                 }
             ],
-            "end_of_block_range_scanned_data_by_pk": [
+            "dynamic_contract_registry_by_pk": [
                 318,
                 {
-                    "block_number": [
-                        60,
-                        "Int!"
-                    ],
-                    "chain_id": [
-                        60,
-                        "Int!"
+                    "id": [
+                        264,
+                        "String!"
                     ]
                 }
             ],
-            "event_sync_state": [
+            "end_of_block_range_scanned_data": [
                 324,
                 {
                     "distinct_on": [
                         327,
-                        "[event_sync_state_select_column!]"
+                        "[end_of_block_range_scanned_data_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
                         326,
-                        "[event_sync_state_order_by!]"
+                        "[end_of_block_range_scanned_data_order_by!]"
                     ],
                     "where": [
                         325
                     ]
                 }
             ],
-            "event_sync_state_by_pk": [
+            "end_of_block_range_scanned_data_by_pk": [
                 324,
                 {
+                    "block_number": [
+                        66,
+                        "Int!"
+                    ],
                     "chain_id": [
-                        60,
+                        66,
+                        "Int!"
+                    ]
+                }
+            ],
+            "event_sync_state": [
+                330,
+                {
+                    "distinct_on": [
+                        333,
+                        "[event_sync_state_select_column!]"
+                    ],
+                    "limit": [
+                        66
+                    ],
+                    "offset": [
+                        66
+                    ],
+                    "order_by": [
+                        332,
+                        "[event_sync_state_order_by!]"
+                    ],
+                    "where": [
+                        331
+                    ]
+                }
+            ],
+            "event_sync_state_by_pk": [
+                330,
+                {
+                    "chain_id": [
+                        66,
                         "Int!"
                     ]
                 }
             ],
             "persisted_state": [
-                341,
+                347,
                 {
                     "distinct_on": [
-                        344,
+                        350,
                         "[persisted_state_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        343,
+                        349,
                         "[persisted_state_order_by!]"
                     ],
                     "where": [
-                        342
+                        348
                     ]
                 }
             ],
             "persisted_state_by_pk": [
-                341,
+                347,
                 {
                     "id": [
-                        60,
+                        66,
                         "Int!"
                     ]
                 }
             ],
             "raw_events": [
-                349,
+                355,
                 {
                     "distinct_on": [
-                        352,
+                        358,
                         "[raw_events_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        351,
+                        357,
                         "[raw_events_order_by!]"
                     ],
                     "where": [
-                        350
+                        356
                     ]
                 }
             ],
             "raw_events_by_pk": [
-                349,
+                355,
                 {
                     "serial": [
-                        60,
+                        66,
                         "Int!"
                     ]
                 }
             ],
             "__typename": [
-                258
+                264
             ]
         },
         "Subscription": {
@@ -11420,10 +11565,10 @@ export default {
                         "[Account_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
                         2,
@@ -11438,7 +11583,7 @@ export default {
                 0,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
@@ -11447,7 +11592,7 @@ export default {
                 0,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
@@ -11467,10 +11612,10 @@ export default {
                         "[AuthorizerContract_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
                         8,
@@ -11485,7 +11630,7 @@ export default {
                 6,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
@@ -11494,7 +11639,7 @@ export default {
                 6,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
@@ -11514,10 +11659,10 @@ export default {
                         "[CreditFacilityContract_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
                         16,
@@ -11532,7 +11677,7 @@ export default {
                 14,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
@@ -11541,7 +11686,7 @@ export default {
                 14,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
@@ -11561,10 +11706,10 @@ export default {
                         "[FeeDistribution_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
                         26,
@@ -11579,7 +11724,7 @@ export default {
                 20,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
@@ -11588,7 +11733,7 @@ export default {
                 20,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
@@ -11608,10 +11753,10 @@ export default {
                         "[FloorElevation_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
                         43,
@@ -11626,7 +11771,7 @@ export default {
                 37,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
@@ -11635,7 +11780,7 @@ export default {
                 37,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
@@ -11647,1234 +11792,1281 @@ export default {
                     ]
                 }
             ],
-            "GlobalStats": [
+            "GlobalRegistry": [
                 54,
                 {
                     "distinct_on": [
                         57,
-                        "[GlobalStats_select_column!]"
+                        "[GlobalRegistry_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
                         56,
-                        "[GlobalStats_order_by!]"
+                        "[GlobalRegistry_order_by!]"
                     ],
                     "where": [
                         55
                     ]
                 }
             ],
-            "GlobalStats_by_pk": [
+            "GlobalRegistry_by_pk": [
                 54,
                 {
                     "id": [
-                        258,
+                        264,
+                        "String!"
+                    ]
+                }
+            ],
+            "GlobalRegistry_stream": [
+                54,
+                {
+                    "batch_size": [
+                        66,
+                        "Int!"
+                    ],
+                    "cursor": [
+                        58,
+                        "[GlobalRegistry_stream_cursor_input]!"
+                    ],
+                    "where": [
+                        55
+                    ]
+                }
+            ],
+            "GlobalStats": [
+                60,
+                {
+                    "distinct_on": [
+                        63,
+                        "[GlobalStats_select_column!]"
+                    ],
+                    "limit": [
+                        66
+                    ],
+                    "offset": [
+                        66
+                    ],
+                    "order_by": [
+                        62,
+                        "[GlobalStats_order_by!]"
+                    ],
+                    "where": [
+                        61
+                    ]
+                }
+            ],
+            "GlobalStats_by_pk": [
+                60,
+                {
+                    "id": [
+                        264,
                         "String!"
                     ]
                 }
             ],
             "GlobalStats_stream": [
-                54,
+                60,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
-                        58,
+                        64,
                         "[GlobalStats_stream_cursor_input]!"
                     ],
                     "where": [
-                        55
+                        61
                     ]
                 }
             ],
             "Loan": [
-                63,
+                69,
                 {
                     "distinct_on": [
-                        87,
+                        93,
                         "[Loan_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        86,
+                        92,
                         "[Loan_order_by!]"
                     ],
                     "where": [
-                        83
+                        89
                     ]
                 }
             ],
             "LoanStatusHistory": [
-                64,
+                70,
                 {
                     "distinct_on": [
-                        71,
+                        77,
                         "[LoanStatusHistory_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        70,
+                        76,
                         "[LoanStatusHistory_order_by!]"
                     ],
                     "where": [
-                        67
+                        73
                     ]
                 }
             ],
             "LoanStatusHistory_by_pk": [
-                64,
+                70,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "LoanStatusHistory_stream": [
-                64,
+                70,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
-                        75,
+                        81,
                         "[LoanStatusHistory_stream_cursor_input]!"
                     ],
                     "where": [
-                        67
+                        73
                     ]
                 }
             ],
             "Loan_by_pk": [
-                63,
+                69,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "Loan_stream": [
-                63,
+                69,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
-                        91,
+                        97,
                         "[Loan_stream_cursor_input]!"
                     ],
                     "where": [
-                        83
+                        89
                     ]
                 }
             ],
             "Market": [
-                97,
+                103,
                 {
                     "distinct_on": [
-                        116,
+                        122,
                         "[Market_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        115,
+                        121,
                         "[Market_order_by!]"
                     ],
                     "where": [
-                        112
+                        118
                     ]
                 }
             ],
             "MarketRollingStats": [
-                98,
+                104,
                 {
                     "distinct_on": [
-                        101,
+                        107,
                         "[MarketRollingStats_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        100,
+                        106,
                         "[MarketRollingStats_order_by!]"
                     ],
                     "where": [
-                        99
+                        105
                     ]
                 }
             ],
             "MarketRollingStats_by_pk": [
-                98,
+                104,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "MarketRollingStats_stream": [
-                98,
+                104,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
-                        102,
+                        108,
                         "[MarketRollingStats_stream_cursor_input]!"
-                    ],
-                    "where": [
-                        99
-                    ]
-                }
-            ],
-            "MarketSnapshot": [
-                104,
-                {
-                    "distinct_on": [
-                        107,
-                        "[MarketSnapshot_select_column!]"
-                    ],
-                    "limit": [
-                        60
-                    ],
-                    "offset": [
-                        60
-                    ],
-                    "order_by": [
-                        106,
-                        "[MarketSnapshot_order_by!]"
                     ],
                     "where": [
                         105
                     ]
                 }
             ],
+            "MarketSnapshot": [
+                110,
+                {
+                    "distinct_on": [
+                        113,
+                        "[MarketSnapshot_select_column!]"
+                    ],
+                    "limit": [
+                        66
+                    ],
+                    "offset": [
+                        66
+                    ],
+                    "order_by": [
+                        112,
+                        "[MarketSnapshot_order_by!]"
+                    ],
+                    "where": [
+                        111
+                    ]
+                }
+            ],
             "MarketSnapshot_by_pk": [
-                104,
+                110,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "MarketSnapshot_stream": [
-                104,
+                110,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
-                        108,
+                        114,
                         "[MarketSnapshot_stream_cursor_input]!"
                     ],
                     "where": [
-                        105
+                        111
                     ]
                 }
             ],
             "Market_by_pk": [
-                97,
+                103,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "Market_stream": [
-                97,
+                103,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
-                        120,
+                        126,
                         "[Market_stream_cursor_input]!"
                     ],
                     "where": [
-                        112
+                        118
                     ]
                 }
             ],
             "ModuleAddress": [
-                126,
+                132,
                 {
                     "distinct_on": [
-                        129,
+                        135,
                         "[ModuleAddress_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        128,
+                        134,
                         "[ModuleAddress_order_by!]"
                     ],
                     "where": [
-                        127
+                        133
                     ]
                 }
             ],
             "ModuleAddress_by_pk": [
-                126,
+                132,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "ModuleAddress_stream": [
-                126,
+                132,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
-                        130,
+                        136,
                         "[ModuleAddress_stream_cursor_input]!"
-                    ],
-                    "where": [
-                        127
-                    ]
-                }
-            ],
-            "ModuleRegistry": [
-                132,
-                {
-                    "distinct_on": [
-                        135,
-                        "[ModuleRegistry_select_column!]"
-                    ],
-                    "limit": [
-                        60
-                    ],
-                    "offset": [
-                        60
-                    ],
-                    "order_by": [
-                        134,
-                        "[ModuleRegistry_order_by!]"
                     ],
                     "where": [
                         133
                     ]
                 }
             ],
+            "ModuleRegistry": [
+                138,
+                {
+                    "distinct_on": [
+                        141,
+                        "[ModuleRegistry_select_column!]"
+                    ],
+                    "limit": [
+                        66
+                    ],
+                    "offset": [
+                        66
+                    ],
+                    "order_by": [
+                        140,
+                        "[ModuleRegistry_order_by!]"
+                    ],
+                    "where": [
+                        139
+                    ]
+                }
+            ],
             "ModuleRegistry_by_pk": [
-                132,
+                138,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "ModuleRegistry_stream": [
-                132,
+                138,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
-                        136,
+                        142,
                         "[ModuleRegistry_stream_cursor_input]!"
-                    ],
-                    "where": [
-                        133
-                    ]
-                }
-            ],
-            "PreSaleContract": [
-                138,
-                {
-                    "distinct_on": [
-                        141,
-                        "[PreSaleContract_select_column!]"
-                    ],
-                    "limit": [
-                        60
-                    ],
-                    "offset": [
-                        60
-                    ],
-                    "order_by": [
-                        140,
-                        "[PreSaleContract_order_by!]"
                     ],
                     "where": [
                         139
                     ]
                 }
             ],
+            "PreSaleContract": [
+                144,
+                {
+                    "distinct_on": [
+                        147,
+                        "[PreSaleContract_select_column!]"
+                    ],
+                    "limit": [
+                        66
+                    ],
+                    "offset": [
+                        66
+                    ],
+                    "order_by": [
+                        146,
+                        "[PreSaleContract_order_by!]"
+                    ],
+                    "where": [
+                        145
+                    ]
+                }
+            ],
             "PreSaleContract_by_pk": [
-                138,
+                144,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "PreSaleContract_stream": [
-                138,
+                144,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
-                        142,
+                        148,
                         "[PreSaleContract_stream_cursor_input]!"
                     ],
                     "where": [
-                        139
+                        145
                     ]
                 }
             ],
             "PresaleClaim": [
-                144,
+                150,
                 {
                     "distinct_on": [
-                        151,
+                        157,
                         "[PresaleClaim_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        150,
+                        156,
                         "[PresaleClaim_order_by!]"
                     ],
                     "where": [
-                        147
+                        153
                     ]
                 }
             ],
             "PresaleClaim_by_pk": [
-                144,
+                150,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "PresaleClaim_stream": [
-                144,
+                150,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
-                        155,
+                        161,
                         "[PresaleClaim_stream_cursor_input]!"
                     ],
                     "where": [
-                        147
+                        153
                     ]
                 }
             ],
             "PresaleParticipation": [
-                161,
+                167,
                 {
                     "distinct_on": [
-                        168,
+                        174,
                         "[PresaleParticipation_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        167,
+                        173,
                         "[PresaleParticipation_order_by!]"
                     ],
                     "where": [
-                        164
+                        170
                     ]
                 }
             ],
             "PresaleParticipation_by_pk": [
-                161,
+                167,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "PresaleParticipation_stream": [
-                161,
+                167,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
-                        172,
+                        178,
                         "[PresaleParticipation_stream_cursor_input]!"
                     ],
                     "where": [
-                        164
+                        170
                     ]
                 }
             ],
             "PriceCandle": [
-                178,
+                184,
                 {
                     "distinct_on": [
-                        181,
+                        187,
                         "[PriceCandle_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        180,
+                        186,
                         "[PriceCandle_order_by!]"
                     ],
                     "where": [
-                        179
+                        185
                     ]
                 }
             ],
             "PriceCandle_by_pk": [
-                178,
+                184,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "PriceCandle_stream": [
-                178,
+                184,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
-                        182,
+                        188,
                         "[PriceCandle_stream_cursor_input]!"
                     ],
                     "where": [
-                        179
+                        185
                     ]
                 }
             ],
             "Role": [
-                184,
+                190,
                 {
                     "distinct_on": [
-                        225,
+                        231,
                         "[Role_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        224,
+                        230,
                         "[Role_order_by!]"
                     ],
                     "where": [
-                        221
+                        227
                     ]
                 }
             ],
             "RoleMember": [
-                185,
+                191,
                 {
                     "distinct_on": [
-                        192,
+                        198,
                         "[RoleMember_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        191,
+                        197,
                         "[RoleMember_order_by!]"
                     ],
                     "where": [
-                        188
+                        194
                     ]
                 }
             ],
             "RoleMember_by_pk": [
-                185,
+                191,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "RoleMember_stream": [
-                185,
+                191,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
-                        196,
+                        202,
                         "[RoleMember_stream_cursor_input]!"
                     ],
                     "where": [
-                        188
+                        194
                     ]
                 }
             ],
             "RolePermission": [
-                202,
+                208,
                 {
                     "distinct_on": [
-                        209,
+                        215,
                         "[RolePermission_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        208,
+                        214,
                         "[RolePermission_order_by!]"
                     ],
                     "where": [
-                        205
+                        211
                     ]
                 }
             ],
             "RolePermission_by_pk": [
-                202,
+                208,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "RolePermission_stream": [
-                202,
+                208,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
-                        213,
+                        219,
                         "[RolePermission_stream_cursor_input]!"
                     ],
                     "where": [
-                        205
+                        211
                     ]
                 }
             ],
             "Role_by_pk": [
-                184,
+                190,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "Role_stream": [
-                184,
+                190,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
-                        229,
+                        235,
                         "[Role_stream_cursor_input]!"
                     ],
                     "where": [
-                        221
+                        227
                     ]
                 }
             ],
             "Stake": [
-                235,
+                241,
                 {
                     "distinct_on": [
-                        242,
+                        248,
                         "[Stake_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        241,
+                        247,
                         "[Stake_order_by!]"
                     ],
                     "where": [
-                        238
+                        244
                     ]
                 }
             ],
             "Stake_by_pk": [
-                235,
+                241,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "Stake_stream": [
-                235,
+                241,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
-                        246,
+                        252,
                         "[Stake_stream_cursor_input]!"
                     ],
                     "where": [
-                        238
+                        244
                     ]
                 }
             ],
             "StakingContract": [
-                252,
+                258,
                 {
                     "distinct_on": [
-                        255,
+                        261,
                         "[StakingContract_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        254,
+                        260,
                         "[StakingContract_order_by!]"
                     ],
                     "where": [
-                        253
+                        259
                     ]
                 }
             ],
             "StakingContract_by_pk": [
-                252,
+                258,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "StakingContract_stream": [
-                252,
+                258,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
-                        256,
+                        262,
                         "[StakingContract_stream_cursor_input]!"
                     ],
                     "where": [
-                        253
+                        259
                     ]
                 }
             ],
             "Token": [
-                261,
+                267,
                 {
                     "distinct_on": [
-                        264,
+                        270,
                         "[Token_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        263,
+                        269,
                         "[Token_order_by!]"
                     ],
                     "where": [
-                        262
+                        268
                     ]
                 }
             ],
             "Token_by_pk": [
-                261,
+                267,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "Token_stream": [
-                261,
+                267,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
-                        265,
+                        271,
                         "[Token_stream_cursor_input]!"
                     ],
                     "where": [
-                        262
+                        268
                     ]
                 }
             ],
             "Trade": [
-                267,
+                273,
                 {
                     "distinct_on": [
-                        274,
+                        280,
                         "[Trade_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        273,
+                        279,
                         "[Trade_order_by!]"
                     ],
                     "where": [
-                        270
+                        276
                     ]
                 }
             ],
             "Trade_by_pk": [
-                267,
+                273,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "Trade_stream": [
-                267,
+                273,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
-                        278,
+                        284,
                         "[Trade_stream_cursor_input]!"
                     ],
                     "where": [
-                        270
+                        276
                     ]
                 }
             ],
             "UserMarketPosition": [
-                284,
+                290,
                 {
                     "distinct_on": [
-                        291,
+                        297,
                         "[UserMarketPosition_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        290,
+                        296,
                         "[UserMarketPosition_order_by!]"
                     ],
                     "where": [
-                        287
+                        293
                     ]
                 }
             ],
             "UserMarketPosition_by_pk": [
-                284,
+                290,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "UserMarketPosition_stream": [
-                284,
+                290,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
-                        295,
+                        301,
                         "[UserMarketPosition_stream_cursor_input]!"
                     ],
                     "where": [
-                        287
+                        293
                     ]
                 }
             ],
             "chain_metadata": [
-                303,
+                309,
                 {
                     "distinct_on": [
-                        306,
+                        312,
                         "[chain_metadata_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        305,
+                        311,
                         "[chain_metadata_order_by!]"
                     ],
                     "where": [
-                        304
+                        310
                     ]
                 }
             ],
             "chain_metadata_by_pk": [
-                303,
+                309,
                 {
                     "chain_id": [
-                        60,
+                        66,
                         "Int!"
                     ]
                 }
             ],
             "chain_metadata_stream": [
-                303,
+                309,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
-                        307,
+                        313,
                         "[chain_metadata_stream_cursor_input]!"
                     ],
                     "where": [
-                        304
+                        310
                     ]
                 }
             ],
             "dynamic_contract_registry": [
-                312,
+                318,
                 {
                     "distinct_on": [
-                        315,
+                        321,
                         "[dynamic_contract_registry_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        314,
+                        320,
                         "[dynamic_contract_registry_order_by!]"
                     ],
                     "where": [
-                        313
+                        319
                     ]
                 }
             ],
             "dynamic_contract_registry_by_pk": [
-                312,
+                318,
                 {
                     "id": [
-                        258,
+                        264,
                         "String!"
                     ]
                 }
             ],
             "dynamic_contract_registry_stream": [
-                312,
+                318,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
-                        316,
+                        322,
                         "[dynamic_contract_registry_stream_cursor_input]!"
-                    ],
-                    "where": [
-                        313
-                    ]
-                }
-            ],
-            "end_of_block_range_scanned_data": [
-                318,
-                {
-                    "distinct_on": [
-                        321,
-                        "[end_of_block_range_scanned_data_select_column!]"
-                    ],
-                    "limit": [
-                        60
-                    ],
-                    "offset": [
-                        60
-                    ],
-                    "order_by": [
-                        320,
-                        "[end_of_block_range_scanned_data_order_by!]"
                     ],
                     "where": [
                         319
                     ]
                 }
             ],
+            "end_of_block_range_scanned_data": [
+                324,
+                {
+                    "distinct_on": [
+                        327,
+                        "[end_of_block_range_scanned_data_select_column!]"
+                    ],
+                    "limit": [
+                        66
+                    ],
+                    "offset": [
+                        66
+                    ],
+                    "order_by": [
+                        326,
+                        "[end_of_block_range_scanned_data_order_by!]"
+                    ],
+                    "where": [
+                        325
+                    ]
+                }
+            ],
             "end_of_block_range_scanned_data_by_pk": [
-                318,
+                324,
                 {
                     "block_number": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "chain_id": [
-                        60,
+                        66,
                         "Int!"
                     ]
                 }
             ],
             "end_of_block_range_scanned_data_stream": [
-                318,
+                324,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
-                        322,
+                        328,
                         "[end_of_block_range_scanned_data_stream_cursor_input]!"
-                    ],
-                    "where": [
-                        319
-                    ]
-                }
-            ],
-            "event_sync_state": [
-                324,
-                {
-                    "distinct_on": [
-                        327,
-                        "[event_sync_state_select_column!]"
-                    ],
-                    "limit": [
-                        60
-                    ],
-                    "offset": [
-                        60
-                    ],
-                    "order_by": [
-                        326,
-                        "[event_sync_state_order_by!]"
                     ],
                     "where": [
                         325
                     ]
                 }
             ],
+            "event_sync_state": [
+                330,
+                {
+                    "distinct_on": [
+                        333,
+                        "[event_sync_state_select_column!]"
+                    ],
+                    "limit": [
+                        66
+                    ],
+                    "offset": [
+                        66
+                    ],
+                    "order_by": [
+                        332,
+                        "[event_sync_state_order_by!]"
+                    ],
+                    "where": [
+                        331
+                    ]
+                }
+            ],
             "event_sync_state_by_pk": [
-                324,
+                330,
                 {
                     "chain_id": [
-                        60,
+                        66,
                         "Int!"
                     ]
                 }
             ],
             "event_sync_state_stream": [
-                324,
+                330,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
-                        328,
+                        334,
                         "[event_sync_state_stream_cursor_input]!"
                     ],
                     "where": [
-                        325
+                        331
                     ]
                 }
             ],
             "persisted_state": [
-                341,
+                347,
                 {
                     "distinct_on": [
-                        344,
+                        350,
                         "[persisted_state_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        343,
+                        349,
                         "[persisted_state_order_by!]"
                     ],
                     "where": [
-                        342
+                        348
                     ]
                 }
             ],
             "persisted_state_by_pk": [
-                341,
+                347,
                 {
                     "id": [
-                        60,
+                        66,
                         "Int!"
                     ]
                 }
             ],
             "persisted_state_stream": [
-                341,
+                347,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
-                        345,
+                        351,
                         "[persisted_state_stream_cursor_input]!"
                     ],
                     "where": [
-                        342
+                        348
                     ]
                 }
             ],
             "raw_events": [
-                349,
+                355,
                 {
                     "distinct_on": [
-                        352,
+                        358,
                         "[raw_events_select_column!]"
                     ],
                     "limit": [
-                        60
+                        66
                     ],
                     "offset": [
-                        60
+                        66
                     ],
                     "order_by": [
-                        351,
+                        357,
                         "[raw_events_order_by!]"
                     ],
                     "where": [
-                        350
+                        356
                     ]
                 }
             ],
             "raw_events_by_pk": [
-                349,
+                355,
                 {
                     "serial": [
-                        60,
+                        66,
                         "Int!"
                     ]
                 }
             ],
             "raw_events_stream": [
-                349,
+                355,
                 {
                     "batch_size": [
-                        60,
+                        66,
                         "Int!"
                     ],
                     "cursor": [
-                        353,
+                        359,
                         "[raw_events_stream_cursor_input]!"
                     ],
                     "where": [
-                        350
+                        356
                     ]
                 }
             ],
             "__typename": [
-                258
+                264
             ]
         }
     }

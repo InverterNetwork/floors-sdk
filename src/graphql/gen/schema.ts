@@ -131,6 +131,22 @@ export interface FloorElevation {
 export type FloorElevation_select_column = 'db_write_timestamp' | 'deployedAmountFormatted' | 'deployedAmountRaw' | 'id' | 'market_id' | 'newFloorPriceFormatted' | 'newFloorPriceRaw' | 'oldFloorPriceFormatted' | 'oldFloorPriceRaw' | 'timestamp' | 'transactionHash'
 
 
+/** columns and relationships of "GlobalRegistry" */
+export interface GlobalRegistry {
+    createdAt: Scalars['numeric']
+    db_write_timestamp: (Scalars['timestamp'] | null)
+    floorFactoryAddress: Scalars['String']
+    id: Scalars['String']
+    lastUpdatedAt: Scalars['numeric']
+    moduleFactoryAddress: Scalars['String']
+    __typename: 'GlobalRegistry'
+}
+
+
+/** select columns of table "GlobalRegistry" */
+export type GlobalRegistry_select_column = 'createdAt' | 'db_write_timestamp' | 'floorFactoryAddress' | 'id' | 'lastUpdatedAt' | 'moduleFactoryAddress'
+
+
 /** columns and relationships of "GlobalStats" */
 export interface GlobalStats {
     activeMarkets: Scalars['numeric']
@@ -732,6 +748,10 @@ export interface query_root {
     FloorElevation: FloorElevation[]
     /** fetch data from the table: "FloorElevation" using primary key columns */
     FloorElevation_by_pk: (FloorElevation | null)
+    /** fetch data from the table: "GlobalRegistry" */
+    GlobalRegistry: GlobalRegistry[]
+    /** fetch data from the table: "GlobalRegistry" using primary key columns */
+    GlobalRegistry_by_pk: (GlobalRegistry | null)
     /** fetch data from the table: "GlobalStats" */
     GlobalStats: GlobalStats[]
     /** fetch data from the table: "GlobalStats" using primary key columns */
@@ -894,6 +914,12 @@ export interface subscription_root {
     FloorElevation_by_pk: (FloorElevation | null)
     /** fetch data from the table in a streaming manner: "FloorElevation" */
     FloorElevation_stream: FloorElevation[]
+    /** fetch data from the table: "GlobalRegistry" */
+    GlobalRegistry: GlobalRegistry[]
+    /** fetch data from the table: "GlobalRegistry" using primary key columns */
+    GlobalRegistry_by_pk: (GlobalRegistry | null)
+    /** fetch data from the table in a streaming manner: "GlobalRegistry" */
+    GlobalRegistry_stream: GlobalRegistry[]
     /** fetch data from the table: "GlobalStats" */
     GlobalStats: GlobalStats[]
     /** fetch data from the table: "GlobalStats" using primary key columns */
@@ -1422,6 +1448,39 @@ export interface FloorElevation_var_samp_order_by {deployedAmountRaw?: (order_by
 
 /** order by variance() on columns of table "FloorElevation" */
 export interface FloorElevation_variance_order_by {deployedAmountRaw?: (order_by | null),newFloorPriceRaw?: (order_by | null),oldFloorPriceRaw?: (order_by | null),timestamp?: (order_by | null)}
+
+
+/** columns and relationships of "GlobalRegistry" */
+export interface GlobalRegistryGenqlSelection{
+    createdAt?: boolean | number
+    db_write_timestamp?: boolean | number
+    floorFactoryAddress?: boolean | number
+    id?: boolean | number
+    lastUpdatedAt?: boolean | number
+    moduleFactoryAddress?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+
+/** Boolean expression to filter rows from the table "GlobalRegistry". All fields are combined with a logical 'AND'. */
+export interface GlobalRegistry_bool_exp {_and?: (GlobalRegistry_bool_exp[] | null),_not?: (GlobalRegistry_bool_exp | null),_or?: (GlobalRegistry_bool_exp[] | null),createdAt?: (numeric_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),floorFactoryAddress?: (String_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),moduleFactoryAddress?: (String_comparison_exp | null)}
+
+
+/** Ordering options when selecting data from "GlobalRegistry". */
+export interface GlobalRegistry_order_by {createdAt?: (order_by | null),db_write_timestamp?: (order_by | null),floorFactoryAddress?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),moduleFactoryAddress?: (order_by | null)}
+
+
+/** Streaming cursor of the table "GlobalRegistry" */
+export interface GlobalRegistry_stream_cursor_input {
+/** Stream column input with initial value */
+initial_value: GlobalRegistry_stream_cursor_value_input,
+/** cursor ordering */
+ordering?: (cursor_ordering | null)}
+
+
+/** Initial value of the column from where the streaming should start */
+export interface GlobalRegistry_stream_cursor_value_input {createdAt?: (Scalars['numeric'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),floorFactoryAddress?: (Scalars['String'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),moduleFactoryAddress?: (Scalars['String'] | null)}
 
 
 /** columns and relationships of "GlobalStats" */
@@ -3158,6 +3217,20 @@ export interface query_rootGenqlSelection{
     where?: (FloorElevation_bool_exp | null)} })
     /** fetch data from the table: "FloorElevation" using primary key columns */
     FloorElevation_by_pk?: (FloorElevationGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table: "GlobalRegistry" */
+    GlobalRegistry?: (GlobalRegistryGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (GlobalRegistry_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (GlobalRegistry_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (GlobalRegistry_bool_exp | null)} })
+    /** fetch data from the table: "GlobalRegistry" using primary key columns */
+    GlobalRegistry_by_pk?: (GlobalRegistryGenqlSelection & { __args: {id: Scalars['String']} })
     /** fetch data from the table: "GlobalStats" */
     GlobalStats?: (GlobalStatsGenqlSelection & { __args?: {
     /** distinct select on columns */
@@ -3688,6 +3761,28 @@ export interface subscription_rootGenqlSelection{
     cursor: (FloorElevation_stream_cursor_input | null)[], 
     /** filter the rows returned */
     where?: (FloorElevation_bool_exp | null)} })
+    /** fetch data from the table: "GlobalRegistry" */
+    GlobalRegistry?: (GlobalRegistryGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (GlobalRegistry_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (GlobalRegistry_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (GlobalRegistry_bool_exp | null)} })
+    /** fetch data from the table: "GlobalRegistry" using primary key columns */
+    GlobalRegistry_by_pk?: (GlobalRegistryGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table in a streaming manner: "GlobalRegistry" */
+    GlobalRegistry_stream?: (GlobalRegistryGenqlSelection & { __args: {
+    /** maximum number of rows returned in a single batch */
+    batch_size: Scalars['Int'], 
+    /** cursor to stream the results returned by the query */
+    cursor: (GlobalRegistry_stream_cursor_input | null)[], 
+    /** filter the rows returned */
+    where?: (GlobalRegistry_bool_exp | null)} })
     /** fetch data from the table: "GlobalStats" */
     GlobalStats?: (GlobalStatsGenqlSelection & { __args?: {
     /** distinct select on columns */
@@ -4320,6 +4415,14 @@ export type SubscriptionGenqlSelection = subscription_rootGenqlSelection
     
 
 
+    const GlobalRegistry_possibleTypes: string[] = ['GlobalRegistry']
+    export const isGlobalRegistry = (obj?: { __typename?: any } | null): obj is GlobalRegistry => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isGlobalRegistry"')
+      return GlobalRegistry_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
     const GlobalStats_possibleTypes: string[] = ['GlobalStats']
     export const isGlobalStats = (obj?: { __typename?: any } | null): obj is GlobalStats => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isGlobalStats"')
@@ -4600,6 +4703,15 @@ export const enumFloorElevationSelectColumn = {
    oldFloorPriceRaw: 'oldFloorPriceRaw' as const,
    timestamp: 'timestamp' as const,
    transactionHash: 'transactionHash' as const
+}
+
+export const enumGlobalRegistrySelectColumn = {
+   createdAt: 'createdAt' as const,
+   db_write_timestamp: 'db_write_timestamp' as const,
+   floorFactoryAddress: 'floorFactoryAddress' as const,
+   id: 'id' as const,
+   lastUpdatedAt: 'lastUpdatedAt' as const,
+   moduleFactoryAddress: 'moduleFactoryAddress' as const
 }
 
 export const enumGlobalStatsSelectColumn = {
