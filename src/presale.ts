@@ -110,15 +110,15 @@ export class Presale {
   }
 
   /**
-   * @description Get user's total deposits
+   * @description Get user's total issuance (tokens minted)
    * @param userAddress User address
-   * @returns Total deposit amount
+   * @returns Total issuance amount
    */
-  public async getDepositsBy(userAddress: Address): Promise<bigint> {
+  public async getIssuanceBy(userAddress: Address): Promise<bigint> {
     return (await this.publicClient.readContract({
       address: this.address,
       abi: Presale_v1,
-      functionName: 'getDepositsBy',
+      functionName: 'getIssuanceBy',
       args: [userAddress],
     })) as bigint
   }
@@ -201,38 +201,38 @@ export class Presale {
   }
 
   /**
-   * @description Get global deposit cap
-   * @returns Global deposit cap (0 if disabled)
+   * @description Get global issuance cap (tokens minted cap)
+   * @returns Global issuance cap (0 if disabled)
    */
-  public async getGlobalDepositCap(): Promise<bigint> {
+  public async getGlobalIssuanceCap(): Promise<bigint> {
     return (await this.publicClient.readContract({
       address: this.address,
       abi: Presale_v1,
-      functionName: 'getGlobalDepositCap',
+      functionName: 'getGlobalIssuanceCap',
     })) as bigint
   }
 
   /**
-   * @description Get per-address deposit cap
-   * @returns Per-address deposit cap (0 if disabled)
+   * @description Get per-address issuance cap (tokens minted cap per address)
+   * @returns Per-address issuance cap (0 if disabled)
    */
-  public async getPerAddressDepositCap(): Promise<bigint> {
+  public async getPerAddressIssuanceCap(): Promise<bigint> {
     return (await this.publicClient.readContract({
       address: this.address,
       abi: Presale_v1,
-      functionName: 'getPerAddressDepositCap',
+      functionName: 'getPerAddressIssuanceCap',
     })) as bigint
   }
 
   /**
-   * @description Get total global deposits
-   * @returns Total amount deposited across all users
+   * @description Get total global issuance (tokens minted)
+   * @returns Total amount of tokens minted across all users
    */
-  public async getGlobalDeposits(): Promise<bigint> {
+  public async getGlobalIssuance(): Promise<bigint> {
     return (await this.publicClient.readContract({
       address: this.address,
       abi: Presale_v1,
-      functionName: 'getGlobalDeposits',
+      functionName: 'getGlobalIssuance',
     })) as bigint
   }
 

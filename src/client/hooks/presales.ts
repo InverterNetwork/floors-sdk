@@ -149,7 +149,7 @@ export type UsePresaleMutationsReturnType = {
   getPurchaseTokenBalance: UseMutationResult<bigint, Error, Address | undefined>
   getPresaleState: UseMutationResult<number, Error, void>
   isWhitelisted: UseMutationResult<boolean, Error, Address | undefined>
-  getDepositsBy: UseMutationResult<bigint, Error, Address | undefined>
+  getIssuanceBy: UseMutationResult<bigint, Error, Address | undefined>
   getPositionsByOwner: UseMutationResult<bigint[], Error, Address | undefined>
   getPosition: UseMutationResult<any, Error, bigint>
   getPositionState: UseMutationResult<any, Error, bigint>
@@ -253,9 +253,9 @@ export const usePresaleMutations = (): UsePresaleMutationsReturnType => {
       ensurePresale().isWhitelisted(ensureWalletAddress(userAddress)),
   })
 
-  const getDepositsBy = useMutation({
+  const getIssuanceBy = useMutation({
     mutationFn: async (userAddress?: Address) =>
-      ensurePresale().getDepositsBy(ensureWalletAddress(userAddress)),
+      ensurePresale().getIssuanceBy(ensureWalletAddress(userAddress)),
   })
 
   const getPositionsByOwner = useMutation({
@@ -288,7 +288,7 @@ export const usePresaleMutations = (): UsePresaleMutationsReturnType => {
     getPurchaseTokenBalance,
     getPresaleState,
     isWhitelisted,
-    getDepositsBy,
+    getIssuanceBy,
     getPositionsByOwner,
     getPosition,
     getPositionState,

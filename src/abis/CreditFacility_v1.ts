@@ -239,11 +239,6 @@ export default [
             internalType: 'uint256',
           },
           {
-            name: 'floorPriceAtBorrow',
-            type: 'uint256',
-            internalType: 'uint256',
-          },
-          {
             name: 'remainingLoanAmount',
             type: 'uint256',
             internalType: 'uint256',
@@ -336,11 +331,6 @@ export default [
           },
           {
             name: 'lockedIssuanceTokens',
-            type: 'uint256',
-            internalType: 'uint256',
-          },
-          {
-            name: 'floorPriceAtBorrow',
             type: 'uint256',
             internalType: 'uint256',
           },
@@ -661,12 +651,6 @@ export default [
         indexed: false,
         internalType: 'uint256',
       },
-      {
-        name: 'floorPriceAtBorrow_',
-        type: 'uint256',
-        indexed: false,
-        internalType: 'uint256',
-      },
     ],
     anonymous: false,
   },
@@ -688,18 +672,6 @@ export default [
       },
       {
         name: 'newLockedIssuanceTokens_',
-        type: 'uint256',
-        indexed: false,
-        internalType: 'uint256',
-      },
-      {
-        name: 'oldFloorPrice_',
-        type: 'uint256',
-        indexed: false,
-        internalType: 'uint256',
-      },
-      {
-        name: 'currentFloorPrice_',
         type: 'uint256',
         indexed: false,
         internalType: 'uint256',
@@ -874,11 +846,6 @@ export default [
   },
   {
     type: 'error',
-    name: 'Module__CreditFacility_FloorPriceNotIncreased',
-    inputs: [],
-  },
-  {
-    type: 'error',
     name: 'Module__CreditFacility_InsufficientCollateralForLeverage',
     inputs: [],
   },
@@ -960,6 +927,11 @@ export default [
   {
     type: 'error',
     name: 'Module__CreditFacility_NoSegmentsConfigured',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'Module__CreditFacility_NothingToRebalance',
     inputs: [],
   },
   {

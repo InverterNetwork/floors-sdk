@@ -502,4 +502,15 @@ export default [
     name: 'NotInitializing',
     inputs: [],
   },
+  {
+    type: 'error',
+    name: 'SafeERC20FailedOperation',
+    inputs: [
+      {
+        name: 'token',
+        type: 'address',
+        internalType: 'address',
+      },
+    ],
+  },
 ] as const
