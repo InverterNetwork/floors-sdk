@@ -115,12 +115,12 @@ export class Presale {
    * @returns Total issuance amount
    */
   public async getIssuanceBy(userAddress: Address): Promise<bigint> {
-    return (await this.publicClient.readContract({
+    return await this.publicClient.readContract({
       address: this.address,
       abi: Presale_v1,
       functionName: 'getIssuanceBy',
       args: [userAddress],
-    })) as bigint
+    })
   }
 
   /**
@@ -229,11 +229,11 @@ export class Presale {
    * @returns Total amount of tokens minted across all users
    */
   public async getGlobalIssuance(): Promise<bigint> {
-    return (await this.publicClient.readContract({
+    return await this.publicClient.readContract({
       address: this.address,
       abi: Presale_v1,
       functionName: 'getGlobalIssuance',
-    })) as bigint
+    })
   }
 
   /**
