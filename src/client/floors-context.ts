@@ -24,6 +24,14 @@ export type TFloorsTokenBalances = {
   reserve: TTokenBalanceContextValue
   issuance: TTokenBalanceContextValue
 }
+
+export type TFloorsConfig = {
+  /** FloorFactory contract address for creating new markets */
+  floorFactoryAddress?: Address
+  /** ModuleFactory contract address */
+  moduleFactoryAddress?: Address
+}
+
 export type TFloorsContextValue = {
   markets: UseQueryResult<TFloorAssetData[], Error>
   market: UseQueryResult<TFloorAssetData | null, Error>
@@ -35,6 +43,8 @@ export type TFloorsContextValue = {
   setSelectedPresaleId: (presaleId: string | null) => void
   balances: TFloorsTokenBalances
   userPosition: UseQueryResult<TUserMarketPositionData | null, Error>
+  /** Contract addresses and configuration */
+  config: TFloorsConfig
   refetch: {
     all: () => Promise<void>
     markets: () => Promise<void>

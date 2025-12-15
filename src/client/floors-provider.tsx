@@ -7,6 +7,7 @@ import { useAccount, useBalance } from 'wagmi'
 
 import {
   FloorsContext,
+  type TFloorsConfig,
   type TFloorsTokenBalances,
   type TTokenBalanceMetadata,
   useFloors,
@@ -26,6 +27,8 @@ type FloorsProviderProps = {
   marketsOptions?: UseMarketsQueryOptions
   marketOptions?: UseMarketQueryOptions
   presalesOptions?: UsePresalesQueryOptions
+  /** Contract addresses and configuration */
+  config?: TFloorsConfig
 }
 
 const toAddress = (value?: string | null): Address | null => {
@@ -41,6 +44,7 @@ export const FloorsProvider = ({
   marketsOptions,
   marketOptions,
   presalesOptions,
+  config = {},
 }: FloorsProviderProps): ReactElement => {
   const queryClient = useQueryClient()
   const [selectedMarketId, setSelectedMarketId] = useState<string | null>(null)
@@ -167,6 +171,7 @@ export const FloorsProvider = ({
       setSelectedPresaleId,
       balances,
       userPosition: userPositionQuery,
+      config,
       refetch,
     }),
     [
@@ -177,6 +182,7 @@ export const FloorsProvider = ({
       selectedPresaleId,
       balances,
       userPositionQuery,
+      config,
       refetch,
     ]
   )
@@ -205,6 +211,7 @@ export const useSetSelectedPresale = (presaleId?: string | null): void => {
 }
 
 export type {
+  TFloorsConfig,
   TFloorsContextValue,
   TFloorsTokenBalances,
   TTokenBalanceContextValue,
