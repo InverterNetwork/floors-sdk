@@ -252,7 +252,7 @@ export class MarketFactory {
     const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
 
     // Get the new market ID
-    const newMarketId = currentCounter + 1n
+    const newMarketId = currentCounter + BigInt(1)
 
     // Get the floor address from the factory
     const floorAddress = await this.getFloorByID(newMarketId)
@@ -462,7 +462,7 @@ export class MarketFactory {
 
     // Validate shares are positive
     for (const recipient of config.recipients) {
-      if (recipient.shares <= 0n) {
+      if (recipient.shares <= BigInt(0)) {
         throw new Error('All recipient shares must be positive')
       }
     }
@@ -506,7 +506,7 @@ export class MarketFactory {
     }
 
     for (const fee of config.baseCommissionBps) {
-      if (fee < 0n || fee > 10_000n) {
+      if (fee < BigInt(0) || fee > BigInt(10_000)) {
         throw new Error('Commission fees must be between 0 and 10000 basis points')
       }
     }
