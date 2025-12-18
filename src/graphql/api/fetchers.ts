@@ -5,7 +5,9 @@ import type {
   AccountsQueryType,
   GlobalStatsQueryType,
   LoansQueryType,
+  MarketSnapshotQueryType,
   MarketsQueryType,
+  PriceCandleQueryType,
   TAuthorizerRole,
   TCreditPositionData,
   TFloorAssetData,
@@ -27,14 +29,17 @@ import {
   globalStatsQuery,
   loansQuery,
   mapGlobalStats,
+  marketSnapshotQuery,
   marketsQuery,
   platformMetricsQuery,
+  priceCandleQuery,
   tradesQuery,
   userMarketPositionQuery,
 } from './fields'
 import {
   buildAccountUserPositions,
   buildCreditPositions,
+  mapMarketSnapshotToPremiumChange,
   mapMarketToFloorAssetData,
   mapPresaleToPresaleData,
   mapRolesToAuthorizerRoles,
@@ -74,6 +79,20 @@ export const buildGlobalStatsQuery = (args?: ExtendableQueryArgs<GlobalStatsQuer
 export const buildLoansQuery = (args?: ExtendableQueryArgs<LoansQueryType['Loan']['__args']>) => {
   const selection = cloneQuery(loansQuery)
   return mergeFieldArgs(selection, 'Loan', args)
+}
+
+export const buildMarketSnapshotQuery = (
+  args?: ExtendableQueryArgs<MarketSnapshotQueryType['MarketSnapshot']['__args']>
+) => {
+  const selection = cloneQuery(marketSnapshotQuery)
+  return mergeFieldArgs(selection, 'MarketSnapshot', args)
+}
+
+export const buildPriceCandleQuery = (
+  args?: ExtendableQueryArgs<PriceCandleQueryType['PriceCandle']['__args']>
+) => {
+  const selection = cloneQuery(priceCandleQuery)
+  return mergeFieldArgs(selection, 'PriceCandle', args)
 }
 
 export async function fetchMarkets(): Promise<TFloorAssetData[]> {
@@ -304,5 +323,43 @@ export async function fetchAllUserLoans(userAddress: string): Promise<TGraphQLLo
   } catch (error) {
     console.error('Error fetching all user loans:', error)
     return []
+  }
+}
+
+/**
+ * Fetch premium change 24h for a market
+ * @param marketId - The market ID
+ * @param currentMarketPrice - Current market price
+ * @param currentFloorPrice - Current floor price
+ * @returns Premium change percentage over 24 hours, or null if no historical data available
+ */
+export async function fetchPremiumChange24h(
+  marketId: string,
+  currentMarketPrice: number,
+  currentFloorPrice: number
+): Promise<number | null> {
+  try {
+    // Calculate 24 hours ago timestamp (in seconds)
+    const now = Math.floor(Date.now() / 1000)
+    const twentyFourHoursAgo = now - 86400 // 24 hours in seconds
+
+    // Query for MarketSnapshot closest to 24h ago
+    const snapshotResponse = await query(
+      buildMarketSnapshotQuery({
+        where: {
+          market_id: { _eq: marketId },
+          timestamp: { _lte: String(twentyFourHoursAgo) },
+        },
+        order_by: [{ timestamp: 'desc' }],
+        limit: 1,
+      })
+    )
+    const snapshot = snapshotResponse.MarketSnapshot?.[0]
+
+    // Use mapper to calculate premium change
+    return mapMarketSnapshotToPremiumChange(snapshot, currentMarketPrice, currentFloorPrice)
+  } catch (error) {
+    console.error('Error fetching premium change 24h:', error)
+    return null
   }
 }

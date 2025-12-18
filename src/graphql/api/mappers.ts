@@ -19,7 +19,13 @@ import type {
   TUserAssetPosition,
   TUserLoanData,
 } from './fields'
-import { buildSegments, safePercentage, toNumber } from './utils'
+import {
+  buildSegments,
+  calculatePremiumChange24h,
+  calculatePremiumRate,
+  safePercentage,
+  toNumber,
+} from './utils'
 
 export function mapMarketToFloorAssetData(
   market: TGraphQLMarket,
@@ -494,4 +500,50 @@ export function mapLoanToUserLoanData(loan: TGraphQLLoan): TUserLoanData {
  */
 export function mapLoansToUserLoanData(loans: TGraphQLLoan[]): TUserLoanData[] {
   return loans.map(mapLoanToUserLoanData)
+}
+
+/**
+ * @description Maps MarketSnapshot data to premium change 24h calculation
+ * @param snapshot - MarketSnapshot from GraphQL query result
+ * @param currentMarketPrice - Current market price
+ * @param currentFloorPrice - Current floor price
+ * @returns Premium change percentage over 24 hours, or null if calculation cannot be performed
+ */
+export function mapMarketSnapshotToPremiumChange(
+  snapshot:
+    | {
+        priceFormatted?: string | null
+        priceRaw?: string | number | null
+        floorPriceFormatted?: string | null
+        floorPriceRaw?: string | number | null
+      }
+    | null
+    | undefined,
+  currentMarketPrice: number,
+  currentFloorPrice: number
+): number | null {
+  if (!snapshot) {
+    return null
+  }
+
+  // Extract prices from snapshot
+  const price24hAgo = toNumber(snapshot.priceFormatted || snapshot.priceRaw)
+  const floorPrice24hAgo = toNumber(snapshot.floorPriceFormatted || snapshot.floorPriceRaw)
+
+  // Validate we have valid prices
+  if (
+    price24hAgo <= 0 ||
+    floorPrice24hAgo <= 0 ||
+    currentMarketPrice <= 0 ||
+    currentFloorPrice <= 0
+  ) {
+    return null
+  }
+
+  // Calculate premium rates
+  const currentPremiumRate = calculatePremiumRate(currentMarketPrice, currentFloorPrice)
+  const premiumRate24hAgo = calculatePremiumRate(price24hAgo, floorPrice24hAgo)
+
+  // Calculate and return change
+  return calculatePremiumChange24h(currentPremiumRate, premiumRate24hAgo)
 }

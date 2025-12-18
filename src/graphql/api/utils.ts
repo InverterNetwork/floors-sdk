@@ -81,3 +81,17 @@ export const mergeFieldArgs = <T extends Record<string, unknown>, K extends keyo
 export const calculatePremiumRate = (marketPrice: number, floorPrice: number) => {
   return ((marketPrice - floorPrice) / floorPrice) * 100
 }
+
+/**
+ * @description Calculates the premium change percentage over 24 hours.
+ * @param {number} currentPremiumRate - Current premium rate percentage
+ * @param {number} premiumRate24hAgo - Premium rate 24 hours ago percentage
+ * @returns {number} - Percentage change (positive = increase, negative = decrease)
+ */
+export const calculatePremiumChange24h = (
+  currentPremiumRate: number,
+  premiumRate24hAgo: number
+): number => {
+  if (premiumRate24hAgo === 0) return 0
+  return ((currentPremiumRate - premiumRate24hAgo) / Math.abs(premiumRate24hAgo)) * 100
+}
