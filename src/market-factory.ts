@@ -5,6 +5,7 @@
 
 import {
   type Address,
+  decodeEventLog,
   encodeAbiParameters,
   parseAbiParameters,
   type TransactionReceipt,
@@ -20,7 +21,7 @@ import {
   TREASURY_METADATA,
 } from './constants/metadata'
 import type { PopPublicClient, PopWalletClient } from './types'
-import { packSegments, type SegmentConfig, validateSegments } from './utils/segments'
+import { type SegmentConfig, validateSegments } from './utils/segments'
 
 // =============================================================================
 // Types
@@ -185,9 +186,6 @@ export class MarketFactory {
     // Validate inputs
     this.validateCreateMarketParams(params)
 
-    // Get current market ID counter (for extracting new market ID from event)
-    const currentCounter = await this.getFloorIDCounter()
-
     // Encode configs
     const floorConfig = this.buildModuleConfig(FLOOR_METADATA, this.encodeFloorConfig(params.floor))
     const authorizerConfig = this.buildModuleConfig(
@@ -251,17 +249,65 @@ export class MarketFactory {
 
     const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
 
-    // Get the new market ID
-    const newMarketId = currentCounter + BigInt(1)
+    // Check if transaction succeeded
+    if (receipt.status === 'reverted') {
+      throw new Error(
+        `createFloor transaction reverted. Hash: ${hash}. Check the transaction for details.`
+      )
+    }
 
-    // Get the floor address from the factory
-    const floorAddress = await this.getFloorByID(newMarketId)
+    // Parse FloorCreated event from transaction logs
+    // Event signature: FloorCreated(uint indexed floorId_, address indexed floorProxy_)
+    const floorCreatedEvent = this.parseFloorCreatedEvent(receipt)
+
+    if (!floorCreatedEvent) {
+      throw new Error('FloorCreated event not found in transaction receipt')
+    }
 
     return {
       receipt,
-      floorAddress,
-      marketId: newMarketId,
+      floorAddress: floorCreatedEvent.floorAddress,
+      marketId: floorCreatedEvent.floorId,
     }
+  }
+
+  /**
+   * @description Parse FloorCreated event from transaction receipt
+   */
+  private parseFloorCreatedEvent(
+    receipt: TransactionReceipt
+  ): { floorId: bigint; floorAddress: Address } | null {
+    // FloorCreated event ABI
+    const floorCreatedEventAbi = {
+      type: 'event',
+      name: 'FloorCreated',
+      inputs: [
+        { name: 'floorId_', type: 'uint256', indexed: true },
+        { name: 'floorProxy_', type: 'address', indexed: true },
+      ],
+    } as const
+
+    for (const log of receipt.logs) {
+      try {
+        const decoded = decodeEventLog({
+          abi: [floorCreatedEventAbi],
+          data: log.data,
+          topics: log.topics,
+        })
+
+        if (decoded.eventName === 'FloorCreated') {
+          return {
+            floorId: decoded.args.floorId_,
+            floorAddress: decoded.args.floorProxy_,
+          }
+        }
+      } catch {
+        // Not the event we're looking for, continue
+        continue
+      }
+    }
+
+    return null
   }
 
   /**
@@ -304,27 +350,55 @@ export class MarketFactory {
 
   /**
    * @description Encode Floor module configData
-   * Format: abi.encode(issuanceToken, reserveToken, segments[], buyFeeBps, sellFeeBps)
+   * Format: abi.encode(issuanceToken, reserveToken, PackedSegment[], buyFeeBps, sellFeeBps)
+   *
+   * PackedSegment is a bytes32 with bit-packed values:
+   * - initialPrice: 72 bits at offset 0
+   * - priceIncrease: 72 bits at offset 72
+   * - supplyPerStep: 96 bits at offset 144
+   * - numberOfSteps: 16 bits at offset 240
    */
   public encodeFloorConfig(config: FloorConfig): `0x${string}` {
     const allSegments = [config.floorSegment, ...config.premiumSegments]
-    const packedSegments = packSegments(allSegments)
 
-    // Encode as tuple matching contract expectation
-    // PackedSegment struct: { initialPrice, priceIncrease, supplyPerStep, numberOfSteps }
+    // Pack segments into bytes32 format matching contract's PackedSegment type
+    const packedSegmentBytes = allSegments.map((seg) => {
+      const initialPrice = BigInt(seg.initialPrice)
+      const priceIncrease = BigInt(seg.priceIncrease)
+      const supplyPerStep = BigInt(seg.supplyPerStep)
+      const numberOfSteps = BigInt(seg.numberOfSteps)
+
+      // Validate bit ranges
+      const INITIAL_PRICE_MAX = (BigInt(1) << BigInt(72)) - BigInt(1)
+      const PRICE_INCREASE_MAX = (BigInt(1) << BigInt(72)) - BigInt(1)
+      const SUPPLY_MAX = (BigInt(1) << BigInt(96)) - BigInt(1)
+      const STEPS_MAX = (BigInt(1) << BigInt(16)) - BigInt(1)
+
+      if (initialPrice > INITIAL_PRICE_MAX) throw new Error('Initial price exceeds 72-bit max')
+      if (priceIncrease > PRICE_INCREASE_MAX) throw new Error('Price increase exceeds 72-bit max')
+      if (supplyPerStep > SUPPLY_MAX) throw new Error('Supply per step exceeds 96-bit max')
+      if (numberOfSteps > STEPS_MAX) throw new Error('Number of steps exceeds 16-bit max')
+      if (numberOfSteps === BigInt(0)) throw new Error('Number of steps cannot be 0')
+
+      // Pack into bytes32: initialPrice | (priceIncrease << 72) | (supplyPerStep << 144) | (numberOfSteps << 240)
+      const packed =
+        initialPrice |
+        (priceIncrease << BigInt(72)) |
+        (supplyPerStep << BigInt(144)) |
+        (numberOfSteps << BigInt(240))
+
+      return packed
+    })
+
+    // Encode as: (address, address, bytes32[], uint256, uint256)
     return encodeAbiParameters(
       parseAbiParameters(
-        'address issuanceToken, address reserveToken, (uint256 initialPrice, uint256 priceIncrease, uint256 supplyPerStep, uint256 numberOfSteps)[] segments, uint256 buyFeeBps, uint256 sellFeeBps'
+        'address issuanceToken, address reserveToken, bytes32[] segments, uint256 buyFeeBps, uint256 sellFeeBps'
       ),
       [
         config.issuanceTokenAddress,
         config.reserveTokenAddress,
-        packedSegments.map((s) => ({
-          initialPrice: s.initialPrice,
-          priceIncrease: s.priceIncrease,
-          supplyPerStep: s.supplyPerStep,
-          numberOfSteps: s.numberOfSteps,
-        })),
+        packedSegmentBytes.map((p) => `0x${p.toString(16).padStart(64, '0')}` as `0x${string}`),
         BigInt(config.buyFeeBps),
         BigInt(config.sellFeeBps),
       ]
