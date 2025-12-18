@@ -1,1 +1,1 @@
-export const DEFAULT_GRAPHQL_URL = 'https://indexer.dev.hyperindex.xyz/009b3fe/v1/graphql'
+export const DEFAULT_GRAPHQL_URL = 'https://indexer.dev.hyperindex.xyz/ffec162/v1/graphql'
