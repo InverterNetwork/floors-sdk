@@ -86,21 +86,6 @@ export const marketsQuery = {
       db_write_timestamp: true,
       __typename: true,
     },
-    feeDistributions: {
-      __args: {
-        order_by: [{ timestamp: 'desc' }],
-        limit: 50,
-      },
-      id: true,
-      floorAmountRaw: true,
-      floorAmountFormatted: true,
-      stakingAmountRaw: true,
-      stakingAmountFormatted: true,
-      treasuryAmountRaw: true,
-      treasuryAmountFormatted: true,
-      timestamp: true,
-      transactionHash: true,
-    },
     __typename: true,
   },
 } satisfies GraphQLQueryArgs
@@ -165,7 +150,7 @@ export interface TComputedAssetData {
     estimatedFloorIncrease: number
   }
 
-  // Fee System (computed from tradingFeeBps and feeDistributions)
+  // Fee System (computed from tradingFeeBps, buyFeeBps, and sellFeeBps)
   fees: {
     buyFeeRate: number
     sellFeeRate: number

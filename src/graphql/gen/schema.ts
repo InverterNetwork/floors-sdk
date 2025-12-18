@@ -89,25 +89,45 @@ export interface CreditFacilityContract {
 export type CreditFacilityContract_select_column = 'borrowToken_id' | 'collateralToken_id' | 'createdAt' | 'db_write_timestamp' | 'id' | 'lastUpdatedAt' | 'market_id' | 'totalDebtFormatted' | 'totalDebtRaw' | 'totalLoans' | 'totalLockedCollateralFormatted' | 'totalLockedCollateralRaw' | 'totalVolumeFormatted' | 'totalVolumeRaw'
 
 
-/** columns and relationships of "FeeDistribution" */
-export interface FeeDistribution {
+/** columns and relationships of "FeeSplitterPayment" */
+export interface FeeSplitterPayment {
+    amountFormatted: Scalars['String']
+    amountRaw: Scalars['numeric']
     db_write_timestamp: (Scalars['timestamp'] | null)
-    floorAmountFormatted: Scalars['String']
-    floorAmountRaw: Scalars['numeric']
     id: Scalars['String']
+    isFloorFee: Scalars['Boolean']
     market_id: Scalars['String']
-    stakingAmountFormatted: Scalars['String']
-    stakingAmountRaw: Scalars['numeric']
+    recipient: Scalars['String']
     timestamp: Scalars['numeric']
+    token_id: Scalars['String']
     transactionHash: Scalars['String']
-    treasuryAmountFormatted: Scalars['String']
-    treasuryAmountRaw: Scalars['numeric']
-    __typename: 'FeeDistribution'
+    treasury_id: Scalars['String']
+    __typename: 'FeeSplitterPayment'
 }
 
 
-/** select columns of table "FeeDistribution" */
-export type FeeDistribution_select_column = 'db_write_timestamp' | 'floorAmountFormatted' | 'floorAmountRaw' | 'id' | 'market_id' | 'stakingAmountFormatted' | 'stakingAmountRaw' | 'timestamp' | 'transactionHash' | 'treasuryAmountFormatted' | 'treasuryAmountRaw'
+/** select columns of table "FeeSplitterPayment" */
+export type FeeSplitterPayment_select_column = 'amountFormatted' | 'amountRaw' | 'db_write_timestamp' | 'id' | 'isFloorFee' | 'market_id' | 'recipient' | 'timestamp' | 'token_id' | 'transactionHash' | 'treasury_id'
+
+
+/** columns and relationships of "FeeSplitterReceipt" */
+export interface FeeSplitterReceipt {
+    amountFormatted: Scalars['String']
+    amountRaw: Scalars['numeric']
+    db_write_timestamp: (Scalars['timestamp'] | null)
+    id: Scalars['String']
+    market_id: Scalars['String']
+    sender: Scalars['String']
+    timestamp: Scalars['numeric']
+    token_id: Scalars['String']
+    transactionHash: Scalars['String']
+    treasury_id: Scalars['String']
+    __typename: 'FeeSplitterReceipt'
+}
+
+
+/** select columns of table "FeeSplitterReceipt" */
+export type FeeSplitterReceipt_select_column = 'amountFormatted' | 'amountRaw' | 'db_write_timestamp' | 'id' | 'market_id' | 'sender' | 'timestamp' | 'token_id' | 'transactionHash' | 'treasury_id'
 
 
 /** columns and relationships of "FloorElevation" */
@@ -229,8 +249,6 @@ export interface Market {
     currentPriceRaw: Scalars['numeric']
     db_write_timestamp: (Scalars['timestamp'] | null)
     factory_id: Scalars['String']
-    /** An array relationship */
-    feeDistributions: FeeDistribution[]
     /** An array relationship */
     floorElevations: FloorElevation[]
     floorPriceFormatted: Scalars['String']
@@ -607,6 +625,30 @@ export interface Trade {
 export type Trade_select_column = 'db_write_timestamp' | 'feeFormatted' | 'feeRaw' | 'id' | 'market_id' | 'newPriceFormatted' | 'newPriceRaw' | 'reserveAmountFormatted' | 'reserveAmountRaw' | 'timestamp' | 'tokenAmountFormatted' | 'tokenAmountRaw' | 'tradeType' | 'transactionHash' | 'user_id'
 
 
+/** columns and relationships of "Treasury" */
+export interface Treasury {
+    createdAt: Scalars['numeric']
+    db_write_timestamp: (Scalars['timestamp'] | null)
+    /** An array relationship */
+    feeSplitterPayments: FeeSplitterPayment[]
+    /** An array relationship */
+    feeSplitterReceipts: FeeSplitterReceipt[]
+    id: Scalars['String']
+    lastUpdatedAt: Scalars['numeric']
+    market_id: Scalars['String']
+    totalFeesDistributedFormatted: Scalars['String']
+    totalFeesDistributedRaw: Scalars['numeric']
+    totalFeesReceivedFormatted: Scalars['String']
+    totalFeesReceivedRaw: Scalars['numeric']
+    treasuryAddress: Scalars['String']
+    __typename: 'Treasury'
+}
+
+
+/** select columns of table "Treasury" */
+export type Treasury_select_column = 'createdAt' | 'db_write_timestamp' | 'id' | 'lastUpdatedAt' | 'market_id' | 'totalFeesDistributedFormatted' | 'totalFeesDistributedRaw' | 'totalFeesReceivedFormatted' | 'totalFeesReceivedRaw' | 'treasuryAddress'
+
+
 /** columns and relationships of "UserMarketPosition" */
 export interface UserMarketPosition {
     claimableRewardsFormatted: Scalars['String']
@@ -740,10 +782,14 @@ export interface query_root {
     CreditFacilityContract: CreditFacilityContract[]
     /** fetch data from the table: "CreditFacilityContract" using primary key columns */
     CreditFacilityContract_by_pk: (CreditFacilityContract | null)
-    /** fetch data from the table: "FeeDistribution" */
-    FeeDistribution: FeeDistribution[]
-    /** fetch data from the table: "FeeDistribution" using primary key columns */
-    FeeDistribution_by_pk: (FeeDistribution | null)
+    /** fetch data from the table: "FeeSplitterPayment" */
+    FeeSplitterPayment: FeeSplitterPayment[]
+    /** fetch data from the table: "FeeSplitterPayment" using primary key columns */
+    FeeSplitterPayment_by_pk: (FeeSplitterPayment | null)
+    /** fetch data from the table: "FeeSplitterReceipt" */
+    FeeSplitterReceipt: FeeSplitterReceipt[]
+    /** fetch data from the table: "FeeSplitterReceipt" using primary key columns */
+    FeeSplitterReceipt_by_pk: (FeeSplitterReceipt | null)
     /** fetch data from the table: "FloorElevation" */
     FloorElevation: FloorElevation[]
     /** fetch data from the table: "FloorElevation" using primary key columns */
@@ -828,6 +874,10 @@ export interface query_root {
     Trade: Trade[]
     /** fetch data from the table: "Trade" using primary key columns */
     Trade_by_pk: (Trade | null)
+    /** fetch data from the table: "Treasury" */
+    Treasury: Treasury[]
+    /** fetch data from the table: "Treasury" using primary key columns */
+    Treasury_by_pk: (Treasury | null)
     /** fetch data from the table: "UserMarketPosition" */
     UserMarketPosition: UserMarketPosition[]
     /** fetch data from the table: "UserMarketPosition" using primary key columns */
@@ -902,12 +952,18 @@ export interface subscription_root {
     CreditFacilityContract_by_pk: (CreditFacilityContract | null)
     /** fetch data from the table in a streaming manner: "CreditFacilityContract" */
     CreditFacilityContract_stream: CreditFacilityContract[]
-    /** fetch data from the table: "FeeDistribution" */
-    FeeDistribution: FeeDistribution[]
-    /** fetch data from the table: "FeeDistribution" using primary key columns */
-    FeeDistribution_by_pk: (FeeDistribution | null)
-    /** fetch data from the table in a streaming manner: "FeeDistribution" */
-    FeeDistribution_stream: FeeDistribution[]
+    /** fetch data from the table: "FeeSplitterPayment" */
+    FeeSplitterPayment: FeeSplitterPayment[]
+    /** fetch data from the table: "FeeSplitterPayment" using primary key columns */
+    FeeSplitterPayment_by_pk: (FeeSplitterPayment | null)
+    /** fetch data from the table in a streaming manner: "FeeSplitterPayment" */
+    FeeSplitterPayment_stream: FeeSplitterPayment[]
+    /** fetch data from the table: "FeeSplitterReceipt" */
+    FeeSplitterReceipt: FeeSplitterReceipt[]
+    /** fetch data from the table: "FeeSplitterReceipt" using primary key columns */
+    FeeSplitterReceipt_by_pk: (FeeSplitterReceipt | null)
+    /** fetch data from the table in a streaming manner: "FeeSplitterReceipt" */
+    FeeSplitterReceipt_stream: FeeSplitterReceipt[]
     /** fetch data from the table: "FloorElevation" */
     FloorElevation: FloorElevation[]
     /** fetch data from the table: "FloorElevation" using primary key columns */
@@ -1034,6 +1090,12 @@ export interface subscription_root {
     Trade_by_pk: (Trade | null)
     /** fetch data from the table in a streaming manner: "Trade" */
     Trade_stream: Trade[]
+    /** fetch data from the table: "Treasury" */
+    Treasury: Treasury[]
+    /** fetch data from the table: "Treasury" using primary key columns */
+    Treasury_by_pk: (Treasury | null)
+    /** fetch data from the table in a streaming manner: "Treasury" */
+    Treasury_stream: Treasury[]
     /** fetch data from the table: "UserMarketPosition" */
     UserMarketPosition: UserMarketPosition[]
     /** fetch data from the table: "UserMarketPosition" using primary key columns */
@@ -1286,86 +1348,167 @@ ordering?: (cursor_ordering | null)}
 export interface CreditFacilityContract_stream_cursor_value_input {borrowToken_id?: (Scalars['String'] | null),collateralToken_id?: (Scalars['String'] | null),createdAt?: (Scalars['numeric'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),market_id?: (Scalars['String'] | null),totalDebtFormatted?: (Scalars['String'] | null),totalDebtRaw?: (Scalars['numeric'] | null),totalLoans?: (Scalars['numeric'] | null),totalLockedCollateralFormatted?: (Scalars['String'] | null),totalLockedCollateralRaw?: (Scalars['numeric'] | null),totalVolumeFormatted?: (Scalars['String'] | null),totalVolumeRaw?: (Scalars['numeric'] | null)}
 
 
-/** columns and relationships of "FeeDistribution" */
-export interface FeeDistributionGenqlSelection{
+/** columns and relationships of "FeeSplitterPayment" */
+export interface FeeSplitterPaymentGenqlSelection{
+    amountFormatted?: boolean | number
+    amountRaw?: boolean | number
     db_write_timestamp?: boolean | number
-    floorAmountFormatted?: boolean | number
-    floorAmountRaw?: boolean | number
     id?: boolean | number
+    isFloorFee?: boolean | number
     market_id?: boolean | number
-    stakingAmountFormatted?: boolean | number
-    stakingAmountRaw?: boolean | number
+    recipient?: boolean | number
     timestamp?: boolean | number
+    token_id?: boolean | number
     transactionHash?: boolean | number
-    treasuryAmountFormatted?: boolean | number
-    treasuryAmountRaw?: boolean | number
+    treasury_id?: boolean | number
     __typename?: boolean | number
     __scalar?: boolean | number
 }
 
 
-/** order by aggregate values of table "FeeDistribution" */
-export interface FeeDistribution_aggregate_order_by {avg?: (FeeDistribution_avg_order_by | null),count?: (order_by | null),max?: (FeeDistribution_max_order_by | null),min?: (FeeDistribution_min_order_by | null),stddev?: (FeeDistribution_stddev_order_by | null),stddev_pop?: (FeeDistribution_stddev_pop_order_by | null),stddev_samp?: (FeeDistribution_stddev_samp_order_by | null),sum?: (FeeDistribution_sum_order_by | null),var_pop?: (FeeDistribution_var_pop_order_by | null),var_samp?: (FeeDistribution_var_samp_order_by | null),variance?: (FeeDistribution_variance_order_by | null)}
+/** order by aggregate values of table "FeeSplitterPayment" */
+export interface FeeSplitterPayment_aggregate_order_by {avg?: (FeeSplitterPayment_avg_order_by | null),count?: (order_by | null),max?: (FeeSplitterPayment_max_order_by | null),min?: (FeeSplitterPayment_min_order_by | null),stddev?: (FeeSplitterPayment_stddev_order_by | null),stddev_pop?: (FeeSplitterPayment_stddev_pop_order_by | null),stddev_samp?: (FeeSplitterPayment_stddev_samp_order_by | null),sum?: (FeeSplitterPayment_sum_order_by | null),var_pop?: (FeeSplitterPayment_var_pop_order_by | null),var_samp?: (FeeSplitterPayment_var_samp_order_by | null),variance?: (FeeSplitterPayment_variance_order_by | null)}
 
 
-/** order by avg() on columns of table "FeeDistribution" */
-export interface FeeDistribution_avg_order_by {floorAmountRaw?: (order_by | null),stakingAmountRaw?: (order_by | null),timestamp?: (order_by | null),treasuryAmountRaw?: (order_by | null)}
+/** order by avg() on columns of table "FeeSplitterPayment" */
+export interface FeeSplitterPayment_avg_order_by {amountRaw?: (order_by | null),timestamp?: (order_by | null)}
 
 
-/** Boolean expression to filter rows from the table "FeeDistribution". All fields are combined with a logical 'AND'. */
-export interface FeeDistribution_bool_exp {_and?: (FeeDistribution_bool_exp[] | null),_not?: (FeeDistribution_bool_exp | null),_or?: (FeeDistribution_bool_exp[] | null),db_write_timestamp?: (timestamp_comparison_exp | null),floorAmountFormatted?: (String_comparison_exp | null),floorAmountRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),market_id?: (String_comparison_exp | null),stakingAmountFormatted?: (String_comparison_exp | null),stakingAmountRaw?: (numeric_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),transactionHash?: (String_comparison_exp | null),treasuryAmountFormatted?: (String_comparison_exp | null),treasuryAmountRaw?: (numeric_comparison_exp | null)}
+/** Boolean expression to filter rows from the table "FeeSplitterPayment". All fields are combined with a logical 'AND'. */
+export interface FeeSplitterPayment_bool_exp {_and?: (FeeSplitterPayment_bool_exp[] | null),_not?: (FeeSplitterPayment_bool_exp | null),_or?: (FeeSplitterPayment_bool_exp[] | null),amountFormatted?: (String_comparison_exp | null),amountRaw?: (numeric_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),id?: (String_comparison_exp | null),isFloorFee?: (Boolean_comparison_exp | null),market_id?: (String_comparison_exp | null),recipient?: (String_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),token_id?: (String_comparison_exp | null),transactionHash?: (String_comparison_exp | null),treasury_id?: (String_comparison_exp | null)}
 
 
-/** order by max() on columns of table "FeeDistribution" */
-export interface FeeDistribution_max_order_by {db_write_timestamp?: (order_by | null),floorAmountFormatted?: (order_by | null),floorAmountRaw?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),stakingAmountFormatted?: (order_by | null),stakingAmountRaw?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),treasuryAmountFormatted?: (order_by | null),treasuryAmountRaw?: (order_by | null)}
+/** order by max() on columns of table "FeeSplitterPayment" */
+export interface FeeSplitterPayment_max_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),recipient?: (order_by | null),timestamp?: (order_by | null),token_id?: (order_by | null),transactionHash?: (order_by | null),treasury_id?: (order_by | null)}
 
 
-/** order by min() on columns of table "FeeDistribution" */
-export interface FeeDistribution_min_order_by {db_write_timestamp?: (order_by | null),floorAmountFormatted?: (order_by | null),floorAmountRaw?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),stakingAmountFormatted?: (order_by | null),stakingAmountRaw?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),treasuryAmountFormatted?: (order_by | null),treasuryAmountRaw?: (order_by | null)}
+/** order by min() on columns of table "FeeSplitterPayment" */
+export interface FeeSplitterPayment_min_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),recipient?: (order_by | null),timestamp?: (order_by | null),token_id?: (order_by | null),transactionHash?: (order_by | null),treasury_id?: (order_by | null)}
 
 
-/** Ordering options when selecting data from "FeeDistribution". */
-export interface FeeDistribution_order_by {db_write_timestamp?: (order_by | null),floorAmountFormatted?: (order_by | null),floorAmountRaw?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),stakingAmountFormatted?: (order_by | null),stakingAmountRaw?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),treasuryAmountFormatted?: (order_by | null),treasuryAmountRaw?: (order_by | null)}
+/** Ordering options when selecting data from "FeeSplitterPayment". */
+export interface FeeSplitterPayment_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),isFloorFee?: (order_by | null),market_id?: (order_by | null),recipient?: (order_by | null),timestamp?: (order_by | null),token_id?: (order_by | null),transactionHash?: (order_by | null),treasury_id?: (order_by | null)}
 
 
-/** order by stddev() on columns of table "FeeDistribution" */
-export interface FeeDistribution_stddev_order_by {floorAmountRaw?: (order_by | null),stakingAmountRaw?: (order_by | null),timestamp?: (order_by | null),treasuryAmountRaw?: (order_by | null)}
+/** order by stddev() on columns of table "FeeSplitterPayment" */
+export interface FeeSplitterPayment_stddev_order_by {amountRaw?: (order_by | null),timestamp?: (order_by | null)}
 
 
-/** order by stddev_pop() on columns of table "FeeDistribution" */
-export interface FeeDistribution_stddev_pop_order_by {floorAmountRaw?: (order_by | null),stakingAmountRaw?: (order_by | null),timestamp?: (order_by | null),treasuryAmountRaw?: (order_by | null)}
+/** order by stddev_pop() on columns of table "FeeSplitterPayment" */
+export interface FeeSplitterPayment_stddev_pop_order_by {amountRaw?: (order_by | null),timestamp?: (order_by | null)}
 
 
-/** order by stddev_samp() on columns of table "FeeDistribution" */
-export interface FeeDistribution_stddev_samp_order_by {floorAmountRaw?: (order_by | null),stakingAmountRaw?: (order_by | null),timestamp?: (order_by | null),treasuryAmountRaw?: (order_by | null)}
+/** order by stddev_samp() on columns of table "FeeSplitterPayment" */
+export interface FeeSplitterPayment_stddev_samp_order_by {amountRaw?: (order_by | null),timestamp?: (order_by | null)}
 
 
-/** Streaming cursor of the table "FeeDistribution" */
-export interface FeeDistribution_stream_cursor_input {
+/** Streaming cursor of the table "FeeSplitterPayment" */
+export interface FeeSplitterPayment_stream_cursor_input {
 /** Stream column input with initial value */
-initial_value: FeeDistribution_stream_cursor_value_input,
+initial_value: FeeSplitterPayment_stream_cursor_value_input,
 /** cursor ordering */
 ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface FeeDistribution_stream_cursor_value_input {db_write_timestamp?: (Scalars['timestamp'] | null),floorAmountFormatted?: (Scalars['String'] | null),floorAmountRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),market_id?: (Scalars['String'] | null),stakingAmountFormatted?: (Scalars['String'] | null),stakingAmountRaw?: (Scalars['numeric'] | null),timestamp?: (Scalars['numeric'] | null),transactionHash?: (Scalars['String'] | null),treasuryAmountFormatted?: (Scalars['String'] | null),treasuryAmountRaw?: (Scalars['numeric'] | null)}
+export interface FeeSplitterPayment_stream_cursor_value_input {amountFormatted?: (Scalars['String'] | null),amountRaw?: (Scalars['numeric'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),id?: (Scalars['String'] | null),isFloorFee?: (Scalars['Boolean'] | null),market_id?: (Scalars['String'] | null),recipient?: (Scalars['String'] | null),timestamp?: (Scalars['numeric'] | null),token_id?: (Scalars['String'] | null),transactionHash?: (Scalars['String'] | null),treasury_id?: (Scalars['String'] | null)}
 
 
-/** order by sum() on columns of table "FeeDistribution" */
-export interface FeeDistribution_sum_order_by {floorAmountRaw?: (order_by | null),stakingAmountRaw?: (order_by | null),timestamp?: (order_by | null),treasuryAmountRaw?: (order_by | null)}
+/** order by sum() on columns of table "FeeSplitterPayment" */
+export interface FeeSplitterPayment_sum_order_by {amountRaw?: (order_by | null),timestamp?: (order_by | null)}
 
 
-/** order by var_pop() on columns of table "FeeDistribution" */
-export interface FeeDistribution_var_pop_order_by {floorAmountRaw?: (order_by | null),stakingAmountRaw?: (order_by | null),timestamp?: (order_by | null),treasuryAmountRaw?: (order_by | null)}
+/** order by var_pop() on columns of table "FeeSplitterPayment" */
+export interface FeeSplitterPayment_var_pop_order_by {amountRaw?: (order_by | null),timestamp?: (order_by | null)}
 
 
-/** order by var_samp() on columns of table "FeeDistribution" */
-export interface FeeDistribution_var_samp_order_by {floorAmountRaw?: (order_by | null),stakingAmountRaw?: (order_by | null),timestamp?: (order_by | null),treasuryAmountRaw?: (order_by | null)}
+/** order by var_samp() on columns of table "FeeSplitterPayment" */
+export interface FeeSplitterPayment_var_samp_order_by {amountRaw?: (order_by | null),timestamp?: (order_by | null)}
 
 
-/** order by variance() on columns of table "FeeDistribution" */
-export interface FeeDistribution_variance_order_by {floorAmountRaw?: (order_by | null),stakingAmountRaw?: (order_by | null),timestamp?: (order_by | null),treasuryAmountRaw?: (order_by | null)}
+/** order by variance() on columns of table "FeeSplitterPayment" */
+export interface FeeSplitterPayment_variance_order_by {amountRaw?: (order_by | null),timestamp?: (order_by | null)}
+
+
+/** columns and relationships of "FeeSplitterReceipt" */
+export interface FeeSplitterReceiptGenqlSelection{
+    amountFormatted?: boolean | number
+    amountRaw?: boolean | number
+    db_write_timestamp?: boolean | number
+    id?: boolean | number
+    market_id?: boolean | number
+    sender?: boolean | number
+    timestamp?: boolean | number
+    token_id?: boolean | number
+    transactionHash?: boolean | number
+    treasury_id?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+
+/** order by aggregate values of table "FeeSplitterReceipt" */
+export interface FeeSplitterReceipt_aggregate_order_by {avg?: (FeeSplitterReceipt_avg_order_by | null),count?: (order_by | null),max?: (FeeSplitterReceipt_max_order_by | null),min?: (FeeSplitterReceipt_min_order_by | null),stddev?: (FeeSplitterReceipt_stddev_order_by | null),stddev_pop?: (FeeSplitterReceipt_stddev_pop_order_by | null),stddev_samp?: (FeeSplitterReceipt_stddev_samp_order_by | null),sum?: (FeeSplitterReceipt_sum_order_by | null),var_pop?: (FeeSplitterReceipt_var_pop_order_by | null),var_samp?: (FeeSplitterReceipt_var_samp_order_by | null),variance?: (FeeSplitterReceipt_variance_order_by | null)}
+
+
+/** order by avg() on columns of table "FeeSplitterReceipt" */
+export interface FeeSplitterReceipt_avg_order_by {amountRaw?: (order_by | null),timestamp?: (order_by | null)}
+
+
+/** Boolean expression to filter rows from the table "FeeSplitterReceipt". All fields are combined with a logical 'AND'. */
+export interface FeeSplitterReceipt_bool_exp {_and?: (FeeSplitterReceipt_bool_exp[] | null),_not?: (FeeSplitterReceipt_bool_exp | null),_or?: (FeeSplitterReceipt_bool_exp[] | null),amountFormatted?: (String_comparison_exp | null),amountRaw?: (numeric_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),id?: (String_comparison_exp | null),market_id?: (String_comparison_exp | null),sender?: (String_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),token_id?: (String_comparison_exp | null),transactionHash?: (String_comparison_exp | null),treasury_id?: (String_comparison_exp | null)}
+
+
+/** order by max() on columns of table "FeeSplitterReceipt" */
+export interface FeeSplitterReceipt_max_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),sender?: (order_by | null),timestamp?: (order_by | null),token_id?: (order_by | null),transactionHash?: (order_by | null),treasury_id?: (order_by | null)}
+
+
+/** order by min() on columns of table "FeeSplitterReceipt" */
+export interface FeeSplitterReceipt_min_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),sender?: (order_by | null),timestamp?: (order_by | null),token_id?: (order_by | null),transactionHash?: (order_by | null),treasury_id?: (order_by | null)}
+
+
+/** Ordering options when selecting data from "FeeSplitterReceipt". */
+export interface FeeSplitterReceipt_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),sender?: (order_by | null),timestamp?: (order_by | null),token_id?: (order_by | null),transactionHash?: (order_by | null),treasury_id?: (order_by | null)}
+
+
+/** order by stddev() on columns of table "FeeSplitterReceipt" */
+export interface FeeSplitterReceipt_stddev_order_by {amountRaw?: (order_by | null),timestamp?: (order_by | null)}
+
+
+/** order by stddev_pop() on columns of table "FeeSplitterReceipt" */
+export interface FeeSplitterReceipt_stddev_pop_order_by {amountRaw?: (order_by | null),timestamp?: (order_by | null)}
+
+
+/** order by stddev_samp() on columns of table "FeeSplitterReceipt" */
+export interface FeeSplitterReceipt_stddev_samp_order_by {amountRaw?: (order_by | null),timestamp?: (order_by | null)}
+
+
+/** Streaming cursor of the table "FeeSplitterReceipt" */
+export interface FeeSplitterReceipt_stream_cursor_input {
+/** Stream column input with initial value */
+initial_value: FeeSplitterReceipt_stream_cursor_value_input,
+/** cursor ordering */
+ordering?: (cursor_ordering | null)}
+
+
+/** Initial value of the column from where the streaming should start */
+export interface FeeSplitterReceipt_stream_cursor_value_input {amountFormatted?: (Scalars['String'] | null),amountRaw?: (Scalars['numeric'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),id?: (Scalars['String'] | null),market_id?: (Scalars['String'] | null),sender?: (Scalars['String'] | null),timestamp?: (Scalars['numeric'] | null),token_id?: (Scalars['String'] | null),transactionHash?: (Scalars['String'] | null),treasury_id?: (Scalars['String'] | null)}
+
+
+/** order by sum() on columns of table "FeeSplitterReceipt" */
+export interface FeeSplitterReceipt_sum_order_by {amountRaw?: (order_by | null),timestamp?: (order_by | null)}
+
+
+/** order by var_pop() on columns of table "FeeSplitterReceipt" */
+export interface FeeSplitterReceipt_var_pop_order_by {amountRaw?: (order_by | null),timestamp?: (order_by | null)}
+
+
+/** order by var_samp() on columns of table "FeeSplitterReceipt" */
+export interface FeeSplitterReceipt_var_samp_order_by {amountRaw?: (order_by | null),timestamp?: (order_by | null)}
+
+
+/** order by variance() on columns of table "FeeSplitterReceipt" */
+export interface FeeSplitterReceipt_variance_order_by {amountRaw?: (order_by | null),timestamp?: (order_by | null)}
 
 
 /** columns and relationships of "FloorElevation" */
@@ -1727,18 +1870,6 @@ export interface MarketGenqlSelection{
     db_write_timestamp?: boolean | number
     factory_id?: boolean | number
     /** An array relationship */
-    feeDistributions?: (FeeDistributionGenqlSelection & { __args?: {
-    /** distinct select on columns */
-    distinct_on?: (FeeDistribution_select_column[] | null), 
-    /** limit the number of rows returned */
-    limit?: (Scalars['Int'] | null), 
-    /** skip the first n rows. Use only with order_by */
-    offset?: (Scalars['Int'] | null), 
-    /** sort the rows by one or more columns */
-    order_by?: (FeeDistribution_order_by[] | null), 
-    /** filter the rows returned */
-    where?: (FeeDistribution_bool_exp | null)} })
-    /** An array relationship */
     floorElevations?: (FloorElevationGenqlSelection & { __args?: {
     /** distinct select on columns */
     distinct_on?: (FloorElevation_select_column[] | null), 
@@ -1881,7 +2012,7 @@ export interface Market_avg_order_by {buyFeeBps?: (order_by | null),createdAt?: 
 
 
 /** Boolean expression to filter rows from the table "Market". All fields are combined with a logical 'AND'. */
-export interface Market_bool_exp {_and?: (Market_bool_exp[] | null),_not?: (Market_bool_exp | null),_or?: (Market_bool_exp[] | null),buyFeeBps?: (numeric_comparison_exp | null),createdAt?: (numeric_comparison_exp | null),creator_id?: (String_comparison_exp | null),currentPriceFormatted?: (String_comparison_exp | null),currentPriceRaw?: (numeric_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),factory_id?: (String_comparison_exp | null),feeDistributions?: (FeeDistribution_bool_exp | null),floorElevations?: (FloorElevation_bool_exp | null),floorPriceFormatted?: (String_comparison_exp | null),floorPriceRaw?: (numeric_comparison_exp | null),floorSupplyFormatted?: (String_comparison_exp | null),floorSupplyRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),initialFloorPriceFormatted?: (String_comparison_exp | null),initialFloorPriceRaw?: (numeric_comparison_exp | null),isBuyOpen?: (Boolean_comparison_exp | null),isSellOpen?: (Boolean_comparison_exp | null),issuanceToken?: (Token_bool_exp | null),issuanceToken_id?: (String_comparison_exp | null),lastElevationTimestamp?: (numeric_comparison_exp | null),lastTradeTimestamp?: (numeric_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),marketSupplyFormatted?: (String_comparison_exp | null),marketSupplyRaw?: (numeric_comparison_exp | null),maxLTV?: (numeric_comparison_exp | null),reserveToken?: (Token_bool_exp | null),reserveToken_id?: (String_comparison_exp | null),sellFeeBps?: (numeric_comparison_exp | null),status?: (marketstatus_comparison_exp | null),totalSupplyFormatted?: (String_comparison_exp | null),totalSupplyRaw?: (numeric_comparison_exp | null),trades?: (Trade_bool_exp | null),tradingFeeBps?: (numeric_comparison_exp | null)}
+export interface Market_bool_exp {_and?: (Market_bool_exp[] | null),_not?: (Market_bool_exp | null),_or?: (Market_bool_exp[] | null),buyFeeBps?: (numeric_comparison_exp | null),createdAt?: (numeric_comparison_exp | null),creator_id?: (String_comparison_exp | null),currentPriceFormatted?: (String_comparison_exp | null),currentPriceRaw?: (numeric_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),factory_id?: (String_comparison_exp | null),floorElevations?: (FloorElevation_bool_exp | null),floorPriceFormatted?: (String_comparison_exp | null),floorPriceRaw?: (numeric_comparison_exp | null),floorSupplyFormatted?: (String_comparison_exp | null),floorSupplyRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),initialFloorPriceFormatted?: (String_comparison_exp | null),initialFloorPriceRaw?: (numeric_comparison_exp | null),isBuyOpen?: (Boolean_comparison_exp | null),isSellOpen?: (Boolean_comparison_exp | null),issuanceToken?: (Token_bool_exp | null),issuanceToken_id?: (String_comparison_exp | null),lastElevationTimestamp?: (numeric_comparison_exp | null),lastTradeTimestamp?: (numeric_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),marketSupplyFormatted?: (String_comparison_exp | null),marketSupplyRaw?: (numeric_comparison_exp | null),maxLTV?: (numeric_comparison_exp | null),reserveToken?: (Token_bool_exp | null),reserveToken_id?: (String_comparison_exp | null),sellFeeBps?: (numeric_comparison_exp | null),status?: (marketstatus_comparison_exp | null),totalSupplyFormatted?: (String_comparison_exp | null),totalSupplyRaw?: (numeric_comparison_exp | null),trades?: (Trade_bool_exp | null),tradingFeeBps?: (numeric_comparison_exp | null)}
 
 
 /** order by max() on columns of table "Market" */
@@ -1893,7 +2024,7 @@ export interface Market_min_order_by {buyFeeBps?: (order_by | null),createdAt?: 
 
 
 /** Ordering options when selecting data from "Market". */
-export interface Market_order_by {buyFeeBps?: (order_by | null),createdAt?: (order_by | null),creator_id?: (order_by | null),currentPriceFormatted?: (order_by | null),currentPriceRaw?: (order_by | null),db_write_timestamp?: (order_by | null),factory_id?: (order_by | null),feeDistributions_aggregate?: (FeeDistribution_aggregate_order_by | null),floorElevations_aggregate?: (FloorElevation_aggregate_order_by | null),floorPriceFormatted?: (order_by | null),floorPriceRaw?: (order_by | null),floorSupplyFormatted?: (order_by | null),floorSupplyRaw?: (order_by | null),id?: (order_by | null),initialFloorPriceFormatted?: (order_by | null),initialFloorPriceRaw?: (order_by | null),isBuyOpen?: (order_by | null),isSellOpen?: (order_by | null),issuanceToken?: (Token_order_by | null),issuanceToken_id?: (order_by | null),lastElevationTimestamp?: (order_by | null),lastTradeTimestamp?: (order_by | null),lastUpdatedAt?: (order_by | null),marketSupplyFormatted?: (order_by | null),marketSupplyRaw?: (order_by | null),maxLTV?: (order_by | null),reserveToken?: (Token_order_by | null),reserveToken_id?: (order_by | null),sellFeeBps?: (order_by | null),status?: (order_by | null),totalSupplyFormatted?: (order_by | null),totalSupplyRaw?: (order_by | null),trades_aggregate?: (Trade_aggregate_order_by | null),tradingFeeBps?: (order_by | null)}
+export interface Market_order_by {buyFeeBps?: (order_by | null),createdAt?: (order_by | null),creator_id?: (order_by | null),currentPriceFormatted?: (order_by | null),currentPriceRaw?: (order_by | null),db_write_timestamp?: (order_by | null),factory_id?: (order_by | null),floorElevations_aggregate?: (FloorElevation_aggregate_order_by | null),floorPriceFormatted?: (order_by | null),floorPriceRaw?: (order_by | null),floorSupplyFormatted?: (order_by | null),floorSupplyRaw?: (order_by | null),id?: (order_by | null),initialFloorPriceFormatted?: (order_by | null),initialFloorPriceRaw?: (order_by | null),isBuyOpen?: (order_by | null),isSellOpen?: (order_by | null),issuanceToken?: (Token_order_by | null),issuanceToken_id?: (order_by | null),lastElevationTimestamp?: (order_by | null),lastTradeTimestamp?: (order_by | null),lastUpdatedAt?: (order_by | null),marketSupplyFormatted?: (order_by | null),marketSupplyRaw?: (order_by | null),maxLTV?: (order_by | null),reserveToken?: (Token_order_by | null),reserveToken_id?: (order_by | null),sellFeeBps?: (order_by | null),status?: (order_by | null),totalSupplyFormatted?: (order_by | null),totalSupplyRaw?: (order_by | null),trades_aggregate?: (Trade_aggregate_order_by | null),tradingFeeBps?: (order_by | null)}
 
 
 /** order by stddev() on columns of table "Market" */
@@ -2840,6 +2971,67 @@ export interface Trade_var_samp_order_by {feeRaw?: (order_by | null),newPriceRaw
 export interface Trade_variance_order_by {feeRaw?: (order_by | null),newPriceRaw?: (order_by | null),reserveAmountRaw?: (order_by | null),timestamp?: (order_by | null),tokenAmountRaw?: (order_by | null)}
 
 
+/** columns and relationships of "Treasury" */
+export interface TreasuryGenqlSelection{
+    createdAt?: boolean | number
+    db_write_timestamp?: boolean | number
+    /** An array relationship */
+    feeSplitterPayments?: (FeeSplitterPaymentGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (FeeSplitterPayment_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (FeeSplitterPayment_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (FeeSplitterPayment_bool_exp | null)} })
+    /** An array relationship */
+    feeSplitterReceipts?: (FeeSplitterReceiptGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (FeeSplitterReceipt_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (FeeSplitterReceipt_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (FeeSplitterReceipt_bool_exp | null)} })
+    id?: boolean | number
+    lastUpdatedAt?: boolean | number
+    market_id?: boolean | number
+    totalFeesDistributedFormatted?: boolean | number
+    totalFeesDistributedRaw?: boolean | number
+    totalFeesReceivedFormatted?: boolean | number
+    totalFeesReceivedRaw?: boolean | number
+    treasuryAddress?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+
+/** Boolean expression to filter rows from the table "Treasury". All fields are combined with a logical 'AND'. */
+export interface Treasury_bool_exp {_and?: (Treasury_bool_exp[] | null),_not?: (Treasury_bool_exp | null),_or?: (Treasury_bool_exp[] | null),createdAt?: (numeric_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),feeSplitterPayments?: (FeeSplitterPayment_bool_exp | null),feeSplitterReceipts?: (FeeSplitterReceipt_bool_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),market_id?: (String_comparison_exp | null),totalFeesDistributedFormatted?: (String_comparison_exp | null),totalFeesDistributedRaw?: (numeric_comparison_exp | null),totalFeesReceivedFormatted?: (String_comparison_exp | null),totalFeesReceivedRaw?: (numeric_comparison_exp | null),treasuryAddress?: (String_comparison_exp | null)}
+
+
+/** Ordering options when selecting data from "Treasury". */
+export interface Treasury_order_by {createdAt?: (order_by | null),db_write_timestamp?: (order_by | null),feeSplitterPayments_aggregate?: (FeeSplitterPayment_aggregate_order_by | null),feeSplitterReceipts_aggregate?: (FeeSplitterReceipt_aggregate_order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),market_id?: (order_by | null),totalFeesDistributedFormatted?: (order_by | null),totalFeesDistributedRaw?: (order_by | null),totalFeesReceivedFormatted?: (order_by | null),totalFeesReceivedRaw?: (order_by | null),treasuryAddress?: (order_by | null)}
+
+
+/** Streaming cursor of the table "Treasury" */
+export interface Treasury_stream_cursor_input {
+/** Stream column input with initial value */
+initial_value: Treasury_stream_cursor_value_input,
+/** cursor ordering */
+ordering?: (cursor_ordering | null)}
+
+
+/** Initial value of the column from where the streaming should start */
+export interface Treasury_stream_cursor_value_input {createdAt?: (Scalars['numeric'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),market_id?: (Scalars['String'] | null),totalFeesDistributedFormatted?: (Scalars['String'] | null),totalFeesDistributedRaw?: (Scalars['numeric'] | null),totalFeesReceivedFormatted?: (Scalars['String'] | null),totalFeesReceivedRaw?: (Scalars['numeric'] | null),treasuryAddress?: (Scalars['String'] | null)}
+
+
 /** columns and relationships of "UserMarketPosition" */
 export interface UserMarketPositionGenqlSelection{
     claimableRewardsFormatted?: boolean | number
@@ -3189,20 +3381,34 @@ export interface query_rootGenqlSelection{
     where?: (CreditFacilityContract_bool_exp | null)} })
     /** fetch data from the table: "CreditFacilityContract" using primary key columns */
     CreditFacilityContract_by_pk?: (CreditFacilityContractGenqlSelection & { __args: {id: Scalars['String']} })
-    /** fetch data from the table: "FeeDistribution" */
-    FeeDistribution?: (FeeDistributionGenqlSelection & { __args?: {
+    /** fetch data from the table: "FeeSplitterPayment" */
+    FeeSplitterPayment?: (FeeSplitterPaymentGenqlSelection & { __args?: {
     /** distinct select on columns */
-    distinct_on?: (FeeDistribution_select_column[] | null), 
+    distinct_on?: (FeeSplitterPayment_select_column[] | null), 
     /** limit the number of rows returned */
     limit?: (Scalars['Int'] | null), 
     /** skip the first n rows. Use only with order_by */
     offset?: (Scalars['Int'] | null), 
     /** sort the rows by one or more columns */
-    order_by?: (FeeDistribution_order_by[] | null), 
+    order_by?: (FeeSplitterPayment_order_by[] | null), 
     /** filter the rows returned */
-    where?: (FeeDistribution_bool_exp | null)} })
-    /** fetch data from the table: "FeeDistribution" using primary key columns */
-    FeeDistribution_by_pk?: (FeeDistributionGenqlSelection & { __args: {id: Scalars['String']} })
+    where?: (FeeSplitterPayment_bool_exp | null)} })
+    /** fetch data from the table: "FeeSplitterPayment" using primary key columns */
+    FeeSplitterPayment_by_pk?: (FeeSplitterPaymentGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table: "FeeSplitterReceipt" */
+    FeeSplitterReceipt?: (FeeSplitterReceiptGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (FeeSplitterReceipt_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (FeeSplitterReceipt_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (FeeSplitterReceipt_bool_exp | null)} })
+    /** fetch data from the table: "FeeSplitterReceipt" using primary key columns */
+    FeeSplitterReceipt_by_pk?: (FeeSplitterReceiptGenqlSelection & { __args: {id: Scalars['String']} })
     /** fetch data from the table: "FloorElevation" */
     FloorElevation?: (FloorElevationGenqlSelection & { __args?: {
     /** distinct select on columns */
@@ -3497,6 +3703,20 @@ export interface query_rootGenqlSelection{
     where?: (Trade_bool_exp | null)} })
     /** fetch data from the table: "Trade" using primary key columns */
     Trade_by_pk?: (TradeGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table: "Treasury" */
+    Treasury?: (TreasuryGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (Treasury_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (Treasury_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (Treasury_bool_exp | null)} })
+    /** fetch data from the table: "Treasury" using primary key columns */
+    Treasury_by_pk?: (TreasuryGenqlSelection & { __args: {id: Scalars['String']} })
     /** fetch data from the table: "UserMarketPosition" */
     UserMarketPosition?: (UserMarketPositionGenqlSelection & { __args?: {
     /** distinct select on columns */
@@ -3717,28 +3937,50 @@ export interface subscription_rootGenqlSelection{
     cursor: (CreditFacilityContract_stream_cursor_input | null)[], 
     /** filter the rows returned */
     where?: (CreditFacilityContract_bool_exp | null)} })
-    /** fetch data from the table: "FeeDistribution" */
-    FeeDistribution?: (FeeDistributionGenqlSelection & { __args?: {
+    /** fetch data from the table: "FeeSplitterPayment" */
+    FeeSplitterPayment?: (FeeSplitterPaymentGenqlSelection & { __args?: {
     /** distinct select on columns */
-    distinct_on?: (FeeDistribution_select_column[] | null), 
+    distinct_on?: (FeeSplitterPayment_select_column[] | null), 
     /** limit the number of rows returned */
     limit?: (Scalars['Int'] | null), 
     /** skip the first n rows. Use only with order_by */
     offset?: (Scalars['Int'] | null), 
     /** sort the rows by one or more columns */
-    order_by?: (FeeDistribution_order_by[] | null), 
+    order_by?: (FeeSplitterPayment_order_by[] | null), 
     /** filter the rows returned */
-    where?: (FeeDistribution_bool_exp | null)} })
-    /** fetch data from the table: "FeeDistribution" using primary key columns */
-    FeeDistribution_by_pk?: (FeeDistributionGenqlSelection & { __args: {id: Scalars['String']} })
-    /** fetch data from the table in a streaming manner: "FeeDistribution" */
-    FeeDistribution_stream?: (FeeDistributionGenqlSelection & { __args: {
+    where?: (FeeSplitterPayment_bool_exp | null)} })
+    /** fetch data from the table: "FeeSplitterPayment" using primary key columns */
+    FeeSplitterPayment_by_pk?: (FeeSplitterPaymentGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table in a streaming manner: "FeeSplitterPayment" */
+    FeeSplitterPayment_stream?: (FeeSplitterPaymentGenqlSelection & { __args: {
     /** maximum number of rows returned in a single batch */
     batch_size: Scalars['Int'], 
     /** cursor to stream the results returned by the query */
-    cursor: (FeeDistribution_stream_cursor_input | null)[], 
+    cursor: (FeeSplitterPayment_stream_cursor_input | null)[], 
     /** filter the rows returned */
-    where?: (FeeDistribution_bool_exp | null)} })
+    where?: (FeeSplitterPayment_bool_exp | null)} })
+    /** fetch data from the table: "FeeSplitterReceipt" */
+    FeeSplitterReceipt?: (FeeSplitterReceiptGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (FeeSplitterReceipt_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (FeeSplitterReceipt_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (FeeSplitterReceipt_bool_exp | null)} })
+    /** fetch data from the table: "FeeSplitterReceipt" using primary key columns */
+    FeeSplitterReceipt_by_pk?: (FeeSplitterReceiptGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table in a streaming manner: "FeeSplitterReceipt" */
+    FeeSplitterReceipt_stream?: (FeeSplitterReceiptGenqlSelection & { __args: {
+    /** maximum number of rows returned in a single batch */
+    batch_size: Scalars['Int'], 
+    /** cursor to stream the results returned by the query */
+    cursor: (FeeSplitterReceipt_stream_cursor_input | null)[], 
+    /** filter the rows returned */
+    where?: (FeeSplitterReceipt_bool_exp | null)} })
     /** fetch data from the table: "FloorElevation" */
     FloorElevation?: (FloorElevationGenqlSelection & { __args?: {
     /** distinct select on columns */
@@ -4201,6 +4443,28 @@ export interface subscription_rootGenqlSelection{
     cursor: (Trade_stream_cursor_input | null)[], 
     /** filter the rows returned */
     where?: (Trade_bool_exp | null)} })
+    /** fetch data from the table: "Treasury" */
+    Treasury?: (TreasuryGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (Treasury_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (Treasury_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (Treasury_bool_exp | null)} })
+    /** fetch data from the table: "Treasury" using primary key columns */
+    Treasury_by_pk?: (TreasuryGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table in a streaming manner: "Treasury" */
+    Treasury_stream?: (TreasuryGenqlSelection & { __args: {
+    /** maximum number of rows returned in a single batch */
+    batch_size: Scalars['Int'], 
+    /** cursor to stream the results returned by the query */
+    cursor: (Treasury_stream_cursor_input | null)[], 
+    /** filter the rows returned */
+    where?: (Treasury_bool_exp | null)} })
     /** fetch data from the table: "UserMarketPosition" */
     UserMarketPosition?: (UserMarketPositionGenqlSelection & { __args?: {
     /** distinct select on columns */
@@ -4399,10 +4663,18 @@ export type SubscriptionGenqlSelection = subscription_rootGenqlSelection
     
 
 
-    const FeeDistribution_possibleTypes: string[] = ['FeeDistribution']
-    export const isFeeDistribution = (obj?: { __typename?: any } | null): obj is FeeDistribution => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isFeeDistribution"')
-      return FeeDistribution_possibleTypes.includes(obj.__typename)
+    const FeeSplitterPayment_possibleTypes: string[] = ['FeeSplitterPayment']
+    export const isFeeSplitterPayment = (obj?: { __typename?: any } | null): obj is FeeSplitterPayment => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isFeeSplitterPayment"')
+      return FeeSplitterPayment_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const FeeSplitterReceipt_possibleTypes: string[] = ['FeeSplitterReceipt']
+    export const isFeeSplitterReceipt = (obj?: { __typename?: any } | null): obj is FeeSplitterReceipt => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isFeeSplitterReceipt"')
+      return FeeSplitterReceipt_possibleTypes.includes(obj.__typename)
     }
     
 
@@ -4575,6 +4847,14 @@ export type SubscriptionGenqlSelection = subscription_rootGenqlSelection
     
 
 
+    const Treasury_possibleTypes: string[] = ['Treasury']
+    export const isTreasury = (obj?: { __typename?: any } | null): obj is Treasury => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isTreasury"')
+      return Treasury_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
     const UserMarketPosition_possibleTypes: string[] = ['UserMarketPosition']
     export const isUserMarketPosition = (obj?: { __typename?: any } | null): obj is UserMarketPosition => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isUserMarketPosition"')
@@ -4677,18 +4957,31 @@ export const enumCreditFacilityContractSelectColumn = {
    totalVolumeRaw: 'totalVolumeRaw' as const
 }
 
-export const enumFeeDistributionSelectColumn = {
+export const enumFeeSplitterPaymentSelectColumn = {
+   amountFormatted: 'amountFormatted' as const,
+   amountRaw: 'amountRaw' as const,
    db_write_timestamp: 'db_write_timestamp' as const,
-   floorAmountFormatted: 'floorAmountFormatted' as const,
-   floorAmountRaw: 'floorAmountRaw' as const,
+   id: 'id' as const,
+   isFloorFee: 'isFloorFee' as const,
+   market_id: 'market_id' as const,
+   recipient: 'recipient' as const,
+   timestamp: 'timestamp' as const,
+   token_id: 'token_id' as const,
+   transactionHash: 'transactionHash' as const,
+   treasury_id: 'treasury_id' as const
+}
+
+export const enumFeeSplitterReceiptSelectColumn = {
+   amountFormatted: 'amountFormatted' as const,
+   amountRaw: 'amountRaw' as const,
+   db_write_timestamp: 'db_write_timestamp' as const,
    id: 'id' as const,
    market_id: 'market_id' as const,
-   stakingAmountFormatted: 'stakingAmountFormatted' as const,
-   stakingAmountRaw: 'stakingAmountRaw' as const,
+   sender: 'sender' as const,
    timestamp: 'timestamp' as const,
+   token_id: 'token_id' as const,
    transactionHash: 'transactionHash' as const,
-   treasuryAmountFormatted: 'treasuryAmountFormatted' as const,
-   treasuryAmountRaw: 'treasuryAmountRaw' as const
+   treasury_id: 'treasury_id' as const
 }
 
 export const enumFloorElevationSelectColumn = {
@@ -5013,6 +5306,19 @@ export const enumTradeSelectColumn = {
    tradeType: 'tradeType' as const,
    transactionHash: 'transactionHash' as const,
    user_id: 'user_id' as const
+}
+
+export const enumTreasurySelectColumn = {
+   createdAt: 'createdAt' as const,
+   db_write_timestamp: 'db_write_timestamp' as const,
+   id: 'id' as const,
+   lastUpdatedAt: 'lastUpdatedAt' as const,
+   market_id: 'market_id' as const,
+   totalFeesDistributedFormatted: 'totalFeesDistributedFormatted' as const,
+   totalFeesDistributedRaw: 'totalFeesDistributedRaw' as const,
+   totalFeesReceivedFormatted: 'totalFeesReceivedFormatted' as const,
+   totalFeesReceivedRaw: 'totalFeesReceivedRaw' as const,
+   treasuryAddress: 'treasuryAddress' as const
 }
 
 export const enumUserMarketPositionSelectColumn = {

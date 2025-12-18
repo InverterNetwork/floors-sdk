@@ -459,130 +459,352 @@ input CreditFacilityContract_stream_cursor_value_input {
 }
 
 """
-columns and relationships of "FeeDistribution"
+columns and relationships of "FeeSplitterPayment"
 """
-type FeeDistribution {
+type FeeSplitterPayment {
+  amountFormatted: String!
+  amountRaw: numeric!
   db_write_timestamp: timestamp
-  floorAmountFormatted: String!
-  floorAmountRaw: numeric!
   id: String!
+  isFloorFee: Boolean!
   market_id: String!
-  stakingAmountFormatted: String!
-  stakingAmountRaw: numeric!
+  recipient: String!
   timestamp: numeric!
+  token_id: String!
   transactionHash: String!
-  treasuryAmountFormatted: String!
-  treasuryAmountRaw: numeric!
+  treasury_id: String!
 }
 
 """
-order by aggregate values of table "FeeDistribution"
+order by aggregate values of table "FeeSplitterPayment"
 """
-input FeeDistribution_aggregate_order_by {
-  avg: FeeDistribution_avg_order_by
+input FeeSplitterPayment_aggregate_order_by {
+  avg: FeeSplitterPayment_avg_order_by
   count: order_by
-  max: FeeDistribution_max_order_by
-  min: FeeDistribution_min_order_by
-  stddev: FeeDistribution_stddev_order_by
-  stddev_pop: FeeDistribution_stddev_pop_order_by
-  stddev_samp: FeeDistribution_stddev_samp_order_by
-  sum: FeeDistribution_sum_order_by
-  var_pop: FeeDistribution_var_pop_order_by
-  var_samp: FeeDistribution_var_samp_order_by
-  variance: FeeDistribution_variance_order_by
+  max: FeeSplitterPayment_max_order_by
+  min: FeeSplitterPayment_min_order_by
+  stddev: FeeSplitterPayment_stddev_order_by
+  stddev_pop: FeeSplitterPayment_stddev_pop_order_by
+  stddev_samp: FeeSplitterPayment_stddev_samp_order_by
+  sum: FeeSplitterPayment_sum_order_by
+  var_pop: FeeSplitterPayment_var_pop_order_by
+  var_samp: FeeSplitterPayment_var_samp_order_by
+  variance: FeeSplitterPayment_variance_order_by
 }
 
 """
-order by avg() on columns of table "FeeDistribution"
+order by avg() on columns of table "FeeSplitterPayment"
 """
-input FeeDistribution_avg_order_by {
-  floorAmountRaw: order_by
-  stakingAmountRaw: order_by
+input FeeSplitterPayment_avg_order_by {
+  amountRaw: order_by
   timestamp: order_by
-  treasuryAmountRaw: order_by
 }
 
 """
-Boolean expression to filter rows from the table "FeeDistribution". All fields are combined with a logical 'AND'.
+Boolean expression to filter rows from the table "FeeSplitterPayment". All fields are combined with a logical 'AND'.
 """
-input FeeDistribution_bool_exp {
-  _and: [FeeDistribution_bool_exp!]
-  _not: FeeDistribution_bool_exp
-  _or: [FeeDistribution_bool_exp!]
+input FeeSplitterPayment_bool_exp {
+  _and: [FeeSplitterPayment_bool_exp!]
+  _not: FeeSplitterPayment_bool_exp
+  _or: [FeeSplitterPayment_bool_exp!]
+  amountFormatted: String_comparison_exp
+  amountRaw: numeric_comparison_exp
   db_write_timestamp: timestamp_comparison_exp
-  floorAmountFormatted: String_comparison_exp
-  floorAmountRaw: numeric_comparison_exp
   id: String_comparison_exp
+  isFloorFee: Boolean_comparison_exp
   market_id: String_comparison_exp
-  stakingAmountFormatted: String_comparison_exp
-  stakingAmountRaw: numeric_comparison_exp
+  recipient: String_comparison_exp
   timestamp: numeric_comparison_exp
+  token_id: String_comparison_exp
   transactionHash: String_comparison_exp
-  treasuryAmountFormatted: String_comparison_exp
-  treasuryAmountRaw: numeric_comparison_exp
+  treasury_id: String_comparison_exp
 }
 
 """
-order by max() on columns of table "FeeDistribution"
+order by max() on columns of table "FeeSplitterPayment"
 """
-input FeeDistribution_max_order_by {
+input FeeSplitterPayment_max_order_by {
+  amountFormatted: order_by
+  amountRaw: order_by
   db_write_timestamp: order_by
-  floorAmountFormatted: order_by
-  floorAmountRaw: order_by
   id: order_by
   market_id: order_by
-  stakingAmountFormatted: order_by
-  stakingAmountRaw: order_by
+  recipient: order_by
   timestamp: order_by
+  token_id: order_by
   transactionHash: order_by
-  treasuryAmountFormatted: order_by
-  treasuryAmountRaw: order_by
+  treasury_id: order_by
 }
 
 """
-order by min() on columns of table "FeeDistribution"
+order by min() on columns of table "FeeSplitterPayment"
 """
-input FeeDistribution_min_order_by {
+input FeeSplitterPayment_min_order_by {
+  amountFormatted: order_by
+  amountRaw: order_by
   db_write_timestamp: order_by
-  floorAmountFormatted: order_by
-  floorAmountRaw: order_by
   id: order_by
   market_id: order_by
-  stakingAmountFormatted: order_by
-  stakingAmountRaw: order_by
+  recipient: order_by
   timestamp: order_by
+  token_id: order_by
   transactionHash: order_by
-  treasuryAmountFormatted: order_by
-  treasuryAmountRaw: order_by
+  treasury_id: order_by
 }
 
-"""Ordering options when selecting data from "FeeDistribution"."""
-input FeeDistribution_order_by {
+"""Ordering options when selecting data from "FeeSplitterPayment"."""
+input FeeSplitterPayment_order_by {
+  amountFormatted: order_by
+  amountRaw: order_by
   db_write_timestamp: order_by
-  floorAmountFormatted: order_by
-  floorAmountRaw: order_by
   id: order_by
+  isFloorFee: order_by
   market_id: order_by
-  stakingAmountFormatted: order_by
-  stakingAmountRaw: order_by
+  recipient: order_by
   timestamp: order_by
+  token_id: order_by
   transactionHash: order_by
-  treasuryAmountFormatted: order_by
-  treasuryAmountRaw: order_by
+  treasury_id: order_by
 }
 
 """
-select columns of table "FeeDistribution"
+select columns of table "FeeSplitterPayment"
 """
-enum FeeDistribution_select_column {
+enum FeeSplitterPayment_select_column {
+  """column name"""
+  amountFormatted
+
+  """column name"""
+  amountRaw
+
   """column name"""
   db_write_timestamp
 
   """column name"""
-  floorAmountFormatted
+  id
 
   """column name"""
-  floorAmountRaw
+  isFloorFee
+
+  """column name"""
+  market_id
+
+  """column name"""
+  recipient
+
+  """column name"""
+  timestamp
+
+  """column name"""
+  token_id
+
+  """column name"""
+  transactionHash
+
+  """column name"""
+  treasury_id
+}
+
+"""
+order by stddev() on columns of table "FeeSplitterPayment"
+"""
+input FeeSplitterPayment_stddev_order_by {
+  amountRaw: order_by
+  timestamp: order_by
+}
+
+"""
+order by stddev_pop() on columns of table "FeeSplitterPayment"
+"""
+input FeeSplitterPayment_stddev_pop_order_by {
+  amountRaw: order_by
+  timestamp: order_by
+}
+
+"""
+order by stddev_samp() on columns of table "FeeSplitterPayment"
+"""
+input FeeSplitterPayment_stddev_samp_order_by {
+  amountRaw: order_by
+  timestamp: order_by
+}
+
+"""
+Streaming cursor of the table "FeeSplitterPayment"
+"""
+input FeeSplitterPayment_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: FeeSplitterPayment_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input FeeSplitterPayment_stream_cursor_value_input {
+  amountFormatted: String
+  amountRaw: numeric
+  db_write_timestamp: timestamp
+  id: String
+  isFloorFee: Boolean
+  market_id: String
+  recipient: String
+  timestamp: numeric
+  token_id: String
+  transactionHash: String
+  treasury_id: String
+}
+
+"""
+order by sum() on columns of table "FeeSplitterPayment"
+"""
+input FeeSplitterPayment_sum_order_by {
+  amountRaw: order_by
+  timestamp: order_by
+}
+
+"""
+order by var_pop() on columns of table "FeeSplitterPayment"
+"""
+input FeeSplitterPayment_var_pop_order_by {
+  amountRaw: order_by
+  timestamp: order_by
+}
+
+"""
+order by var_samp() on columns of table "FeeSplitterPayment"
+"""
+input FeeSplitterPayment_var_samp_order_by {
+  amountRaw: order_by
+  timestamp: order_by
+}
+
+"""
+order by variance() on columns of table "FeeSplitterPayment"
+"""
+input FeeSplitterPayment_variance_order_by {
+  amountRaw: order_by
+  timestamp: order_by
+}
+
+"""
+columns and relationships of "FeeSplitterReceipt"
+"""
+type FeeSplitterReceipt {
+  amountFormatted: String!
+  amountRaw: numeric!
+  db_write_timestamp: timestamp
+  id: String!
+  market_id: String!
+  sender: String!
+  timestamp: numeric!
+  token_id: String!
+  transactionHash: String!
+  treasury_id: String!
+}
+
+"""
+order by aggregate values of table "FeeSplitterReceipt"
+"""
+input FeeSplitterReceipt_aggregate_order_by {
+  avg: FeeSplitterReceipt_avg_order_by
+  count: order_by
+  max: FeeSplitterReceipt_max_order_by
+  min: FeeSplitterReceipt_min_order_by
+  stddev: FeeSplitterReceipt_stddev_order_by
+  stddev_pop: FeeSplitterReceipt_stddev_pop_order_by
+  stddev_samp: FeeSplitterReceipt_stddev_samp_order_by
+  sum: FeeSplitterReceipt_sum_order_by
+  var_pop: FeeSplitterReceipt_var_pop_order_by
+  var_samp: FeeSplitterReceipt_var_samp_order_by
+  variance: FeeSplitterReceipt_variance_order_by
+}
+
+"""
+order by avg() on columns of table "FeeSplitterReceipt"
+"""
+input FeeSplitterReceipt_avg_order_by {
+  amountRaw: order_by
+  timestamp: order_by
+}
+
+"""
+Boolean expression to filter rows from the table "FeeSplitterReceipt". All fields are combined with a logical 'AND'.
+"""
+input FeeSplitterReceipt_bool_exp {
+  _and: [FeeSplitterReceipt_bool_exp!]
+  _not: FeeSplitterReceipt_bool_exp
+  _or: [FeeSplitterReceipt_bool_exp!]
+  amountFormatted: String_comparison_exp
+  amountRaw: numeric_comparison_exp
+  db_write_timestamp: timestamp_comparison_exp
+  id: String_comparison_exp
+  market_id: String_comparison_exp
+  sender: String_comparison_exp
+  timestamp: numeric_comparison_exp
+  token_id: String_comparison_exp
+  transactionHash: String_comparison_exp
+  treasury_id: String_comparison_exp
+}
+
+"""
+order by max() on columns of table "FeeSplitterReceipt"
+"""
+input FeeSplitterReceipt_max_order_by {
+  amountFormatted: order_by
+  amountRaw: order_by
+  db_write_timestamp: order_by
+  id: order_by
+  market_id: order_by
+  sender: order_by
+  timestamp: order_by
+  token_id: order_by
+  transactionHash: order_by
+  treasury_id: order_by
+}
+
+"""
+order by min() on columns of table "FeeSplitterReceipt"
+"""
+input FeeSplitterReceipt_min_order_by {
+  amountFormatted: order_by
+  amountRaw: order_by
+  db_write_timestamp: order_by
+  id: order_by
+  market_id: order_by
+  sender: order_by
+  timestamp: order_by
+  token_id: order_by
+  transactionHash: order_by
+  treasury_id: order_by
+}
+
+"""Ordering options when selecting data from "FeeSplitterReceipt"."""
+input FeeSplitterReceipt_order_by {
+  amountFormatted: order_by
+  amountRaw: order_by
+  db_write_timestamp: order_by
+  id: order_by
+  market_id: order_by
+  sender: order_by
+  timestamp: order_by
+  token_id: order_by
+  transactionHash: order_by
+  treasury_id: order_by
+}
+
+"""
+select columns of table "FeeSplitterReceipt"
+"""
+enum FeeSplitterReceipt_select_column {
+  """column name"""
+  amountFormatted
+
+  """column name"""
+  amountRaw
+
+  """column name"""
+  db_write_timestamp
 
   """column name"""
   id
@@ -591,118 +813,100 @@ enum FeeDistribution_select_column {
   market_id
 
   """column name"""
-  stakingAmountFormatted
-
-  """column name"""
-  stakingAmountRaw
+  sender
 
   """column name"""
   timestamp
 
   """column name"""
+  token_id
+
+  """column name"""
   transactionHash
 
   """column name"""
-  treasuryAmountFormatted
-
-  """column name"""
-  treasuryAmountRaw
+  treasury_id
 }
 
 """
-order by stddev() on columns of table "FeeDistribution"
+order by stddev() on columns of table "FeeSplitterReceipt"
 """
-input FeeDistribution_stddev_order_by {
-  floorAmountRaw: order_by
-  stakingAmountRaw: order_by
+input FeeSplitterReceipt_stddev_order_by {
+  amountRaw: order_by
   timestamp: order_by
-  treasuryAmountRaw: order_by
 }
 
 """
-order by stddev_pop() on columns of table "FeeDistribution"
+order by stddev_pop() on columns of table "FeeSplitterReceipt"
 """
-input FeeDistribution_stddev_pop_order_by {
-  floorAmountRaw: order_by
-  stakingAmountRaw: order_by
+input FeeSplitterReceipt_stddev_pop_order_by {
+  amountRaw: order_by
   timestamp: order_by
-  treasuryAmountRaw: order_by
 }
 
 """
-order by stddev_samp() on columns of table "FeeDistribution"
+order by stddev_samp() on columns of table "FeeSplitterReceipt"
 """
-input FeeDistribution_stddev_samp_order_by {
-  floorAmountRaw: order_by
-  stakingAmountRaw: order_by
+input FeeSplitterReceipt_stddev_samp_order_by {
+  amountRaw: order_by
   timestamp: order_by
-  treasuryAmountRaw: order_by
 }
 
 """
-Streaming cursor of the table "FeeDistribution"
+Streaming cursor of the table "FeeSplitterReceipt"
 """
-input FeeDistribution_stream_cursor_input {
+input FeeSplitterReceipt_stream_cursor_input {
   """Stream column input with initial value"""
-  initial_value: FeeDistribution_stream_cursor_value_input!
+  initial_value: FeeSplitterReceipt_stream_cursor_value_input!
 
   """cursor ordering"""
   ordering: cursor_ordering
 }
 
 """Initial value of the column from where the streaming should start"""
-input FeeDistribution_stream_cursor_value_input {
+input FeeSplitterReceipt_stream_cursor_value_input {
+  amountFormatted: String
+  amountRaw: numeric
   db_write_timestamp: timestamp
-  floorAmountFormatted: String
-  floorAmountRaw: numeric
   id: String
   market_id: String
-  stakingAmountFormatted: String
-  stakingAmountRaw: numeric
+  sender: String
   timestamp: numeric
+  token_id: String
   transactionHash: String
-  treasuryAmountFormatted: String
-  treasuryAmountRaw: numeric
+  treasury_id: String
 }
 
 """
-order by sum() on columns of table "FeeDistribution"
+order by sum() on columns of table "FeeSplitterReceipt"
 """
-input FeeDistribution_sum_order_by {
-  floorAmountRaw: order_by
-  stakingAmountRaw: order_by
+input FeeSplitterReceipt_sum_order_by {
+  amountRaw: order_by
   timestamp: order_by
-  treasuryAmountRaw: order_by
 }
 
 """
-order by var_pop() on columns of table "FeeDistribution"
+order by var_pop() on columns of table "FeeSplitterReceipt"
 """
-input FeeDistribution_var_pop_order_by {
-  floorAmountRaw: order_by
-  stakingAmountRaw: order_by
+input FeeSplitterReceipt_var_pop_order_by {
+  amountRaw: order_by
   timestamp: order_by
-  treasuryAmountRaw: order_by
 }
 
 """
-order by var_samp() on columns of table "FeeDistribution"
+order by var_samp() on columns of table "FeeSplitterReceipt"
 """
-input FeeDistribution_var_samp_order_by {
-  floorAmountRaw: order_by
-  stakingAmountRaw: order_by
+input FeeSplitterReceipt_var_samp_order_by {
+  amountRaw: order_by
   timestamp: order_by
-  treasuryAmountRaw: order_by
 }
 
 """
-order by variance() on columns of table "FeeDistribution"
+order by variance() on columns of table "FeeSplitterReceipt"
 """
-input FeeDistribution_variance_order_by {
-  floorAmountRaw: order_by
-  stakingAmountRaw: order_by
+input FeeSplitterReceipt_variance_order_by {
+  amountRaw: order_by
   timestamp: order_by
-  treasuryAmountRaw: order_by
 }
 
 """
@@ -1807,24 +2011,6 @@ type Market {
   factory_id: String!
 
   """An array relationship"""
-  feeDistributions(
-    """distinct select on columns"""
-    distinct_on: [FeeDistribution_select_column!]
-
-    """limit the number of rows returned"""
-    limit: Int
-
-    """skip the first n rows. Use only with order_by"""
-    offset: Int
-
-    """sort the rows by one or more columns"""
-    order_by: [FeeDistribution_order_by!]
-
-    """filter the rows returned"""
-    where: FeeDistribution_bool_exp
-  ): [FeeDistribution!]!
-
-  """An array relationship"""
   floorElevations(
     """distinct select on columns"""
     distinct_on: [FloorElevation_select_column!]
@@ -2193,7 +2379,6 @@ input Market_bool_exp {
   currentPriceRaw: numeric_comparison_exp
   db_write_timestamp: timestamp_comparison_exp
   factory_id: String_comparison_exp
-  feeDistributions: FeeDistribution_bool_exp
   floorElevations: FloorElevation_bool_exp
   floorPriceFormatted: String_comparison_exp
   floorPriceRaw: numeric_comparison_exp
@@ -2297,7 +2482,6 @@ input Market_order_by {
   currentPriceRaw: order_by
   db_write_timestamp: order_by
   factory_id: order_by
-  feeDistributions_aggregate: FeeDistribution_aggregate_order_by
   floorElevations_aggregate: FloorElevation_aggregate_order_by
   floorPriceFormatted: order_by
   floorPriceRaw: order_by
@@ -5205,6 +5389,155 @@ input Trade_variance_order_by {
 }
 
 """
+columns and relationships of "Treasury"
+"""
+type Treasury {
+  createdAt: numeric!
+  db_write_timestamp: timestamp
+
+  """An array relationship"""
+  feeSplitterPayments(
+    """distinct select on columns"""
+    distinct_on: [FeeSplitterPayment_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [FeeSplitterPayment_order_by!]
+
+    """filter the rows returned"""
+    where: FeeSplitterPayment_bool_exp
+  ): [FeeSplitterPayment!]!
+
+  """An array relationship"""
+  feeSplitterReceipts(
+    """distinct select on columns"""
+    distinct_on: [FeeSplitterReceipt_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [FeeSplitterReceipt_order_by!]
+
+    """filter the rows returned"""
+    where: FeeSplitterReceipt_bool_exp
+  ): [FeeSplitterReceipt!]!
+  id: String!
+  lastUpdatedAt: numeric!
+  market_id: String!
+  totalFeesDistributedFormatted: String!
+  totalFeesDistributedRaw: numeric!
+  totalFeesReceivedFormatted: String!
+  totalFeesReceivedRaw: numeric!
+  treasuryAddress: String!
+}
+
+"""
+Boolean expression to filter rows from the table "Treasury". All fields are combined with a logical 'AND'.
+"""
+input Treasury_bool_exp {
+  _and: [Treasury_bool_exp!]
+  _not: Treasury_bool_exp
+  _or: [Treasury_bool_exp!]
+  createdAt: numeric_comparison_exp
+  db_write_timestamp: timestamp_comparison_exp
+  feeSplitterPayments: FeeSplitterPayment_bool_exp
+  feeSplitterReceipts: FeeSplitterReceipt_bool_exp
+  id: String_comparison_exp
+  lastUpdatedAt: numeric_comparison_exp
+  market_id: String_comparison_exp
+  totalFeesDistributedFormatted: String_comparison_exp
+  totalFeesDistributedRaw: numeric_comparison_exp
+  totalFeesReceivedFormatted: String_comparison_exp
+  totalFeesReceivedRaw: numeric_comparison_exp
+  treasuryAddress: String_comparison_exp
+}
+
+"""Ordering options when selecting data from "Treasury"."""
+input Treasury_order_by {
+  createdAt: order_by
+  db_write_timestamp: order_by
+  feeSplitterPayments_aggregate: FeeSplitterPayment_aggregate_order_by
+  feeSplitterReceipts_aggregate: FeeSplitterReceipt_aggregate_order_by
+  id: order_by
+  lastUpdatedAt: order_by
+  market_id: order_by
+  totalFeesDistributedFormatted: order_by
+  totalFeesDistributedRaw: order_by
+  totalFeesReceivedFormatted: order_by
+  totalFeesReceivedRaw: order_by
+  treasuryAddress: order_by
+}
+
+"""
+select columns of table "Treasury"
+"""
+enum Treasury_select_column {
+  """column name"""
+  createdAt
+
+  """column name"""
+  db_write_timestamp
+
+  """column name"""
+  id
+
+  """column name"""
+  lastUpdatedAt
+
+  """column name"""
+  market_id
+
+  """column name"""
+  totalFeesDistributedFormatted
+
+  """column name"""
+  totalFeesDistributedRaw
+
+  """column name"""
+  totalFeesReceivedFormatted
+
+  """column name"""
+  totalFeesReceivedRaw
+
+  """column name"""
+  treasuryAddress
+}
+
+"""
+Streaming cursor of the table "Treasury"
+"""
+input Treasury_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: Treasury_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input Treasury_stream_cursor_value_input {
+  createdAt: numeric
+  db_write_timestamp: timestamp
+  id: String
+  lastUpdatedAt: numeric
+  market_id: String
+  totalFeesDistributedFormatted: String
+  totalFeesDistributedRaw: numeric
+  totalFeesReceivedFormatted: String
+  totalFeesReceivedRaw: numeric
+  treasuryAddress: String
+}
+
+"""
 columns and relationships of "UserMarketPosition"
 """
 type UserMarketPosition {
@@ -6252,11 +6585,11 @@ type query_root {
   CreditFacilityContract_by_pk(id: String!): CreditFacilityContract
 
   """
-  fetch data from the table: "FeeDistribution"
+  fetch data from the table: "FeeSplitterPayment"
   """
-  FeeDistribution(
+  FeeSplitterPayment(
     """distinct select on columns"""
-    distinct_on: [FeeDistribution_select_column!]
+    distinct_on: [FeeSplitterPayment_select_column!]
 
     """limit the number of rows returned"""
     limit: Int
@@ -6265,14 +6598,41 @@ type query_root {
     offset: Int
 
     """sort the rows by one or more columns"""
-    order_by: [FeeDistribution_order_by!]
+    order_by: [FeeSplitterPayment_order_by!]
 
     """filter the rows returned"""
-    where: FeeDistribution_bool_exp
-  ): [FeeDistribution!]!
+    where: FeeSplitterPayment_bool_exp
+  ): [FeeSplitterPayment!]!
 
-  """fetch data from the table: "FeeDistribution" using primary key columns"""
-  FeeDistribution_by_pk(id: String!): FeeDistribution
+  """
+  fetch data from the table: "FeeSplitterPayment" using primary key columns
+  """
+  FeeSplitterPayment_by_pk(id: String!): FeeSplitterPayment
+
+  """
+  fetch data from the table: "FeeSplitterReceipt"
+  """
+  FeeSplitterReceipt(
+    """distinct select on columns"""
+    distinct_on: [FeeSplitterReceipt_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [FeeSplitterReceipt_order_by!]
+
+    """filter the rows returned"""
+    where: FeeSplitterReceipt_bool_exp
+  ): [FeeSplitterReceipt!]!
+
+  """
+  fetch data from the table: "FeeSplitterReceipt" using primary key columns
+  """
+  FeeSplitterReceipt_by_pk(id: String!): FeeSplitterReceipt
 
   """
   fetch data from the table: "FloorElevation"
@@ -6764,6 +7124,29 @@ type query_root {
   Trade_by_pk(id: String!): Trade
 
   """
+  fetch data from the table: "Treasury"
+  """
+  Treasury(
+    """distinct select on columns"""
+    distinct_on: [Treasury_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [Treasury_order_by!]
+
+    """filter the rows returned"""
+    where: Treasury_bool_exp
+  ): [Treasury!]!
+
+  """fetch data from the table: "Treasury" using primary key columns"""
+  Treasury_by_pk(id: String!): Treasury
+
+  """
   fetch data from the table: "UserMarketPosition"
   """
   UserMarketPosition(
@@ -7213,11 +7596,11 @@ type subscription_root {
   ): [CreditFacilityContract!]!
 
   """
-  fetch data from the table: "FeeDistribution"
+  fetch data from the table: "FeeSplitterPayment"
   """
-  FeeDistribution(
+  FeeSplitterPayment(
     """distinct select on columns"""
-    distinct_on: [FeeDistribution_select_column!]
+    distinct_on: [FeeSplitterPayment_select_column!]
 
     """limit the number of rows returned"""
     limit: Int
@@ -7226,28 +7609,69 @@ type subscription_root {
     offset: Int
 
     """sort the rows by one or more columns"""
-    order_by: [FeeDistribution_order_by!]
+    order_by: [FeeSplitterPayment_order_by!]
 
     """filter the rows returned"""
-    where: FeeDistribution_bool_exp
-  ): [FeeDistribution!]!
-
-  """fetch data from the table: "FeeDistribution" using primary key columns"""
-  FeeDistribution_by_pk(id: String!): FeeDistribution
+    where: FeeSplitterPayment_bool_exp
+  ): [FeeSplitterPayment!]!
 
   """
-  fetch data from the table in a streaming manner: "FeeDistribution"
+  fetch data from the table: "FeeSplitterPayment" using primary key columns
   """
-  FeeDistribution_stream(
+  FeeSplitterPayment_by_pk(id: String!): FeeSplitterPayment
+
+  """
+  fetch data from the table in a streaming manner: "FeeSplitterPayment"
+  """
+  FeeSplitterPayment_stream(
     """maximum number of rows returned in a single batch"""
     batch_size: Int!
 
     """cursor to stream the results returned by the query"""
-    cursor: [FeeDistribution_stream_cursor_input]!
+    cursor: [FeeSplitterPayment_stream_cursor_input]!
 
     """filter the rows returned"""
-    where: FeeDistribution_bool_exp
-  ): [FeeDistribution!]!
+    where: FeeSplitterPayment_bool_exp
+  ): [FeeSplitterPayment!]!
+
+  """
+  fetch data from the table: "FeeSplitterReceipt"
+  """
+  FeeSplitterReceipt(
+    """distinct select on columns"""
+    distinct_on: [FeeSplitterReceipt_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [FeeSplitterReceipt_order_by!]
+
+    """filter the rows returned"""
+    where: FeeSplitterReceipt_bool_exp
+  ): [FeeSplitterReceipt!]!
+
+  """
+  fetch data from the table: "FeeSplitterReceipt" using primary key columns
+  """
+  FeeSplitterReceipt_by_pk(id: String!): FeeSplitterReceipt
+
+  """
+  fetch data from the table in a streaming manner: "FeeSplitterReceipt"
+  """
+  FeeSplitterReceipt_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [FeeSplitterReceipt_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: FeeSplitterReceipt_bool_exp
+  ): [FeeSplitterReceipt!]!
 
   """
   fetch data from the table: "FloorElevation"
@@ -8031,6 +8455,43 @@ type subscription_root {
     """filter the rows returned"""
     where: Trade_bool_exp
   ): [Trade!]!
+
+  """
+  fetch data from the table: "Treasury"
+  """
+  Treasury(
+    """distinct select on columns"""
+    distinct_on: [Treasury_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [Treasury_order_by!]
+
+    """filter the rows returned"""
+    where: Treasury_bool_exp
+  ): [Treasury!]!
+
+  """fetch data from the table: "Treasury" using primary key columns"""
+  Treasury_by_pk(id: String!): Treasury
+
+  """
+  fetch data from the table in a streaming manner: "Treasury"
+  """
+  Treasury_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [Treasury_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: Treasury_bool_exp
+  ): [Treasury!]!
 
   """
   fetch data from the table: "UserMarketPosition"
