@@ -21,7 +21,6 @@ export const tradesQuery = {
     newPriceFormatted: true,
     timestamp: true,
     transactionHash: true,
-    db_write_timestamp: true,
     __typename: true,
   },
 } satisfies GraphQLQueryArgs

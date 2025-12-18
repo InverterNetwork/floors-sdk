@@ -16,7 +16,6 @@ directive @cached(
 columns and relationships of "Account"
 """
 type Account {
-  db_write_timestamp: timestamp
   id: String!
 
   """An array relationship"""
@@ -135,7 +134,6 @@ input Account_bool_exp {
   _and: [Account_bool_exp!]
   _not: Account_bool_exp
   _or: [Account_bool_exp!]
-  db_write_timestamp: timestamp_comparison_exp
   id: String_comparison_exp
   loans: Loan_bool_exp
   marketsCreated: Market_bool_exp
@@ -147,7 +145,6 @@ input Account_bool_exp {
 
 """Ordering options when selecting data from "Account"."""
 input Account_order_by {
-  db_write_timestamp: order_by
   id: order_by
   loans_aggregate: Loan_aggregate_order_by
   marketsCreated_aggregate: Market_aggregate_order_by
@@ -161,9 +158,6 @@ input Account_order_by {
 select columns of table "Account"
 """
 enum Account_select_column {
-  """column name"""
-  db_write_timestamp
-
   """column name"""
   id
 }
@@ -181,7 +175,6 @@ input Account_stream_cursor_input {
 
 """Initial value of the column from where the streaming should start"""
 input Account_stream_cursor_value_input {
-  db_write_timestamp: timestamp
   id: String
 }
 
@@ -190,7 +183,6 @@ columns and relationships of "AuthorizerContract"
 """
 type AuthorizerContract {
   createdAt: numeric!
-  db_write_timestamp: timestamp
   floor: String!
   id: String!
   lastAssignedRoleId: numeric!
@@ -223,7 +215,6 @@ input AuthorizerContract_bool_exp {
   _not: AuthorizerContract_bool_exp
   _or: [AuthorizerContract_bool_exp!]
   createdAt: numeric_comparison_exp
-  db_write_timestamp: timestamp_comparison_exp
   floor: String_comparison_exp
   id: String_comparison_exp
   lastAssignedRoleId: numeric_comparison_exp
@@ -234,7 +225,6 @@ input AuthorizerContract_bool_exp {
 """Ordering options when selecting data from "AuthorizerContract"."""
 input AuthorizerContract_order_by {
   createdAt: order_by
-  db_write_timestamp: order_by
   floor: order_by
   id: order_by
   lastAssignedRoleId: order_by
@@ -248,9 +238,6 @@ select columns of table "AuthorizerContract"
 enum AuthorizerContract_select_column {
   """column name"""
   createdAt
-
-  """column name"""
-  db_write_timestamp
 
   """column name"""
   floor
@@ -279,7 +266,6 @@ input AuthorizerContract_stream_cursor_input {
 """Initial value of the column from where the streaming should start"""
 input AuthorizerContract_stream_cursor_value_input {
   createdAt: numeric
-  db_write_timestamp: timestamp
   floor: String
   id: String
   lastAssignedRoleId: numeric
@@ -308,7 +294,6 @@ type CreditFacilityContract {
   borrowToken_id: String!
   collateralToken_id: String!
   createdAt: numeric!
-  db_write_timestamp: timestamp
   id: String!
   lastUpdatedAt: numeric!
 
@@ -349,7 +334,6 @@ input CreditFacilityContract_bool_exp {
   borrowToken_id: String_comparison_exp
   collateralToken_id: String_comparison_exp
   createdAt: numeric_comparison_exp
-  db_write_timestamp: timestamp_comparison_exp
   id: String_comparison_exp
   lastUpdatedAt: numeric_comparison_exp
   loans: Loan_bool_exp
@@ -368,7 +352,6 @@ input CreditFacilityContract_order_by {
   borrowToken_id: order_by
   collateralToken_id: order_by
   createdAt: order_by
-  db_write_timestamp: order_by
   id: order_by
   lastUpdatedAt: order_by
   loans_aggregate: Loan_aggregate_order_by
@@ -394,9 +377,6 @@ enum CreditFacilityContract_select_column {
 
   """column name"""
   createdAt
-
-  """column name"""
-  db_write_timestamp
 
   """column name"""
   id
@@ -445,7 +425,6 @@ input CreditFacilityContract_stream_cursor_value_input {
   borrowToken_id: String
   collateralToken_id: String
   createdAt: numeric
-  db_write_timestamp: timestamp
   id: String
   lastUpdatedAt: numeric
   market_id: String
@@ -464,7 +443,6 @@ columns and relationships of "FeeSplitterPayment"
 type FeeSplitterPayment {
   amountFormatted: String!
   amountRaw: numeric!
-  db_write_timestamp: timestamp
   id: String!
   isFloorFee: Boolean!
   market_id: String!
@@ -509,7 +487,6 @@ input FeeSplitterPayment_bool_exp {
   _or: [FeeSplitterPayment_bool_exp!]
   amountFormatted: String_comparison_exp
   amountRaw: numeric_comparison_exp
-  db_write_timestamp: timestamp_comparison_exp
   id: String_comparison_exp
   isFloorFee: Boolean_comparison_exp
   market_id: String_comparison_exp
@@ -526,7 +503,6 @@ order by max() on columns of table "FeeSplitterPayment"
 input FeeSplitterPayment_max_order_by {
   amountFormatted: order_by
   amountRaw: order_by
-  db_write_timestamp: order_by
   id: order_by
   market_id: order_by
   recipient: order_by
@@ -542,7 +518,6 @@ order by min() on columns of table "FeeSplitterPayment"
 input FeeSplitterPayment_min_order_by {
   amountFormatted: order_by
   amountRaw: order_by
-  db_write_timestamp: order_by
   id: order_by
   market_id: order_by
   recipient: order_by
@@ -556,7 +531,6 @@ input FeeSplitterPayment_min_order_by {
 input FeeSplitterPayment_order_by {
   amountFormatted: order_by
   amountRaw: order_by
-  db_write_timestamp: order_by
   id: order_by
   isFloorFee: order_by
   market_id: order_by
@@ -576,9 +550,6 @@ enum FeeSplitterPayment_select_column {
 
   """column name"""
   amountRaw
-
-  """column name"""
-  db_write_timestamp
 
   """column name"""
   id
@@ -644,7 +615,6 @@ input FeeSplitterPayment_stream_cursor_input {
 input FeeSplitterPayment_stream_cursor_value_input {
   amountFormatted: String
   amountRaw: numeric
-  db_write_timestamp: timestamp
   id: String
   isFloorFee: Boolean
   market_id: String
@@ -693,7 +663,6 @@ columns and relationships of "FeeSplitterReceipt"
 type FeeSplitterReceipt {
   amountFormatted: String!
   amountRaw: numeric!
-  db_write_timestamp: timestamp
   id: String!
   market_id: String!
   sender: String!
@@ -737,7 +706,6 @@ input FeeSplitterReceipt_bool_exp {
   _or: [FeeSplitterReceipt_bool_exp!]
   amountFormatted: String_comparison_exp
   amountRaw: numeric_comparison_exp
-  db_write_timestamp: timestamp_comparison_exp
   id: String_comparison_exp
   market_id: String_comparison_exp
   sender: String_comparison_exp
@@ -753,7 +721,6 @@ order by max() on columns of table "FeeSplitterReceipt"
 input FeeSplitterReceipt_max_order_by {
   amountFormatted: order_by
   amountRaw: order_by
-  db_write_timestamp: order_by
   id: order_by
   market_id: order_by
   sender: order_by
@@ -769,7 +736,6 @@ order by min() on columns of table "FeeSplitterReceipt"
 input FeeSplitterReceipt_min_order_by {
   amountFormatted: order_by
   amountRaw: order_by
-  db_write_timestamp: order_by
   id: order_by
   market_id: order_by
   sender: order_by
@@ -783,7 +749,6 @@ input FeeSplitterReceipt_min_order_by {
 input FeeSplitterReceipt_order_by {
   amountFormatted: order_by
   amountRaw: order_by
-  db_write_timestamp: order_by
   id: order_by
   market_id: order_by
   sender: order_by
@@ -802,9 +767,6 @@ enum FeeSplitterReceipt_select_column {
 
   """column name"""
   amountRaw
-
-  """column name"""
-  db_write_timestamp
 
   """column name"""
   id
@@ -867,7 +829,6 @@ input FeeSplitterReceipt_stream_cursor_input {
 input FeeSplitterReceipt_stream_cursor_value_input {
   amountFormatted: String
   amountRaw: numeric
-  db_write_timestamp: timestamp
   id: String
   market_id: String
   sender: String
@@ -913,7 +874,6 @@ input FeeSplitterReceipt_variance_order_by {
 columns and relationships of "FloorElevation"
 """
 type FloorElevation {
-  db_write_timestamp: timestamp
   deployedAmountFormatted: String!
   deployedAmountRaw: numeric!
   id: String!
@@ -960,7 +920,6 @@ input FloorElevation_bool_exp {
   _and: [FloorElevation_bool_exp!]
   _not: FloorElevation_bool_exp
   _or: [FloorElevation_bool_exp!]
-  db_write_timestamp: timestamp_comparison_exp
   deployedAmountFormatted: String_comparison_exp
   deployedAmountRaw: numeric_comparison_exp
   id: String_comparison_exp
@@ -977,7 +936,6 @@ input FloorElevation_bool_exp {
 order by max() on columns of table "FloorElevation"
 """
 input FloorElevation_max_order_by {
-  db_write_timestamp: order_by
   deployedAmountFormatted: order_by
   deployedAmountRaw: order_by
   id: order_by
@@ -994,7 +952,6 @@ input FloorElevation_max_order_by {
 order by min() on columns of table "FloorElevation"
 """
 input FloorElevation_min_order_by {
-  db_write_timestamp: order_by
   deployedAmountFormatted: order_by
   deployedAmountRaw: order_by
   id: order_by
@@ -1009,7 +966,6 @@ input FloorElevation_min_order_by {
 
 """Ordering options when selecting data from "FloorElevation"."""
 input FloorElevation_order_by {
-  db_write_timestamp: order_by
   deployedAmountFormatted: order_by
   deployedAmountRaw: order_by
   id: order_by
@@ -1026,9 +982,6 @@ input FloorElevation_order_by {
 select columns of table "FloorElevation"
 """
 enum FloorElevation_select_column {
-  """column name"""
-  db_write_timestamp
-
   """column name"""
   deployedAmountFormatted
 
@@ -1103,7 +1056,6 @@ input FloorElevation_stream_cursor_input {
 
 """Initial value of the column from where the streaming should start"""
 input FloorElevation_stream_cursor_value_input {
-  db_write_timestamp: timestamp
   deployedAmountFormatted: String
   deployedAmountRaw: numeric
   id: String
@@ -1161,7 +1113,6 @@ columns and relationships of "GlobalRegistry"
 """
 type GlobalRegistry {
   createdAt: numeric!
-  db_write_timestamp: timestamp
   floorFactoryAddress: String!
   id: String!
   lastUpdatedAt: numeric!
@@ -1176,7 +1127,6 @@ input GlobalRegistry_bool_exp {
   _not: GlobalRegistry_bool_exp
   _or: [GlobalRegistry_bool_exp!]
   createdAt: numeric_comparison_exp
-  db_write_timestamp: timestamp_comparison_exp
   floorFactoryAddress: String_comparison_exp
   id: String_comparison_exp
   lastUpdatedAt: numeric_comparison_exp
@@ -1186,7 +1136,6 @@ input GlobalRegistry_bool_exp {
 """Ordering options when selecting data from "GlobalRegistry"."""
 input GlobalRegistry_order_by {
   createdAt: order_by
-  db_write_timestamp: order_by
   floorFactoryAddress: order_by
   id: order_by
   lastUpdatedAt: order_by
@@ -1199,9 +1148,6 @@ select columns of table "GlobalRegistry"
 enum GlobalRegistry_select_column {
   """column name"""
   createdAt
-
-  """column name"""
-  db_write_timestamp
 
   """column name"""
   floorFactoryAddress
@@ -1230,7 +1176,6 @@ input GlobalRegistry_stream_cursor_input {
 """Initial value of the column from where the streaming should start"""
 input GlobalRegistry_stream_cursor_value_input {
   createdAt: numeric
-  db_write_timestamp: timestamp
   floorFactoryAddress: String
   id: String
   lastUpdatedAt: numeric
@@ -1242,7 +1187,6 @@ columns and relationships of "GlobalStats"
 """
 type GlobalStats {
   activeMarkets: numeric!
-  db_write_timestamp: timestamp
   id: String!
   lastUpdatedAt: numeric!
   totalLockedCollateralFormatted: String!
@@ -1262,7 +1206,6 @@ input GlobalStats_bool_exp {
   _not: GlobalStats_bool_exp
   _or: [GlobalStats_bool_exp!]
   activeMarkets: numeric_comparison_exp
-  db_write_timestamp: timestamp_comparison_exp
   id: String_comparison_exp
   lastUpdatedAt: numeric_comparison_exp
   totalLockedCollateralFormatted: String_comparison_exp
@@ -1277,7 +1220,6 @@ input GlobalStats_bool_exp {
 """Ordering options when selecting data from "GlobalStats"."""
 input GlobalStats_order_by {
   activeMarkets: order_by
-  db_write_timestamp: order_by
   id: order_by
   lastUpdatedAt: order_by
   totalLockedCollateralFormatted: order_by
@@ -1295,9 +1237,6 @@ select columns of table "GlobalStats"
 enum GlobalStats_select_column {
   """column name"""
   activeMarkets
-
-  """column name"""
-  db_write_timestamp
 
   """column name"""
   id
@@ -1341,7 +1280,6 @@ input GlobalStats_stream_cursor_input {
 """Initial value of the column from where the streaming should start"""
 input GlobalStats_stream_cursor_value_input {
   activeMarkets: numeric
-  db_write_timestamp: timestamp
   id: String
   lastUpdatedAt: numeric
   totalLockedCollateralFormatted: String
@@ -1396,7 +1334,6 @@ type Loan {
   borrowAmountRaw: numeric!
   borrower_id: String!
   closedAt: numeric
-  db_write_timestamp: timestamp
   facility_id: String!
   floorPriceAtBorrowFormatted: String!
   floorPriceAtBorrowRaw: numeric!
@@ -1436,7 +1373,6 @@ type Loan {
 columns and relationships of "LoanStatusHistory"
 """
 type LoanStatusHistory {
-  db_write_timestamp: timestamp
   id: String!
   loan_id: String!
   lockedCollateralFormatted: String!
@@ -1481,7 +1417,6 @@ input LoanStatusHistory_bool_exp {
   _and: [LoanStatusHistory_bool_exp!]
   _not: LoanStatusHistory_bool_exp
   _or: [LoanStatusHistory_bool_exp!]
-  db_write_timestamp: timestamp_comparison_exp
   id: String_comparison_exp
   loan_id: String_comparison_exp
   lockedCollateralFormatted: String_comparison_exp
@@ -1497,7 +1432,6 @@ input LoanStatusHistory_bool_exp {
 order by max() on columns of table "LoanStatusHistory"
 """
 input LoanStatusHistory_max_order_by {
-  db_write_timestamp: order_by
   id: order_by
   loan_id: order_by
   lockedCollateralFormatted: order_by
@@ -1513,7 +1447,6 @@ input LoanStatusHistory_max_order_by {
 order by min() on columns of table "LoanStatusHistory"
 """
 input LoanStatusHistory_min_order_by {
-  db_write_timestamp: order_by
   id: order_by
   loan_id: order_by
   lockedCollateralFormatted: order_by
@@ -1527,7 +1460,6 @@ input LoanStatusHistory_min_order_by {
 
 """Ordering options when selecting data from "LoanStatusHistory"."""
 input LoanStatusHistory_order_by {
-  db_write_timestamp: order_by
   id: order_by
   loan_id: order_by
   lockedCollateralFormatted: order_by
@@ -1543,9 +1475,6 @@ input LoanStatusHistory_order_by {
 select columns of table "LoanStatusHistory"
 """
 enum LoanStatusHistory_select_column {
-  """column name"""
-  db_write_timestamp
-
   """column name"""
   id
 
@@ -1614,7 +1543,6 @@ input LoanStatusHistory_stream_cursor_input {
 
 """Initial value of the column from where the streaming should start"""
 input LoanStatusHistory_stream_cursor_value_input {
-  db_write_timestamp: timestamp
   id: String
   loan_id: String
   lockedCollateralFormatted: String
@@ -1704,7 +1632,6 @@ input Loan_bool_exp {
   borrowAmountRaw: numeric_comparison_exp
   borrower_id: String_comparison_exp
   closedAt: numeric_comparison_exp
-  db_write_timestamp: timestamp_comparison_exp
   facility_id: String_comparison_exp
   floorPriceAtBorrowFormatted: String_comparison_exp
   floorPriceAtBorrowRaw: numeric_comparison_exp
@@ -1731,7 +1658,6 @@ input Loan_max_order_by {
   borrowAmountRaw: order_by
   borrower_id: order_by
   closedAt: order_by
-  db_write_timestamp: order_by
   facility_id: order_by
   floorPriceAtBorrowFormatted: order_by
   floorPriceAtBorrowRaw: order_by
@@ -1757,7 +1683,6 @@ input Loan_min_order_by {
   borrowAmountRaw: order_by
   borrower_id: order_by
   closedAt: order_by
-  db_write_timestamp: order_by
   facility_id: order_by
   floorPriceAtBorrowFormatted: order_by
   floorPriceAtBorrowRaw: order_by
@@ -1781,7 +1706,6 @@ input Loan_order_by {
   borrowAmountRaw: order_by
   borrower_id: order_by
   closedAt: order_by
-  db_write_timestamp: order_by
   facility_id: order_by
   floorPriceAtBorrowFormatted: order_by
   floorPriceAtBorrowRaw: order_by
@@ -1815,9 +1739,6 @@ enum Loan_select_column {
 
   """column name"""
   closedAt
-
-  """column name"""
-  db_write_timestamp
 
   """column name"""
   facility_id
@@ -1924,7 +1845,6 @@ input Loan_stream_cursor_value_input {
   borrowAmountRaw: numeric
   borrower_id: String
   closedAt: numeric
-  db_write_timestamp: timestamp
   facility_id: String
   floorPriceAtBorrowFormatted: String
   floorPriceAtBorrowRaw: numeric
@@ -2007,7 +1927,6 @@ type Market {
   creator_id: String!
   currentPriceFormatted: String!
   currentPriceRaw: numeric!
-  db_write_timestamp: timestamp
   factory_id: String!
 
   """An array relationship"""
@@ -2081,7 +2000,6 @@ columns and relationships of "MarketRollingStats"
 type MarketRollingStats {
   averagePriceFormatted: String!
   averagePriceRaw: numeric!
-  db_write_timestamp: timestamp
   id: String!
   lastUpdatedAt: numeric!
   market_id: String!
@@ -2100,7 +2018,6 @@ input MarketRollingStats_bool_exp {
   _or: [MarketRollingStats_bool_exp!]
   averagePriceFormatted: String_comparison_exp
   averagePriceRaw: numeric_comparison_exp
-  db_write_timestamp: timestamp_comparison_exp
   id: String_comparison_exp
   lastUpdatedAt: numeric_comparison_exp
   market_id: String_comparison_exp
@@ -2114,7 +2031,6 @@ input MarketRollingStats_bool_exp {
 input MarketRollingStats_order_by {
   averagePriceFormatted: order_by
   averagePriceRaw: order_by
-  db_write_timestamp: order_by
   id: order_by
   lastUpdatedAt: order_by
   market_id: order_by
@@ -2133,9 +2049,6 @@ enum MarketRollingStats_select_column {
 
   """column name"""
   averagePriceRaw
-
-  """column name"""
-  db_write_timestamp
 
   """column name"""
   id
@@ -2174,7 +2087,6 @@ input MarketRollingStats_stream_cursor_input {
 input MarketRollingStats_stream_cursor_value_input {
   averagePriceFormatted: String
   averagePriceRaw: numeric
-  db_write_timestamp: timestamp
   id: String
   lastUpdatedAt: numeric
   market_id: String
@@ -2188,7 +2100,6 @@ input MarketRollingStats_stream_cursor_value_input {
 columns and relationships of "MarketSnapshot"
 """
 type MarketSnapshot {
-  db_write_timestamp: timestamp
   floorPriceFormatted: String!
   floorPriceRaw: numeric!
   id: String!
@@ -2212,7 +2123,6 @@ input MarketSnapshot_bool_exp {
   _and: [MarketSnapshot_bool_exp!]
   _not: MarketSnapshot_bool_exp
   _or: [MarketSnapshot_bool_exp!]
-  db_write_timestamp: timestamp_comparison_exp
   floorPriceFormatted: String_comparison_exp
   floorPriceRaw: numeric_comparison_exp
   id: String_comparison_exp
@@ -2231,7 +2141,6 @@ input MarketSnapshot_bool_exp {
 
 """Ordering options when selecting data from "MarketSnapshot"."""
 input MarketSnapshot_order_by {
-  db_write_timestamp: order_by
   floorPriceFormatted: order_by
   floorPriceRaw: order_by
   id: order_by
@@ -2252,9 +2161,6 @@ input MarketSnapshot_order_by {
 select columns of table "MarketSnapshot"
 """
 enum MarketSnapshot_select_column {
-  """column name"""
-  db_write_timestamp
-
   """column name"""
   floorPriceFormatted
 
@@ -2311,7 +2217,6 @@ input MarketSnapshot_stream_cursor_input {
 
 """Initial value of the column from where the streaming should start"""
 input MarketSnapshot_stream_cursor_value_input {
-  db_write_timestamp: timestamp
   floorPriceFormatted: String
   floorPriceRaw: numeric
   id: String
@@ -2377,7 +2282,6 @@ input Market_bool_exp {
   creator_id: String_comparison_exp
   currentPriceFormatted: String_comparison_exp
   currentPriceRaw: numeric_comparison_exp
-  db_write_timestamp: timestamp_comparison_exp
   factory_id: String_comparison_exp
   floorElevations: FloorElevation_bool_exp
   floorPriceFormatted: String_comparison_exp
@@ -2416,7 +2320,6 @@ input Market_max_order_by {
   creator_id: order_by
   currentPriceFormatted: order_by
   currentPriceRaw: order_by
-  db_write_timestamp: order_by
   factory_id: order_by
   floorPriceFormatted: order_by
   floorPriceRaw: order_by
@@ -2449,7 +2352,6 @@ input Market_min_order_by {
   creator_id: order_by
   currentPriceFormatted: order_by
   currentPriceRaw: order_by
-  db_write_timestamp: order_by
   factory_id: order_by
   floorPriceFormatted: order_by
   floorPriceRaw: order_by
@@ -2480,7 +2382,6 @@ input Market_order_by {
   creator_id: order_by
   currentPriceFormatted: order_by
   currentPriceRaw: order_by
-  db_write_timestamp: order_by
   factory_id: order_by
   floorElevations_aggregate: FloorElevation_aggregate_order_by
   floorPriceFormatted: order_by
@@ -2528,9 +2429,6 @@ enum Market_select_column {
 
   """column name"""
   currentPriceRaw
-
-  """column name"""
-  db_write_timestamp
 
   """column name"""
   factory_id
@@ -2680,7 +2578,6 @@ input Market_stream_cursor_value_input {
   creator_id: String
   currentPriceFormatted: String
   currentPriceRaw: numeric
-  db_write_timestamp: timestamp
   factory_id: String
   floorPriceFormatted: String
   floorPriceRaw: numeric
@@ -2791,7 +2688,6 @@ columns and relationships of "ModuleAddress"
 """
 type ModuleAddress {
   createdAt: numeric!
-  db_write_timestamp: timestamp
   id: String!
   lastUpdatedAt: numeric!
   market_id: String!
@@ -2806,7 +2702,6 @@ input ModuleAddress_bool_exp {
   _not: ModuleAddress_bool_exp
   _or: [ModuleAddress_bool_exp!]
   createdAt: numeric_comparison_exp
-  db_write_timestamp: timestamp_comparison_exp
   id: String_comparison_exp
   lastUpdatedAt: numeric_comparison_exp
   market_id: String_comparison_exp
@@ -2816,7 +2711,6 @@ input ModuleAddress_bool_exp {
 """Ordering options when selecting data from "ModuleAddress"."""
 input ModuleAddress_order_by {
   createdAt: order_by
-  db_write_timestamp: order_by
   id: order_by
   lastUpdatedAt: order_by
   market_id: order_by
@@ -2829,9 +2723,6 @@ select columns of table "ModuleAddress"
 enum ModuleAddress_select_column {
   """column name"""
   createdAt
-
-  """column name"""
-  db_write_timestamp
 
   """column name"""
   id
@@ -2860,7 +2751,6 @@ input ModuleAddress_stream_cursor_input {
 """Initial value of the column from where the streaming should start"""
 input ModuleAddress_stream_cursor_value_input {
   createdAt: numeric
-  db_write_timestamp: timestamp
   id: String
   lastUpdatedAt: numeric
   market_id: String
@@ -2874,7 +2764,6 @@ type ModuleRegistry {
   authorizer: String!
   createdAt: numeric!
   creditFacility: String
-  db_write_timestamp: timestamp
   feeTreasury: String!
   floor: String!
   id: String!
@@ -2893,7 +2782,6 @@ input ModuleRegistry_bool_exp {
   authorizer: String_comparison_exp
   createdAt: numeric_comparison_exp
   creditFacility: String_comparison_exp
-  db_write_timestamp: timestamp_comparison_exp
   feeTreasury: String_comparison_exp
   floor: String_comparison_exp
   id: String_comparison_exp
@@ -2907,7 +2795,6 @@ input ModuleRegistry_order_by {
   authorizer: order_by
   createdAt: order_by
   creditFacility: order_by
-  db_write_timestamp: order_by
   feeTreasury: order_by
   floor: order_by
   id: order_by
@@ -2928,9 +2815,6 @@ enum ModuleRegistry_select_column {
 
   """column name"""
   creditFacility
-
-  """column name"""
-  db_write_timestamp
 
   """column name"""
   feeTreasury
@@ -2967,7 +2851,6 @@ input ModuleRegistry_stream_cursor_value_input {
   authorizer: String
   createdAt: numeric
   creditFacility: String
-  db_write_timestamp: timestamp
   feeTreasury: String
   floor: String
   id: String
@@ -2999,10 +2882,9 @@ type PreSaleContract {
     """filter the rows returned"""
     where: PresaleClaim_bool_exp
   ): [PresaleClaim!]!
-  commissionBps: [numeric!]
+  commissionBps: [String!]
   createdAt: numeric!
   currentState: Int!
-  db_write_timestamp: timestamp
   endTime: numeric!
   feeTreasury: String
   globalDepositCapFormatted: String!
@@ -3033,7 +2915,7 @@ type PreSaleContract {
   perAddressDepositCapFormatted: String!
   perAddressDepositCapRaw: numeric!
   priceBreakpointOffsets: [Int!]
-  priceBreakpointsFlat: [numeric!]
+  priceBreakpointsFlat: [String!]
 
   """An object relationship"""
   purchaseToken: Token
@@ -3060,10 +2942,9 @@ input PreSaleContract_bool_exp {
   _or: [PreSaleContract_bool_exp!]
   authorizer: String_comparison_exp
   claims: PresaleClaim_bool_exp
-  commissionBps: numeric_array_comparison_exp
+  commissionBps: String_array_comparison_exp
   createdAt: numeric_comparison_exp
   currentState: Int_comparison_exp
-  db_write_timestamp: timestamp_comparison_exp
   endTime: numeric_comparison_exp
   feeTreasury: String_comparison_exp
   globalDepositCapFormatted: String_comparison_exp
@@ -3077,7 +2958,7 @@ input PreSaleContract_bool_exp {
   perAddressDepositCapFormatted: String_comparison_exp
   perAddressDepositCapRaw: numeric_comparison_exp
   priceBreakpointOffsets: Int_array_comparison_exp
-  priceBreakpointsFlat: numeric_array_comparison_exp
+  priceBreakpointsFlat: String_array_comparison_exp
   purchaseToken: Token_bool_exp
   purchaseToken_id: String_comparison_exp
   saleToken: Token_bool_exp
@@ -3098,7 +2979,6 @@ input PreSaleContract_order_by {
   commissionBps: order_by
   createdAt: order_by
   currentState: order_by
-  db_write_timestamp: order_by
   endTime: order_by
   feeTreasury: order_by
   globalDepositCapFormatted: order_by
@@ -3141,9 +3021,6 @@ enum PreSaleContract_select_column {
 
   """column name"""
   currentState
-
-  """column name"""
-  db_write_timestamp
 
   """column name"""
   endTime
@@ -3226,10 +3103,9 @@ input PreSaleContract_stream_cursor_input {
 """Initial value of the column from where the streaming should start"""
 input PreSaleContract_stream_cursor_value_input {
   authorizer: String
-  commissionBps: [numeric!]
+  commissionBps: [String!]
   createdAt: numeric
   currentState: Int
-  db_write_timestamp: timestamp
   endTime: numeric
   feeTreasury: String
   globalDepositCapFormatted: String
@@ -3242,7 +3118,7 @@ input PreSaleContract_stream_cursor_value_input {
   perAddressDepositCapFormatted: String
   perAddressDepositCapRaw: numeric
   priceBreakpointOffsets: [Int!]
-  priceBreakpointsFlat: [numeric!]
+  priceBreakpointsFlat: [String!]
   purchaseToken_id: String
   saleToken_id: String
   startTime: numeric
@@ -3261,7 +3137,6 @@ type PresaleClaim {
   amountFormatted: String!
   amountRaw: numeric!
   claimType: presaleclaimtype!
-  db_write_timestamp: timestamp
   id: String!
   loanId: numeric
   positionId: numeric
@@ -3309,7 +3184,6 @@ input PresaleClaim_bool_exp {
   amountFormatted: String_comparison_exp
   amountRaw: numeric_comparison_exp
   claimType: presaleclaimtype_comparison_exp
-  db_write_timestamp: timestamp_comparison_exp
   id: String_comparison_exp
   loanId: numeric_comparison_exp
   positionId: numeric_comparison_exp
@@ -3326,7 +3200,6 @@ input PresaleClaim_max_order_by {
   amountFormatted: order_by
   amountRaw: order_by
   claimType: order_by
-  db_write_timestamp: order_by
   id: order_by
   loanId: order_by
   positionId: order_by
@@ -3343,7 +3216,6 @@ input PresaleClaim_min_order_by {
   amountFormatted: order_by
   amountRaw: order_by
   claimType: order_by
-  db_write_timestamp: order_by
   id: order_by
   loanId: order_by
   positionId: order_by
@@ -3358,7 +3230,6 @@ input PresaleClaim_order_by {
   amountFormatted: order_by
   amountRaw: order_by
   claimType: order_by
-  db_write_timestamp: order_by
   id: order_by
   loanId: order_by
   positionId: order_by
@@ -3380,9 +3251,6 @@ enum PresaleClaim_select_column {
 
   """column name"""
   claimType
-
-  """column name"""
-  db_write_timestamp
 
   """column name"""
   id
@@ -3455,7 +3323,6 @@ input PresaleClaim_stream_cursor_value_input {
   amountFormatted: String
   amountRaw: numeric
   claimType: presaleclaimtype
-  db_write_timestamp: timestamp
   id: String
   loanId: numeric
   positionId: numeric
@@ -3513,7 +3380,6 @@ input PresaleClaim_variance_order_by {
 columns and relationships of "PresaleParticipation"
 """
 type PresaleParticipation {
-  db_write_timestamp: timestamp
   depositAmountFormatted: String!
   depositAmountRaw: numeric!
   id: String!
@@ -3564,7 +3430,6 @@ input PresaleParticipation_bool_exp {
   _and: [PresaleParticipation_bool_exp!]
   _not: PresaleParticipation_bool_exp
   _or: [PresaleParticipation_bool_exp!]
-  db_write_timestamp: timestamp_comparison_exp
   depositAmountFormatted: String_comparison_exp
   depositAmountRaw: numeric_comparison_exp
   id: String_comparison_exp
@@ -3583,7 +3448,6 @@ input PresaleParticipation_bool_exp {
 order by max() on columns of table "PresaleParticipation"
 """
 input PresaleParticipation_max_order_by {
-  db_write_timestamp: order_by
   depositAmountFormatted: order_by
   depositAmountRaw: order_by
   id: order_by
@@ -3602,7 +3466,6 @@ input PresaleParticipation_max_order_by {
 order by min() on columns of table "PresaleParticipation"
 """
 input PresaleParticipation_min_order_by {
-  db_write_timestamp: order_by
   depositAmountFormatted: order_by
   depositAmountRaw: order_by
   id: order_by
@@ -3619,7 +3482,6 @@ input PresaleParticipation_min_order_by {
 
 """Ordering options when selecting data from "PresaleParticipation"."""
 input PresaleParticipation_order_by {
-  db_write_timestamp: order_by
   depositAmountFormatted: order_by
   depositAmountRaw: order_by
   id: order_by
@@ -3638,9 +3500,6 @@ input PresaleParticipation_order_by {
 select columns of table "PresaleParticipation"
 """
 enum PresaleParticipation_select_column {
-  """column name"""
-  db_write_timestamp
-
   """column name"""
   depositAmountFormatted
 
@@ -3727,7 +3586,6 @@ input PresaleParticipation_stream_cursor_input {
 
 """Initial value of the column from where the streaming should start"""
 input PresaleParticipation_stream_cursor_value_input {
-  db_write_timestamp: timestamp
   depositAmountFormatted: String
   depositAmountRaw: numeric
   id: String
@@ -3796,7 +3654,6 @@ columns and relationships of "PriceCandle"
 type PriceCandle {
   closeFormatted: String!
   closeRaw: numeric!
-  db_write_timestamp: timestamp
   highFormatted: String!
   highRaw: numeric!
   id: String!
@@ -3821,7 +3678,6 @@ input PriceCandle_bool_exp {
   _or: [PriceCandle_bool_exp!]
   closeFormatted: String_comparison_exp
   closeRaw: numeric_comparison_exp
-  db_write_timestamp: timestamp_comparison_exp
   highFormatted: String_comparison_exp
   highRaw: numeric_comparison_exp
   id: String_comparison_exp
@@ -3841,7 +3697,6 @@ input PriceCandle_bool_exp {
 input PriceCandle_order_by {
   closeFormatted: order_by
   closeRaw: order_by
-  db_write_timestamp: order_by
   highFormatted: order_by
   highRaw: order_by
   id: order_by
@@ -3866,9 +3721,6 @@ enum PriceCandle_select_column {
 
   """column name"""
   closeRaw
-
-  """column name"""
-  db_write_timestamp
 
   """column name"""
   highFormatted
@@ -3925,7 +3777,6 @@ input PriceCandle_stream_cursor_input {
 input PriceCandle_stream_cursor_value_input {
   closeFormatted: String
   closeRaw: numeric
-  db_write_timestamp: timestamp
   highFormatted: String
   highRaw: numeric
   id: String
@@ -3949,7 +3800,6 @@ type Role {
   adminRoleName: String
   authorizer_id: String!
   createdAt: numeric!
-  db_write_timestamp: timestamp
   id: String!
   isAdminBurned: Boolean!
   lastUpdatedAt: numeric!
@@ -3997,7 +3847,6 @@ type Role {
 columns and relationships of "RoleMember"
 """
 type RoleMember {
-  db_write_timestamp: timestamp
   grantedAt: numeric!
   grantedBy: String!
   id: String!
@@ -4037,7 +3886,6 @@ input RoleMember_bool_exp {
   _and: [RoleMember_bool_exp!]
   _not: RoleMember_bool_exp
   _or: [RoleMember_bool_exp!]
-  db_write_timestamp: timestamp_comparison_exp
   grantedAt: numeric_comparison_exp
   grantedBy: String_comparison_exp
   id: String_comparison_exp
@@ -4050,7 +3898,6 @@ input RoleMember_bool_exp {
 order by max() on columns of table "RoleMember"
 """
 input RoleMember_max_order_by {
-  db_write_timestamp: order_by
   grantedAt: order_by
   grantedBy: order_by
   id: order_by
@@ -4063,7 +3910,6 @@ input RoleMember_max_order_by {
 order by min() on columns of table "RoleMember"
 """
 input RoleMember_min_order_by {
-  db_write_timestamp: order_by
   grantedAt: order_by
   grantedBy: order_by
   id: order_by
@@ -4074,7 +3920,6 @@ input RoleMember_min_order_by {
 
 """Ordering options when selecting data from "RoleMember"."""
 input RoleMember_order_by {
-  db_write_timestamp: order_by
   grantedAt: order_by
   grantedBy: order_by
   id: order_by
@@ -4087,9 +3932,6 @@ input RoleMember_order_by {
 select columns of table "RoleMember"
 """
 enum RoleMember_select_column {
-  """column name"""
-  db_write_timestamp
-
   """column name"""
   grantedAt
 
@@ -4143,7 +3985,6 @@ input RoleMember_stream_cursor_input {
 
 """Initial value of the column from where the streaming should start"""
 input RoleMember_stream_cursor_value_input {
-  db_write_timestamp: timestamp
   grantedAt: numeric
   grantedBy: String
   id: String
@@ -4185,7 +4026,6 @@ columns and relationships of "RolePermission"
 """
 type RolePermission {
   addedAt: numeric!
-  db_write_timestamp: timestamp
   id: String!
   role_id: String!
   selector: String!
@@ -4226,7 +4066,6 @@ input RolePermission_bool_exp {
   _not: RolePermission_bool_exp
   _or: [RolePermission_bool_exp!]
   addedAt: numeric_comparison_exp
-  db_write_timestamp: timestamp_comparison_exp
   id: String_comparison_exp
   role_id: String_comparison_exp
   selector: String_comparison_exp
@@ -4240,7 +4079,6 @@ order by max() on columns of table "RolePermission"
 """
 input RolePermission_max_order_by {
   addedAt: order_by
-  db_write_timestamp: order_by
   id: order_by
   role_id: order_by
   selector: order_by
@@ -4254,7 +4092,6 @@ order by min() on columns of table "RolePermission"
 """
 input RolePermission_min_order_by {
   addedAt: order_by
-  db_write_timestamp: order_by
   id: order_by
   role_id: order_by
   selector: order_by
@@ -4266,7 +4103,6 @@ input RolePermission_min_order_by {
 """Ordering options when selecting data from "RolePermission"."""
 input RolePermission_order_by {
   addedAt: order_by
-  db_write_timestamp: order_by
   id: order_by
   role_id: order_by
   selector: order_by
@@ -4281,9 +4117,6 @@ select columns of table "RolePermission"
 enum RolePermission_select_column {
   """column name"""
   addedAt
-
-  """column name"""
-  db_write_timestamp
 
   """column name"""
   id
@@ -4339,7 +4172,6 @@ input RolePermission_stream_cursor_input {
 """Initial value of the column from where the streaming should start"""
 input RolePermission_stream_cursor_value_input {
   addedAt: numeric
-  db_write_timestamp: timestamp
   id: String
   role_id: String
   selector: String
@@ -4412,7 +4244,6 @@ input Role_bool_exp {
   adminRoleName: String_comparison_exp
   authorizer_id: String_comparison_exp
   createdAt: numeric_comparison_exp
-  db_write_timestamp: timestamp_comparison_exp
   id: String_comparison_exp
   isAdminBurned: Boolean_comparison_exp
   lastUpdatedAt: numeric_comparison_exp
@@ -4430,7 +4261,6 @@ input Role_max_order_by {
   adminRoleName: order_by
   authorizer_id: order_by
   createdAt: order_by
-  db_write_timestamp: order_by
   id: order_by
   lastUpdatedAt: order_by
   name: order_by
@@ -4445,7 +4275,6 @@ input Role_min_order_by {
   adminRoleName: order_by
   authorizer_id: order_by
   createdAt: order_by
-  db_write_timestamp: order_by
   id: order_by
   lastUpdatedAt: order_by
   name: order_by
@@ -4458,7 +4287,6 @@ input Role_order_by {
   adminRoleName: order_by
   authorizer_id: order_by
   createdAt: order_by
-  db_write_timestamp: order_by
   id: order_by
   isAdminBurned: order_by
   lastUpdatedAt: order_by
@@ -4483,9 +4311,6 @@ enum Role_select_column {
 
   """column name"""
   createdAt
-
-  """column name"""
-  db_write_timestamp
 
   """column name"""
   id
@@ -4544,7 +4369,6 @@ input Role_stream_cursor_value_input {
   adminRoleName: String
   authorizer_id: String
   createdAt: numeric
-  db_write_timestamp: timestamp
   id: String
   isAdminBurned: Boolean
   lastUpdatedAt: numeric
@@ -4591,7 +4415,6 @@ type Stake {
   amountFormatted: String!
   amountRaw: numeric!
   contract_id: String!
-  db_write_timestamp: timestamp
   id: String!
   lockDuration: numeric!
   status: stakestatus!
@@ -4636,7 +4459,6 @@ input Stake_bool_exp {
   amountFormatted: String_comparison_exp
   amountRaw: numeric_comparison_exp
   contract_id: String_comparison_exp
-  db_write_timestamp: timestamp_comparison_exp
   id: String_comparison_exp
   lockDuration: numeric_comparison_exp
   status: stakestatus_comparison_exp
@@ -4652,7 +4474,6 @@ input Stake_max_order_by {
   amountFormatted: order_by
   amountRaw: order_by
   contract_id: order_by
-  db_write_timestamp: order_by
   id: order_by
   lockDuration: order_by
   status: order_by
@@ -4668,7 +4489,6 @@ input Stake_min_order_by {
   amountFormatted: order_by
   amountRaw: order_by
   contract_id: order_by
-  db_write_timestamp: order_by
   id: order_by
   lockDuration: order_by
   status: order_by
@@ -4682,7 +4502,6 @@ input Stake_order_by {
   amountFormatted: order_by
   amountRaw: order_by
   contract_id: order_by
-  db_write_timestamp: order_by
   id: order_by
   lockDuration: order_by
   status: order_by
@@ -4703,9 +4522,6 @@ enum Stake_select_column {
 
   """column name"""
   contract_id
-
-  """column name"""
-  db_write_timestamp
 
   """column name"""
   id
@@ -4769,7 +4585,6 @@ input Stake_stream_cursor_value_input {
   amountFormatted: String
   amountRaw: numeric
   contract_id: String
-  db_write_timestamp: timestamp
   id: String
   lockDuration: numeric
   status: stakestatus
@@ -4819,7 +4634,6 @@ columns and relationships of "StakingContract"
 """
 type StakingContract {
   createdAt: numeric!
-  db_write_timestamp: timestamp
   id: String!
   rewardToken_id: String!
 
@@ -4855,7 +4669,6 @@ input StakingContract_bool_exp {
   _not: StakingContract_bool_exp
   _or: [StakingContract_bool_exp!]
   createdAt: numeric_comparison_exp
-  db_write_timestamp: timestamp_comparison_exp
   id: String_comparison_exp
   rewardToken_id: String_comparison_exp
   stakes: Stake_bool_exp
@@ -4869,7 +4682,6 @@ input StakingContract_bool_exp {
 """Ordering options when selecting data from "StakingContract"."""
 input StakingContract_order_by {
   createdAt: order_by
-  db_write_timestamp: order_by
   id: order_by
   rewardToken_id: order_by
   stakes_aggregate: Stake_aggregate_order_by
@@ -4886,9 +4698,6 @@ select columns of table "StakingContract"
 enum StakingContract_select_column {
   """column name"""
   createdAt
-
-  """column name"""
-  db_write_timestamp
 
   """column name"""
   id
@@ -4926,7 +4735,6 @@ input StakingContract_stream_cursor_input {
 """Initial value of the column from where the streaming should start"""
 input StakingContract_stream_cursor_value_input {
   createdAt: numeric
-  db_write_timestamp: timestamp
   id: String
   rewardToken_id: String
   stakingToken_id: String
@@ -5013,7 +4821,6 @@ input String_comparison_exp {
 columns and relationships of "Token"
 """
 type Token {
-  db_write_timestamp: timestamp
   decimals: Int!
   id: String!
   maxSupplyFormatted: String!
@@ -5029,7 +4836,6 @@ input Token_bool_exp {
   _and: [Token_bool_exp!]
   _not: Token_bool_exp
   _or: [Token_bool_exp!]
-  db_write_timestamp: timestamp_comparison_exp
   decimals: Int_comparison_exp
   id: String_comparison_exp
   maxSupplyFormatted: String_comparison_exp
@@ -5040,7 +4846,6 @@ input Token_bool_exp {
 
 """Ordering options when selecting data from "Token"."""
 input Token_order_by {
-  db_write_timestamp: order_by
   decimals: order_by
   id: order_by
   maxSupplyFormatted: order_by
@@ -5053,9 +4858,6 @@ input Token_order_by {
 select columns of table "Token"
 """
 enum Token_select_column {
-  """column name"""
-  db_write_timestamp
-
   """column name"""
   decimals
 
@@ -5088,7 +4890,6 @@ input Token_stream_cursor_input {
 
 """Initial value of the column from where the streaming should start"""
 input Token_stream_cursor_value_input {
-  db_write_timestamp: timestamp
   decimals: Int
   id: String
   maxSupplyFormatted: String
@@ -5101,7 +4902,6 @@ input Token_stream_cursor_value_input {
 columns and relationships of "Trade"
 """
 type Trade {
-  db_write_timestamp: timestamp
   feeFormatted: String!
   feeRaw: numeric!
   id: String!
@@ -5153,7 +4953,6 @@ input Trade_bool_exp {
   _and: [Trade_bool_exp!]
   _not: Trade_bool_exp
   _or: [Trade_bool_exp!]
-  db_write_timestamp: timestamp_comparison_exp
   feeFormatted: String_comparison_exp
   feeRaw: numeric_comparison_exp
   id: String_comparison_exp
@@ -5174,7 +4973,6 @@ input Trade_bool_exp {
 order by max() on columns of table "Trade"
 """
 input Trade_max_order_by {
-  db_write_timestamp: order_by
   feeFormatted: order_by
   feeRaw: order_by
   id: order_by
@@ -5195,7 +4993,6 @@ input Trade_max_order_by {
 order by min() on columns of table "Trade"
 """
 input Trade_min_order_by {
-  db_write_timestamp: order_by
   feeFormatted: order_by
   feeRaw: order_by
   id: order_by
@@ -5214,7 +5011,6 @@ input Trade_min_order_by {
 
 """Ordering options when selecting data from "Trade"."""
 input Trade_order_by {
-  db_write_timestamp: order_by
   feeFormatted: order_by
   feeRaw: order_by
   id: order_by
@@ -5235,9 +5031,6 @@ input Trade_order_by {
 select columns of table "Trade"
 """
 enum Trade_select_column {
-  """column name"""
-  db_write_timestamp
-
   """column name"""
   feeFormatted
 
@@ -5327,7 +5120,6 @@ input Trade_stream_cursor_input {
 
 """Initial value of the column from where the streaming should start"""
 input Trade_stream_cursor_value_input {
-  db_write_timestamp: timestamp
   feeFormatted: String
   feeRaw: numeric
   id: String
@@ -5393,7 +5185,6 @@ columns and relationships of "Treasury"
 """
 type Treasury {
   createdAt: numeric!
-  db_write_timestamp: timestamp
 
   """An array relationship"""
   feeSplitterPayments(
@@ -5448,7 +5239,6 @@ input Treasury_bool_exp {
   _not: Treasury_bool_exp
   _or: [Treasury_bool_exp!]
   createdAt: numeric_comparison_exp
-  db_write_timestamp: timestamp_comparison_exp
   feeSplitterPayments: FeeSplitterPayment_bool_exp
   feeSplitterReceipts: FeeSplitterReceipt_bool_exp
   id: String_comparison_exp
@@ -5464,7 +5254,6 @@ input Treasury_bool_exp {
 """Ordering options when selecting data from "Treasury"."""
 input Treasury_order_by {
   createdAt: order_by
-  db_write_timestamp: order_by
   feeSplitterPayments_aggregate: FeeSplitterPayment_aggregate_order_by
   feeSplitterReceipts_aggregate: FeeSplitterReceipt_aggregate_order_by
   id: order_by
@@ -5483,9 +5272,6 @@ select columns of table "Treasury"
 enum Treasury_select_column {
   """column name"""
   createdAt
-
-  """column name"""
-  db_write_timestamp
 
   """column name"""
   id
@@ -5526,7 +5312,6 @@ input Treasury_stream_cursor_input {
 """Initial value of the column from where the streaming should start"""
 input Treasury_stream_cursor_value_input {
   createdAt: numeric
-  db_write_timestamp: timestamp
   id: String
   lastUpdatedAt: numeric
   market_id: String
@@ -5543,7 +5328,6 @@ columns and relationships of "UserMarketPosition"
 type UserMarketPosition {
   claimableRewardsFormatted: String!
   claimableRewardsRaw: numeric!
-  db_write_timestamp: timestamp
   id: String!
   lastUpdatedAt: numeric!
   lockedCollateralFormatted: String!
@@ -5601,7 +5385,6 @@ input UserMarketPosition_bool_exp {
   _or: [UserMarketPosition_bool_exp!]
   claimableRewardsFormatted: String_comparison_exp
   claimableRewardsRaw: numeric_comparison_exp
-  db_write_timestamp: timestamp_comparison_exp
   id: String_comparison_exp
   lastUpdatedAt: numeric_comparison_exp
   lockedCollateralFormatted: String_comparison_exp
@@ -5625,7 +5408,6 @@ order by max() on columns of table "UserMarketPosition"
 input UserMarketPosition_max_order_by {
   claimableRewardsFormatted: order_by
   claimableRewardsRaw: order_by
-  db_write_timestamp: order_by
   id: order_by
   lastUpdatedAt: order_by
   lockedCollateralFormatted: order_by
@@ -5649,7 +5431,6 @@ order by min() on columns of table "UserMarketPosition"
 input UserMarketPosition_min_order_by {
   claimableRewardsFormatted: order_by
   claimableRewardsRaw: order_by
-  db_write_timestamp: order_by
   id: order_by
   lastUpdatedAt: order_by
   lockedCollateralFormatted: order_by
@@ -5671,7 +5452,6 @@ input UserMarketPosition_min_order_by {
 input UserMarketPosition_order_by {
   claimableRewardsFormatted: order_by
   claimableRewardsRaw: order_by
-  db_write_timestamp: order_by
   id: order_by
   lastUpdatedAt: order_by
   lockedCollateralFormatted: order_by
@@ -5698,9 +5478,6 @@ enum UserMarketPosition_select_column {
 
   """column name"""
   claimableRewardsRaw
-
-  """column name"""
-  db_write_timestamp
 
   """column name"""
   id
@@ -5805,7 +5582,6 @@ input UserMarketPosition_stream_cursor_input {
 input UserMarketPosition_stream_cursor_value_input {
   claimableRewardsFormatted: String
   claimableRewardsRaw: numeric
-  db_write_timestamp: timestamp
   id: String
   lastUpdatedAt: numeric
   lockedCollateralFormatted: String
@@ -5879,6 +5655,115 @@ input UserMarketPosition_variance_order_by {
   totalDebtRaw: order_by
 }
 
+"""
+columns and relationships of "_meta"
+"""
+type _meta {
+  bufferBlock: Int
+  chainId: Int
+  endBlock: Int
+  eventsProcessed: Int
+  firstEventBlock: Int
+  isReady: Boolean
+  progressBlock: Int
+  readyAt: timestamptz
+  sourceBlock: Int
+  startBlock: Int
+}
+
+"""
+Boolean expression to filter rows from the table "_meta". All fields are combined with a logical 'AND'.
+"""
+input _meta_bool_exp {
+  _and: [_meta_bool_exp!]
+  _not: _meta_bool_exp
+  _or: [_meta_bool_exp!]
+  bufferBlock: Int_comparison_exp
+  chainId: Int_comparison_exp
+  endBlock: Int_comparison_exp
+  eventsProcessed: Int_comparison_exp
+  firstEventBlock: Int_comparison_exp
+  isReady: Boolean_comparison_exp
+  progressBlock: Int_comparison_exp
+  readyAt: timestamptz_comparison_exp
+  sourceBlock: Int_comparison_exp
+  startBlock: Int_comparison_exp
+}
+
+"""Ordering options when selecting data from "_meta"."""
+input _meta_order_by {
+  bufferBlock: order_by
+  chainId: order_by
+  endBlock: order_by
+  eventsProcessed: order_by
+  firstEventBlock: order_by
+  isReady: order_by
+  progressBlock: order_by
+  readyAt: order_by
+  sourceBlock: order_by
+  startBlock: order_by
+}
+
+"""
+select columns of table "_meta"
+"""
+enum _meta_select_column {
+  """column name"""
+  bufferBlock
+
+  """column name"""
+  chainId
+
+  """column name"""
+  endBlock
+
+  """column name"""
+  eventsProcessed
+
+  """column name"""
+  firstEventBlock
+
+  """column name"""
+  isReady
+
+  """column name"""
+  progressBlock
+
+  """column name"""
+  readyAt
+
+  """column name"""
+  sourceBlock
+
+  """column name"""
+  startBlock
+}
+
+"""
+Streaming cursor of the table "_meta"
+"""
+input _meta_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: _meta_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input _meta_stream_cursor_value_input {
+  bufferBlock: Int
+  chainId: Int
+  endBlock: Int
+  eventsProcessed: Int
+  firstEventBlock: Int
+  isReady: Boolean
+  progressBlock: Int
+  readyAt: timestamptz
+  sourceBlock: Int
+  startBlock: Int
+}
+
 scalar candleperiod
 
 """
@@ -5900,16 +5785,16 @@ input candleperiod_comparison_exp {
 columns and relationships of "chain_metadata"
 """
 type chain_metadata {
-  block_height: Int!
-  chain_id: Int!
+  block_height: Int
+  chain_id: Int
   end_block: Int
   first_event_block_number: Int
-  is_hyper_sync: Boolean!
-  latest_fetched_block_number: Int!
+  is_hyper_sync: Boolean
+  latest_fetched_block_number: Int
   latest_processed_block: Int
-  num_batches_fetched: Int!
+  num_batches_fetched: Int
   num_events_processed: Int
-  start_block: Int!
+  start_block: Int
   timestamp_caught_up_to_head_or_endblock: timestamptz
 }
 
@@ -6012,23 +5897,6 @@ input chain_metadata_stream_cursor_value_input {
   timestamp_caught_up_to_head_or_endblock: timestamptz
 }
 
-scalar contract_type
-
-"""
-Boolean expression to compare columns of type "contract_type". All fields are combined with logical 'AND'.
-"""
-input contract_type_comparison_exp {
-  _eq: contract_type
-  _gt: contract_type
-  _gte: contract_type
-  _in: [contract_type!]
-  _is_null: Boolean
-  _lt: contract_type
-  _lte: contract_type
-  _neq: contract_type
-  _nin: [contract_type!]
-}
-
 """ordering argument of a cursor"""
 enum cursor_ordering {
   """ascending ordering of the cursor"""
@@ -6036,251 +5904,6 @@ enum cursor_ordering {
 
   """descending ordering of the cursor"""
   DESC
-}
-
-"""
-columns and relationships of "dynamic_contract_registry"
-"""
-type dynamic_contract_registry {
-  chain_id: Int!
-  contract_address: String!
-  contract_type: contract_type!
-  id: String!
-  registering_event_block_number: Int!
-  registering_event_block_timestamp: Int!
-  registering_event_contract_name: String!
-  registering_event_log_index: Int!
-  registering_event_name: String!
-  registering_event_src_address: String!
-}
-
-"""
-Boolean expression to filter rows from the table "dynamic_contract_registry". All fields are combined with a logical 'AND'.
-"""
-input dynamic_contract_registry_bool_exp {
-  _and: [dynamic_contract_registry_bool_exp!]
-  _not: dynamic_contract_registry_bool_exp
-  _or: [dynamic_contract_registry_bool_exp!]
-  chain_id: Int_comparison_exp
-  contract_address: String_comparison_exp
-  contract_type: contract_type_comparison_exp
-  id: String_comparison_exp
-  registering_event_block_number: Int_comparison_exp
-  registering_event_block_timestamp: Int_comparison_exp
-  registering_event_contract_name: String_comparison_exp
-  registering_event_log_index: Int_comparison_exp
-  registering_event_name: String_comparison_exp
-  registering_event_src_address: String_comparison_exp
-}
-
-"""Ordering options when selecting data from "dynamic_contract_registry"."""
-input dynamic_contract_registry_order_by {
-  chain_id: order_by
-  contract_address: order_by
-  contract_type: order_by
-  id: order_by
-  registering_event_block_number: order_by
-  registering_event_block_timestamp: order_by
-  registering_event_contract_name: order_by
-  registering_event_log_index: order_by
-  registering_event_name: order_by
-  registering_event_src_address: order_by
-}
-
-"""
-select columns of table "dynamic_contract_registry"
-"""
-enum dynamic_contract_registry_select_column {
-  """column name"""
-  chain_id
-
-  """column name"""
-  contract_address
-
-  """column name"""
-  contract_type
-
-  """column name"""
-  id
-
-  """column name"""
-  registering_event_block_number
-
-  """column name"""
-  registering_event_block_timestamp
-
-  """column name"""
-  registering_event_contract_name
-
-  """column name"""
-  registering_event_log_index
-
-  """column name"""
-  registering_event_name
-
-  """column name"""
-  registering_event_src_address
-}
-
-"""
-Streaming cursor of the table "dynamic_contract_registry"
-"""
-input dynamic_contract_registry_stream_cursor_input {
-  """Stream column input with initial value"""
-  initial_value: dynamic_contract_registry_stream_cursor_value_input!
-
-  """cursor ordering"""
-  ordering: cursor_ordering
-}
-
-"""Initial value of the column from where the streaming should start"""
-input dynamic_contract_registry_stream_cursor_value_input {
-  chain_id: Int
-  contract_address: String
-  contract_type: contract_type
-  id: String
-  registering_event_block_number: Int
-  registering_event_block_timestamp: Int
-  registering_event_contract_name: String
-  registering_event_log_index: Int
-  registering_event_name: String
-  registering_event_src_address: String
-}
-
-"""
-columns and relationships of "end_of_block_range_scanned_data"
-"""
-type end_of_block_range_scanned_data {
-  block_hash: String!
-  block_number: Int!
-  chain_id: Int!
-}
-
-"""
-Boolean expression to filter rows from the table "end_of_block_range_scanned_data". All fields are combined with a logical 'AND'.
-"""
-input end_of_block_range_scanned_data_bool_exp {
-  _and: [end_of_block_range_scanned_data_bool_exp!]
-  _not: end_of_block_range_scanned_data_bool_exp
-  _or: [end_of_block_range_scanned_data_bool_exp!]
-  block_hash: String_comparison_exp
-  block_number: Int_comparison_exp
-  chain_id: Int_comparison_exp
-}
-
-"""
-Ordering options when selecting data from "end_of_block_range_scanned_data".
-"""
-input end_of_block_range_scanned_data_order_by {
-  block_hash: order_by
-  block_number: order_by
-  chain_id: order_by
-}
-
-"""
-select columns of table "end_of_block_range_scanned_data"
-"""
-enum end_of_block_range_scanned_data_select_column {
-  """column name"""
-  block_hash
-
-  """column name"""
-  block_number
-
-  """column name"""
-  chain_id
-}
-
-"""
-Streaming cursor of the table "end_of_block_range_scanned_data"
-"""
-input end_of_block_range_scanned_data_stream_cursor_input {
-  """Stream column input with initial value"""
-  initial_value: end_of_block_range_scanned_data_stream_cursor_value_input!
-
-  """cursor ordering"""
-  ordering: cursor_ordering
-}
-
-"""Initial value of the column from where the streaming should start"""
-input end_of_block_range_scanned_data_stream_cursor_value_input {
-  block_hash: String
-  block_number: Int
-  chain_id: Int
-}
-
-"""
-columns and relationships of "event_sync_state"
-"""
-type event_sync_state {
-  block_number: Int!
-  block_timestamp: Int!
-  chain_id: Int!
-  is_pre_registering_dynamic_contracts: Boolean
-  log_index: Int!
-}
-
-"""
-Boolean expression to filter rows from the table "event_sync_state". All fields are combined with a logical 'AND'.
-"""
-input event_sync_state_bool_exp {
-  _and: [event_sync_state_bool_exp!]
-  _not: event_sync_state_bool_exp
-  _or: [event_sync_state_bool_exp!]
-  block_number: Int_comparison_exp
-  block_timestamp: Int_comparison_exp
-  chain_id: Int_comparison_exp
-  is_pre_registering_dynamic_contracts: Boolean_comparison_exp
-  log_index: Int_comparison_exp
-}
-
-"""Ordering options when selecting data from "event_sync_state"."""
-input event_sync_state_order_by {
-  block_number: order_by
-  block_timestamp: order_by
-  chain_id: order_by
-  is_pre_registering_dynamic_contracts: order_by
-  log_index: order_by
-}
-
-"""
-select columns of table "event_sync_state"
-"""
-enum event_sync_state_select_column {
-  """column name"""
-  block_number
-
-  """column name"""
-  block_timestamp
-
-  """column name"""
-  chain_id
-
-  """column name"""
-  is_pre_registering_dynamic_contracts
-
-  """column name"""
-  log_index
-}
-
-"""
-Streaming cursor of the table "event_sync_state"
-"""
-input event_sync_state_stream_cursor_input {
-  """Stream column input with initial value"""
-  initial_value: event_sync_state_stream_cursor_value_input!
-
-  """cursor ordering"""
-  ordering: cursor_ordering
-}
-
-"""Initial value of the column from where the streaming should start"""
-input event_sync_state_stream_cursor_value_input {
-  block_number: Int
-  block_timestamp: Int
-  chain_id: Int
-  is_pre_registering_dynamic_contracts: Boolean
-  log_index: Int
 }
 
 scalar jsonb
@@ -6359,26 +5982,6 @@ scalar numeric
 """
 Boolean expression to compare columns of type "numeric". All fields are combined with logical 'AND'.
 """
-input numeric_array_comparison_exp {
-  """is the array contained in the given array value"""
-  _contained_in: [numeric!]
-
-  """does the array contain the given value"""
-  _contains: [numeric!]
-  _eq: [numeric!]
-  _gt: [numeric!]
-  _gte: [numeric!]
-  _in: [[numeric!]!]
-  _is_null: Boolean
-  _lt: [numeric!]
-  _lte: [numeric!]
-  _neq: [numeric!]
-  _nin: [[numeric!]!]
-}
-
-"""
-Boolean expression to compare columns of type "numeric". All fields are combined with logical 'AND'.
-"""
 input numeric_comparison_exp {
   _eq: numeric
   _gt: numeric
@@ -6410,87 +6013,6 @@ enum order_by {
 
   """in descending order, nulls last"""
   desc_nulls_last
-}
-
-"""
-columns and relationships of "persisted_state"
-"""
-type persisted_state {
-  abi_files_hash: String!
-  config_hash: String!
-  envio_version: String!
-  handler_files_hash: String!
-  id: Int!
-  schema_hash: String!
-}
-
-"""
-Boolean expression to filter rows from the table "persisted_state". All fields are combined with a logical 'AND'.
-"""
-input persisted_state_bool_exp {
-  _and: [persisted_state_bool_exp!]
-  _not: persisted_state_bool_exp
-  _or: [persisted_state_bool_exp!]
-  abi_files_hash: String_comparison_exp
-  config_hash: String_comparison_exp
-  envio_version: String_comparison_exp
-  handler_files_hash: String_comparison_exp
-  id: Int_comparison_exp
-  schema_hash: String_comparison_exp
-}
-
-"""Ordering options when selecting data from "persisted_state"."""
-input persisted_state_order_by {
-  abi_files_hash: order_by
-  config_hash: order_by
-  envio_version: order_by
-  handler_files_hash: order_by
-  id: order_by
-  schema_hash: order_by
-}
-
-"""
-select columns of table "persisted_state"
-"""
-enum persisted_state_select_column {
-  """column name"""
-  abi_files_hash
-
-  """column name"""
-  config_hash
-
-  """column name"""
-  envio_version
-
-  """column name"""
-  handler_files_hash
-
-  """column name"""
-  id
-
-  """column name"""
-  schema_hash
-}
-
-"""
-Streaming cursor of the table "persisted_state"
-"""
-input persisted_state_stream_cursor_input {
-  """Stream column input with initial value"""
-  initial_value: persisted_state_stream_cursor_value_input!
-
-  """cursor ordering"""
-  ordering: cursor_ordering
-}
-
-"""Initial value of the column from where the streaming should start"""
-input persisted_state_stream_cursor_value_input {
-  abi_files_hash: String
-  config_hash: String
-  envio_version: String
-  handler_files_hash: String
-  id: Int
-  schema_hash: String
 }
 
 scalar presaleclaimtype
@@ -7172,6 +6694,26 @@ type query_root {
   UserMarketPosition_by_pk(id: String!): UserMarketPosition
 
   """
+  fetch data from the table: "_meta"
+  """
+  _meta(
+    """distinct select on columns"""
+    distinct_on: [_meta_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [_meta_order_by!]
+
+    """filter the rows returned"""
+    where: _meta_bool_exp
+  ): [_meta!]!
+
+  """
   fetch data from the table: "chain_metadata"
   """
   chain_metadata(
@@ -7190,107 +6732,6 @@ type query_root {
     """filter the rows returned"""
     where: chain_metadata_bool_exp
   ): [chain_metadata!]!
-
-  """fetch data from the table: "chain_metadata" using primary key columns"""
-  chain_metadata_by_pk(chain_id: Int!): chain_metadata
-
-  """
-  fetch data from the table: "dynamic_contract_registry"
-  """
-  dynamic_contract_registry(
-    """distinct select on columns"""
-    distinct_on: [dynamic_contract_registry_select_column!]
-
-    """limit the number of rows returned"""
-    limit: Int
-
-    """skip the first n rows. Use only with order_by"""
-    offset: Int
-
-    """sort the rows by one or more columns"""
-    order_by: [dynamic_contract_registry_order_by!]
-
-    """filter the rows returned"""
-    where: dynamic_contract_registry_bool_exp
-  ): [dynamic_contract_registry!]!
-
-  """
-  fetch data from the table: "dynamic_contract_registry" using primary key columns
-  """
-  dynamic_contract_registry_by_pk(id: String!): dynamic_contract_registry
-
-  """
-  fetch data from the table: "end_of_block_range_scanned_data"
-  """
-  end_of_block_range_scanned_data(
-    """distinct select on columns"""
-    distinct_on: [end_of_block_range_scanned_data_select_column!]
-
-    """limit the number of rows returned"""
-    limit: Int
-
-    """skip the first n rows. Use only with order_by"""
-    offset: Int
-
-    """sort the rows by one or more columns"""
-    order_by: [end_of_block_range_scanned_data_order_by!]
-
-    """filter the rows returned"""
-    where: end_of_block_range_scanned_data_bool_exp
-  ): [end_of_block_range_scanned_data!]!
-
-  """
-  fetch data from the table: "end_of_block_range_scanned_data" using primary key columns
-  """
-  end_of_block_range_scanned_data_by_pk(block_number: Int!, chain_id: Int!): end_of_block_range_scanned_data
-
-  """
-  fetch data from the table: "event_sync_state"
-  """
-  event_sync_state(
-    """distinct select on columns"""
-    distinct_on: [event_sync_state_select_column!]
-
-    """limit the number of rows returned"""
-    limit: Int
-
-    """skip the first n rows. Use only with order_by"""
-    offset: Int
-
-    """sort the rows by one or more columns"""
-    order_by: [event_sync_state_order_by!]
-
-    """filter the rows returned"""
-    where: event_sync_state_bool_exp
-  ): [event_sync_state!]!
-
-  """
-  fetch data from the table: "event_sync_state" using primary key columns
-  """
-  event_sync_state_by_pk(chain_id: Int!): event_sync_state
-
-  """
-  fetch data from the table: "persisted_state"
-  """
-  persisted_state(
-    """distinct select on columns"""
-    distinct_on: [persisted_state_select_column!]
-
-    """limit the number of rows returned"""
-    limit: Int
-
-    """skip the first n rows. Use only with order_by"""
-    offset: Int
-
-    """sort the rows by one or more columns"""
-    order_by: [persisted_state_order_by!]
-
-    """filter the rows returned"""
-    where: persisted_state_bool_exp
-  ): [persisted_state!]!
-
-  """fetch data from the table: "persisted_state" using primary key columns"""
-  persisted_state_by_pk(id: Int!): persisted_state
 
   """
   fetch data from the table: "raw_events"
@@ -7329,7 +6770,6 @@ type raw_events {
   block_timestamp: Int!
   chain_id: Int!
   contract_name: String!
-  db_write_timestamp: timestamp
   event_id: numeric!
   event_name: String!
   log_index: Int!
@@ -7358,7 +6798,6 @@ input raw_events_bool_exp {
   block_timestamp: Int_comparison_exp
   chain_id: Int_comparison_exp
   contract_name: String_comparison_exp
-  db_write_timestamp: timestamp_comparison_exp
   event_id: numeric_comparison_exp
   event_name: String_comparison_exp
   log_index: Int_comparison_exp
@@ -7376,7 +6815,6 @@ input raw_events_order_by {
   block_timestamp: order_by
   chain_id: order_by
   contract_name: order_by
-  db_write_timestamp: order_by
   event_id: order_by
   event_name: order_by
   log_index: order_by
@@ -7407,9 +6845,6 @@ enum raw_events_select_column {
 
   """column name"""
   contract_name
-
-  """column name"""
-  db_write_timestamp
 
   """column name"""
   event_id
@@ -7452,7 +6887,6 @@ input raw_events_stream_cursor_value_input {
   block_timestamp: Int
   chain_id: Int
   contract_name: String
-  db_write_timestamp: timestamp
   event_id: numeric
   event_name: String
   log_index: Int
@@ -8533,6 +7967,40 @@ type subscription_root {
   ): [UserMarketPosition!]!
 
   """
+  fetch data from the table: "_meta"
+  """
+  _meta(
+    """distinct select on columns"""
+    distinct_on: [_meta_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [_meta_order_by!]
+
+    """filter the rows returned"""
+    where: _meta_bool_exp
+  ): [_meta!]!
+
+  """
+  fetch data from the table in a streaming manner: "_meta"
+  """
+  _meta_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [_meta_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: _meta_bool_exp
+  ): [_meta!]!
+
+  """
   fetch data from the table: "chain_metadata"
   """
   chain_metadata(
@@ -8552,9 +8020,6 @@ type subscription_root {
     where: chain_metadata_bool_exp
   ): [chain_metadata!]!
 
-  """fetch data from the table: "chain_metadata" using primary key columns"""
-  chain_metadata_by_pk(chain_id: Int!): chain_metadata
-
   """
   fetch data from the table in a streaming manner: "chain_metadata"
   """
@@ -8568,160 +8033,6 @@ type subscription_root {
     """filter the rows returned"""
     where: chain_metadata_bool_exp
   ): [chain_metadata!]!
-
-  """
-  fetch data from the table: "dynamic_contract_registry"
-  """
-  dynamic_contract_registry(
-    """distinct select on columns"""
-    distinct_on: [dynamic_contract_registry_select_column!]
-
-    """limit the number of rows returned"""
-    limit: Int
-
-    """skip the first n rows. Use only with order_by"""
-    offset: Int
-
-    """sort the rows by one or more columns"""
-    order_by: [dynamic_contract_registry_order_by!]
-
-    """filter the rows returned"""
-    where: dynamic_contract_registry_bool_exp
-  ): [dynamic_contract_registry!]!
-
-  """
-  fetch data from the table: "dynamic_contract_registry" using primary key columns
-  """
-  dynamic_contract_registry_by_pk(id: String!): dynamic_contract_registry
-
-  """
-  fetch data from the table in a streaming manner: "dynamic_contract_registry"
-  """
-  dynamic_contract_registry_stream(
-    """maximum number of rows returned in a single batch"""
-    batch_size: Int!
-
-    """cursor to stream the results returned by the query"""
-    cursor: [dynamic_contract_registry_stream_cursor_input]!
-
-    """filter the rows returned"""
-    where: dynamic_contract_registry_bool_exp
-  ): [dynamic_contract_registry!]!
-
-  """
-  fetch data from the table: "end_of_block_range_scanned_data"
-  """
-  end_of_block_range_scanned_data(
-    """distinct select on columns"""
-    distinct_on: [end_of_block_range_scanned_data_select_column!]
-
-    """limit the number of rows returned"""
-    limit: Int
-
-    """skip the first n rows. Use only with order_by"""
-    offset: Int
-
-    """sort the rows by one or more columns"""
-    order_by: [end_of_block_range_scanned_data_order_by!]
-
-    """filter the rows returned"""
-    where: end_of_block_range_scanned_data_bool_exp
-  ): [end_of_block_range_scanned_data!]!
-
-  """
-  fetch data from the table: "end_of_block_range_scanned_data" using primary key columns
-  """
-  end_of_block_range_scanned_data_by_pk(block_number: Int!, chain_id: Int!): end_of_block_range_scanned_data
-
-  """
-  fetch data from the table in a streaming manner: "end_of_block_range_scanned_data"
-  """
-  end_of_block_range_scanned_data_stream(
-    """maximum number of rows returned in a single batch"""
-    batch_size: Int!
-
-    """cursor to stream the results returned by the query"""
-    cursor: [end_of_block_range_scanned_data_stream_cursor_input]!
-
-    """filter the rows returned"""
-    where: end_of_block_range_scanned_data_bool_exp
-  ): [end_of_block_range_scanned_data!]!
-
-  """
-  fetch data from the table: "event_sync_state"
-  """
-  event_sync_state(
-    """distinct select on columns"""
-    distinct_on: [event_sync_state_select_column!]
-
-    """limit the number of rows returned"""
-    limit: Int
-
-    """skip the first n rows. Use only with order_by"""
-    offset: Int
-
-    """sort the rows by one or more columns"""
-    order_by: [event_sync_state_order_by!]
-
-    """filter the rows returned"""
-    where: event_sync_state_bool_exp
-  ): [event_sync_state!]!
-
-  """
-  fetch data from the table: "event_sync_state" using primary key columns
-  """
-  event_sync_state_by_pk(chain_id: Int!): event_sync_state
-
-  """
-  fetch data from the table in a streaming manner: "event_sync_state"
-  """
-  event_sync_state_stream(
-    """maximum number of rows returned in a single batch"""
-    batch_size: Int!
-
-    """cursor to stream the results returned by the query"""
-    cursor: [event_sync_state_stream_cursor_input]!
-
-    """filter the rows returned"""
-    where: event_sync_state_bool_exp
-  ): [event_sync_state!]!
-
-  """
-  fetch data from the table: "persisted_state"
-  """
-  persisted_state(
-    """distinct select on columns"""
-    distinct_on: [persisted_state_select_column!]
-
-    """limit the number of rows returned"""
-    limit: Int
-
-    """skip the first n rows. Use only with order_by"""
-    offset: Int
-
-    """sort the rows by one or more columns"""
-    order_by: [persisted_state_order_by!]
-
-    """filter the rows returned"""
-    where: persisted_state_bool_exp
-  ): [persisted_state!]!
-
-  """fetch data from the table: "persisted_state" using primary key columns"""
-  persisted_state_by_pk(id: Int!): persisted_state
-
-  """
-  fetch data from the table in a streaming manner: "persisted_state"
-  """
-  persisted_state_stream(
-    """maximum number of rows returned in a single batch"""
-    batch_size: Int!
-
-    """cursor to stream the results returned by the query"""
-    cursor: [persisted_state_stream_cursor_input]!
-
-    """filter the rows returned"""
-    where: persisted_state_bool_exp
-  ): [persisted_state!]!
 
   """
   fetch data from the table: "raw_events"
@@ -8759,23 +8070,6 @@ type subscription_root {
     """filter the rows returned"""
     where: raw_events_bool_exp
   ): [raw_events!]!
-}
-
-scalar timestamp
-
-"""
-Boolean expression to compare columns of type "timestamp". All fields are combined with logical 'AND'.
-"""
-input timestamp_comparison_exp {
-  _eq: timestamp
-  _gt: timestamp
-  _gte: timestamp
-  _in: [timestamp!]
-  _is_null: Boolean
-  _lt: timestamp
-  _lte: timestamp
-  _neq: timestamp
-  _nin: [timestamp!]
 }
 
 scalar timestamptz

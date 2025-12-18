@@ -8,14 +8,12 @@ export type Scalars = {
     Int: number,
     String: string,
     candleperiod: any,
-    contract_type: any,
     jsonb: any,
     loanstatus: any,
     marketstatus: any,
     numeric: any,
     presaleclaimtype: any,
     stakestatus: any,
-    timestamp: any,
     timestamptz: any,
     tradetype: any,
 }
@@ -23,7 +21,6 @@ export type Scalars = {
 
 /** columns and relationships of "Account" */
 export interface Account {
-    db_write_timestamp: (Scalars['timestamp'] | null)
     id: Scalars['String']
     /** An array relationship */
     loans: Loan[]
@@ -42,13 +39,12 @@ export interface Account {
 
 
 /** select columns of table "Account" */
-export type Account_select_column = 'db_write_timestamp' | 'id'
+export type Account_select_column = 'id'
 
 
 /** columns and relationships of "AuthorizerContract" */
 export interface AuthorizerContract {
     createdAt: Scalars['numeric']
-    db_write_timestamp: (Scalars['timestamp'] | null)
     floor: Scalars['String']
     id: Scalars['String']
     lastAssignedRoleId: Scalars['numeric']
@@ -60,7 +56,7 @@ export interface AuthorizerContract {
 
 
 /** select columns of table "AuthorizerContract" */
-export type AuthorizerContract_select_column = 'createdAt' | 'db_write_timestamp' | 'floor' | 'id' | 'lastAssignedRoleId' | 'lastUpdatedAt'
+export type AuthorizerContract_select_column = 'createdAt' | 'floor' | 'id' | 'lastAssignedRoleId' | 'lastUpdatedAt'
 
 
 /** columns and relationships of "CreditFacilityContract" */
@@ -68,7 +64,6 @@ export interface CreditFacilityContract {
     borrowToken_id: Scalars['String']
     collateralToken_id: Scalars['String']
     createdAt: Scalars['numeric']
-    db_write_timestamp: (Scalars['timestamp'] | null)
     id: Scalars['String']
     lastUpdatedAt: Scalars['numeric']
     /** An array relationship */
@@ -86,14 +81,13 @@ export interface CreditFacilityContract {
 
 
 /** select columns of table "CreditFacilityContract" */
-export type CreditFacilityContract_select_column = 'borrowToken_id' | 'collateralToken_id' | 'createdAt' | 'db_write_timestamp' | 'id' | 'lastUpdatedAt' | 'market_id' | 'totalDebtFormatted' | 'totalDebtRaw' | 'totalLoans' | 'totalLockedCollateralFormatted' | 'totalLockedCollateralRaw' | 'totalVolumeFormatted' | 'totalVolumeRaw'
+export type CreditFacilityContract_select_column = 'borrowToken_id' | 'collateralToken_id' | 'createdAt' | 'id' | 'lastUpdatedAt' | 'market_id' | 'totalDebtFormatted' | 'totalDebtRaw' | 'totalLoans' | 'totalLockedCollateralFormatted' | 'totalLockedCollateralRaw' | 'totalVolumeFormatted' | 'totalVolumeRaw'
 
 
 /** columns and relationships of "FeeSplitterPayment" */
 export interface FeeSplitterPayment {
     amountFormatted: Scalars['String']
     amountRaw: Scalars['numeric']
-    db_write_timestamp: (Scalars['timestamp'] | null)
     id: Scalars['String']
     isFloorFee: Scalars['Boolean']
     market_id: Scalars['String']
@@ -107,14 +101,13 @@ export interface FeeSplitterPayment {
 
 
 /** select columns of table "FeeSplitterPayment" */
-export type FeeSplitterPayment_select_column = 'amountFormatted' | 'amountRaw' | 'db_write_timestamp' | 'id' | 'isFloorFee' | 'market_id' | 'recipient' | 'timestamp' | 'token_id' | 'transactionHash' | 'treasury_id'
+export type FeeSplitterPayment_select_column = 'amountFormatted' | 'amountRaw' | 'id' | 'isFloorFee' | 'market_id' | 'recipient' | 'timestamp' | 'token_id' | 'transactionHash' | 'treasury_id'
 
 
 /** columns and relationships of "FeeSplitterReceipt" */
 export interface FeeSplitterReceipt {
     amountFormatted: Scalars['String']
     amountRaw: Scalars['numeric']
-    db_write_timestamp: (Scalars['timestamp'] | null)
     id: Scalars['String']
     market_id: Scalars['String']
     sender: Scalars['String']
@@ -127,12 +120,11 @@ export interface FeeSplitterReceipt {
 
 
 /** select columns of table "FeeSplitterReceipt" */
-export type FeeSplitterReceipt_select_column = 'amountFormatted' | 'amountRaw' | 'db_write_timestamp' | 'id' | 'market_id' | 'sender' | 'timestamp' | 'token_id' | 'transactionHash' | 'treasury_id'
+export type FeeSplitterReceipt_select_column = 'amountFormatted' | 'amountRaw' | 'id' | 'market_id' | 'sender' | 'timestamp' | 'token_id' | 'transactionHash' | 'treasury_id'
 
 
 /** columns and relationships of "FloorElevation" */
 export interface FloorElevation {
-    db_write_timestamp: (Scalars['timestamp'] | null)
     deployedAmountFormatted: Scalars['String']
     deployedAmountRaw: Scalars['numeric']
     id: Scalars['String']
@@ -148,13 +140,12 @@ export interface FloorElevation {
 
 
 /** select columns of table "FloorElevation" */
-export type FloorElevation_select_column = 'db_write_timestamp' | 'deployedAmountFormatted' | 'deployedAmountRaw' | 'id' | 'market_id' | 'newFloorPriceFormatted' | 'newFloorPriceRaw' | 'oldFloorPriceFormatted' | 'oldFloorPriceRaw' | 'timestamp' | 'transactionHash'
+export type FloorElevation_select_column = 'deployedAmountFormatted' | 'deployedAmountRaw' | 'id' | 'market_id' | 'newFloorPriceFormatted' | 'newFloorPriceRaw' | 'oldFloorPriceFormatted' | 'oldFloorPriceRaw' | 'timestamp' | 'transactionHash'
 
 
 /** columns and relationships of "GlobalRegistry" */
 export interface GlobalRegistry {
     createdAt: Scalars['numeric']
-    db_write_timestamp: (Scalars['timestamp'] | null)
     floorFactoryAddress: Scalars['String']
     id: Scalars['String']
     lastUpdatedAt: Scalars['numeric']
@@ -164,13 +155,12 @@ export interface GlobalRegistry {
 
 
 /** select columns of table "GlobalRegistry" */
-export type GlobalRegistry_select_column = 'createdAt' | 'db_write_timestamp' | 'floorFactoryAddress' | 'id' | 'lastUpdatedAt' | 'moduleFactoryAddress'
+export type GlobalRegistry_select_column = 'createdAt' | 'floorFactoryAddress' | 'id' | 'lastUpdatedAt' | 'moduleFactoryAddress'
 
 
 /** columns and relationships of "GlobalStats" */
 export interface GlobalStats {
     activeMarkets: Scalars['numeric']
-    db_write_timestamp: (Scalars['timestamp'] | null)
     id: Scalars['String']
     lastUpdatedAt: Scalars['numeric']
     totalLockedCollateralFormatted: Scalars['String']
@@ -185,7 +175,7 @@ export interface GlobalStats {
 
 
 /** select columns of table "GlobalStats" */
-export type GlobalStats_select_column = 'activeMarkets' | 'db_write_timestamp' | 'id' | 'lastUpdatedAt' | 'totalLockedCollateralFormatted' | 'totalLockedCollateralRaw' | 'totalMarkets' | 'totalOutstandingDebtFormatted' | 'totalOutstandingDebtRaw' | 'totalVolumeFormatted' | 'totalVolumeRaw'
+export type GlobalStats_select_column = 'activeMarkets' | 'id' | 'lastUpdatedAt' | 'totalLockedCollateralFormatted' | 'totalLockedCollateralRaw' | 'totalMarkets' | 'totalOutstandingDebtFormatted' | 'totalOutstandingDebtRaw' | 'totalVolumeFormatted' | 'totalVolumeRaw'
 
 
 /** columns and relationships of "Loan" */
@@ -194,7 +184,6 @@ export interface Loan {
     borrowAmountRaw: Scalars['numeric']
     borrower_id: Scalars['String']
     closedAt: (Scalars['numeric'] | null)
-    db_write_timestamp: (Scalars['timestamp'] | null)
     facility_id: Scalars['String']
     floorPriceAtBorrowFormatted: Scalars['String']
     floorPriceAtBorrowRaw: Scalars['numeric']
@@ -218,7 +207,6 @@ export interface Loan {
 
 /** columns and relationships of "LoanStatusHistory" */
 export interface LoanStatusHistory {
-    db_write_timestamp: (Scalars['timestamp'] | null)
     id: Scalars['String']
     loan_id: Scalars['String']
     lockedCollateralFormatted: Scalars['String']
@@ -233,11 +221,11 @@ export interface LoanStatusHistory {
 
 
 /** select columns of table "LoanStatusHistory" */
-export type LoanStatusHistory_select_column = 'db_write_timestamp' | 'id' | 'loan_id' | 'lockedCollateralFormatted' | 'lockedCollateralRaw' | 'remainingDebtFormatted' | 'remainingDebtRaw' | 'status' | 'timestamp' | 'transactionHash'
+export type LoanStatusHistory_select_column = 'id' | 'loan_id' | 'lockedCollateralFormatted' | 'lockedCollateralRaw' | 'remainingDebtFormatted' | 'remainingDebtRaw' | 'status' | 'timestamp' | 'transactionHash'
 
 
 /** select columns of table "Loan" */
-export type Loan_select_column = 'borrowAmountFormatted' | 'borrowAmountRaw' | 'borrower_id' | 'closedAt' | 'db_write_timestamp' | 'facility_id' | 'floorPriceAtBorrowFormatted' | 'floorPriceAtBorrowRaw' | 'id' | 'lastUpdatedAt' | 'lockedCollateralFormatted' | 'lockedCollateralRaw' | 'market_id' | 'openedAt' | 'originationFeeFormatted' | 'originationFeeRaw' | 'remainingDebtFormatted' | 'remainingDebtRaw' | 'status' | 'transactionHash'
+export type Loan_select_column = 'borrowAmountFormatted' | 'borrowAmountRaw' | 'borrower_id' | 'closedAt' | 'facility_id' | 'floorPriceAtBorrowFormatted' | 'floorPriceAtBorrowRaw' | 'id' | 'lastUpdatedAt' | 'lockedCollateralFormatted' | 'lockedCollateralRaw' | 'market_id' | 'openedAt' | 'originationFeeFormatted' | 'originationFeeRaw' | 'remainingDebtFormatted' | 'remainingDebtRaw' | 'status' | 'transactionHash'
 
 
 /** columns and relationships of "Market" */
@@ -247,7 +235,6 @@ export interface Market {
     creator_id: Scalars['String']
     currentPriceFormatted: Scalars['String']
     currentPriceRaw: Scalars['numeric']
-    db_write_timestamp: (Scalars['timestamp'] | null)
     factory_id: Scalars['String']
     /** An array relationship */
     floorElevations: FloorElevation[]
@@ -287,7 +274,6 @@ export interface Market {
 export interface MarketRollingStats {
     averagePriceFormatted: Scalars['String']
     averagePriceRaw: Scalars['numeric']
-    db_write_timestamp: (Scalars['timestamp'] | null)
     id: Scalars['String']
     lastUpdatedAt: Scalars['numeric']
     market_id: Scalars['String']
@@ -300,12 +286,11 @@ export interface MarketRollingStats {
 
 
 /** select columns of table "MarketRollingStats" */
-export type MarketRollingStats_select_column = 'averagePriceFormatted' | 'averagePriceRaw' | 'db_write_timestamp' | 'id' | 'lastUpdatedAt' | 'market_id' | 'tradeCount' | 'volumeFormatted' | 'volumeRaw' | 'windowSeconds'
+export type MarketRollingStats_select_column = 'averagePriceFormatted' | 'averagePriceRaw' | 'id' | 'lastUpdatedAt' | 'market_id' | 'tradeCount' | 'volumeFormatted' | 'volumeRaw' | 'windowSeconds'
 
 
 /** columns and relationships of "MarketSnapshot" */
 export interface MarketSnapshot {
-    db_write_timestamp: (Scalars['timestamp'] | null)
     floorPriceFormatted: Scalars['String']
     floorPriceRaw: Scalars['numeric']
     id: Scalars['String']
@@ -325,17 +310,16 @@ export interface MarketSnapshot {
 
 
 /** select columns of table "MarketSnapshot" */
-export type MarketSnapshot_select_column = 'db_write_timestamp' | 'floorPriceFormatted' | 'floorPriceRaw' | 'id' | 'marketSupplyFormatted' | 'marketSupplyRaw' | 'market_id' | 'priceFormatted' | 'priceRaw' | 'timestamp' | 'totalSupplyFormatted' | 'totalSupplyRaw' | 'trades24h' | 'volume24hFormatted' | 'volume24hRaw'
+export type MarketSnapshot_select_column = 'floorPriceFormatted' | 'floorPriceRaw' | 'id' | 'marketSupplyFormatted' | 'marketSupplyRaw' | 'market_id' | 'priceFormatted' | 'priceRaw' | 'timestamp' | 'totalSupplyFormatted' | 'totalSupplyRaw' | 'trades24h' | 'volume24hFormatted' | 'volume24hRaw'
 
 
 /** select columns of table "Market" */
-export type Market_select_column = 'buyFeeBps' | 'createdAt' | 'creator_id' | 'currentPriceFormatted' | 'currentPriceRaw' | 'db_write_timestamp' | 'factory_id' | 'floorPriceFormatted' | 'floorPriceRaw' | 'floorSupplyFormatted' | 'floorSupplyRaw' | 'id' | 'initialFloorPriceFormatted' | 'initialFloorPriceRaw' | 'isBuyOpen' | 'isSellOpen' | 'issuanceToken_id' | 'lastElevationTimestamp' | 'lastTradeTimestamp' | 'lastUpdatedAt' | 'marketSupplyFormatted' | 'marketSupplyRaw' | 'maxLTV' | 'reserveToken_id' | 'sellFeeBps' | 'status' | 'totalSupplyFormatted' | 'totalSupplyRaw' | 'tradingFeeBps'
+export type Market_select_column = 'buyFeeBps' | 'createdAt' | 'creator_id' | 'currentPriceFormatted' | 'currentPriceRaw' | 'factory_id' | 'floorPriceFormatted' | 'floorPriceRaw' | 'floorSupplyFormatted' | 'floorSupplyRaw' | 'id' | 'initialFloorPriceFormatted' | 'initialFloorPriceRaw' | 'isBuyOpen' | 'isSellOpen' | 'issuanceToken_id' | 'lastElevationTimestamp' | 'lastTradeTimestamp' | 'lastUpdatedAt' | 'marketSupplyFormatted' | 'marketSupplyRaw' | 'maxLTV' | 'reserveToken_id' | 'sellFeeBps' | 'status' | 'totalSupplyFormatted' | 'totalSupplyRaw' | 'tradingFeeBps'
 
 
 /** columns and relationships of "ModuleAddress" */
 export interface ModuleAddress {
     createdAt: Scalars['numeric']
-    db_write_timestamp: (Scalars['timestamp'] | null)
     id: Scalars['String']
     lastUpdatedAt: Scalars['numeric']
     market_id: Scalars['String']
@@ -345,7 +329,7 @@ export interface ModuleAddress {
 
 
 /** select columns of table "ModuleAddress" */
-export type ModuleAddress_select_column = 'createdAt' | 'db_write_timestamp' | 'id' | 'lastUpdatedAt' | 'market_id' | 'moduleType'
+export type ModuleAddress_select_column = 'createdAt' | 'id' | 'lastUpdatedAt' | 'market_id' | 'moduleType'
 
 
 /** columns and relationships of "ModuleRegistry" */
@@ -353,7 +337,6 @@ export interface ModuleRegistry {
     authorizer: Scalars['String']
     createdAt: Scalars['numeric']
     creditFacility: (Scalars['String'] | null)
-    db_write_timestamp: (Scalars['timestamp'] | null)
     feeTreasury: Scalars['String']
     floor: Scalars['String']
     id: Scalars['String']
@@ -365,7 +348,7 @@ export interface ModuleRegistry {
 
 
 /** select columns of table "ModuleRegistry" */
-export type ModuleRegistry_select_column = 'authorizer' | 'createdAt' | 'creditFacility' | 'db_write_timestamp' | 'feeTreasury' | 'floor' | 'id' | 'lastUpdatedAt' | 'presale' | 'staking'
+export type ModuleRegistry_select_column = 'authorizer' | 'createdAt' | 'creditFacility' | 'feeTreasury' | 'floor' | 'id' | 'lastUpdatedAt' | 'presale' | 'staking'
 
 
 /** columns and relationships of "PreSaleContract" */
@@ -373,10 +356,9 @@ export interface PreSaleContract {
     authorizer: (Scalars['String'] | null)
     /** An array relationship */
     claims: PresaleClaim[]
-    commissionBps: (Scalars['numeric'][] | null)
+    commissionBps: (Scalars['String'][] | null)
     createdAt: Scalars['numeric']
     currentState: Scalars['Int']
-    db_write_timestamp: (Scalars['timestamp'] | null)
     endTime: Scalars['numeric']
     feeTreasury: (Scalars['String'] | null)
     globalDepositCapFormatted: Scalars['String']
@@ -391,7 +373,7 @@ export interface PreSaleContract {
     perAddressDepositCapFormatted: Scalars['String']
     perAddressDepositCapRaw: Scalars['numeric']
     priceBreakpointOffsets: (Scalars['Int'][] | null)
-    priceBreakpointsFlat: (Scalars['numeric'][] | null)
+    priceBreakpointsFlat: (Scalars['String'][] | null)
     /** An object relationship */
     purchaseToken: (Token | null)
     purchaseToken_id: Scalars['String']
@@ -410,7 +392,7 @@ export interface PreSaleContract {
 
 
 /** select columns of table "PreSaleContract" */
-export type PreSaleContract_select_column = 'authorizer' | 'commissionBps' | 'createdAt' | 'currentState' | 'db_write_timestamp' | 'endTime' | 'feeTreasury' | 'globalDepositCapFormatted' | 'globalDepositCapRaw' | 'id' | 'lastUpdatedAt' | 'lendingFacility' | 'market_id' | 'maxLeverage' | 'perAddressDepositCapFormatted' | 'perAddressDepositCapRaw' | 'priceBreakpointOffsets' | 'priceBreakpointsFlat' | 'purchaseToken_id' | 'saleToken_id' | 'startTime' | 'timeSafeguardTs' | 'totalParticipants' | 'totalRaisedFormatted' | 'totalRaisedRaw' | 'whitelistSize' | 'whitelistedAddresses'
+export type PreSaleContract_select_column = 'authorizer' | 'commissionBps' | 'createdAt' | 'currentState' | 'endTime' | 'feeTreasury' | 'globalDepositCapFormatted' | 'globalDepositCapRaw' | 'id' | 'lastUpdatedAt' | 'lendingFacility' | 'market_id' | 'maxLeverage' | 'perAddressDepositCapFormatted' | 'perAddressDepositCapRaw' | 'priceBreakpointOffsets' | 'priceBreakpointsFlat' | 'purchaseToken_id' | 'saleToken_id' | 'startTime' | 'timeSafeguardTs' | 'totalParticipants' | 'totalRaisedFormatted' | 'totalRaisedRaw' | 'whitelistSize' | 'whitelistedAddresses'
 
 
 /** columns and relationships of "PresaleClaim" */
@@ -418,7 +400,6 @@ export interface PresaleClaim {
     amountFormatted: Scalars['String']
     amountRaw: Scalars['numeric']
     claimType: Scalars['presaleclaimtype']
-    db_write_timestamp: (Scalars['timestamp'] | null)
     id: Scalars['String']
     loanId: (Scalars['numeric'] | null)
     positionId: (Scalars['numeric'] | null)
@@ -431,12 +412,11 @@ export interface PresaleClaim {
 
 
 /** select columns of table "PresaleClaim" */
-export type PresaleClaim_select_column = 'amountFormatted' | 'amountRaw' | 'claimType' | 'db_write_timestamp' | 'id' | 'loanId' | 'positionId' | 'presale_id' | 'timestamp' | 'trancheIndex' | 'transactionHash'
+export type PresaleClaim_select_column = 'amountFormatted' | 'amountRaw' | 'claimType' | 'id' | 'loanId' | 'positionId' | 'presale_id' | 'timestamp' | 'trancheIndex' | 'transactionHash'
 
 
 /** columns and relationships of "PresaleParticipation" */
 export interface PresaleParticipation {
-    db_write_timestamp: (Scalars['timestamp'] | null)
     depositAmountFormatted: Scalars['String']
     depositAmountRaw: Scalars['numeric']
     id: Scalars['String']
@@ -454,14 +434,13 @@ export interface PresaleParticipation {
 
 
 /** select columns of table "PresaleParticipation" */
-export type PresaleParticipation_select_column = 'db_write_timestamp' | 'depositAmountFormatted' | 'depositAmountRaw' | 'id' | 'leverage' | 'loopCount' | 'mintedAmountFormatted' | 'mintedAmountRaw' | 'positionId' | 'presale_id' | 'timestamp' | 'transactionHash' | 'user_id'
+export type PresaleParticipation_select_column = 'depositAmountFormatted' | 'depositAmountRaw' | 'id' | 'leverage' | 'loopCount' | 'mintedAmountFormatted' | 'mintedAmountRaw' | 'positionId' | 'presale_id' | 'timestamp' | 'transactionHash' | 'user_id'
 
 
 /** columns and relationships of "PriceCandle" */
 export interface PriceCandle {
     closeFormatted: Scalars['String']
     closeRaw: Scalars['numeric']
-    db_write_timestamp: (Scalars['timestamp'] | null)
     highFormatted: Scalars['String']
     highRaw: Scalars['numeric']
     id: Scalars['String']
@@ -480,7 +459,7 @@ export interface PriceCandle {
 
 
 /** select columns of table "PriceCandle" */
-export type PriceCandle_select_column = 'closeFormatted' | 'closeRaw' | 'db_write_timestamp' | 'highFormatted' | 'highRaw' | 'id' | 'lowFormatted' | 'lowRaw' | 'market_id' | 'openFormatted' | 'openRaw' | 'period' | 'timestamp' | 'trades' | 'volumeFormatted' | 'volumeRaw'
+export type PriceCandle_select_column = 'closeFormatted' | 'closeRaw' | 'highFormatted' | 'highRaw' | 'id' | 'lowFormatted' | 'lowRaw' | 'market_id' | 'openFormatted' | 'openRaw' | 'period' | 'timestamp' | 'trades' | 'volumeFormatted' | 'volumeRaw'
 
 
 /** columns and relationships of "Role" */
@@ -489,7 +468,6 @@ export interface Role {
     adminRoleName: (Scalars['String'] | null)
     authorizer_id: Scalars['String']
     createdAt: Scalars['numeric']
-    db_write_timestamp: (Scalars['timestamp'] | null)
     id: Scalars['String']
     isAdminBurned: Scalars['Boolean']
     lastUpdatedAt: Scalars['numeric']
@@ -505,7 +483,6 @@ export interface Role {
 
 /** columns and relationships of "RoleMember" */
 export interface RoleMember {
-    db_write_timestamp: (Scalars['timestamp'] | null)
     grantedAt: Scalars['numeric']
     grantedBy: Scalars['String']
     id: Scalars['String']
@@ -517,13 +494,12 @@ export interface RoleMember {
 
 
 /** select columns of table "RoleMember" */
-export type RoleMember_select_column = 'db_write_timestamp' | 'grantedAt' | 'grantedBy' | 'id' | 'member' | 'role_id' | 'transactionHash'
+export type RoleMember_select_column = 'grantedAt' | 'grantedBy' | 'id' | 'member' | 'role_id' | 'transactionHash'
 
 
 /** columns and relationships of "RolePermission" */
 export interface RolePermission {
     addedAt: Scalars['numeric']
-    db_write_timestamp: (Scalars['timestamp'] | null)
     id: Scalars['String']
     role_id: Scalars['String']
     selector: Scalars['String']
@@ -535,11 +511,11 @@ export interface RolePermission {
 
 
 /** select columns of table "RolePermission" */
-export type RolePermission_select_column = 'addedAt' | 'db_write_timestamp' | 'id' | 'role_id' | 'selector' | 'selectorName' | 'target' | 'transactionHash'
+export type RolePermission_select_column = 'addedAt' | 'id' | 'role_id' | 'selector' | 'selectorName' | 'target' | 'transactionHash'
 
 
 /** select columns of table "Role" */
-export type Role_select_column = 'adminRole' | 'adminRoleName' | 'authorizer_id' | 'createdAt' | 'db_write_timestamp' | 'id' | 'isAdminBurned' | 'lastUpdatedAt' | 'name' | 'roleId'
+export type Role_select_column = 'adminRole' | 'adminRoleName' | 'authorizer_id' | 'createdAt' | 'id' | 'isAdminBurned' | 'lastUpdatedAt' | 'name' | 'roleId'
 
 
 /** columns and relationships of "Stake" */
@@ -547,7 +523,6 @@ export interface Stake {
     amountFormatted: Scalars['String']
     amountRaw: Scalars['numeric']
     contract_id: Scalars['String']
-    db_write_timestamp: (Scalars['timestamp'] | null)
     id: Scalars['String']
     lockDuration: Scalars['numeric']
     status: Scalars['stakestatus']
@@ -559,13 +534,12 @@ export interface Stake {
 
 
 /** select columns of table "Stake" */
-export type Stake_select_column = 'amountFormatted' | 'amountRaw' | 'contract_id' | 'db_write_timestamp' | 'id' | 'lockDuration' | 'status' | 'timestamp' | 'transactionHash' | 'user_id'
+export type Stake_select_column = 'amountFormatted' | 'amountRaw' | 'contract_id' | 'id' | 'lockDuration' | 'status' | 'timestamp' | 'transactionHash' | 'user_id'
 
 
 /** columns and relationships of "StakingContract" */
 export interface StakingContract {
     createdAt: Scalars['numeric']
-    db_write_timestamp: (Scalars['timestamp'] | null)
     id: Scalars['String']
     rewardToken_id: Scalars['String']
     /** An array relationship */
@@ -580,12 +554,11 @@ export interface StakingContract {
 
 
 /** select columns of table "StakingContract" */
-export type StakingContract_select_column = 'createdAt' | 'db_write_timestamp' | 'id' | 'rewardToken_id' | 'stakingToken_id' | 'totalRewardsFormatted' | 'totalRewardsRaw' | 'totalStakedFormatted' | 'totalStakedRaw'
+export type StakingContract_select_column = 'createdAt' | 'id' | 'rewardToken_id' | 'stakingToken_id' | 'totalRewardsFormatted' | 'totalRewardsRaw' | 'totalStakedFormatted' | 'totalStakedRaw'
 
 
 /** columns and relationships of "Token" */
 export interface Token {
-    db_write_timestamp: (Scalars['timestamp'] | null)
     decimals: Scalars['Int']
     id: Scalars['String']
     maxSupplyFormatted: Scalars['String']
@@ -597,12 +570,11 @@ export interface Token {
 
 
 /** select columns of table "Token" */
-export type Token_select_column = 'db_write_timestamp' | 'decimals' | 'id' | 'maxSupplyFormatted' | 'maxSupplyRaw' | 'name' | 'symbol'
+export type Token_select_column = 'decimals' | 'id' | 'maxSupplyFormatted' | 'maxSupplyRaw' | 'name' | 'symbol'
 
 
 /** columns and relationships of "Trade" */
 export interface Trade {
-    db_write_timestamp: (Scalars['timestamp'] | null)
     feeFormatted: Scalars['String']
     feeRaw: Scalars['numeric']
     id: Scalars['String']
@@ -622,13 +594,12 @@ export interface Trade {
 
 
 /** select columns of table "Trade" */
-export type Trade_select_column = 'db_write_timestamp' | 'feeFormatted' | 'feeRaw' | 'id' | 'market_id' | 'newPriceFormatted' | 'newPriceRaw' | 'reserveAmountFormatted' | 'reserveAmountRaw' | 'timestamp' | 'tokenAmountFormatted' | 'tokenAmountRaw' | 'tradeType' | 'transactionHash' | 'user_id'
+export type Trade_select_column = 'feeFormatted' | 'feeRaw' | 'id' | 'market_id' | 'newPriceFormatted' | 'newPriceRaw' | 'reserveAmountFormatted' | 'reserveAmountRaw' | 'timestamp' | 'tokenAmountFormatted' | 'tokenAmountRaw' | 'tradeType' | 'transactionHash' | 'user_id'
 
 
 /** columns and relationships of "Treasury" */
 export interface Treasury {
     createdAt: Scalars['numeric']
-    db_write_timestamp: (Scalars['timestamp'] | null)
     /** An array relationship */
     feeSplitterPayments: FeeSplitterPayment[]
     /** An array relationship */
@@ -646,14 +617,13 @@ export interface Treasury {
 
 
 /** select columns of table "Treasury" */
-export type Treasury_select_column = 'createdAt' | 'db_write_timestamp' | 'id' | 'lastUpdatedAt' | 'market_id' | 'totalFeesDistributedFormatted' | 'totalFeesDistributedRaw' | 'totalFeesReceivedFormatted' | 'totalFeesReceivedRaw' | 'treasuryAddress'
+export type Treasury_select_column = 'createdAt' | 'id' | 'lastUpdatedAt' | 'market_id' | 'totalFeesDistributedFormatted' | 'totalFeesDistributedRaw' | 'totalFeesReceivedFormatted' | 'totalFeesReceivedRaw' | 'treasuryAddress'
 
 
 /** columns and relationships of "UserMarketPosition" */
 export interface UserMarketPosition {
     claimableRewardsFormatted: Scalars['String']
     claimableRewardsRaw: Scalars['numeric']
-    db_write_timestamp: (Scalars['timestamp'] | null)
     id: Scalars['String']
     lastUpdatedAt: Scalars['numeric']
     lockedCollateralFormatted: Scalars['String']
@@ -674,21 +644,41 @@ export interface UserMarketPosition {
 
 
 /** select columns of table "UserMarketPosition" */
-export type UserMarketPosition_select_column = 'claimableRewardsFormatted' | 'claimableRewardsRaw' | 'db_write_timestamp' | 'id' | 'lastUpdatedAt' | 'lockedCollateralFormatted' | 'lockedCollateralRaw' | 'market_id' | 'netFTokenChangeFormatted' | 'netFTokenChangeRaw' | 'presaleDepositFormatted' | 'presaleDepositRaw' | 'presaleLeverage' | 'stakedAmountFormatted' | 'stakedAmountRaw' | 'totalDebtFormatted' | 'totalDebtRaw' | 'user_id'
+export type UserMarketPosition_select_column = 'claimableRewardsFormatted' | 'claimableRewardsRaw' | 'id' | 'lastUpdatedAt' | 'lockedCollateralFormatted' | 'lockedCollateralRaw' | 'market_id' | 'netFTokenChangeFormatted' | 'netFTokenChangeRaw' | 'presaleDepositFormatted' | 'presaleDepositRaw' | 'presaleLeverage' | 'stakedAmountFormatted' | 'stakedAmountRaw' | 'totalDebtFormatted' | 'totalDebtRaw' | 'user_id'
+
+
+/** columns and relationships of "_meta" */
+export interface _meta {
+    bufferBlock: (Scalars['Int'] | null)
+    chainId: (Scalars['Int'] | null)
+    endBlock: (Scalars['Int'] | null)
+    eventsProcessed: (Scalars['Int'] | null)
+    firstEventBlock: (Scalars['Int'] | null)
+    isReady: (Scalars['Boolean'] | null)
+    progressBlock: (Scalars['Int'] | null)
+    readyAt: (Scalars['timestamptz'] | null)
+    sourceBlock: (Scalars['Int'] | null)
+    startBlock: (Scalars['Int'] | null)
+    __typename: '_meta'
+}
+
+
+/** select columns of table "_meta" */
+export type _meta_select_column = 'bufferBlock' | 'chainId' | 'endBlock' | 'eventsProcessed' | 'firstEventBlock' | 'isReady' | 'progressBlock' | 'readyAt' | 'sourceBlock' | 'startBlock'
 
 
 /** columns and relationships of "chain_metadata" */
 export interface chain_metadata {
-    block_height: Scalars['Int']
-    chain_id: Scalars['Int']
+    block_height: (Scalars['Int'] | null)
+    chain_id: (Scalars['Int'] | null)
     end_block: (Scalars['Int'] | null)
     first_event_block_number: (Scalars['Int'] | null)
-    is_hyper_sync: Scalars['Boolean']
-    latest_fetched_block_number: Scalars['Int']
+    is_hyper_sync: (Scalars['Boolean'] | null)
+    latest_fetched_block_number: (Scalars['Int'] | null)
     latest_processed_block: (Scalars['Int'] | null)
-    num_batches_fetched: Scalars['Int']
+    num_batches_fetched: (Scalars['Int'] | null)
     num_events_processed: (Scalars['Int'] | null)
-    start_block: Scalars['Int']
+    start_block: (Scalars['Int'] | null)
     timestamp_caught_up_to_head_or_endblock: (Scalars['timestamptz'] | null)
     __typename: 'chain_metadata'
 }
@@ -702,72 +692,8 @@ export type chain_metadata_select_column = 'block_height' | 'chain_id' | 'end_bl
 export type cursor_ordering = 'ASC' | 'DESC'
 
 
-/** columns and relationships of "dynamic_contract_registry" */
-export interface dynamic_contract_registry {
-    chain_id: Scalars['Int']
-    contract_address: Scalars['String']
-    contract_type: Scalars['contract_type']
-    id: Scalars['String']
-    registering_event_block_number: Scalars['Int']
-    registering_event_block_timestamp: Scalars['Int']
-    registering_event_contract_name: Scalars['String']
-    registering_event_log_index: Scalars['Int']
-    registering_event_name: Scalars['String']
-    registering_event_src_address: Scalars['String']
-    __typename: 'dynamic_contract_registry'
-}
-
-
-/** select columns of table "dynamic_contract_registry" */
-export type dynamic_contract_registry_select_column = 'chain_id' | 'contract_address' | 'contract_type' | 'id' | 'registering_event_block_number' | 'registering_event_block_timestamp' | 'registering_event_contract_name' | 'registering_event_log_index' | 'registering_event_name' | 'registering_event_src_address'
-
-
-/** columns and relationships of "end_of_block_range_scanned_data" */
-export interface end_of_block_range_scanned_data {
-    block_hash: Scalars['String']
-    block_number: Scalars['Int']
-    chain_id: Scalars['Int']
-    __typename: 'end_of_block_range_scanned_data'
-}
-
-
-/** select columns of table "end_of_block_range_scanned_data" */
-export type end_of_block_range_scanned_data_select_column = 'block_hash' | 'block_number' | 'chain_id'
-
-
-/** columns and relationships of "event_sync_state" */
-export interface event_sync_state {
-    block_number: Scalars['Int']
-    block_timestamp: Scalars['Int']
-    chain_id: Scalars['Int']
-    is_pre_registering_dynamic_contracts: (Scalars['Boolean'] | null)
-    log_index: Scalars['Int']
-    __typename: 'event_sync_state'
-}
-
-
-/** select columns of table "event_sync_state" */
-export type event_sync_state_select_column = 'block_number' | 'block_timestamp' | 'chain_id' | 'is_pre_registering_dynamic_contracts' | 'log_index'
-
-
 /** column ordering options */
 export type order_by = 'asc' | 'asc_nulls_first' | 'asc_nulls_last' | 'desc' | 'desc_nulls_first' | 'desc_nulls_last'
-
-
-/** columns and relationships of "persisted_state" */
-export interface persisted_state {
-    abi_files_hash: Scalars['String']
-    config_hash: Scalars['String']
-    envio_version: Scalars['String']
-    handler_files_hash: Scalars['String']
-    id: Scalars['Int']
-    schema_hash: Scalars['String']
-    __typename: 'persisted_state'
-}
-
-
-/** select columns of table "persisted_state" */
-export type persisted_state_select_column = 'abi_files_hash' | 'config_hash' | 'envio_version' | 'handler_files_hash' | 'id' | 'schema_hash'
 
 export interface query_root {
     /** fetch data from the table: "Account" */
@@ -882,26 +808,10 @@ export interface query_root {
     UserMarketPosition: UserMarketPosition[]
     /** fetch data from the table: "UserMarketPosition" using primary key columns */
     UserMarketPosition_by_pk: (UserMarketPosition | null)
+    /** fetch data from the table: "_meta" */
+    _meta: _meta[]
     /** fetch data from the table: "chain_metadata" */
     chain_metadata: chain_metadata[]
-    /** fetch data from the table: "chain_metadata" using primary key columns */
-    chain_metadata_by_pk: (chain_metadata | null)
-    /** fetch data from the table: "dynamic_contract_registry" */
-    dynamic_contract_registry: dynamic_contract_registry[]
-    /** fetch data from the table: "dynamic_contract_registry" using primary key columns */
-    dynamic_contract_registry_by_pk: (dynamic_contract_registry | null)
-    /** fetch data from the table: "end_of_block_range_scanned_data" */
-    end_of_block_range_scanned_data: end_of_block_range_scanned_data[]
-    /** fetch data from the table: "end_of_block_range_scanned_data" using primary key columns */
-    end_of_block_range_scanned_data_by_pk: (end_of_block_range_scanned_data | null)
-    /** fetch data from the table: "event_sync_state" */
-    event_sync_state: event_sync_state[]
-    /** fetch data from the table: "event_sync_state" using primary key columns */
-    event_sync_state_by_pk: (event_sync_state | null)
-    /** fetch data from the table: "persisted_state" */
-    persisted_state: persisted_state[]
-    /** fetch data from the table: "persisted_state" using primary key columns */
-    persisted_state_by_pk: (persisted_state | null)
     /** fetch data from the table: "raw_events" */
     raw_events: raw_events[]
     /** fetch data from the table: "raw_events" using primary key columns */
@@ -918,7 +828,6 @@ export interface raw_events {
     block_timestamp: Scalars['Int']
     chain_id: Scalars['Int']
     contract_name: Scalars['String']
-    db_write_timestamp: (Scalars['timestamp'] | null)
     event_id: Scalars['numeric']
     event_name: Scalars['String']
     log_index: Scalars['Int']
@@ -931,7 +840,7 @@ export interface raw_events {
 
 
 /** select columns of table "raw_events" */
-export type raw_events_select_column = 'block_fields' | 'block_hash' | 'block_number' | 'block_timestamp' | 'chain_id' | 'contract_name' | 'db_write_timestamp' | 'event_id' | 'event_name' | 'log_index' | 'params' | 'serial' | 'src_address' | 'transaction_fields'
+export type raw_events_select_column = 'block_fields' | 'block_hash' | 'block_number' | 'block_timestamp' | 'chain_id' | 'contract_name' | 'event_id' | 'event_name' | 'log_index' | 'params' | 'serial' | 'src_address' | 'transaction_fields'
 
 export interface subscription_root {
     /** fetch data from the table: "Account" */
@@ -1102,36 +1011,14 @@ export interface subscription_root {
     UserMarketPosition_by_pk: (UserMarketPosition | null)
     /** fetch data from the table in a streaming manner: "UserMarketPosition" */
     UserMarketPosition_stream: UserMarketPosition[]
+    /** fetch data from the table: "_meta" */
+    _meta: _meta[]
+    /** fetch data from the table in a streaming manner: "_meta" */
+    _meta_stream: _meta[]
     /** fetch data from the table: "chain_metadata" */
     chain_metadata: chain_metadata[]
-    /** fetch data from the table: "chain_metadata" using primary key columns */
-    chain_metadata_by_pk: (chain_metadata | null)
     /** fetch data from the table in a streaming manner: "chain_metadata" */
     chain_metadata_stream: chain_metadata[]
-    /** fetch data from the table: "dynamic_contract_registry" */
-    dynamic_contract_registry: dynamic_contract_registry[]
-    /** fetch data from the table: "dynamic_contract_registry" using primary key columns */
-    dynamic_contract_registry_by_pk: (dynamic_contract_registry | null)
-    /** fetch data from the table in a streaming manner: "dynamic_contract_registry" */
-    dynamic_contract_registry_stream: dynamic_contract_registry[]
-    /** fetch data from the table: "end_of_block_range_scanned_data" */
-    end_of_block_range_scanned_data: end_of_block_range_scanned_data[]
-    /** fetch data from the table: "end_of_block_range_scanned_data" using primary key columns */
-    end_of_block_range_scanned_data_by_pk: (end_of_block_range_scanned_data | null)
-    /** fetch data from the table in a streaming manner: "end_of_block_range_scanned_data" */
-    end_of_block_range_scanned_data_stream: end_of_block_range_scanned_data[]
-    /** fetch data from the table: "event_sync_state" */
-    event_sync_state: event_sync_state[]
-    /** fetch data from the table: "event_sync_state" using primary key columns */
-    event_sync_state_by_pk: (event_sync_state | null)
-    /** fetch data from the table in a streaming manner: "event_sync_state" */
-    event_sync_state_stream: event_sync_state[]
-    /** fetch data from the table: "persisted_state" */
-    persisted_state: persisted_state[]
-    /** fetch data from the table: "persisted_state" using primary key columns */
-    persisted_state_by_pk: (persisted_state | null)
-    /** fetch data from the table in a streaming manner: "persisted_state" */
-    persisted_state_stream: persisted_state[]
     /** fetch data from the table: "raw_events" */
     raw_events: raw_events[]
     /** fetch data from the table: "raw_events" using primary key columns */
@@ -1147,7 +1034,6 @@ export type Subscription = subscription_root
 
 /** columns and relationships of "Account" */
 export interface AccountGenqlSelection{
-    db_write_timestamp?: boolean | number
     id?: boolean | number
     /** An array relationship */
     loans?: (LoanGenqlSelection & { __args?: {
@@ -1227,11 +1113,11 @@ export interface AccountGenqlSelection{
 
 
 /** Boolean expression to filter rows from the table "Account". All fields are combined with a logical 'AND'. */
-export interface Account_bool_exp {_and?: (Account_bool_exp[] | null),_not?: (Account_bool_exp | null),_or?: (Account_bool_exp[] | null),db_write_timestamp?: (timestamp_comparison_exp | null),id?: (String_comparison_exp | null),loans?: (Loan_bool_exp | null),marketsCreated?: (Market_bool_exp | null),presaleParticipations?: (PresaleParticipation_bool_exp | null),stakes?: (Stake_bool_exp | null),trades?: (Trade_bool_exp | null),userMarketPositions?: (UserMarketPosition_bool_exp | null)}
+export interface Account_bool_exp {_and?: (Account_bool_exp[] | null),_not?: (Account_bool_exp | null),_or?: (Account_bool_exp[] | null),id?: (String_comparison_exp | null),loans?: (Loan_bool_exp | null),marketsCreated?: (Market_bool_exp | null),presaleParticipations?: (PresaleParticipation_bool_exp | null),stakes?: (Stake_bool_exp | null),trades?: (Trade_bool_exp | null),userMarketPositions?: (UserMarketPosition_bool_exp | null)}
 
 
 /** Ordering options when selecting data from "Account". */
-export interface Account_order_by {db_write_timestamp?: (order_by | null),id?: (order_by | null),loans_aggregate?: (Loan_aggregate_order_by | null),marketsCreated_aggregate?: (Market_aggregate_order_by | null),presaleParticipations_aggregate?: (PresaleParticipation_aggregate_order_by | null),stakes_aggregate?: (Stake_aggregate_order_by | null),trades_aggregate?: (Trade_aggregate_order_by | null),userMarketPositions_aggregate?: (UserMarketPosition_aggregate_order_by | null)}
+export interface Account_order_by {id?: (order_by | null),loans_aggregate?: (Loan_aggregate_order_by | null),marketsCreated_aggregate?: (Market_aggregate_order_by | null),presaleParticipations_aggregate?: (PresaleParticipation_aggregate_order_by | null),stakes_aggregate?: (Stake_aggregate_order_by | null),trades_aggregate?: (Trade_aggregate_order_by | null),userMarketPositions_aggregate?: (UserMarketPosition_aggregate_order_by | null)}
 
 
 /** Streaming cursor of the table "Account" */
@@ -1243,13 +1129,12 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface Account_stream_cursor_value_input {db_write_timestamp?: (Scalars['timestamp'] | null),id?: (Scalars['String'] | null)}
+export interface Account_stream_cursor_value_input {id?: (Scalars['String'] | null)}
 
 
 /** columns and relationships of "AuthorizerContract" */
 export interface AuthorizerContractGenqlSelection{
     createdAt?: boolean | number
-    db_write_timestamp?: boolean | number
     floor?: boolean | number
     id?: boolean | number
     lastAssignedRoleId?: boolean | number
@@ -1272,11 +1157,11 @@ export interface AuthorizerContractGenqlSelection{
 
 
 /** Boolean expression to filter rows from the table "AuthorizerContract". All fields are combined with a logical 'AND'. */
-export interface AuthorizerContract_bool_exp {_and?: (AuthorizerContract_bool_exp[] | null),_not?: (AuthorizerContract_bool_exp | null),_or?: (AuthorizerContract_bool_exp[] | null),createdAt?: (numeric_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),floor?: (String_comparison_exp | null),id?: (String_comparison_exp | null),lastAssignedRoleId?: (numeric_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),roles?: (Role_bool_exp | null)}
+export interface AuthorizerContract_bool_exp {_and?: (AuthorizerContract_bool_exp[] | null),_not?: (AuthorizerContract_bool_exp | null),_or?: (AuthorizerContract_bool_exp[] | null),createdAt?: (numeric_comparison_exp | null),floor?: (String_comparison_exp | null),id?: (String_comparison_exp | null),lastAssignedRoleId?: (numeric_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),roles?: (Role_bool_exp | null)}
 
 
 /** Ordering options when selecting data from "AuthorizerContract". */
-export interface AuthorizerContract_order_by {createdAt?: (order_by | null),db_write_timestamp?: (order_by | null),floor?: (order_by | null),id?: (order_by | null),lastAssignedRoleId?: (order_by | null),lastUpdatedAt?: (order_by | null),roles_aggregate?: (Role_aggregate_order_by | null)}
+export interface AuthorizerContract_order_by {createdAt?: (order_by | null),floor?: (order_by | null),id?: (order_by | null),lastAssignedRoleId?: (order_by | null),lastUpdatedAt?: (order_by | null),roles_aggregate?: (Role_aggregate_order_by | null)}
 
 
 /** Streaming cursor of the table "AuthorizerContract" */
@@ -1288,7 +1173,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface AuthorizerContract_stream_cursor_value_input {createdAt?: (Scalars['numeric'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),floor?: (Scalars['String'] | null),id?: (Scalars['String'] | null),lastAssignedRoleId?: (Scalars['numeric'] | null),lastUpdatedAt?: (Scalars['numeric'] | null)}
+export interface AuthorizerContract_stream_cursor_value_input {createdAt?: (Scalars['numeric'] | null),floor?: (Scalars['String'] | null),id?: (Scalars['String'] | null),lastAssignedRoleId?: (Scalars['numeric'] | null),lastUpdatedAt?: (Scalars['numeric'] | null)}
 
 
 /** Boolean expression to compare columns of type "Boolean". All fields are combined with logical 'AND'. */
@@ -1300,7 +1185,6 @@ export interface CreditFacilityContractGenqlSelection{
     borrowToken_id?: boolean | number
     collateralToken_id?: boolean | number
     createdAt?: boolean | number
-    db_write_timestamp?: boolean | number
     id?: boolean | number
     lastUpdatedAt?: boolean | number
     /** An array relationship */
@@ -1329,11 +1213,11 @@ export interface CreditFacilityContractGenqlSelection{
 
 
 /** Boolean expression to filter rows from the table "CreditFacilityContract". All fields are combined with a logical 'AND'. */
-export interface CreditFacilityContract_bool_exp {_and?: (CreditFacilityContract_bool_exp[] | null),_not?: (CreditFacilityContract_bool_exp | null),_or?: (CreditFacilityContract_bool_exp[] | null),borrowToken_id?: (String_comparison_exp | null),collateralToken_id?: (String_comparison_exp | null),createdAt?: (numeric_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),loans?: (Loan_bool_exp | null),market_id?: (String_comparison_exp | null),totalDebtFormatted?: (String_comparison_exp | null),totalDebtRaw?: (numeric_comparison_exp | null),totalLoans?: (numeric_comparison_exp | null),totalLockedCollateralFormatted?: (String_comparison_exp | null),totalLockedCollateralRaw?: (numeric_comparison_exp | null),totalVolumeFormatted?: (String_comparison_exp | null),totalVolumeRaw?: (numeric_comparison_exp | null)}
+export interface CreditFacilityContract_bool_exp {_and?: (CreditFacilityContract_bool_exp[] | null),_not?: (CreditFacilityContract_bool_exp | null),_or?: (CreditFacilityContract_bool_exp[] | null),borrowToken_id?: (String_comparison_exp | null),collateralToken_id?: (String_comparison_exp | null),createdAt?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),loans?: (Loan_bool_exp | null),market_id?: (String_comparison_exp | null),totalDebtFormatted?: (String_comparison_exp | null),totalDebtRaw?: (numeric_comparison_exp | null),totalLoans?: (numeric_comparison_exp | null),totalLockedCollateralFormatted?: (String_comparison_exp | null),totalLockedCollateralRaw?: (numeric_comparison_exp | null),totalVolumeFormatted?: (String_comparison_exp | null),totalVolumeRaw?: (numeric_comparison_exp | null)}
 
 
 /** Ordering options when selecting data from "CreditFacilityContract". */
-export interface CreditFacilityContract_order_by {borrowToken_id?: (order_by | null),collateralToken_id?: (order_by | null),createdAt?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),loans_aggregate?: (Loan_aggregate_order_by | null),market_id?: (order_by | null),totalDebtFormatted?: (order_by | null),totalDebtRaw?: (order_by | null),totalLoans?: (order_by | null),totalLockedCollateralFormatted?: (order_by | null),totalLockedCollateralRaw?: (order_by | null),totalVolumeFormatted?: (order_by | null),totalVolumeRaw?: (order_by | null)}
+export interface CreditFacilityContract_order_by {borrowToken_id?: (order_by | null),collateralToken_id?: (order_by | null),createdAt?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),loans_aggregate?: (Loan_aggregate_order_by | null),market_id?: (order_by | null),totalDebtFormatted?: (order_by | null),totalDebtRaw?: (order_by | null),totalLoans?: (order_by | null),totalLockedCollateralFormatted?: (order_by | null),totalLockedCollateralRaw?: (order_by | null),totalVolumeFormatted?: (order_by | null),totalVolumeRaw?: (order_by | null)}
 
 
 /** Streaming cursor of the table "CreditFacilityContract" */
@@ -1345,14 +1229,13 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface CreditFacilityContract_stream_cursor_value_input {borrowToken_id?: (Scalars['String'] | null),collateralToken_id?: (Scalars['String'] | null),createdAt?: (Scalars['numeric'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),market_id?: (Scalars['String'] | null),totalDebtFormatted?: (Scalars['String'] | null),totalDebtRaw?: (Scalars['numeric'] | null),totalLoans?: (Scalars['numeric'] | null),totalLockedCollateralFormatted?: (Scalars['String'] | null),totalLockedCollateralRaw?: (Scalars['numeric'] | null),totalVolumeFormatted?: (Scalars['String'] | null),totalVolumeRaw?: (Scalars['numeric'] | null)}
+export interface CreditFacilityContract_stream_cursor_value_input {borrowToken_id?: (Scalars['String'] | null),collateralToken_id?: (Scalars['String'] | null),createdAt?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),market_id?: (Scalars['String'] | null),totalDebtFormatted?: (Scalars['String'] | null),totalDebtRaw?: (Scalars['numeric'] | null),totalLoans?: (Scalars['numeric'] | null),totalLockedCollateralFormatted?: (Scalars['String'] | null),totalLockedCollateralRaw?: (Scalars['numeric'] | null),totalVolumeFormatted?: (Scalars['String'] | null),totalVolumeRaw?: (Scalars['numeric'] | null)}
 
 
 /** columns and relationships of "FeeSplitterPayment" */
 export interface FeeSplitterPaymentGenqlSelection{
     amountFormatted?: boolean | number
     amountRaw?: boolean | number
-    db_write_timestamp?: boolean | number
     id?: boolean | number
     isFloorFee?: boolean | number
     market_id?: boolean | number
@@ -1375,19 +1258,19 @@ export interface FeeSplitterPayment_avg_order_by {amountRaw?: (order_by | null),
 
 
 /** Boolean expression to filter rows from the table "FeeSplitterPayment". All fields are combined with a logical 'AND'. */
-export interface FeeSplitterPayment_bool_exp {_and?: (FeeSplitterPayment_bool_exp[] | null),_not?: (FeeSplitterPayment_bool_exp | null),_or?: (FeeSplitterPayment_bool_exp[] | null),amountFormatted?: (String_comparison_exp | null),amountRaw?: (numeric_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),id?: (String_comparison_exp | null),isFloorFee?: (Boolean_comparison_exp | null),market_id?: (String_comparison_exp | null),recipient?: (String_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),token_id?: (String_comparison_exp | null),transactionHash?: (String_comparison_exp | null),treasury_id?: (String_comparison_exp | null)}
+export interface FeeSplitterPayment_bool_exp {_and?: (FeeSplitterPayment_bool_exp[] | null),_not?: (FeeSplitterPayment_bool_exp | null),_or?: (FeeSplitterPayment_bool_exp[] | null),amountFormatted?: (String_comparison_exp | null),amountRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),isFloorFee?: (Boolean_comparison_exp | null),market_id?: (String_comparison_exp | null),recipient?: (String_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),token_id?: (String_comparison_exp | null),transactionHash?: (String_comparison_exp | null),treasury_id?: (String_comparison_exp | null)}
 
 
 /** order by max() on columns of table "FeeSplitterPayment" */
-export interface FeeSplitterPayment_max_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),recipient?: (order_by | null),timestamp?: (order_by | null),token_id?: (order_by | null),transactionHash?: (order_by | null),treasury_id?: (order_by | null)}
+export interface FeeSplitterPayment_max_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),recipient?: (order_by | null),timestamp?: (order_by | null),token_id?: (order_by | null),transactionHash?: (order_by | null),treasury_id?: (order_by | null)}
 
 
 /** order by min() on columns of table "FeeSplitterPayment" */
-export interface FeeSplitterPayment_min_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),recipient?: (order_by | null),timestamp?: (order_by | null),token_id?: (order_by | null),transactionHash?: (order_by | null),treasury_id?: (order_by | null)}
+export interface FeeSplitterPayment_min_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),recipient?: (order_by | null),timestamp?: (order_by | null),token_id?: (order_by | null),transactionHash?: (order_by | null),treasury_id?: (order_by | null)}
 
 
 /** Ordering options when selecting data from "FeeSplitterPayment". */
-export interface FeeSplitterPayment_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),isFloorFee?: (order_by | null),market_id?: (order_by | null),recipient?: (order_by | null),timestamp?: (order_by | null),token_id?: (order_by | null),transactionHash?: (order_by | null),treasury_id?: (order_by | null)}
+export interface FeeSplitterPayment_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),id?: (order_by | null),isFloorFee?: (order_by | null),market_id?: (order_by | null),recipient?: (order_by | null),timestamp?: (order_by | null),token_id?: (order_by | null),transactionHash?: (order_by | null),treasury_id?: (order_by | null)}
 
 
 /** order by stddev() on columns of table "FeeSplitterPayment" */
@@ -1411,7 +1294,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface FeeSplitterPayment_stream_cursor_value_input {amountFormatted?: (Scalars['String'] | null),amountRaw?: (Scalars['numeric'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),id?: (Scalars['String'] | null),isFloorFee?: (Scalars['Boolean'] | null),market_id?: (Scalars['String'] | null),recipient?: (Scalars['String'] | null),timestamp?: (Scalars['numeric'] | null),token_id?: (Scalars['String'] | null),transactionHash?: (Scalars['String'] | null),treasury_id?: (Scalars['String'] | null)}
+export interface FeeSplitterPayment_stream_cursor_value_input {amountFormatted?: (Scalars['String'] | null),amountRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),isFloorFee?: (Scalars['Boolean'] | null),market_id?: (Scalars['String'] | null),recipient?: (Scalars['String'] | null),timestamp?: (Scalars['numeric'] | null),token_id?: (Scalars['String'] | null),transactionHash?: (Scalars['String'] | null),treasury_id?: (Scalars['String'] | null)}
 
 
 /** order by sum() on columns of table "FeeSplitterPayment" */
@@ -1434,7 +1317,6 @@ export interface FeeSplitterPayment_variance_order_by {amountRaw?: (order_by | n
 export interface FeeSplitterReceiptGenqlSelection{
     amountFormatted?: boolean | number
     amountRaw?: boolean | number
-    db_write_timestamp?: boolean | number
     id?: boolean | number
     market_id?: boolean | number
     sender?: boolean | number
@@ -1456,19 +1338,19 @@ export interface FeeSplitterReceipt_avg_order_by {amountRaw?: (order_by | null),
 
 
 /** Boolean expression to filter rows from the table "FeeSplitterReceipt". All fields are combined with a logical 'AND'. */
-export interface FeeSplitterReceipt_bool_exp {_and?: (FeeSplitterReceipt_bool_exp[] | null),_not?: (FeeSplitterReceipt_bool_exp | null),_or?: (FeeSplitterReceipt_bool_exp[] | null),amountFormatted?: (String_comparison_exp | null),amountRaw?: (numeric_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),id?: (String_comparison_exp | null),market_id?: (String_comparison_exp | null),sender?: (String_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),token_id?: (String_comparison_exp | null),transactionHash?: (String_comparison_exp | null),treasury_id?: (String_comparison_exp | null)}
+export interface FeeSplitterReceipt_bool_exp {_and?: (FeeSplitterReceipt_bool_exp[] | null),_not?: (FeeSplitterReceipt_bool_exp | null),_or?: (FeeSplitterReceipt_bool_exp[] | null),amountFormatted?: (String_comparison_exp | null),amountRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),market_id?: (String_comparison_exp | null),sender?: (String_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),token_id?: (String_comparison_exp | null),transactionHash?: (String_comparison_exp | null),treasury_id?: (String_comparison_exp | null)}
 
 
 /** order by max() on columns of table "FeeSplitterReceipt" */
-export interface FeeSplitterReceipt_max_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),sender?: (order_by | null),timestamp?: (order_by | null),token_id?: (order_by | null),transactionHash?: (order_by | null),treasury_id?: (order_by | null)}
+export interface FeeSplitterReceipt_max_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),sender?: (order_by | null),timestamp?: (order_by | null),token_id?: (order_by | null),transactionHash?: (order_by | null),treasury_id?: (order_by | null)}
 
 
 /** order by min() on columns of table "FeeSplitterReceipt" */
-export interface FeeSplitterReceipt_min_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),sender?: (order_by | null),timestamp?: (order_by | null),token_id?: (order_by | null),transactionHash?: (order_by | null),treasury_id?: (order_by | null)}
+export interface FeeSplitterReceipt_min_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),sender?: (order_by | null),timestamp?: (order_by | null),token_id?: (order_by | null),transactionHash?: (order_by | null),treasury_id?: (order_by | null)}
 
 
 /** Ordering options when selecting data from "FeeSplitterReceipt". */
-export interface FeeSplitterReceipt_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),sender?: (order_by | null),timestamp?: (order_by | null),token_id?: (order_by | null),transactionHash?: (order_by | null),treasury_id?: (order_by | null)}
+export interface FeeSplitterReceipt_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),sender?: (order_by | null),timestamp?: (order_by | null),token_id?: (order_by | null),transactionHash?: (order_by | null),treasury_id?: (order_by | null)}
 
 
 /** order by stddev() on columns of table "FeeSplitterReceipt" */
@@ -1492,7 +1374,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface FeeSplitterReceipt_stream_cursor_value_input {amountFormatted?: (Scalars['String'] | null),amountRaw?: (Scalars['numeric'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),id?: (Scalars['String'] | null),market_id?: (Scalars['String'] | null),sender?: (Scalars['String'] | null),timestamp?: (Scalars['numeric'] | null),token_id?: (Scalars['String'] | null),transactionHash?: (Scalars['String'] | null),treasury_id?: (Scalars['String'] | null)}
+export interface FeeSplitterReceipt_stream_cursor_value_input {amountFormatted?: (Scalars['String'] | null),amountRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),market_id?: (Scalars['String'] | null),sender?: (Scalars['String'] | null),timestamp?: (Scalars['numeric'] | null),token_id?: (Scalars['String'] | null),transactionHash?: (Scalars['String'] | null),treasury_id?: (Scalars['String'] | null)}
 
 
 /** order by sum() on columns of table "FeeSplitterReceipt" */
@@ -1513,7 +1395,6 @@ export interface FeeSplitterReceipt_variance_order_by {amountRaw?: (order_by | n
 
 /** columns and relationships of "FloorElevation" */
 export interface FloorElevationGenqlSelection{
-    db_write_timestamp?: boolean | number
     deployedAmountFormatted?: boolean | number
     deployedAmountRaw?: boolean | number
     id?: boolean | number
@@ -1538,19 +1419,19 @@ export interface FloorElevation_avg_order_by {deployedAmountRaw?: (order_by | nu
 
 
 /** Boolean expression to filter rows from the table "FloorElevation". All fields are combined with a logical 'AND'. */
-export interface FloorElevation_bool_exp {_and?: (FloorElevation_bool_exp[] | null),_not?: (FloorElevation_bool_exp | null),_or?: (FloorElevation_bool_exp[] | null),db_write_timestamp?: (timestamp_comparison_exp | null),deployedAmountFormatted?: (String_comparison_exp | null),deployedAmountRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),market_id?: (String_comparison_exp | null),newFloorPriceFormatted?: (String_comparison_exp | null),newFloorPriceRaw?: (numeric_comparison_exp | null),oldFloorPriceFormatted?: (String_comparison_exp | null),oldFloorPriceRaw?: (numeric_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),transactionHash?: (String_comparison_exp | null)}
+export interface FloorElevation_bool_exp {_and?: (FloorElevation_bool_exp[] | null),_not?: (FloorElevation_bool_exp | null),_or?: (FloorElevation_bool_exp[] | null),deployedAmountFormatted?: (String_comparison_exp | null),deployedAmountRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),market_id?: (String_comparison_exp | null),newFloorPriceFormatted?: (String_comparison_exp | null),newFloorPriceRaw?: (numeric_comparison_exp | null),oldFloorPriceFormatted?: (String_comparison_exp | null),oldFloorPriceRaw?: (numeric_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),transactionHash?: (String_comparison_exp | null)}
 
 
 /** order by max() on columns of table "FloorElevation" */
-export interface FloorElevation_max_order_by {db_write_timestamp?: (order_by | null),deployedAmountFormatted?: (order_by | null),deployedAmountRaw?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),newFloorPriceFormatted?: (order_by | null),newFloorPriceRaw?: (order_by | null),oldFloorPriceFormatted?: (order_by | null),oldFloorPriceRaw?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null)}
+export interface FloorElevation_max_order_by {deployedAmountFormatted?: (order_by | null),deployedAmountRaw?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),newFloorPriceFormatted?: (order_by | null),newFloorPriceRaw?: (order_by | null),oldFloorPriceFormatted?: (order_by | null),oldFloorPriceRaw?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null)}
 
 
 /** order by min() on columns of table "FloorElevation" */
-export interface FloorElevation_min_order_by {db_write_timestamp?: (order_by | null),deployedAmountFormatted?: (order_by | null),deployedAmountRaw?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),newFloorPriceFormatted?: (order_by | null),newFloorPriceRaw?: (order_by | null),oldFloorPriceFormatted?: (order_by | null),oldFloorPriceRaw?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null)}
+export interface FloorElevation_min_order_by {deployedAmountFormatted?: (order_by | null),deployedAmountRaw?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),newFloorPriceFormatted?: (order_by | null),newFloorPriceRaw?: (order_by | null),oldFloorPriceFormatted?: (order_by | null),oldFloorPriceRaw?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null)}
 
 
 /** Ordering options when selecting data from "FloorElevation". */
-export interface FloorElevation_order_by {db_write_timestamp?: (order_by | null),deployedAmountFormatted?: (order_by | null),deployedAmountRaw?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),newFloorPriceFormatted?: (order_by | null),newFloorPriceRaw?: (order_by | null),oldFloorPriceFormatted?: (order_by | null),oldFloorPriceRaw?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null)}
+export interface FloorElevation_order_by {deployedAmountFormatted?: (order_by | null),deployedAmountRaw?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),newFloorPriceFormatted?: (order_by | null),newFloorPriceRaw?: (order_by | null),oldFloorPriceFormatted?: (order_by | null),oldFloorPriceRaw?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null)}
 
 
 /** order by stddev() on columns of table "FloorElevation" */
@@ -1574,7 +1455,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface FloorElevation_stream_cursor_value_input {db_write_timestamp?: (Scalars['timestamp'] | null),deployedAmountFormatted?: (Scalars['String'] | null),deployedAmountRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),market_id?: (Scalars['String'] | null),newFloorPriceFormatted?: (Scalars['String'] | null),newFloorPriceRaw?: (Scalars['numeric'] | null),oldFloorPriceFormatted?: (Scalars['String'] | null),oldFloorPriceRaw?: (Scalars['numeric'] | null),timestamp?: (Scalars['numeric'] | null),transactionHash?: (Scalars['String'] | null)}
+export interface FloorElevation_stream_cursor_value_input {deployedAmountFormatted?: (Scalars['String'] | null),deployedAmountRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),market_id?: (Scalars['String'] | null),newFloorPriceFormatted?: (Scalars['String'] | null),newFloorPriceRaw?: (Scalars['numeric'] | null),oldFloorPriceFormatted?: (Scalars['String'] | null),oldFloorPriceRaw?: (Scalars['numeric'] | null),timestamp?: (Scalars['numeric'] | null),transactionHash?: (Scalars['String'] | null)}
 
 
 /** order by sum() on columns of table "FloorElevation" */
@@ -1596,7 +1477,6 @@ export interface FloorElevation_variance_order_by {deployedAmountRaw?: (order_by
 /** columns and relationships of "GlobalRegistry" */
 export interface GlobalRegistryGenqlSelection{
     createdAt?: boolean | number
-    db_write_timestamp?: boolean | number
     floorFactoryAddress?: boolean | number
     id?: boolean | number
     lastUpdatedAt?: boolean | number
@@ -1607,11 +1487,11 @@ export interface GlobalRegistryGenqlSelection{
 
 
 /** Boolean expression to filter rows from the table "GlobalRegistry". All fields are combined with a logical 'AND'. */
-export interface GlobalRegistry_bool_exp {_and?: (GlobalRegistry_bool_exp[] | null),_not?: (GlobalRegistry_bool_exp | null),_or?: (GlobalRegistry_bool_exp[] | null),createdAt?: (numeric_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),floorFactoryAddress?: (String_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),moduleFactoryAddress?: (String_comparison_exp | null)}
+export interface GlobalRegistry_bool_exp {_and?: (GlobalRegistry_bool_exp[] | null),_not?: (GlobalRegistry_bool_exp | null),_or?: (GlobalRegistry_bool_exp[] | null),createdAt?: (numeric_comparison_exp | null),floorFactoryAddress?: (String_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),moduleFactoryAddress?: (String_comparison_exp | null)}
 
 
 /** Ordering options when selecting data from "GlobalRegistry". */
-export interface GlobalRegistry_order_by {createdAt?: (order_by | null),db_write_timestamp?: (order_by | null),floorFactoryAddress?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),moduleFactoryAddress?: (order_by | null)}
+export interface GlobalRegistry_order_by {createdAt?: (order_by | null),floorFactoryAddress?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),moduleFactoryAddress?: (order_by | null)}
 
 
 /** Streaming cursor of the table "GlobalRegistry" */
@@ -1623,13 +1503,12 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface GlobalRegistry_stream_cursor_value_input {createdAt?: (Scalars['numeric'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),floorFactoryAddress?: (Scalars['String'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),moduleFactoryAddress?: (Scalars['String'] | null)}
+export interface GlobalRegistry_stream_cursor_value_input {createdAt?: (Scalars['numeric'] | null),floorFactoryAddress?: (Scalars['String'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),moduleFactoryAddress?: (Scalars['String'] | null)}
 
 
 /** columns and relationships of "GlobalStats" */
 export interface GlobalStatsGenqlSelection{
     activeMarkets?: boolean | number
-    db_write_timestamp?: boolean | number
     id?: boolean | number
     lastUpdatedAt?: boolean | number
     totalLockedCollateralFormatted?: boolean | number
@@ -1645,11 +1524,11 @@ export interface GlobalStatsGenqlSelection{
 
 
 /** Boolean expression to filter rows from the table "GlobalStats". All fields are combined with a logical 'AND'. */
-export interface GlobalStats_bool_exp {_and?: (GlobalStats_bool_exp[] | null),_not?: (GlobalStats_bool_exp | null),_or?: (GlobalStats_bool_exp[] | null),activeMarkets?: (numeric_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),totalLockedCollateralFormatted?: (String_comparison_exp | null),totalLockedCollateralRaw?: (numeric_comparison_exp | null),totalMarkets?: (numeric_comparison_exp | null),totalOutstandingDebtFormatted?: (String_comparison_exp | null),totalOutstandingDebtRaw?: (numeric_comparison_exp | null),totalVolumeFormatted?: (String_comparison_exp | null),totalVolumeRaw?: (numeric_comparison_exp | null)}
+export interface GlobalStats_bool_exp {_and?: (GlobalStats_bool_exp[] | null),_not?: (GlobalStats_bool_exp | null),_or?: (GlobalStats_bool_exp[] | null),activeMarkets?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),totalLockedCollateralFormatted?: (String_comparison_exp | null),totalLockedCollateralRaw?: (numeric_comparison_exp | null),totalMarkets?: (numeric_comparison_exp | null),totalOutstandingDebtFormatted?: (String_comparison_exp | null),totalOutstandingDebtRaw?: (numeric_comparison_exp | null),totalVolumeFormatted?: (String_comparison_exp | null),totalVolumeRaw?: (numeric_comparison_exp | null)}
 
 
 /** Ordering options when selecting data from "GlobalStats". */
-export interface GlobalStats_order_by {activeMarkets?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),totalLockedCollateralFormatted?: (order_by | null),totalLockedCollateralRaw?: (order_by | null),totalMarkets?: (order_by | null),totalOutstandingDebtFormatted?: (order_by | null),totalOutstandingDebtRaw?: (order_by | null),totalVolumeFormatted?: (order_by | null),totalVolumeRaw?: (order_by | null)}
+export interface GlobalStats_order_by {activeMarkets?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),totalLockedCollateralFormatted?: (order_by | null),totalLockedCollateralRaw?: (order_by | null),totalMarkets?: (order_by | null),totalOutstandingDebtFormatted?: (order_by | null),totalOutstandingDebtRaw?: (order_by | null),totalVolumeFormatted?: (order_by | null),totalVolumeRaw?: (order_by | null)}
 
 
 /** Streaming cursor of the table "GlobalStats" */
@@ -1661,7 +1540,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface GlobalStats_stream_cursor_value_input {activeMarkets?: (Scalars['numeric'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),totalLockedCollateralFormatted?: (Scalars['String'] | null),totalLockedCollateralRaw?: (Scalars['numeric'] | null),totalMarkets?: (Scalars['numeric'] | null),totalOutstandingDebtFormatted?: (Scalars['String'] | null),totalOutstandingDebtRaw?: (Scalars['numeric'] | null),totalVolumeFormatted?: (Scalars['String'] | null),totalVolumeRaw?: (Scalars['numeric'] | null)}
+export interface GlobalStats_stream_cursor_value_input {activeMarkets?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),totalLockedCollateralFormatted?: (Scalars['String'] | null),totalLockedCollateralRaw?: (Scalars['numeric'] | null),totalMarkets?: (Scalars['numeric'] | null),totalOutstandingDebtFormatted?: (Scalars['String'] | null),totalOutstandingDebtRaw?: (Scalars['numeric'] | null),totalVolumeFormatted?: (Scalars['String'] | null),totalVolumeRaw?: (Scalars['numeric'] | null)}
 
 
 /** Boolean expression to compare columns of type "Int". All fields are combined with logical 'AND'. */
@@ -1682,7 +1561,6 @@ export interface LoanGenqlSelection{
     borrowAmountRaw?: boolean | number
     borrower_id?: boolean | number
     closedAt?: boolean | number
-    db_write_timestamp?: boolean | number
     facility_id?: boolean | number
     floorPriceAtBorrowFormatted?: boolean | number
     floorPriceAtBorrowRaw?: boolean | number
@@ -1717,7 +1595,6 @@ export interface LoanGenqlSelection{
 
 /** columns and relationships of "LoanStatusHistory" */
 export interface LoanStatusHistoryGenqlSelection{
-    db_write_timestamp?: boolean | number
     id?: boolean | number
     loan_id?: boolean | number
     lockedCollateralFormatted?: boolean | number
@@ -1741,19 +1618,19 @@ export interface LoanStatusHistory_avg_order_by {lockedCollateralRaw?: (order_by
 
 
 /** Boolean expression to filter rows from the table "LoanStatusHistory". All fields are combined with a logical 'AND'. */
-export interface LoanStatusHistory_bool_exp {_and?: (LoanStatusHistory_bool_exp[] | null),_not?: (LoanStatusHistory_bool_exp | null),_or?: (LoanStatusHistory_bool_exp[] | null),db_write_timestamp?: (timestamp_comparison_exp | null),id?: (String_comparison_exp | null),loan_id?: (String_comparison_exp | null),lockedCollateralFormatted?: (String_comparison_exp | null),lockedCollateralRaw?: (numeric_comparison_exp | null),remainingDebtFormatted?: (String_comparison_exp | null),remainingDebtRaw?: (numeric_comparison_exp | null),status?: (loanstatus_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),transactionHash?: (String_comparison_exp | null)}
+export interface LoanStatusHistory_bool_exp {_and?: (LoanStatusHistory_bool_exp[] | null),_not?: (LoanStatusHistory_bool_exp | null),_or?: (LoanStatusHistory_bool_exp[] | null),id?: (String_comparison_exp | null),loan_id?: (String_comparison_exp | null),lockedCollateralFormatted?: (String_comparison_exp | null),lockedCollateralRaw?: (numeric_comparison_exp | null),remainingDebtFormatted?: (String_comparison_exp | null),remainingDebtRaw?: (numeric_comparison_exp | null),status?: (loanstatus_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),transactionHash?: (String_comparison_exp | null)}
 
 
 /** order by max() on columns of table "LoanStatusHistory" */
-export interface LoanStatusHistory_max_order_by {db_write_timestamp?: (order_by | null),id?: (order_by | null),loan_id?: (order_by | null),lockedCollateralFormatted?: (order_by | null),lockedCollateralRaw?: (order_by | null),remainingDebtFormatted?: (order_by | null),remainingDebtRaw?: (order_by | null),status?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null)}
+export interface LoanStatusHistory_max_order_by {id?: (order_by | null),loan_id?: (order_by | null),lockedCollateralFormatted?: (order_by | null),lockedCollateralRaw?: (order_by | null),remainingDebtFormatted?: (order_by | null),remainingDebtRaw?: (order_by | null),status?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null)}
 
 
 /** order by min() on columns of table "LoanStatusHistory" */
-export interface LoanStatusHistory_min_order_by {db_write_timestamp?: (order_by | null),id?: (order_by | null),loan_id?: (order_by | null),lockedCollateralFormatted?: (order_by | null),lockedCollateralRaw?: (order_by | null),remainingDebtFormatted?: (order_by | null),remainingDebtRaw?: (order_by | null),status?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null)}
+export interface LoanStatusHistory_min_order_by {id?: (order_by | null),loan_id?: (order_by | null),lockedCollateralFormatted?: (order_by | null),lockedCollateralRaw?: (order_by | null),remainingDebtFormatted?: (order_by | null),remainingDebtRaw?: (order_by | null),status?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null)}
 
 
 /** Ordering options when selecting data from "LoanStatusHistory". */
-export interface LoanStatusHistory_order_by {db_write_timestamp?: (order_by | null),id?: (order_by | null),loan_id?: (order_by | null),lockedCollateralFormatted?: (order_by | null),lockedCollateralRaw?: (order_by | null),remainingDebtFormatted?: (order_by | null),remainingDebtRaw?: (order_by | null),status?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null)}
+export interface LoanStatusHistory_order_by {id?: (order_by | null),loan_id?: (order_by | null),lockedCollateralFormatted?: (order_by | null),lockedCollateralRaw?: (order_by | null),remainingDebtFormatted?: (order_by | null),remainingDebtRaw?: (order_by | null),status?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null)}
 
 
 /** order by stddev() on columns of table "LoanStatusHistory" */
@@ -1777,7 +1654,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface LoanStatusHistory_stream_cursor_value_input {db_write_timestamp?: (Scalars['timestamp'] | null),id?: (Scalars['String'] | null),loan_id?: (Scalars['String'] | null),lockedCollateralFormatted?: (Scalars['String'] | null),lockedCollateralRaw?: (Scalars['numeric'] | null),remainingDebtFormatted?: (Scalars['String'] | null),remainingDebtRaw?: (Scalars['numeric'] | null),status?: (Scalars['loanstatus'] | null),timestamp?: (Scalars['numeric'] | null),transactionHash?: (Scalars['String'] | null)}
+export interface LoanStatusHistory_stream_cursor_value_input {id?: (Scalars['String'] | null),loan_id?: (Scalars['String'] | null),lockedCollateralFormatted?: (Scalars['String'] | null),lockedCollateralRaw?: (Scalars['numeric'] | null),remainingDebtFormatted?: (Scalars['String'] | null),remainingDebtRaw?: (Scalars['numeric'] | null),status?: (Scalars['loanstatus'] | null),timestamp?: (Scalars['numeric'] | null),transactionHash?: (Scalars['String'] | null)}
 
 
 /** order by sum() on columns of table "LoanStatusHistory" */
@@ -1805,19 +1682,19 @@ export interface Loan_avg_order_by {borrowAmountRaw?: (order_by | null),closedAt
 
 
 /** Boolean expression to filter rows from the table "Loan". All fields are combined with a logical 'AND'. */
-export interface Loan_bool_exp {_and?: (Loan_bool_exp[] | null),_not?: (Loan_bool_exp | null),_or?: (Loan_bool_exp[] | null),borrowAmountFormatted?: (String_comparison_exp | null),borrowAmountRaw?: (numeric_comparison_exp | null),borrower_id?: (String_comparison_exp | null),closedAt?: (numeric_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),facility_id?: (String_comparison_exp | null),floorPriceAtBorrowFormatted?: (String_comparison_exp | null),floorPriceAtBorrowRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),lockedCollateralFormatted?: (String_comparison_exp | null),lockedCollateralRaw?: (numeric_comparison_exp | null),market_id?: (String_comparison_exp | null),openedAt?: (numeric_comparison_exp | null),originationFeeFormatted?: (String_comparison_exp | null),originationFeeRaw?: (numeric_comparison_exp | null),remainingDebtFormatted?: (String_comparison_exp | null),remainingDebtRaw?: (numeric_comparison_exp | null),status?: (loanstatus_comparison_exp | null),statusHistory?: (LoanStatusHistory_bool_exp | null),transactionHash?: (String_comparison_exp | null)}
+export interface Loan_bool_exp {_and?: (Loan_bool_exp[] | null),_not?: (Loan_bool_exp | null),_or?: (Loan_bool_exp[] | null),borrowAmountFormatted?: (String_comparison_exp | null),borrowAmountRaw?: (numeric_comparison_exp | null),borrower_id?: (String_comparison_exp | null),closedAt?: (numeric_comparison_exp | null),facility_id?: (String_comparison_exp | null),floorPriceAtBorrowFormatted?: (String_comparison_exp | null),floorPriceAtBorrowRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),lockedCollateralFormatted?: (String_comparison_exp | null),lockedCollateralRaw?: (numeric_comparison_exp | null),market_id?: (String_comparison_exp | null),openedAt?: (numeric_comparison_exp | null),originationFeeFormatted?: (String_comparison_exp | null),originationFeeRaw?: (numeric_comparison_exp | null),remainingDebtFormatted?: (String_comparison_exp | null),remainingDebtRaw?: (numeric_comparison_exp | null),status?: (loanstatus_comparison_exp | null),statusHistory?: (LoanStatusHistory_bool_exp | null),transactionHash?: (String_comparison_exp | null)}
 
 
 /** order by max() on columns of table "Loan" */
-export interface Loan_max_order_by {borrowAmountFormatted?: (order_by | null),borrowAmountRaw?: (order_by | null),borrower_id?: (order_by | null),closedAt?: (order_by | null),db_write_timestamp?: (order_by | null),facility_id?: (order_by | null),floorPriceAtBorrowFormatted?: (order_by | null),floorPriceAtBorrowRaw?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),lockedCollateralFormatted?: (order_by | null),lockedCollateralRaw?: (order_by | null),market_id?: (order_by | null),openedAt?: (order_by | null),originationFeeFormatted?: (order_by | null),originationFeeRaw?: (order_by | null),remainingDebtFormatted?: (order_by | null),remainingDebtRaw?: (order_by | null),status?: (order_by | null),transactionHash?: (order_by | null)}
+export interface Loan_max_order_by {borrowAmountFormatted?: (order_by | null),borrowAmountRaw?: (order_by | null),borrower_id?: (order_by | null),closedAt?: (order_by | null),facility_id?: (order_by | null),floorPriceAtBorrowFormatted?: (order_by | null),floorPriceAtBorrowRaw?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),lockedCollateralFormatted?: (order_by | null),lockedCollateralRaw?: (order_by | null),market_id?: (order_by | null),openedAt?: (order_by | null),originationFeeFormatted?: (order_by | null),originationFeeRaw?: (order_by | null),remainingDebtFormatted?: (order_by | null),remainingDebtRaw?: (order_by | null),status?: (order_by | null),transactionHash?: (order_by | null)}
 
 
 /** order by min() on columns of table "Loan" */
-export interface Loan_min_order_by {borrowAmountFormatted?: (order_by | null),borrowAmountRaw?: (order_by | null),borrower_id?: (order_by | null),closedAt?: (order_by | null),db_write_timestamp?: (order_by | null),facility_id?: (order_by | null),floorPriceAtBorrowFormatted?: (order_by | null),floorPriceAtBorrowRaw?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),lockedCollateralFormatted?: (order_by | null),lockedCollateralRaw?: (order_by | null),market_id?: (order_by | null),openedAt?: (order_by | null),originationFeeFormatted?: (order_by | null),originationFeeRaw?: (order_by | null),remainingDebtFormatted?: (order_by | null),remainingDebtRaw?: (order_by | null),status?: (order_by | null),transactionHash?: (order_by | null)}
+export interface Loan_min_order_by {borrowAmountFormatted?: (order_by | null),borrowAmountRaw?: (order_by | null),borrower_id?: (order_by | null),closedAt?: (order_by | null),facility_id?: (order_by | null),floorPriceAtBorrowFormatted?: (order_by | null),floorPriceAtBorrowRaw?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),lockedCollateralFormatted?: (order_by | null),lockedCollateralRaw?: (order_by | null),market_id?: (order_by | null),openedAt?: (order_by | null),originationFeeFormatted?: (order_by | null),originationFeeRaw?: (order_by | null),remainingDebtFormatted?: (order_by | null),remainingDebtRaw?: (order_by | null),status?: (order_by | null),transactionHash?: (order_by | null)}
 
 
 /** Ordering options when selecting data from "Loan". */
-export interface Loan_order_by {borrowAmountFormatted?: (order_by | null),borrowAmountRaw?: (order_by | null),borrower_id?: (order_by | null),closedAt?: (order_by | null),db_write_timestamp?: (order_by | null),facility_id?: (order_by | null),floorPriceAtBorrowFormatted?: (order_by | null),floorPriceAtBorrowRaw?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),lockedCollateralFormatted?: (order_by | null),lockedCollateralRaw?: (order_by | null),market_id?: (order_by | null),openedAt?: (order_by | null),originationFeeFormatted?: (order_by | null),originationFeeRaw?: (order_by | null),remainingDebtFormatted?: (order_by | null),remainingDebtRaw?: (order_by | null),status?: (order_by | null),statusHistory_aggregate?: (LoanStatusHistory_aggregate_order_by | null),transactionHash?: (order_by | null)}
+export interface Loan_order_by {borrowAmountFormatted?: (order_by | null),borrowAmountRaw?: (order_by | null),borrower_id?: (order_by | null),closedAt?: (order_by | null),facility_id?: (order_by | null),floorPriceAtBorrowFormatted?: (order_by | null),floorPriceAtBorrowRaw?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),lockedCollateralFormatted?: (order_by | null),lockedCollateralRaw?: (order_by | null),market_id?: (order_by | null),openedAt?: (order_by | null),originationFeeFormatted?: (order_by | null),originationFeeRaw?: (order_by | null),remainingDebtFormatted?: (order_by | null),remainingDebtRaw?: (order_by | null),status?: (order_by | null),statusHistory_aggregate?: (LoanStatusHistory_aggregate_order_by | null),transactionHash?: (order_by | null)}
 
 
 /** order by stddev() on columns of table "Loan" */
@@ -1841,7 +1718,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface Loan_stream_cursor_value_input {borrowAmountFormatted?: (Scalars['String'] | null),borrowAmountRaw?: (Scalars['numeric'] | null),borrower_id?: (Scalars['String'] | null),closedAt?: (Scalars['numeric'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),facility_id?: (Scalars['String'] | null),floorPriceAtBorrowFormatted?: (Scalars['String'] | null),floorPriceAtBorrowRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),lockedCollateralFormatted?: (Scalars['String'] | null),lockedCollateralRaw?: (Scalars['numeric'] | null),market_id?: (Scalars['String'] | null),openedAt?: (Scalars['numeric'] | null),originationFeeFormatted?: (Scalars['String'] | null),originationFeeRaw?: (Scalars['numeric'] | null),remainingDebtFormatted?: (Scalars['String'] | null),remainingDebtRaw?: (Scalars['numeric'] | null),status?: (Scalars['loanstatus'] | null),transactionHash?: (Scalars['String'] | null)}
+export interface Loan_stream_cursor_value_input {borrowAmountFormatted?: (Scalars['String'] | null),borrowAmountRaw?: (Scalars['numeric'] | null),borrower_id?: (Scalars['String'] | null),closedAt?: (Scalars['numeric'] | null),facility_id?: (Scalars['String'] | null),floorPriceAtBorrowFormatted?: (Scalars['String'] | null),floorPriceAtBorrowRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),lockedCollateralFormatted?: (Scalars['String'] | null),lockedCollateralRaw?: (Scalars['numeric'] | null),market_id?: (Scalars['String'] | null),openedAt?: (Scalars['numeric'] | null),originationFeeFormatted?: (Scalars['String'] | null),originationFeeRaw?: (Scalars['numeric'] | null),remainingDebtFormatted?: (Scalars['String'] | null),remainingDebtRaw?: (Scalars['numeric'] | null),status?: (Scalars['loanstatus'] | null),transactionHash?: (Scalars['String'] | null)}
 
 
 /** order by sum() on columns of table "Loan" */
@@ -1867,7 +1744,6 @@ export interface MarketGenqlSelection{
     creator_id?: boolean | number
     currentPriceFormatted?: boolean | number
     currentPriceRaw?: boolean | number
-    db_write_timestamp?: boolean | number
     factory_id?: boolean | number
     /** An array relationship */
     floorElevations?: (FloorElevationGenqlSelection & { __args?: {
@@ -1928,7 +1804,6 @@ export interface MarketGenqlSelection{
 export interface MarketRollingStatsGenqlSelection{
     averagePriceFormatted?: boolean | number
     averagePriceRaw?: boolean | number
-    db_write_timestamp?: boolean | number
     id?: boolean | number
     lastUpdatedAt?: boolean | number
     market_id?: boolean | number
@@ -1942,11 +1817,11 @@ export interface MarketRollingStatsGenqlSelection{
 
 
 /** Boolean expression to filter rows from the table "MarketRollingStats". All fields are combined with a logical 'AND'. */
-export interface MarketRollingStats_bool_exp {_and?: (MarketRollingStats_bool_exp[] | null),_not?: (MarketRollingStats_bool_exp | null),_or?: (MarketRollingStats_bool_exp[] | null),averagePriceFormatted?: (String_comparison_exp | null),averagePriceRaw?: (numeric_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),market_id?: (String_comparison_exp | null),tradeCount?: (numeric_comparison_exp | null),volumeFormatted?: (String_comparison_exp | null),volumeRaw?: (numeric_comparison_exp | null),windowSeconds?: (Int_comparison_exp | null)}
+export interface MarketRollingStats_bool_exp {_and?: (MarketRollingStats_bool_exp[] | null),_not?: (MarketRollingStats_bool_exp | null),_or?: (MarketRollingStats_bool_exp[] | null),averagePriceFormatted?: (String_comparison_exp | null),averagePriceRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),market_id?: (String_comparison_exp | null),tradeCount?: (numeric_comparison_exp | null),volumeFormatted?: (String_comparison_exp | null),volumeRaw?: (numeric_comparison_exp | null),windowSeconds?: (Int_comparison_exp | null)}
 
 
 /** Ordering options when selecting data from "MarketRollingStats". */
-export interface MarketRollingStats_order_by {averagePriceFormatted?: (order_by | null),averagePriceRaw?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),market_id?: (order_by | null),tradeCount?: (order_by | null),volumeFormatted?: (order_by | null),volumeRaw?: (order_by | null),windowSeconds?: (order_by | null)}
+export interface MarketRollingStats_order_by {averagePriceFormatted?: (order_by | null),averagePriceRaw?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),market_id?: (order_by | null),tradeCount?: (order_by | null),volumeFormatted?: (order_by | null),volumeRaw?: (order_by | null),windowSeconds?: (order_by | null)}
 
 
 /** Streaming cursor of the table "MarketRollingStats" */
@@ -1958,12 +1833,11 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface MarketRollingStats_stream_cursor_value_input {averagePriceFormatted?: (Scalars['String'] | null),averagePriceRaw?: (Scalars['numeric'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),market_id?: (Scalars['String'] | null),tradeCount?: (Scalars['numeric'] | null),volumeFormatted?: (Scalars['String'] | null),volumeRaw?: (Scalars['numeric'] | null),windowSeconds?: (Scalars['Int'] | null)}
+export interface MarketRollingStats_stream_cursor_value_input {averagePriceFormatted?: (Scalars['String'] | null),averagePriceRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),market_id?: (Scalars['String'] | null),tradeCount?: (Scalars['numeric'] | null),volumeFormatted?: (Scalars['String'] | null),volumeRaw?: (Scalars['numeric'] | null),windowSeconds?: (Scalars['Int'] | null)}
 
 
 /** columns and relationships of "MarketSnapshot" */
 export interface MarketSnapshotGenqlSelection{
-    db_write_timestamp?: boolean | number
     floorPriceFormatted?: boolean | number
     floorPriceRaw?: boolean | number
     id?: boolean | number
@@ -1984,11 +1858,11 @@ export interface MarketSnapshotGenqlSelection{
 
 
 /** Boolean expression to filter rows from the table "MarketSnapshot". All fields are combined with a logical 'AND'. */
-export interface MarketSnapshot_bool_exp {_and?: (MarketSnapshot_bool_exp[] | null),_not?: (MarketSnapshot_bool_exp | null),_or?: (MarketSnapshot_bool_exp[] | null),db_write_timestamp?: (timestamp_comparison_exp | null),floorPriceFormatted?: (String_comparison_exp | null),floorPriceRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),marketSupplyFormatted?: (String_comparison_exp | null),marketSupplyRaw?: (numeric_comparison_exp | null),market_id?: (String_comparison_exp | null),priceFormatted?: (String_comparison_exp | null),priceRaw?: (numeric_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),totalSupplyFormatted?: (String_comparison_exp | null),totalSupplyRaw?: (numeric_comparison_exp | null),trades24h?: (numeric_comparison_exp | null),volume24hFormatted?: (String_comparison_exp | null),volume24hRaw?: (numeric_comparison_exp | null)}
+export interface MarketSnapshot_bool_exp {_and?: (MarketSnapshot_bool_exp[] | null),_not?: (MarketSnapshot_bool_exp | null),_or?: (MarketSnapshot_bool_exp[] | null),floorPriceFormatted?: (String_comparison_exp | null),floorPriceRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),marketSupplyFormatted?: (String_comparison_exp | null),marketSupplyRaw?: (numeric_comparison_exp | null),market_id?: (String_comparison_exp | null),priceFormatted?: (String_comparison_exp | null),priceRaw?: (numeric_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),totalSupplyFormatted?: (String_comparison_exp | null),totalSupplyRaw?: (numeric_comparison_exp | null),trades24h?: (numeric_comparison_exp | null),volume24hFormatted?: (String_comparison_exp | null),volume24hRaw?: (numeric_comparison_exp | null)}
 
 
 /** Ordering options when selecting data from "MarketSnapshot". */
-export interface MarketSnapshot_order_by {db_write_timestamp?: (order_by | null),floorPriceFormatted?: (order_by | null),floorPriceRaw?: (order_by | null),id?: (order_by | null),marketSupplyFormatted?: (order_by | null),marketSupplyRaw?: (order_by | null),market_id?: (order_by | null),priceFormatted?: (order_by | null),priceRaw?: (order_by | null),timestamp?: (order_by | null),totalSupplyFormatted?: (order_by | null),totalSupplyRaw?: (order_by | null),trades24h?: (order_by | null),volume24hFormatted?: (order_by | null),volume24hRaw?: (order_by | null)}
+export interface MarketSnapshot_order_by {floorPriceFormatted?: (order_by | null),floorPriceRaw?: (order_by | null),id?: (order_by | null),marketSupplyFormatted?: (order_by | null),marketSupplyRaw?: (order_by | null),market_id?: (order_by | null),priceFormatted?: (order_by | null),priceRaw?: (order_by | null),timestamp?: (order_by | null),totalSupplyFormatted?: (order_by | null),totalSupplyRaw?: (order_by | null),trades24h?: (order_by | null),volume24hFormatted?: (order_by | null),volume24hRaw?: (order_by | null)}
 
 
 /** Streaming cursor of the table "MarketSnapshot" */
@@ -2000,7 +1874,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface MarketSnapshot_stream_cursor_value_input {db_write_timestamp?: (Scalars['timestamp'] | null),floorPriceFormatted?: (Scalars['String'] | null),floorPriceRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),marketSupplyFormatted?: (Scalars['String'] | null),marketSupplyRaw?: (Scalars['numeric'] | null),market_id?: (Scalars['String'] | null),priceFormatted?: (Scalars['String'] | null),priceRaw?: (Scalars['numeric'] | null),timestamp?: (Scalars['numeric'] | null),totalSupplyFormatted?: (Scalars['String'] | null),totalSupplyRaw?: (Scalars['numeric'] | null),trades24h?: (Scalars['numeric'] | null),volume24hFormatted?: (Scalars['String'] | null),volume24hRaw?: (Scalars['numeric'] | null)}
+export interface MarketSnapshot_stream_cursor_value_input {floorPriceFormatted?: (Scalars['String'] | null),floorPriceRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),marketSupplyFormatted?: (Scalars['String'] | null),marketSupplyRaw?: (Scalars['numeric'] | null),market_id?: (Scalars['String'] | null),priceFormatted?: (Scalars['String'] | null),priceRaw?: (Scalars['numeric'] | null),timestamp?: (Scalars['numeric'] | null),totalSupplyFormatted?: (Scalars['String'] | null),totalSupplyRaw?: (Scalars['numeric'] | null),trades24h?: (Scalars['numeric'] | null),volume24hFormatted?: (Scalars['String'] | null),volume24hRaw?: (Scalars['numeric'] | null)}
 
 
 /** order by aggregate values of table "Market" */
@@ -2012,19 +1886,19 @@ export interface Market_avg_order_by {buyFeeBps?: (order_by | null),createdAt?: 
 
 
 /** Boolean expression to filter rows from the table "Market". All fields are combined with a logical 'AND'. */
-export interface Market_bool_exp {_and?: (Market_bool_exp[] | null),_not?: (Market_bool_exp | null),_or?: (Market_bool_exp[] | null),buyFeeBps?: (numeric_comparison_exp | null),createdAt?: (numeric_comparison_exp | null),creator_id?: (String_comparison_exp | null),currentPriceFormatted?: (String_comparison_exp | null),currentPriceRaw?: (numeric_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),factory_id?: (String_comparison_exp | null),floorElevations?: (FloorElevation_bool_exp | null),floorPriceFormatted?: (String_comparison_exp | null),floorPriceRaw?: (numeric_comparison_exp | null),floorSupplyFormatted?: (String_comparison_exp | null),floorSupplyRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),initialFloorPriceFormatted?: (String_comparison_exp | null),initialFloorPriceRaw?: (numeric_comparison_exp | null),isBuyOpen?: (Boolean_comparison_exp | null),isSellOpen?: (Boolean_comparison_exp | null),issuanceToken?: (Token_bool_exp | null),issuanceToken_id?: (String_comparison_exp | null),lastElevationTimestamp?: (numeric_comparison_exp | null),lastTradeTimestamp?: (numeric_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),marketSupplyFormatted?: (String_comparison_exp | null),marketSupplyRaw?: (numeric_comparison_exp | null),maxLTV?: (numeric_comparison_exp | null),reserveToken?: (Token_bool_exp | null),reserveToken_id?: (String_comparison_exp | null),sellFeeBps?: (numeric_comparison_exp | null),status?: (marketstatus_comparison_exp | null),totalSupplyFormatted?: (String_comparison_exp | null),totalSupplyRaw?: (numeric_comparison_exp | null),trades?: (Trade_bool_exp | null),tradingFeeBps?: (numeric_comparison_exp | null)}
+export interface Market_bool_exp {_and?: (Market_bool_exp[] | null),_not?: (Market_bool_exp | null),_or?: (Market_bool_exp[] | null),buyFeeBps?: (numeric_comparison_exp | null),createdAt?: (numeric_comparison_exp | null),creator_id?: (String_comparison_exp | null),currentPriceFormatted?: (String_comparison_exp | null),currentPriceRaw?: (numeric_comparison_exp | null),factory_id?: (String_comparison_exp | null),floorElevations?: (FloorElevation_bool_exp | null),floorPriceFormatted?: (String_comparison_exp | null),floorPriceRaw?: (numeric_comparison_exp | null),floorSupplyFormatted?: (String_comparison_exp | null),floorSupplyRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),initialFloorPriceFormatted?: (String_comparison_exp | null),initialFloorPriceRaw?: (numeric_comparison_exp | null),isBuyOpen?: (Boolean_comparison_exp | null),isSellOpen?: (Boolean_comparison_exp | null),issuanceToken?: (Token_bool_exp | null),issuanceToken_id?: (String_comparison_exp | null),lastElevationTimestamp?: (numeric_comparison_exp | null),lastTradeTimestamp?: (numeric_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),marketSupplyFormatted?: (String_comparison_exp | null),marketSupplyRaw?: (numeric_comparison_exp | null),maxLTV?: (numeric_comparison_exp | null),reserveToken?: (Token_bool_exp | null),reserveToken_id?: (String_comparison_exp | null),sellFeeBps?: (numeric_comparison_exp | null),status?: (marketstatus_comparison_exp | null),totalSupplyFormatted?: (String_comparison_exp | null),totalSupplyRaw?: (numeric_comparison_exp | null),trades?: (Trade_bool_exp | null),tradingFeeBps?: (numeric_comparison_exp | null)}
 
 
 /** order by max() on columns of table "Market" */
-export interface Market_max_order_by {buyFeeBps?: (order_by | null),createdAt?: (order_by | null),creator_id?: (order_by | null),currentPriceFormatted?: (order_by | null),currentPriceRaw?: (order_by | null),db_write_timestamp?: (order_by | null),factory_id?: (order_by | null),floorPriceFormatted?: (order_by | null),floorPriceRaw?: (order_by | null),floorSupplyFormatted?: (order_by | null),floorSupplyRaw?: (order_by | null),id?: (order_by | null),initialFloorPriceFormatted?: (order_by | null),initialFloorPriceRaw?: (order_by | null),issuanceToken_id?: (order_by | null),lastElevationTimestamp?: (order_by | null),lastTradeTimestamp?: (order_by | null),lastUpdatedAt?: (order_by | null),marketSupplyFormatted?: (order_by | null),marketSupplyRaw?: (order_by | null),maxLTV?: (order_by | null),reserveToken_id?: (order_by | null),sellFeeBps?: (order_by | null),status?: (order_by | null),totalSupplyFormatted?: (order_by | null),totalSupplyRaw?: (order_by | null),tradingFeeBps?: (order_by | null)}
+export interface Market_max_order_by {buyFeeBps?: (order_by | null),createdAt?: (order_by | null),creator_id?: (order_by | null),currentPriceFormatted?: (order_by | null),currentPriceRaw?: (order_by | null),factory_id?: (order_by | null),floorPriceFormatted?: (order_by | null),floorPriceRaw?: (order_by | null),floorSupplyFormatted?: (order_by | null),floorSupplyRaw?: (order_by | null),id?: (order_by | null),initialFloorPriceFormatted?: (order_by | null),initialFloorPriceRaw?: (order_by | null),issuanceToken_id?: (order_by | null),lastElevationTimestamp?: (order_by | null),lastTradeTimestamp?: (order_by | null),lastUpdatedAt?: (order_by | null),marketSupplyFormatted?: (order_by | null),marketSupplyRaw?: (order_by | null),maxLTV?: (order_by | null),reserveToken_id?: (order_by | null),sellFeeBps?: (order_by | null),status?: (order_by | null),totalSupplyFormatted?: (order_by | null),totalSupplyRaw?: (order_by | null),tradingFeeBps?: (order_by | null)}
 
 
 /** order by min() on columns of table "Market" */
-export interface Market_min_order_by {buyFeeBps?: (order_by | null),createdAt?: (order_by | null),creator_id?: (order_by | null),currentPriceFormatted?: (order_by | null),currentPriceRaw?: (order_by | null),db_write_timestamp?: (order_by | null),factory_id?: (order_by | null),floorPriceFormatted?: (order_by | null),floorPriceRaw?: (order_by | null),floorSupplyFormatted?: (order_by | null),floorSupplyRaw?: (order_by | null),id?: (order_by | null),initialFloorPriceFormatted?: (order_by | null),initialFloorPriceRaw?: (order_by | null),issuanceToken_id?: (order_by | null),lastElevationTimestamp?: (order_by | null),lastTradeTimestamp?: (order_by | null),lastUpdatedAt?: (order_by | null),marketSupplyFormatted?: (order_by | null),marketSupplyRaw?: (order_by | null),maxLTV?: (order_by | null),reserveToken_id?: (order_by | null),sellFeeBps?: (order_by | null),status?: (order_by | null),totalSupplyFormatted?: (order_by | null),totalSupplyRaw?: (order_by | null),tradingFeeBps?: (order_by | null)}
+export interface Market_min_order_by {buyFeeBps?: (order_by | null),createdAt?: (order_by | null),creator_id?: (order_by | null),currentPriceFormatted?: (order_by | null),currentPriceRaw?: (order_by | null),factory_id?: (order_by | null),floorPriceFormatted?: (order_by | null),floorPriceRaw?: (order_by | null),floorSupplyFormatted?: (order_by | null),floorSupplyRaw?: (order_by | null),id?: (order_by | null),initialFloorPriceFormatted?: (order_by | null),initialFloorPriceRaw?: (order_by | null),issuanceToken_id?: (order_by | null),lastElevationTimestamp?: (order_by | null),lastTradeTimestamp?: (order_by | null),lastUpdatedAt?: (order_by | null),marketSupplyFormatted?: (order_by | null),marketSupplyRaw?: (order_by | null),maxLTV?: (order_by | null),reserveToken_id?: (order_by | null),sellFeeBps?: (order_by | null),status?: (order_by | null),totalSupplyFormatted?: (order_by | null),totalSupplyRaw?: (order_by | null),tradingFeeBps?: (order_by | null)}
 
 
 /** Ordering options when selecting data from "Market". */
-export interface Market_order_by {buyFeeBps?: (order_by | null),createdAt?: (order_by | null),creator_id?: (order_by | null),currentPriceFormatted?: (order_by | null),currentPriceRaw?: (order_by | null),db_write_timestamp?: (order_by | null),factory_id?: (order_by | null),floorElevations_aggregate?: (FloorElevation_aggregate_order_by | null),floorPriceFormatted?: (order_by | null),floorPriceRaw?: (order_by | null),floorSupplyFormatted?: (order_by | null),floorSupplyRaw?: (order_by | null),id?: (order_by | null),initialFloorPriceFormatted?: (order_by | null),initialFloorPriceRaw?: (order_by | null),isBuyOpen?: (order_by | null),isSellOpen?: (order_by | null),issuanceToken?: (Token_order_by | null),issuanceToken_id?: (order_by | null),lastElevationTimestamp?: (order_by | null),lastTradeTimestamp?: (order_by | null),lastUpdatedAt?: (order_by | null),marketSupplyFormatted?: (order_by | null),marketSupplyRaw?: (order_by | null),maxLTV?: (order_by | null),reserveToken?: (Token_order_by | null),reserveToken_id?: (order_by | null),sellFeeBps?: (order_by | null),status?: (order_by | null),totalSupplyFormatted?: (order_by | null),totalSupplyRaw?: (order_by | null),trades_aggregate?: (Trade_aggregate_order_by | null),tradingFeeBps?: (order_by | null)}
+export interface Market_order_by {buyFeeBps?: (order_by | null),createdAt?: (order_by | null),creator_id?: (order_by | null),currentPriceFormatted?: (order_by | null),currentPriceRaw?: (order_by | null),factory_id?: (order_by | null),floorElevations_aggregate?: (FloorElevation_aggregate_order_by | null),floorPriceFormatted?: (order_by | null),floorPriceRaw?: (order_by | null),floorSupplyFormatted?: (order_by | null),floorSupplyRaw?: (order_by | null),id?: (order_by | null),initialFloorPriceFormatted?: (order_by | null),initialFloorPriceRaw?: (order_by | null),isBuyOpen?: (order_by | null),isSellOpen?: (order_by | null),issuanceToken?: (Token_order_by | null),issuanceToken_id?: (order_by | null),lastElevationTimestamp?: (order_by | null),lastTradeTimestamp?: (order_by | null),lastUpdatedAt?: (order_by | null),marketSupplyFormatted?: (order_by | null),marketSupplyRaw?: (order_by | null),maxLTV?: (order_by | null),reserveToken?: (Token_order_by | null),reserveToken_id?: (order_by | null),sellFeeBps?: (order_by | null),status?: (order_by | null),totalSupplyFormatted?: (order_by | null),totalSupplyRaw?: (order_by | null),trades_aggregate?: (Trade_aggregate_order_by | null),tradingFeeBps?: (order_by | null)}
 
 
 /** order by stddev() on columns of table "Market" */
@@ -2048,7 +1922,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface Market_stream_cursor_value_input {buyFeeBps?: (Scalars['numeric'] | null),createdAt?: (Scalars['numeric'] | null),creator_id?: (Scalars['String'] | null),currentPriceFormatted?: (Scalars['String'] | null),currentPriceRaw?: (Scalars['numeric'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),factory_id?: (Scalars['String'] | null),floorPriceFormatted?: (Scalars['String'] | null),floorPriceRaw?: (Scalars['numeric'] | null),floorSupplyFormatted?: (Scalars['String'] | null),floorSupplyRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),initialFloorPriceFormatted?: (Scalars['String'] | null),initialFloorPriceRaw?: (Scalars['numeric'] | null),isBuyOpen?: (Scalars['Boolean'] | null),isSellOpen?: (Scalars['Boolean'] | null),issuanceToken_id?: (Scalars['String'] | null),lastElevationTimestamp?: (Scalars['numeric'] | null),lastTradeTimestamp?: (Scalars['numeric'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),marketSupplyFormatted?: (Scalars['String'] | null),marketSupplyRaw?: (Scalars['numeric'] | null),maxLTV?: (Scalars['numeric'] | null),reserveToken_id?: (Scalars['String'] | null),sellFeeBps?: (Scalars['numeric'] | null),status?: (Scalars['marketstatus'] | null),totalSupplyFormatted?: (Scalars['String'] | null),totalSupplyRaw?: (Scalars['numeric'] | null),tradingFeeBps?: (Scalars['numeric'] | null)}
+export interface Market_stream_cursor_value_input {buyFeeBps?: (Scalars['numeric'] | null),createdAt?: (Scalars['numeric'] | null),creator_id?: (Scalars['String'] | null),currentPriceFormatted?: (Scalars['String'] | null),currentPriceRaw?: (Scalars['numeric'] | null),factory_id?: (Scalars['String'] | null),floorPriceFormatted?: (Scalars['String'] | null),floorPriceRaw?: (Scalars['numeric'] | null),floorSupplyFormatted?: (Scalars['String'] | null),floorSupplyRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),initialFloorPriceFormatted?: (Scalars['String'] | null),initialFloorPriceRaw?: (Scalars['numeric'] | null),isBuyOpen?: (Scalars['Boolean'] | null),isSellOpen?: (Scalars['Boolean'] | null),issuanceToken_id?: (Scalars['String'] | null),lastElevationTimestamp?: (Scalars['numeric'] | null),lastTradeTimestamp?: (Scalars['numeric'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),marketSupplyFormatted?: (Scalars['String'] | null),marketSupplyRaw?: (Scalars['numeric'] | null),maxLTV?: (Scalars['numeric'] | null),reserveToken_id?: (Scalars['String'] | null),sellFeeBps?: (Scalars['numeric'] | null),status?: (Scalars['marketstatus'] | null),totalSupplyFormatted?: (Scalars['String'] | null),totalSupplyRaw?: (Scalars['numeric'] | null),tradingFeeBps?: (Scalars['numeric'] | null)}
 
 
 /** order by sum() on columns of table "Market" */
@@ -2070,7 +1944,6 @@ export interface Market_variance_order_by {buyFeeBps?: (order_by | null),created
 /** columns and relationships of "ModuleAddress" */
 export interface ModuleAddressGenqlSelection{
     createdAt?: boolean | number
-    db_write_timestamp?: boolean | number
     id?: boolean | number
     lastUpdatedAt?: boolean | number
     market_id?: boolean | number
@@ -2081,11 +1954,11 @@ export interface ModuleAddressGenqlSelection{
 
 
 /** Boolean expression to filter rows from the table "ModuleAddress". All fields are combined with a logical 'AND'. */
-export interface ModuleAddress_bool_exp {_and?: (ModuleAddress_bool_exp[] | null),_not?: (ModuleAddress_bool_exp | null),_or?: (ModuleAddress_bool_exp[] | null),createdAt?: (numeric_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),market_id?: (String_comparison_exp | null),moduleType?: (String_comparison_exp | null)}
+export interface ModuleAddress_bool_exp {_and?: (ModuleAddress_bool_exp[] | null),_not?: (ModuleAddress_bool_exp | null),_or?: (ModuleAddress_bool_exp[] | null),createdAt?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),market_id?: (String_comparison_exp | null),moduleType?: (String_comparison_exp | null)}
 
 
 /** Ordering options when selecting data from "ModuleAddress". */
-export interface ModuleAddress_order_by {createdAt?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),market_id?: (order_by | null),moduleType?: (order_by | null)}
+export interface ModuleAddress_order_by {createdAt?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),market_id?: (order_by | null),moduleType?: (order_by | null)}
 
 
 /** Streaming cursor of the table "ModuleAddress" */
@@ -2097,7 +1970,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface ModuleAddress_stream_cursor_value_input {createdAt?: (Scalars['numeric'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),market_id?: (Scalars['String'] | null),moduleType?: (Scalars['String'] | null)}
+export interface ModuleAddress_stream_cursor_value_input {createdAt?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),market_id?: (Scalars['String'] | null),moduleType?: (Scalars['String'] | null)}
 
 
 /** columns and relationships of "ModuleRegistry" */
@@ -2105,7 +1978,6 @@ export interface ModuleRegistryGenqlSelection{
     authorizer?: boolean | number
     createdAt?: boolean | number
     creditFacility?: boolean | number
-    db_write_timestamp?: boolean | number
     feeTreasury?: boolean | number
     floor?: boolean | number
     id?: boolean | number
@@ -2118,11 +1990,11 @@ export interface ModuleRegistryGenqlSelection{
 
 
 /** Boolean expression to filter rows from the table "ModuleRegistry". All fields are combined with a logical 'AND'. */
-export interface ModuleRegistry_bool_exp {_and?: (ModuleRegistry_bool_exp[] | null),_not?: (ModuleRegistry_bool_exp | null),_or?: (ModuleRegistry_bool_exp[] | null),authorizer?: (String_comparison_exp | null),createdAt?: (numeric_comparison_exp | null),creditFacility?: (String_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),feeTreasury?: (String_comparison_exp | null),floor?: (String_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),presale?: (String_comparison_exp | null),staking?: (String_comparison_exp | null)}
+export interface ModuleRegistry_bool_exp {_and?: (ModuleRegistry_bool_exp[] | null),_not?: (ModuleRegistry_bool_exp | null),_or?: (ModuleRegistry_bool_exp[] | null),authorizer?: (String_comparison_exp | null),createdAt?: (numeric_comparison_exp | null),creditFacility?: (String_comparison_exp | null),feeTreasury?: (String_comparison_exp | null),floor?: (String_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),presale?: (String_comparison_exp | null),staking?: (String_comparison_exp | null)}
 
 
 /** Ordering options when selecting data from "ModuleRegistry". */
-export interface ModuleRegistry_order_by {authorizer?: (order_by | null),createdAt?: (order_by | null),creditFacility?: (order_by | null),db_write_timestamp?: (order_by | null),feeTreasury?: (order_by | null),floor?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),presale?: (order_by | null),staking?: (order_by | null)}
+export interface ModuleRegistry_order_by {authorizer?: (order_by | null),createdAt?: (order_by | null),creditFacility?: (order_by | null),feeTreasury?: (order_by | null),floor?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),presale?: (order_by | null),staking?: (order_by | null)}
 
 
 /** Streaming cursor of the table "ModuleRegistry" */
@@ -2134,7 +2006,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface ModuleRegistry_stream_cursor_value_input {authorizer?: (Scalars['String'] | null),createdAt?: (Scalars['numeric'] | null),creditFacility?: (Scalars['String'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),feeTreasury?: (Scalars['String'] | null),floor?: (Scalars['String'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),presale?: (Scalars['String'] | null),staking?: (Scalars['String'] | null)}
+export interface ModuleRegistry_stream_cursor_value_input {authorizer?: (Scalars['String'] | null),createdAt?: (Scalars['numeric'] | null),creditFacility?: (Scalars['String'] | null),feeTreasury?: (Scalars['String'] | null),floor?: (Scalars['String'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),presale?: (Scalars['String'] | null),staking?: (Scalars['String'] | null)}
 
 
 /** columns and relationships of "PreSaleContract" */
@@ -2155,7 +2027,6 @@ export interface PreSaleContractGenqlSelection{
     commissionBps?: boolean | number
     createdAt?: boolean | number
     currentState?: boolean | number
-    db_write_timestamp?: boolean | number
     endTime?: boolean | number
     feeTreasury?: boolean | number
     globalDepositCapFormatted?: boolean | number
@@ -2200,11 +2071,11 @@ export interface PreSaleContractGenqlSelection{
 
 
 /** Boolean expression to filter rows from the table "PreSaleContract". All fields are combined with a logical 'AND'. */
-export interface PreSaleContract_bool_exp {_and?: (PreSaleContract_bool_exp[] | null),_not?: (PreSaleContract_bool_exp | null),_or?: (PreSaleContract_bool_exp[] | null),authorizer?: (String_comparison_exp | null),claims?: (PresaleClaim_bool_exp | null),commissionBps?: (numeric_array_comparison_exp | null),createdAt?: (numeric_comparison_exp | null),currentState?: (Int_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),endTime?: (numeric_comparison_exp | null),feeTreasury?: (String_comparison_exp | null),globalDepositCapFormatted?: (String_comparison_exp | null),globalDepositCapRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),lendingFacility?: (String_comparison_exp | null),market_id?: (String_comparison_exp | null),maxLeverage?: (numeric_comparison_exp | null),participations?: (PresaleParticipation_bool_exp | null),perAddressDepositCapFormatted?: (String_comparison_exp | null),perAddressDepositCapRaw?: (numeric_comparison_exp | null),priceBreakpointOffsets?: (Int_array_comparison_exp | null),priceBreakpointsFlat?: (numeric_array_comparison_exp | null),purchaseToken?: (Token_bool_exp | null),purchaseToken_id?: (String_comparison_exp | null),saleToken?: (Token_bool_exp | null),saleToken_id?: (String_comparison_exp | null),startTime?: (numeric_comparison_exp | null),timeSafeguardTs?: (numeric_comparison_exp | null),totalParticipants?: (numeric_comparison_exp | null),totalRaisedFormatted?: (String_comparison_exp | null),totalRaisedRaw?: (numeric_comparison_exp | null),whitelistSize?: (numeric_comparison_exp | null),whitelistedAddresses?: (String_array_comparison_exp | null)}
+export interface PreSaleContract_bool_exp {_and?: (PreSaleContract_bool_exp[] | null),_not?: (PreSaleContract_bool_exp | null),_or?: (PreSaleContract_bool_exp[] | null),authorizer?: (String_comparison_exp | null),claims?: (PresaleClaim_bool_exp | null),commissionBps?: (String_array_comparison_exp | null),createdAt?: (numeric_comparison_exp | null),currentState?: (Int_comparison_exp | null),endTime?: (numeric_comparison_exp | null),feeTreasury?: (String_comparison_exp | null),globalDepositCapFormatted?: (String_comparison_exp | null),globalDepositCapRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),lendingFacility?: (String_comparison_exp | null),market_id?: (String_comparison_exp | null),maxLeverage?: (numeric_comparison_exp | null),participations?: (PresaleParticipation_bool_exp | null),perAddressDepositCapFormatted?: (String_comparison_exp | null),perAddressDepositCapRaw?: (numeric_comparison_exp | null),priceBreakpointOffsets?: (Int_array_comparison_exp | null),priceBreakpointsFlat?: (String_array_comparison_exp | null),purchaseToken?: (Token_bool_exp | null),purchaseToken_id?: (String_comparison_exp | null),saleToken?: (Token_bool_exp | null),saleToken_id?: (String_comparison_exp | null),startTime?: (numeric_comparison_exp | null),timeSafeguardTs?: (numeric_comparison_exp | null),totalParticipants?: (numeric_comparison_exp | null),totalRaisedFormatted?: (String_comparison_exp | null),totalRaisedRaw?: (numeric_comparison_exp | null),whitelistSize?: (numeric_comparison_exp | null),whitelistedAddresses?: (String_array_comparison_exp | null)}
 
 
 /** Ordering options when selecting data from "PreSaleContract". */
-export interface PreSaleContract_order_by {authorizer?: (order_by | null),claims_aggregate?: (PresaleClaim_aggregate_order_by | null),commissionBps?: (order_by | null),createdAt?: (order_by | null),currentState?: (order_by | null),db_write_timestamp?: (order_by | null),endTime?: (order_by | null),feeTreasury?: (order_by | null),globalDepositCapFormatted?: (order_by | null),globalDepositCapRaw?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),lendingFacility?: (order_by | null),market_id?: (order_by | null),maxLeverage?: (order_by | null),participations_aggregate?: (PresaleParticipation_aggregate_order_by | null),perAddressDepositCapFormatted?: (order_by | null),perAddressDepositCapRaw?: (order_by | null),priceBreakpointOffsets?: (order_by | null),priceBreakpointsFlat?: (order_by | null),purchaseToken?: (Token_order_by | null),purchaseToken_id?: (order_by | null),saleToken?: (Token_order_by | null),saleToken_id?: (order_by | null),startTime?: (order_by | null),timeSafeguardTs?: (order_by | null),totalParticipants?: (order_by | null),totalRaisedFormatted?: (order_by | null),totalRaisedRaw?: (order_by | null),whitelistSize?: (order_by | null),whitelistedAddresses?: (order_by | null)}
+export interface PreSaleContract_order_by {authorizer?: (order_by | null),claims_aggregate?: (PresaleClaim_aggregate_order_by | null),commissionBps?: (order_by | null),createdAt?: (order_by | null),currentState?: (order_by | null),endTime?: (order_by | null),feeTreasury?: (order_by | null),globalDepositCapFormatted?: (order_by | null),globalDepositCapRaw?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),lendingFacility?: (order_by | null),market_id?: (order_by | null),maxLeverage?: (order_by | null),participations_aggregate?: (PresaleParticipation_aggregate_order_by | null),perAddressDepositCapFormatted?: (order_by | null),perAddressDepositCapRaw?: (order_by | null),priceBreakpointOffsets?: (order_by | null),priceBreakpointsFlat?: (order_by | null),purchaseToken?: (Token_order_by | null),purchaseToken_id?: (order_by | null),saleToken?: (Token_order_by | null),saleToken_id?: (order_by | null),startTime?: (order_by | null),timeSafeguardTs?: (order_by | null),totalParticipants?: (order_by | null),totalRaisedFormatted?: (order_by | null),totalRaisedRaw?: (order_by | null),whitelistSize?: (order_by | null),whitelistedAddresses?: (order_by | null)}
 
 
 /** Streaming cursor of the table "PreSaleContract" */
@@ -2216,7 +2087,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface PreSaleContract_stream_cursor_value_input {authorizer?: (Scalars['String'] | null),commissionBps?: (Scalars['numeric'][] | null),createdAt?: (Scalars['numeric'] | null),currentState?: (Scalars['Int'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),endTime?: (Scalars['numeric'] | null),feeTreasury?: (Scalars['String'] | null),globalDepositCapFormatted?: (Scalars['String'] | null),globalDepositCapRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),lendingFacility?: (Scalars['String'] | null),market_id?: (Scalars['String'] | null),maxLeverage?: (Scalars['numeric'] | null),perAddressDepositCapFormatted?: (Scalars['String'] | null),perAddressDepositCapRaw?: (Scalars['numeric'] | null),priceBreakpointOffsets?: (Scalars['Int'][] | null),priceBreakpointsFlat?: (Scalars['numeric'][] | null),purchaseToken_id?: (Scalars['String'] | null),saleToken_id?: (Scalars['String'] | null),startTime?: (Scalars['numeric'] | null),timeSafeguardTs?: (Scalars['numeric'] | null),totalParticipants?: (Scalars['numeric'] | null),totalRaisedFormatted?: (Scalars['String'] | null),totalRaisedRaw?: (Scalars['numeric'] | null),whitelistSize?: (Scalars['numeric'] | null),whitelistedAddresses?: (Scalars['String'][] | null)}
+export interface PreSaleContract_stream_cursor_value_input {authorizer?: (Scalars['String'] | null),commissionBps?: (Scalars['String'][] | null),createdAt?: (Scalars['numeric'] | null),currentState?: (Scalars['Int'] | null),endTime?: (Scalars['numeric'] | null),feeTreasury?: (Scalars['String'] | null),globalDepositCapFormatted?: (Scalars['String'] | null),globalDepositCapRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),lendingFacility?: (Scalars['String'] | null),market_id?: (Scalars['String'] | null),maxLeverage?: (Scalars['numeric'] | null),perAddressDepositCapFormatted?: (Scalars['String'] | null),perAddressDepositCapRaw?: (Scalars['numeric'] | null),priceBreakpointOffsets?: (Scalars['Int'][] | null),priceBreakpointsFlat?: (Scalars['String'][] | null),purchaseToken_id?: (Scalars['String'] | null),saleToken_id?: (Scalars['String'] | null),startTime?: (Scalars['numeric'] | null),timeSafeguardTs?: (Scalars['numeric'] | null),totalParticipants?: (Scalars['numeric'] | null),totalRaisedFormatted?: (Scalars['String'] | null),totalRaisedRaw?: (Scalars['numeric'] | null),whitelistSize?: (Scalars['numeric'] | null),whitelistedAddresses?: (Scalars['String'][] | null)}
 
 
 /** columns and relationships of "PresaleClaim" */
@@ -2224,7 +2095,6 @@ export interface PresaleClaimGenqlSelection{
     amountFormatted?: boolean | number
     amountRaw?: boolean | number
     claimType?: boolean | number
-    db_write_timestamp?: boolean | number
     id?: boolean | number
     loanId?: boolean | number
     positionId?: boolean | number
@@ -2246,19 +2116,19 @@ export interface PresaleClaim_avg_order_by {amountRaw?: (order_by | null),loanId
 
 
 /** Boolean expression to filter rows from the table "PresaleClaim". All fields are combined with a logical 'AND'. */
-export interface PresaleClaim_bool_exp {_and?: (PresaleClaim_bool_exp[] | null),_not?: (PresaleClaim_bool_exp | null),_or?: (PresaleClaim_bool_exp[] | null),amountFormatted?: (String_comparison_exp | null),amountRaw?: (numeric_comparison_exp | null),claimType?: (presaleclaimtype_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),id?: (String_comparison_exp | null),loanId?: (numeric_comparison_exp | null),positionId?: (numeric_comparison_exp | null),presale_id?: (String_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),trancheIndex?: (numeric_comparison_exp | null),transactionHash?: (String_comparison_exp | null)}
+export interface PresaleClaim_bool_exp {_and?: (PresaleClaim_bool_exp[] | null),_not?: (PresaleClaim_bool_exp | null),_or?: (PresaleClaim_bool_exp[] | null),amountFormatted?: (String_comparison_exp | null),amountRaw?: (numeric_comparison_exp | null),claimType?: (presaleclaimtype_comparison_exp | null),id?: (String_comparison_exp | null),loanId?: (numeric_comparison_exp | null),positionId?: (numeric_comparison_exp | null),presale_id?: (String_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),trancheIndex?: (numeric_comparison_exp | null),transactionHash?: (String_comparison_exp | null)}
 
 
 /** order by max() on columns of table "PresaleClaim" */
-export interface PresaleClaim_max_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),claimType?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),loanId?: (order_by | null),positionId?: (order_by | null),presale_id?: (order_by | null),timestamp?: (order_by | null),trancheIndex?: (order_by | null),transactionHash?: (order_by | null)}
+export interface PresaleClaim_max_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),claimType?: (order_by | null),id?: (order_by | null),loanId?: (order_by | null),positionId?: (order_by | null),presale_id?: (order_by | null),timestamp?: (order_by | null),trancheIndex?: (order_by | null),transactionHash?: (order_by | null)}
 
 
 /** order by min() on columns of table "PresaleClaim" */
-export interface PresaleClaim_min_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),claimType?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),loanId?: (order_by | null),positionId?: (order_by | null),presale_id?: (order_by | null),timestamp?: (order_by | null),trancheIndex?: (order_by | null),transactionHash?: (order_by | null)}
+export interface PresaleClaim_min_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),claimType?: (order_by | null),id?: (order_by | null),loanId?: (order_by | null),positionId?: (order_by | null),presale_id?: (order_by | null),timestamp?: (order_by | null),trancheIndex?: (order_by | null),transactionHash?: (order_by | null)}
 
 
 /** Ordering options when selecting data from "PresaleClaim". */
-export interface PresaleClaim_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),claimType?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),loanId?: (order_by | null),positionId?: (order_by | null),presale_id?: (order_by | null),timestamp?: (order_by | null),trancheIndex?: (order_by | null),transactionHash?: (order_by | null)}
+export interface PresaleClaim_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),claimType?: (order_by | null),id?: (order_by | null),loanId?: (order_by | null),positionId?: (order_by | null),presale_id?: (order_by | null),timestamp?: (order_by | null),trancheIndex?: (order_by | null),transactionHash?: (order_by | null)}
 
 
 /** order by stddev() on columns of table "PresaleClaim" */
@@ -2282,7 +2152,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface PresaleClaim_stream_cursor_value_input {amountFormatted?: (Scalars['String'] | null),amountRaw?: (Scalars['numeric'] | null),claimType?: (Scalars['presaleclaimtype'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),id?: (Scalars['String'] | null),loanId?: (Scalars['numeric'] | null),positionId?: (Scalars['numeric'] | null),presale_id?: (Scalars['String'] | null),timestamp?: (Scalars['numeric'] | null),trancheIndex?: (Scalars['numeric'] | null),transactionHash?: (Scalars['String'] | null)}
+export interface PresaleClaim_stream_cursor_value_input {amountFormatted?: (Scalars['String'] | null),amountRaw?: (Scalars['numeric'] | null),claimType?: (Scalars['presaleclaimtype'] | null),id?: (Scalars['String'] | null),loanId?: (Scalars['numeric'] | null),positionId?: (Scalars['numeric'] | null),presale_id?: (Scalars['String'] | null),timestamp?: (Scalars['numeric'] | null),trancheIndex?: (Scalars['numeric'] | null),transactionHash?: (Scalars['String'] | null)}
 
 
 /** order by sum() on columns of table "PresaleClaim" */
@@ -2303,7 +2173,6 @@ export interface PresaleClaim_variance_order_by {amountRaw?: (order_by | null),l
 
 /** columns and relationships of "PresaleParticipation" */
 export interface PresaleParticipationGenqlSelection{
-    db_write_timestamp?: boolean | number
     depositAmountFormatted?: boolean | number
     depositAmountRaw?: boolean | number
     id?: boolean | number
@@ -2330,19 +2199,19 @@ export interface PresaleParticipation_avg_order_by {depositAmountRaw?: (order_by
 
 
 /** Boolean expression to filter rows from the table "PresaleParticipation". All fields are combined with a logical 'AND'. */
-export interface PresaleParticipation_bool_exp {_and?: (PresaleParticipation_bool_exp[] | null),_not?: (PresaleParticipation_bool_exp | null),_or?: (PresaleParticipation_bool_exp[] | null),db_write_timestamp?: (timestamp_comparison_exp | null),depositAmountFormatted?: (String_comparison_exp | null),depositAmountRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),leverage?: (numeric_comparison_exp | null),loopCount?: (numeric_comparison_exp | null),mintedAmountFormatted?: (String_comparison_exp | null),mintedAmountRaw?: (numeric_comparison_exp | null),positionId?: (numeric_comparison_exp | null),presale_id?: (String_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),transactionHash?: (String_comparison_exp | null),user_id?: (String_comparison_exp | null)}
+export interface PresaleParticipation_bool_exp {_and?: (PresaleParticipation_bool_exp[] | null),_not?: (PresaleParticipation_bool_exp | null),_or?: (PresaleParticipation_bool_exp[] | null),depositAmountFormatted?: (String_comparison_exp | null),depositAmountRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),leverage?: (numeric_comparison_exp | null),loopCount?: (numeric_comparison_exp | null),mintedAmountFormatted?: (String_comparison_exp | null),mintedAmountRaw?: (numeric_comparison_exp | null),positionId?: (numeric_comparison_exp | null),presale_id?: (String_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),transactionHash?: (String_comparison_exp | null),user_id?: (String_comparison_exp | null)}
 
 
 /** order by max() on columns of table "PresaleParticipation" */
-export interface PresaleParticipation_max_order_by {db_write_timestamp?: (order_by | null),depositAmountFormatted?: (order_by | null),depositAmountRaw?: (order_by | null),id?: (order_by | null),leverage?: (order_by | null),loopCount?: (order_by | null),mintedAmountFormatted?: (order_by | null),mintedAmountRaw?: (order_by | null),positionId?: (order_by | null),presale_id?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null)}
+export interface PresaleParticipation_max_order_by {depositAmountFormatted?: (order_by | null),depositAmountRaw?: (order_by | null),id?: (order_by | null),leverage?: (order_by | null),loopCount?: (order_by | null),mintedAmountFormatted?: (order_by | null),mintedAmountRaw?: (order_by | null),positionId?: (order_by | null),presale_id?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null)}
 
 
 /** order by min() on columns of table "PresaleParticipation" */
-export interface PresaleParticipation_min_order_by {db_write_timestamp?: (order_by | null),depositAmountFormatted?: (order_by | null),depositAmountRaw?: (order_by | null),id?: (order_by | null),leverage?: (order_by | null),loopCount?: (order_by | null),mintedAmountFormatted?: (order_by | null),mintedAmountRaw?: (order_by | null),positionId?: (order_by | null),presale_id?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null)}
+export interface PresaleParticipation_min_order_by {depositAmountFormatted?: (order_by | null),depositAmountRaw?: (order_by | null),id?: (order_by | null),leverage?: (order_by | null),loopCount?: (order_by | null),mintedAmountFormatted?: (order_by | null),mintedAmountRaw?: (order_by | null),positionId?: (order_by | null),presale_id?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null)}
 
 
 /** Ordering options when selecting data from "PresaleParticipation". */
-export interface PresaleParticipation_order_by {db_write_timestamp?: (order_by | null),depositAmountFormatted?: (order_by | null),depositAmountRaw?: (order_by | null),id?: (order_by | null),leverage?: (order_by | null),loopCount?: (order_by | null),mintedAmountFormatted?: (order_by | null),mintedAmountRaw?: (order_by | null),positionId?: (order_by | null),presale_id?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null)}
+export interface PresaleParticipation_order_by {depositAmountFormatted?: (order_by | null),depositAmountRaw?: (order_by | null),id?: (order_by | null),leverage?: (order_by | null),loopCount?: (order_by | null),mintedAmountFormatted?: (order_by | null),mintedAmountRaw?: (order_by | null),positionId?: (order_by | null),presale_id?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null)}
 
 
 /** order by stddev() on columns of table "PresaleParticipation" */
@@ -2366,7 +2235,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface PresaleParticipation_stream_cursor_value_input {db_write_timestamp?: (Scalars['timestamp'] | null),depositAmountFormatted?: (Scalars['String'] | null),depositAmountRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),leverage?: (Scalars['numeric'] | null),loopCount?: (Scalars['numeric'] | null),mintedAmountFormatted?: (Scalars['String'] | null),mintedAmountRaw?: (Scalars['numeric'] | null),positionId?: (Scalars['numeric'] | null),presale_id?: (Scalars['String'] | null),timestamp?: (Scalars['numeric'] | null),transactionHash?: (Scalars['String'] | null),user_id?: (Scalars['String'] | null)}
+export interface PresaleParticipation_stream_cursor_value_input {depositAmountFormatted?: (Scalars['String'] | null),depositAmountRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),leverage?: (Scalars['numeric'] | null),loopCount?: (Scalars['numeric'] | null),mintedAmountFormatted?: (Scalars['String'] | null),mintedAmountRaw?: (Scalars['numeric'] | null),positionId?: (Scalars['numeric'] | null),presale_id?: (Scalars['String'] | null),timestamp?: (Scalars['numeric'] | null),transactionHash?: (Scalars['String'] | null),user_id?: (Scalars['String'] | null)}
 
 
 /** order by sum() on columns of table "PresaleParticipation" */
@@ -2389,7 +2258,6 @@ export interface PresaleParticipation_variance_order_by {depositAmountRaw?: (ord
 export interface PriceCandleGenqlSelection{
     closeFormatted?: boolean | number
     closeRaw?: boolean | number
-    db_write_timestamp?: boolean | number
     highFormatted?: boolean | number
     highRaw?: boolean | number
     id?: boolean | number
@@ -2409,11 +2277,11 @@ export interface PriceCandleGenqlSelection{
 
 
 /** Boolean expression to filter rows from the table "PriceCandle". All fields are combined with a logical 'AND'. */
-export interface PriceCandle_bool_exp {_and?: (PriceCandle_bool_exp[] | null),_not?: (PriceCandle_bool_exp | null),_or?: (PriceCandle_bool_exp[] | null),closeFormatted?: (String_comparison_exp | null),closeRaw?: (numeric_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),highFormatted?: (String_comparison_exp | null),highRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),lowFormatted?: (String_comparison_exp | null),lowRaw?: (numeric_comparison_exp | null),market_id?: (String_comparison_exp | null),openFormatted?: (String_comparison_exp | null),openRaw?: (numeric_comparison_exp | null),period?: (candleperiod_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),trades?: (numeric_comparison_exp | null),volumeFormatted?: (String_comparison_exp | null),volumeRaw?: (numeric_comparison_exp | null)}
+export interface PriceCandle_bool_exp {_and?: (PriceCandle_bool_exp[] | null),_not?: (PriceCandle_bool_exp | null),_or?: (PriceCandle_bool_exp[] | null),closeFormatted?: (String_comparison_exp | null),closeRaw?: (numeric_comparison_exp | null),highFormatted?: (String_comparison_exp | null),highRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),lowFormatted?: (String_comparison_exp | null),lowRaw?: (numeric_comparison_exp | null),market_id?: (String_comparison_exp | null),openFormatted?: (String_comparison_exp | null),openRaw?: (numeric_comparison_exp | null),period?: (candleperiod_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),trades?: (numeric_comparison_exp | null),volumeFormatted?: (String_comparison_exp | null),volumeRaw?: (numeric_comparison_exp | null)}
 
 
 /** Ordering options when selecting data from "PriceCandle". */
-export interface PriceCandle_order_by {closeFormatted?: (order_by | null),closeRaw?: (order_by | null),db_write_timestamp?: (order_by | null),highFormatted?: (order_by | null),highRaw?: (order_by | null),id?: (order_by | null),lowFormatted?: (order_by | null),lowRaw?: (order_by | null),market_id?: (order_by | null),openFormatted?: (order_by | null),openRaw?: (order_by | null),period?: (order_by | null),timestamp?: (order_by | null),trades?: (order_by | null),volumeFormatted?: (order_by | null),volumeRaw?: (order_by | null)}
+export interface PriceCandle_order_by {closeFormatted?: (order_by | null),closeRaw?: (order_by | null),highFormatted?: (order_by | null),highRaw?: (order_by | null),id?: (order_by | null),lowFormatted?: (order_by | null),lowRaw?: (order_by | null),market_id?: (order_by | null),openFormatted?: (order_by | null),openRaw?: (order_by | null),period?: (order_by | null),timestamp?: (order_by | null),trades?: (order_by | null),volumeFormatted?: (order_by | null),volumeRaw?: (order_by | null)}
 
 
 /** Streaming cursor of the table "PriceCandle" */
@@ -2425,7 +2293,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface PriceCandle_stream_cursor_value_input {closeFormatted?: (Scalars['String'] | null),closeRaw?: (Scalars['numeric'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),highFormatted?: (Scalars['String'] | null),highRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),lowFormatted?: (Scalars['String'] | null),lowRaw?: (Scalars['numeric'] | null),market_id?: (Scalars['String'] | null),openFormatted?: (Scalars['String'] | null),openRaw?: (Scalars['numeric'] | null),period?: (Scalars['candleperiod'] | null),timestamp?: (Scalars['numeric'] | null),trades?: (Scalars['numeric'] | null),volumeFormatted?: (Scalars['String'] | null),volumeRaw?: (Scalars['numeric'] | null)}
+export interface PriceCandle_stream_cursor_value_input {closeFormatted?: (Scalars['String'] | null),closeRaw?: (Scalars['numeric'] | null),highFormatted?: (Scalars['String'] | null),highRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),lowFormatted?: (Scalars['String'] | null),lowRaw?: (Scalars['numeric'] | null),market_id?: (Scalars['String'] | null),openFormatted?: (Scalars['String'] | null),openRaw?: (Scalars['numeric'] | null),period?: (Scalars['candleperiod'] | null),timestamp?: (Scalars['numeric'] | null),trades?: (Scalars['numeric'] | null),volumeFormatted?: (Scalars['String'] | null),volumeRaw?: (Scalars['numeric'] | null)}
 
 
 /** columns and relationships of "Role" */
@@ -2434,7 +2302,6 @@ export interface RoleGenqlSelection{
     adminRoleName?: boolean | number
     authorizer_id?: boolean | number
     createdAt?: boolean | number
-    db_write_timestamp?: boolean | number
     id?: boolean | number
     isAdminBurned?: boolean | number
     lastUpdatedAt?: boolean | number
@@ -2471,7 +2338,6 @@ export interface RoleGenqlSelection{
 
 /** columns and relationships of "RoleMember" */
 export interface RoleMemberGenqlSelection{
-    db_write_timestamp?: boolean | number
     grantedAt?: boolean | number
     grantedBy?: boolean | number
     id?: boolean | number
@@ -2492,19 +2358,19 @@ export interface RoleMember_avg_order_by {grantedAt?: (order_by | null)}
 
 
 /** Boolean expression to filter rows from the table "RoleMember". All fields are combined with a logical 'AND'. */
-export interface RoleMember_bool_exp {_and?: (RoleMember_bool_exp[] | null),_not?: (RoleMember_bool_exp | null),_or?: (RoleMember_bool_exp[] | null),db_write_timestamp?: (timestamp_comparison_exp | null),grantedAt?: (numeric_comparison_exp | null),grantedBy?: (String_comparison_exp | null),id?: (String_comparison_exp | null),member?: (String_comparison_exp | null),role_id?: (String_comparison_exp | null),transactionHash?: (String_comparison_exp | null)}
+export interface RoleMember_bool_exp {_and?: (RoleMember_bool_exp[] | null),_not?: (RoleMember_bool_exp | null),_or?: (RoleMember_bool_exp[] | null),grantedAt?: (numeric_comparison_exp | null),grantedBy?: (String_comparison_exp | null),id?: (String_comparison_exp | null),member?: (String_comparison_exp | null),role_id?: (String_comparison_exp | null),transactionHash?: (String_comparison_exp | null)}
 
 
 /** order by max() on columns of table "RoleMember" */
-export interface RoleMember_max_order_by {db_write_timestamp?: (order_by | null),grantedAt?: (order_by | null),grantedBy?: (order_by | null),id?: (order_by | null),member?: (order_by | null),role_id?: (order_by | null),transactionHash?: (order_by | null)}
+export interface RoleMember_max_order_by {grantedAt?: (order_by | null),grantedBy?: (order_by | null),id?: (order_by | null),member?: (order_by | null),role_id?: (order_by | null),transactionHash?: (order_by | null)}
 
 
 /** order by min() on columns of table "RoleMember" */
-export interface RoleMember_min_order_by {db_write_timestamp?: (order_by | null),grantedAt?: (order_by | null),grantedBy?: (order_by | null),id?: (order_by | null),member?: (order_by | null),role_id?: (order_by | null),transactionHash?: (order_by | null)}
+export interface RoleMember_min_order_by {grantedAt?: (order_by | null),grantedBy?: (order_by | null),id?: (order_by | null),member?: (order_by | null),role_id?: (order_by | null),transactionHash?: (order_by | null)}
 
 
 /** Ordering options when selecting data from "RoleMember". */
-export interface RoleMember_order_by {db_write_timestamp?: (order_by | null),grantedAt?: (order_by | null),grantedBy?: (order_by | null),id?: (order_by | null),member?: (order_by | null),role_id?: (order_by | null),transactionHash?: (order_by | null)}
+export interface RoleMember_order_by {grantedAt?: (order_by | null),grantedBy?: (order_by | null),id?: (order_by | null),member?: (order_by | null),role_id?: (order_by | null),transactionHash?: (order_by | null)}
 
 
 /** order by stddev() on columns of table "RoleMember" */
@@ -2528,7 +2394,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface RoleMember_stream_cursor_value_input {db_write_timestamp?: (Scalars['timestamp'] | null),grantedAt?: (Scalars['numeric'] | null),grantedBy?: (Scalars['String'] | null),id?: (Scalars['String'] | null),member?: (Scalars['String'] | null),role_id?: (Scalars['String'] | null),transactionHash?: (Scalars['String'] | null)}
+export interface RoleMember_stream_cursor_value_input {grantedAt?: (Scalars['numeric'] | null),grantedBy?: (Scalars['String'] | null),id?: (Scalars['String'] | null),member?: (Scalars['String'] | null),role_id?: (Scalars['String'] | null),transactionHash?: (Scalars['String'] | null)}
 
 
 /** order by sum() on columns of table "RoleMember" */
@@ -2550,7 +2416,6 @@ export interface RoleMember_variance_order_by {grantedAt?: (order_by | null)}
 /** columns and relationships of "RolePermission" */
 export interface RolePermissionGenqlSelection{
     addedAt?: boolean | number
-    db_write_timestamp?: boolean | number
     id?: boolean | number
     role_id?: boolean | number
     selector?: boolean | number
@@ -2571,19 +2436,19 @@ export interface RolePermission_avg_order_by {addedAt?: (order_by | null)}
 
 
 /** Boolean expression to filter rows from the table "RolePermission". All fields are combined with a logical 'AND'. */
-export interface RolePermission_bool_exp {_and?: (RolePermission_bool_exp[] | null),_not?: (RolePermission_bool_exp | null),_or?: (RolePermission_bool_exp[] | null),addedAt?: (numeric_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),id?: (String_comparison_exp | null),role_id?: (String_comparison_exp | null),selector?: (String_comparison_exp | null),selectorName?: (String_comparison_exp | null),target?: (String_comparison_exp | null),transactionHash?: (String_comparison_exp | null)}
+export interface RolePermission_bool_exp {_and?: (RolePermission_bool_exp[] | null),_not?: (RolePermission_bool_exp | null),_or?: (RolePermission_bool_exp[] | null),addedAt?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),role_id?: (String_comparison_exp | null),selector?: (String_comparison_exp | null),selectorName?: (String_comparison_exp | null),target?: (String_comparison_exp | null),transactionHash?: (String_comparison_exp | null)}
 
 
 /** order by max() on columns of table "RolePermission" */
-export interface RolePermission_max_order_by {addedAt?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),role_id?: (order_by | null),selector?: (order_by | null),selectorName?: (order_by | null),target?: (order_by | null),transactionHash?: (order_by | null)}
+export interface RolePermission_max_order_by {addedAt?: (order_by | null),id?: (order_by | null),role_id?: (order_by | null),selector?: (order_by | null),selectorName?: (order_by | null),target?: (order_by | null),transactionHash?: (order_by | null)}
 
 
 /** order by min() on columns of table "RolePermission" */
-export interface RolePermission_min_order_by {addedAt?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),role_id?: (order_by | null),selector?: (order_by | null),selectorName?: (order_by | null),target?: (order_by | null),transactionHash?: (order_by | null)}
+export interface RolePermission_min_order_by {addedAt?: (order_by | null),id?: (order_by | null),role_id?: (order_by | null),selector?: (order_by | null),selectorName?: (order_by | null),target?: (order_by | null),transactionHash?: (order_by | null)}
 
 
 /** Ordering options when selecting data from "RolePermission". */
-export interface RolePermission_order_by {addedAt?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),role_id?: (order_by | null),selector?: (order_by | null),selectorName?: (order_by | null),target?: (order_by | null),transactionHash?: (order_by | null)}
+export interface RolePermission_order_by {addedAt?: (order_by | null),id?: (order_by | null),role_id?: (order_by | null),selector?: (order_by | null),selectorName?: (order_by | null),target?: (order_by | null),transactionHash?: (order_by | null)}
 
 
 /** order by stddev() on columns of table "RolePermission" */
@@ -2607,7 +2472,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface RolePermission_stream_cursor_value_input {addedAt?: (Scalars['numeric'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),id?: (Scalars['String'] | null),role_id?: (Scalars['String'] | null),selector?: (Scalars['String'] | null),selectorName?: (Scalars['String'] | null),target?: (Scalars['String'] | null),transactionHash?: (Scalars['String'] | null)}
+export interface RolePermission_stream_cursor_value_input {addedAt?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),role_id?: (Scalars['String'] | null),selector?: (Scalars['String'] | null),selectorName?: (Scalars['String'] | null),target?: (Scalars['String'] | null),transactionHash?: (Scalars['String'] | null)}
 
 
 /** order by sum() on columns of table "RolePermission" */
@@ -2635,19 +2500,19 @@ export interface Role_avg_order_by {createdAt?: (order_by | null),lastUpdatedAt?
 
 
 /** Boolean expression to filter rows from the table "Role". All fields are combined with a logical 'AND'. */
-export interface Role_bool_exp {_and?: (Role_bool_exp[] | null),_not?: (Role_bool_exp | null),_or?: (Role_bool_exp[] | null),adminRole?: (String_comparison_exp | null),adminRoleName?: (String_comparison_exp | null),authorizer_id?: (String_comparison_exp | null),createdAt?: (numeric_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),id?: (String_comparison_exp | null),isAdminBurned?: (Boolean_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),members?: (RoleMember_bool_exp | null),name?: (String_comparison_exp | null),permissions?: (RolePermission_bool_exp | null),roleId?: (String_comparison_exp | null)}
+export interface Role_bool_exp {_and?: (Role_bool_exp[] | null),_not?: (Role_bool_exp | null),_or?: (Role_bool_exp[] | null),adminRole?: (String_comparison_exp | null),adminRoleName?: (String_comparison_exp | null),authorizer_id?: (String_comparison_exp | null),createdAt?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),isAdminBurned?: (Boolean_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),members?: (RoleMember_bool_exp | null),name?: (String_comparison_exp | null),permissions?: (RolePermission_bool_exp | null),roleId?: (String_comparison_exp | null)}
 
 
 /** order by max() on columns of table "Role" */
-export interface Role_max_order_by {adminRole?: (order_by | null),adminRoleName?: (order_by | null),authorizer_id?: (order_by | null),createdAt?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),name?: (order_by | null),roleId?: (order_by | null)}
+export interface Role_max_order_by {adminRole?: (order_by | null),adminRoleName?: (order_by | null),authorizer_id?: (order_by | null),createdAt?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),name?: (order_by | null),roleId?: (order_by | null)}
 
 
 /** order by min() on columns of table "Role" */
-export interface Role_min_order_by {adminRole?: (order_by | null),adminRoleName?: (order_by | null),authorizer_id?: (order_by | null),createdAt?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),name?: (order_by | null),roleId?: (order_by | null)}
+export interface Role_min_order_by {adminRole?: (order_by | null),adminRoleName?: (order_by | null),authorizer_id?: (order_by | null),createdAt?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),name?: (order_by | null),roleId?: (order_by | null)}
 
 
 /** Ordering options when selecting data from "Role". */
-export interface Role_order_by {adminRole?: (order_by | null),adminRoleName?: (order_by | null),authorizer_id?: (order_by | null),createdAt?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),isAdminBurned?: (order_by | null),lastUpdatedAt?: (order_by | null),members_aggregate?: (RoleMember_aggregate_order_by | null),name?: (order_by | null),permissions_aggregate?: (RolePermission_aggregate_order_by | null),roleId?: (order_by | null)}
+export interface Role_order_by {adminRole?: (order_by | null),adminRoleName?: (order_by | null),authorizer_id?: (order_by | null),createdAt?: (order_by | null),id?: (order_by | null),isAdminBurned?: (order_by | null),lastUpdatedAt?: (order_by | null),members_aggregate?: (RoleMember_aggregate_order_by | null),name?: (order_by | null),permissions_aggregate?: (RolePermission_aggregate_order_by | null),roleId?: (order_by | null)}
 
 
 /** order by stddev() on columns of table "Role" */
@@ -2671,7 +2536,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface Role_stream_cursor_value_input {adminRole?: (Scalars['String'] | null),adminRoleName?: (Scalars['String'] | null),authorizer_id?: (Scalars['String'] | null),createdAt?: (Scalars['numeric'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),id?: (Scalars['String'] | null),isAdminBurned?: (Scalars['Boolean'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),name?: (Scalars['String'] | null),roleId?: (Scalars['String'] | null)}
+export interface Role_stream_cursor_value_input {adminRole?: (Scalars['String'] | null),adminRoleName?: (Scalars['String'] | null),authorizer_id?: (Scalars['String'] | null),createdAt?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),isAdminBurned?: (Scalars['Boolean'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),name?: (Scalars['String'] | null),roleId?: (Scalars['String'] | null)}
 
 
 /** order by sum() on columns of table "Role" */
@@ -2695,7 +2560,6 @@ export interface StakeGenqlSelection{
     amountFormatted?: boolean | number
     amountRaw?: boolean | number
     contract_id?: boolean | number
-    db_write_timestamp?: boolean | number
     id?: boolean | number
     lockDuration?: boolean | number
     status?: boolean | number
@@ -2716,19 +2580,19 @@ export interface Stake_avg_order_by {amountRaw?: (order_by | null),lockDuration?
 
 
 /** Boolean expression to filter rows from the table "Stake". All fields are combined with a logical 'AND'. */
-export interface Stake_bool_exp {_and?: (Stake_bool_exp[] | null),_not?: (Stake_bool_exp | null),_or?: (Stake_bool_exp[] | null),amountFormatted?: (String_comparison_exp | null),amountRaw?: (numeric_comparison_exp | null),contract_id?: (String_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),id?: (String_comparison_exp | null),lockDuration?: (numeric_comparison_exp | null),status?: (stakestatus_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),transactionHash?: (String_comparison_exp | null),user_id?: (String_comparison_exp | null)}
+export interface Stake_bool_exp {_and?: (Stake_bool_exp[] | null),_not?: (Stake_bool_exp | null),_or?: (Stake_bool_exp[] | null),amountFormatted?: (String_comparison_exp | null),amountRaw?: (numeric_comparison_exp | null),contract_id?: (String_comparison_exp | null),id?: (String_comparison_exp | null),lockDuration?: (numeric_comparison_exp | null),status?: (stakestatus_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),transactionHash?: (String_comparison_exp | null),user_id?: (String_comparison_exp | null)}
 
 
 /** order by max() on columns of table "Stake" */
-export interface Stake_max_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),contract_id?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),lockDuration?: (order_by | null),status?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null)}
+export interface Stake_max_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),contract_id?: (order_by | null),id?: (order_by | null),lockDuration?: (order_by | null),status?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null)}
 
 
 /** order by min() on columns of table "Stake" */
-export interface Stake_min_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),contract_id?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),lockDuration?: (order_by | null),status?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null)}
+export interface Stake_min_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),contract_id?: (order_by | null),id?: (order_by | null),lockDuration?: (order_by | null),status?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null)}
 
 
 /** Ordering options when selecting data from "Stake". */
-export interface Stake_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),contract_id?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),lockDuration?: (order_by | null),status?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null)}
+export interface Stake_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),contract_id?: (order_by | null),id?: (order_by | null),lockDuration?: (order_by | null),status?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null)}
 
 
 /** order by stddev() on columns of table "Stake" */
@@ -2752,7 +2616,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface Stake_stream_cursor_value_input {amountFormatted?: (Scalars['String'] | null),amountRaw?: (Scalars['numeric'] | null),contract_id?: (Scalars['String'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),id?: (Scalars['String'] | null),lockDuration?: (Scalars['numeric'] | null),status?: (Scalars['stakestatus'] | null),timestamp?: (Scalars['numeric'] | null),transactionHash?: (Scalars['String'] | null),user_id?: (Scalars['String'] | null)}
+export interface Stake_stream_cursor_value_input {amountFormatted?: (Scalars['String'] | null),amountRaw?: (Scalars['numeric'] | null),contract_id?: (Scalars['String'] | null),id?: (Scalars['String'] | null),lockDuration?: (Scalars['numeric'] | null),status?: (Scalars['stakestatus'] | null),timestamp?: (Scalars['numeric'] | null),transactionHash?: (Scalars['String'] | null),user_id?: (Scalars['String'] | null)}
 
 
 /** order by sum() on columns of table "Stake" */
@@ -2774,7 +2638,6 @@ export interface Stake_variance_order_by {amountRaw?: (order_by | null),lockDura
 /** columns and relationships of "StakingContract" */
 export interface StakingContractGenqlSelection{
     createdAt?: boolean | number
-    db_write_timestamp?: boolean | number
     id?: boolean | number
     rewardToken_id?: boolean | number
     /** An array relationship */
@@ -2800,11 +2663,11 @@ export interface StakingContractGenqlSelection{
 
 
 /** Boolean expression to filter rows from the table "StakingContract". All fields are combined with a logical 'AND'. */
-export interface StakingContract_bool_exp {_and?: (StakingContract_bool_exp[] | null),_not?: (StakingContract_bool_exp | null),_or?: (StakingContract_bool_exp[] | null),createdAt?: (numeric_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),id?: (String_comparison_exp | null),rewardToken_id?: (String_comparison_exp | null),stakes?: (Stake_bool_exp | null),stakingToken_id?: (String_comparison_exp | null),totalRewardsFormatted?: (String_comparison_exp | null),totalRewardsRaw?: (numeric_comparison_exp | null),totalStakedFormatted?: (String_comparison_exp | null),totalStakedRaw?: (numeric_comparison_exp | null)}
+export interface StakingContract_bool_exp {_and?: (StakingContract_bool_exp[] | null),_not?: (StakingContract_bool_exp | null),_or?: (StakingContract_bool_exp[] | null),createdAt?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),rewardToken_id?: (String_comparison_exp | null),stakes?: (Stake_bool_exp | null),stakingToken_id?: (String_comparison_exp | null),totalRewardsFormatted?: (String_comparison_exp | null),totalRewardsRaw?: (numeric_comparison_exp | null),totalStakedFormatted?: (String_comparison_exp | null),totalStakedRaw?: (numeric_comparison_exp | null)}
 
 
 /** Ordering options when selecting data from "StakingContract". */
-export interface StakingContract_order_by {createdAt?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),rewardToken_id?: (order_by | null),stakes_aggregate?: (Stake_aggregate_order_by | null),stakingToken_id?: (order_by | null),totalRewardsFormatted?: (order_by | null),totalRewardsRaw?: (order_by | null),totalStakedFormatted?: (order_by | null),totalStakedRaw?: (order_by | null)}
+export interface StakingContract_order_by {createdAt?: (order_by | null),id?: (order_by | null),rewardToken_id?: (order_by | null),stakes_aggregate?: (Stake_aggregate_order_by | null),stakingToken_id?: (order_by | null),totalRewardsFormatted?: (order_by | null),totalRewardsRaw?: (order_by | null),totalStakedFormatted?: (order_by | null),totalStakedRaw?: (order_by | null)}
 
 
 /** Streaming cursor of the table "StakingContract" */
@@ -2816,7 +2679,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface StakingContract_stream_cursor_value_input {createdAt?: (Scalars['numeric'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),id?: (Scalars['String'] | null),rewardToken_id?: (Scalars['String'] | null),stakingToken_id?: (Scalars['String'] | null),totalRewardsFormatted?: (Scalars['String'] | null),totalRewardsRaw?: (Scalars['numeric'] | null),totalStakedFormatted?: (Scalars['String'] | null),totalStakedRaw?: (Scalars['numeric'] | null)}
+export interface StakingContract_stream_cursor_value_input {createdAt?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),rewardToken_id?: (Scalars['String'] | null),stakingToken_id?: (Scalars['String'] | null),totalRewardsFormatted?: (Scalars['String'] | null),totalRewardsRaw?: (Scalars['numeric'] | null),totalStakedFormatted?: (Scalars['String'] | null),totalStakedRaw?: (Scalars['numeric'] | null)}
 
 
 /** Boolean expression to compare columns of type "String". All fields are combined with logical 'AND'. */
@@ -2853,7 +2716,6 @@ _similar?: (Scalars['String'] | null)}
 
 /** columns and relationships of "Token" */
 export interface TokenGenqlSelection{
-    db_write_timestamp?: boolean | number
     decimals?: boolean | number
     id?: boolean | number
     maxSupplyFormatted?: boolean | number
@@ -2866,11 +2728,11 @@ export interface TokenGenqlSelection{
 
 
 /** Boolean expression to filter rows from the table "Token". All fields are combined with a logical 'AND'. */
-export interface Token_bool_exp {_and?: (Token_bool_exp[] | null),_not?: (Token_bool_exp | null),_or?: (Token_bool_exp[] | null),db_write_timestamp?: (timestamp_comparison_exp | null),decimals?: (Int_comparison_exp | null),id?: (String_comparison_exp | null),maxSupplyFormatted?: (String_comparison_exp | null),maxSupplyRaw?: (numeric_comparison_exp | null),name?: (String_comparison_exp | null),symbol?: (String_comparison_exp | null)}
+export interface Token_bool_exp {_and?: (Token_bool_exp[] | null),_not?: (Token_bool_exp | null),_or?: (Token_bool_exp[] | null),decimals?: (Int_comparison_exp | null),id?: (String_comparison_exp | null),maxSupplyFormatted?: (String_comparison_exp | null),maxSupplyRaw?: (numeric_comparison_exp | null),name?: (String_comparison_exp | null),symbol?: (String_comparison_exp | null)}
 
 
 /** Ordering options when selecting data from "Token". */
-export interface Token_order_by {db_write_timestamp?: (order_by | null),decimals?: (order_by | null),id?: (order_by | null),maxSupplyFormatted?: (order_by | null),maxSupplyRaw?: (order_by | null),name?: (order_by | null),symbol?: (order_by | null)}
+export interface Token_order_by {decimals?: (order_by | null),id?: (order_by | null),maxSupplyFormatted?: (order_by | null),maxSupplyRaw?: (order_by | null),name?: (order_by | null),symbol?: (order_by | null)}
 
 
 /** Streaming cursor of the table "Token" */
@@ -2882,12 +2744,11 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface Token_stream_cursor_value_input {db_write_timestamp?: (Scalars['timestamp'] | null),decimals?: (Scalars['Int'] | null),id?: (Scalars['String'] | null),maxSupplyFormatted?: (Scalars['String'] | null),maxSupplyRaw?: (Scalars['numeric'] | null),name?: (Scalars['String'] | null),symbol?: (Scalars['String'] | null)}
+export interface Token_stream_cursor_value_input {decimals?: (Scalars['Int'] | null),id?: (Scalars['String'] | null),maxSupplyFormatted?: (Scalars['String'] | null),maxSupplyRaw?: (Scalars['numeric'] | null),name?: (Scalars['String'] | null),symbol?: (Scalars['String'] | null)}
 
 
 /** columns and relationships of "Trade" */
 export interface TradeGenqlSelection{
-    db_write_timestamp?: boolean | number
     feeFormatted?: boolean | number
     feeRaw?: boolean | number
     id?: boolean | number
@@ -2916,19 +2777,19 @@ export interface Trade_avg_order_by {feeRaw?: (order_by | null),newPriceRaw?: (o
 
 
 /** Boolean expression to filter rows from the table "Trade". All fields are combined with a logical 'AND'. */
-export interface Trade_bool_exp {_and?: (Trade_bool_exp[] | null),_not?: (Trade_bool_exp | null),_or?: (Trade_bool_exp[] | null),db_write_timestamp?: (timestamp_comparison_exp | null),feeFormatted?: (String_comparison_exp | null),feeRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),market_id?: (String_comparison_exp | null),newPriceFormatted?: (String_comparison_exp | null),newPriceRaw?: (numeric_comparison_exp | null),reserveAmountFormatted?: (String_comparison_exp | null),reserveAmountRaw?: (numeric_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),tokenAmountFormatted?: (String_comparison_exp | null),tokenAmountRaw?: (numeric_comparison_exp | null),tradeType?: (tradetype_comparison_exp | null),transactionHash?: (String_comparison_exp | null),user_id?: (String_comparison_exp | null)}
+export interface Trade_bool_exp {_and?: (Trade_bool_exp[] | null),_not?: (Trade_bool_exp | null),_or?: (Trade_bool_exp[] | null),feeFormatted?: (String_comparison_exp | null),feeRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),market_id?: (String_comparison_exp | null),newPriceFormatted?: (String_comparison_exp | null),newPriceRaw?: (numeric_comparison_exp | null),reserveAmountFormatted?: (String_comparison_exp | null),reserveAmountRaw?: (numeric_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),tokenAmountFormatted?: (String_comparison_exp | null),tokenAmountRaw?: (numeric_comparison_exp | null),tradeType?: (tradetype_comparison_exp | null),transactionHash?: (String_comparison_exp | null),user_id?: (String_comparison_exp | null)}
 
 
 /** order by max() on columns of table "Trade" */
-export interface Trade_max_order_by {db_write_timestamp?: (order_by | null),feeFormatted?: (order_by | null),feeRaw?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),newPriceFormatted?: (order_by | null),newPriceRaw?: (order_by | null),reserveAmountFormatted?: (order_by | null),reserveAmountRaw?: (order_by | null),timestamp?: (order_by | null),tokenAmountFormatted?: (order_by | null),tokenAmountRaw?: (order_by | null),tradeType?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null)}
+export interface Trade_max_order_by {feeFormatted?: (order_by | null),feeRaw?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),newPriceFormatted?: (order_by | null),newPriceRaw?: (order_by | null),reserveAmountFormatted?: (order_by | null),reserveAmountRaw?: (order_by | null),timestamp?: (order_by | null),tokenAmountFormatted?: (order_by | null),tokenAmountRaw?: (order_by | null),tradeType?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null)}
 
 
 /** order by min() on columns of table "Trade" */
-export interface Trade_min_order_by {db_write_timestamp?: (order_by | null),feeFormatted?: (order_by | null),feeRaw?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),newPriceFormatted?: (order_by | null),newPriceRaw?: (order_by | null),reserveAmountFormatted?: (order_by | null),reserveAmountRaw?: (order_by | null),timestamp?: (order_by | null),tokenAmountFormatted?: (order_by | null),tokenAmountRaw?: (order_by | null),tradeType?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null)}
+export interface Trade_min_order_by {feeFormatted?: (order_by | null),feeRaw?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),newPriceFormatted?: (order_by | null),newPriceRaw?: (order_by | null),reserveAmountFormatted?: (order_by | null),reserveAmountRaw?: (order_by | null),timestamp?: (order_by | null),tokenAmountFormatted?: (order_by | null),tokenAmountRaw?: (order_by | null),tradeType?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null)}
 
 
 /** Ordering options when selecting data from "Trade". */
-export interface Trade_order_by {db_write_timestamp?: (order_by | null),feeFormatted?: (order_by | null),feeRaw?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),newPriceFormatted?: (order_by | null),newPriceRaw?: (order_by | null),reserveAmountFormatted?: (order_by | null),reserveAmountRaw?: (order_by | null),timestamp?: (order_by | null),tokenAmountFormatted?: (order_by | null),tokenAmountRaw?: (order_by | null),tradeType?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null)}
+export interface Trade_order_by {feeFormatted?: (order_by | null),feeRaw?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),newPriceFormatted?: (order_by | null),newPriceRaw?: (order_by | null),reserveAmountFormatted?: (order_by | null),reserveAmountRaw?: (order_by | null),timestamp?: (order_by | null),tokenAmountFormatted?: (order_by | null),tokenAmountRaw?: (order_by | null),tradeType?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null)}
 
 
 /** order by stddev() on columns of table "Trade" */
@@ -2952,7 +2813,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface Trade_stream_cursor_value_input {db_write_timestamp?: (Scalars['timestamp'] | null),feeFormatted?: (Scalars['String'] | null),feeRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),market_id?: (Scalars['String'] | null),newPriceFormatted?: (Scalars['String'] | null),newPriceRaw?: (Scalars['numeric'] | null),reserveAmountFormatted?: (Scalars['String'] | null),reserveAmountRaw?: (Scalars['numeric'] | null),timestamp?: (Scalars['numeric'] | null),tokenAmountFormatted?: (Scalars['String'] | null),tokenAmountRaw?: (Scalars['numeric'] | null),tradeType?: (Scalars['tradetype'] | null),transactionHash?: (Scalars['String'] | null),user_id?: (Scalars['String'] | null)}
+export interface Trade_stream_cursor_value_input {feeFormatted?: (Scalars['String'] | null),feeRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),market_id?: (Scalars['String'] | null),newPriceFormatted?: (Scalars['String'] | null),newPriceRaw?: (Scalars['numeric'] | null),reserveAmountFormatted?: (Scalars['String'] | null),reserveAmountRaw?: (Scalars['numeric'] | null),timestamp?: (Scalars['numeric'] | null),tokenAmountFormatted?: (Scalars['String'] | null),tokenAmountRaw?: (Scalars['numeric'] | null),tradeType?: (Scalars['tradetype'] | null),transactionHash?: (Scalars['String'] | null),user_id?: (Scalars['String'] | null)}
 
 
 /** order by sum() on columns of table "Trade" */
@@ -2974,7 +2835,6 @@ export interface Trade_variance_order_by {feeRaw?: (order_by | null),newPriceRaw
 /** columns and relationships of "Treasury" */
 export interface TreasuryGenqlSelection{
     createdAt?: boolean | number
-    db_write_timestamp?: boolean | number
     /** An array relationship */
     feeSplitterPayments?: (FeeSplitterPaymentGenqlSelection & { __args?: {
     /** distinct select on columns */
@@ -3013,11 +2873,11 @@ export interface TreasuryGenqlSelection{
 
 
 /** Boolean expression to filter rows from the table "Treasury". All fields are combined with a logical 'AND'. */
-export interface Treasury_bool_exp {_and?: (Treasury_bool_exp[] | null),_not?: (Treasury_bool_exp | null),_or?: (Treasury_bool_exp[] | null),createdAt?: (numeric_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),feeSplitterPayments?: (FeeSplitterPayment_bool_exp | null),feeSplitterReceipts?: (FeeSplitterReceipt_bool_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),market_id?: (String_comparison_exp | null),totalFeesDistributedFormatted?: (String_comparison_exp | null),totalFeesDistributedRaw?: (numeric_comparison_exp | null),totalFeesReceivedFormatted?: (String_comparison_exp | null),totalFeesReceivedRaw?: (numeric_comparison_exp | null),treasuryAddress?: (String_comparison_exp | null)}
+export interface Treasury_bool_exp {_and?: (Treasury_bool_exp[] | null),_not?: (Treasury_bool_exp | null),_or?: (Treasury_bool_exp[] | null),createdAt?: (numeric_comparison_exp | null),feeSplitterPayments?: (FeeSplitterPayment_bool_exp | null),feeSplitterReceipts?: (FeeSplitterReceipt_bool_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),market_id?: (String_comparison_exp | null),totalFeesDistributedFormatted?: (String_comparison_exp | null),totalFeesDistributedRaw?: (numeric_comparison_exp | null),totalFeesReceivedFormatted?: (String_comparison_exp | null),totalFeesReceivedRaw?: (numeric_comparison_exp | null),treasuryAddress?: (String_comparison_exp | null)}
 
 
 /** Ordering options when selecting data from "Treasury". */
-export interface Treasury_order_by {createdAt?: (order_by | null),db_write_timestamp?: (order_by | null),feeSplitterPayments_aggregate?: (FeeSplitterPayment_aggregate_order_by | null),feeSplitterReceipts_aggregate?: (FeeSplitterReceipt_aggregate_order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),market_id?: (order_by | null),totalFeesDistributedFormatted?: (order_by | null),totalFeesDistributedRaw?: (order_by | null),totalFeesReceivedFormatted?: (order_by | null),totalFeesReceivedRaw?: (order_by | null),treasuryAddress?: (order_by | null)}
+export interface Treasury_order_by {createdAt?: (order_by | null),feeSplitterPayments_aggregate?: (FeeSplitterPayment_aggregate_order_by | null),feeSplitterReceipts_aggregate?: (FeeSplitterReceipt_aggregate_order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),market_id?: (order_by | null),totalFeesDistributedFormatted?: (order_by | null),totalFeesDistributedRaw?: (order_by | null),totalFeesReceivedFormatted?: (order_by | null),totalFeesReceivedRaw?: (order_by | null),treasuryAddress?: (order_by | null)}
 
 
 /** Streaming cursor of the table "Treasury" */
@@ -3029,14 +2889,13 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface Treasury_stream_cursor_value_input {createdAt?: (Scalars['numeric'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),market_id?: (Scalars['String'] | null),totalFeesDistributedFormatted?: (Scalars['String'] | null),totalFeesDistributedRaw?: (Scalars['numeric'] | null),totalFeesReceivedFormatted?: (Scalars['String'] | null),totalFeesReceivedRaw?: (Scalars['numeric'] | null),treasuryAddress?: (Scalars['String'] | null)}
+export interface Treasury_stream_cursor_value_input {createdAt?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),market_id?: (Scalars['String'] | null),totalFeesDistributedFormatted?: (Scalars['String'] | null),totalFeesDistributedRaw?: (Scalars['numeric'] | null),totalFeesReceivedFormatted?: (Scalars['String'] | null),totalFeesReceivedRaw?: (Scalars['numeric'] | null),treasuryAddress?: (Scalars['String'] | null)}
 
 
 /** columns and relationships of "UserMarketPosition" */
 export interface UserMarketPositionGenqlSelection{
     claimableRewardsFormatted?: boolean | number
     claimableRewardsRaw?: boolean | number
-    db_write_timestamp?: boolean | number
     id?: boolean | number
     lastUpdatedAt?: boolean | number
     lockedCollateralFormatted?: boolean | number
@@ -3066,19 +2925,19 @@ export interface UserMarketPosition_avg_order_by {claimableRewardsRaw?: (order_b
 
 
 /** Boolean expression to filter rows from the table "UserMarketPosition". All fields are combined with a logical 'AND'. */
-export interface UserMarketPosition_bool_exp {_and?: (UserMarketPosition_bool_exp[] | null),_not?: (UserMarketPosition_bool_exp | null),_or?: (UserMarketPosition_bool_exp[] | null),claimableRewardsFormatted?: (String_comparison_exp | null),claimableRewardsRaw?: (numeric_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),lockedCollateralFormatted?: (String_comparison_exp | null),lockedCollateralRaw?: (numeric_comparison_exp | null),market_id?: (String_comparison_exp | null),netFTokenChangeFormatted?: (String_comparison_exp | null),netFTokenChangeRaw?: (numeric_comparison_exp | null),presaleDepositFormatted?: (String_comparison_exp | null),presaleDepositRaw?: (numeric_comparison_exp | null),presaleLeverage?: (numeric_comparison_exp | null),stakedAmountFormatted?: (String_comparison_exp | null),stakedAmountRaw?: (numeric_comparison_exp | null),totalDebtFormatted?: (String_comparison_exp | null),totalDebtRaw?: (numeric_comparison_exp | null),user_id?: (String_comparison_exp | null)}
+export interface UserMarketPosition_bool_exp {_and?: (UserMarketPosition_bool_exp[] | null),_not?: (UserMarketPosition_bool_exp | null),_or?: (UserMarketPosition_bool_exp[] | null),claimableRewardsFormatted?: (String_comparison_exp | null),claimableRewardsRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),lockedCollateralFormatted?: (String_comparison_exp | null),lockedCollateralRaw?: (numeric_comparison_exp | null),market_id?: (String_comparison_exp | null),netFTokenChangeFormatted?: (String_comparison_exp | null),netFTokenChangeRaw?: (numeric_comparison_exp | null),presaleDepositFormatted?: (String_comparison_exp | null),presaleDepositRaw?: (numeric_comparison_exp | null),presaleLeverage?: (numeric_comparison_exp | null),stakedAmountFormatted?: (String_comparison_exp | null),stakedAmountRaw?: (numeric_comparison_exp | null),totalDebtFormatted?: (String_comparison_exp | null),totalDebtRaw?: (numeric_comparison_exp | null),user_id?: (String_comparison_exp | null)}
 
 
 /** order by max() on columns of table "UserMarketPosition" */
-export interface UserMarketPosition_max_order_by {claimableRewardsFormatted?: (order_by | null),claimableRewardsRaw?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),lockedCollateralFormatted?: (order_by | null),lockedCollateralRaw?: (order_by | null),market_id?: (order_by | null),netFTokenChangeFormatted?: (order_by | null),netFTokenChangeRaw?: (order_by | null),presaleDepositFormatted?: (order_by | null),presaleDepositRaw?: (order_by | null),presaleLeverage?: (order_by | null),stakedAmountFormatted?: (order_by | null),stakedAmountRaw?: (order_by | null),totalDebtFormatted?: (order_by | null),totalDebtRaw?: (order_by | null),user_id?: (order_by | null)}
+export interface UserMarketPosition_max_order_by {claimableRewardsFormatted?: (order_by | null),claimableRewardsRaw?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),lockedCollateralFormatted?: (order_by | null),lockedCollateralRaw?: (order_by | null),market_id?: (order_by | null),netFTokenChangeFormatted?: (order_by | null),netFTokenChangeRaw?: (order_by | null),presaleDepositFormatted?: (order_by | null),presaleDepositRaw?: (order_by | null),presaleLeverage?: (order_by | null),stakedAmountFormatted?: (order_by | null),stakedAmountRaw?: (order_by | null),totalDebtFormatted?: (order_by | null),totalDebtRaw?: (order_by | null),user_id?: (order_by | null)}
 
 
 /** order by min() on columns of table "UserMarketPosition" */
-export interface UserMarketPosition_min_order_by {claimableRewardsFormatted?: (order_by | null),claimableRewardsRaw?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),lockedCollateralFormatted?: (order_by | null),lockedCollateralRaw?: (order_by | null),market_id?: (order_by | null),netFTokenChangeFormatted?: (order_by | null),netFTokenChangeRaw?: (order_by | null),presaleDepositFormatted?: (order_by | null),presaleDepositRaw?: (order_by | null),presaleLeverage?: (order_by | null),stakedAmountFormatted?: (order_by | null),stakedAmountRaw?: (order_by | null),totalDebtFormatted?: (order_by | null),totalDebtRaw?: (order_by | null),user_id?: (order_by | null)}
+export interface UserMarketPosition_min_order_by {claimableRewardsFormatted?: (order_by | null),claimableRewardsRaw?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),lockedCollateralFormatted?: (order_by | null),lockedCollateralRaw?: (order_by | null),market_id?: (order_by | null),netFTokenChangeFormatted?: (order_by | null),netFTokenChangeRaw?: (order_by | null),presaleDepositFormatted?: (order_by | null),presaleDepositRaw?: (order_by | null),presaleLeverage?: (order_by | null),stakedAmountFormatted?: (order_by | null),stakedAmountRaw?: (order_by | null),totalDebtFormatted?: (order_by | null),totalDebtRaw?: (order_by | null),user_id?: (order_by | null)}
 
 
 /** Ordering options when selecting data from "UserMarketPosition". */
-export interface UserMarketPosition_order_by {claimableRewardsFormatted?: (order_by | null),claimableRewardsRaw?: (order_by | null),db_write_timestamp?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),lockedCollateralFormatted?: (order_by | null),lockedCollateralRaw?: (order_by | null),market_id?: (order_by | null),netFTokenChangeFormatted?: (order_by | null),netFTokenChangeRaw?: (order_by | null),presaleDepositFormatted?: (order_by | null),presaleDepositRaw?: (order_by | null),presaleLeverage?: (order_by | null),stakedAmountFormatted?: (order_by | null),stakedAmountRaw?: (order_by | null),totalDebtFormatted?: (order_by | null),totalDebtRaw?: (order_by | null),user_id?: (order_by | null)}
+export interface UserMarketPosition_order_by {claimableRewardsFormatted?: (order_by | null),claimableRewardsRaw?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),lockedCollateralFormatted?: (order_by | null),lockedCollateralRaw?: (order_by | null),market_id?: (order_by | null),netFTokenChangeFormatted?: (order_by | null),netFTokenChangeRaw?: (order_by | null),presaleDepositFormatted?: (order_by | null),presaleDepositRaw?: (order_by | null),presaleLeverage?: (order_by | null),stakedAmountFormatted?: (order_by | null),stakedAmountRaw?: (order_by | null),totalDebtFormatted?: (order_by | null),totalDebtRaw?: (order_by | null),user_id?: (order_by | null)}
 
 
 /** order by stddev() on columns of table "UserMarketPosition" */
@@ -3102,7 +2961,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface UserMarketPosition_stream_cursor_value_input {claimableRewardsFormatted?: (Scalars['String'] | null),claimableRewardsRaw?: (Scalars['numeric'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),lockedCollateralFormatted?: (Scalars['String'] | null),lockedCollateralRaw?: (Scalars['numeric'] | null),market_id?: (Scalars['String'] | null),netFTokenChangeFormatted?: (Scalars['String'] | null),netFTokenChangeRaw?: (Scalars['numeric'] | null),presaleDepositFormatted?: (Scalars['String'] | null),presaleDepositRaw?: (Scalars['numeric'] | null),presaleLeverage?: (Scalars['numeric'] | null),stakedAmountFormatted?: (Scalars['String'] | null),stakedAmountRaw?: (Scalars['numeric'] | null),totalDebtFormatted?: (Scalars['String'] | null),totalDebtRaw?: (Scalars['numeric'] | null),user_id?: (Scalars['String'] | null)}
+export interface UserMarketPosition_stream_cursor_value_input {claimableRewardsFormatted?: (Scalars['String'] | null),claimableRewardsRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),lockedCollateralFormatted?: (Scalars['String'] | null),lockedCollateralRaw?: (Scalars['numeric'] | null),market_id?: (Scalars['String'] | null),netFTokenChangeFormatted?: (Scalars['String'] | null),netFTokenChangeRaw?: (Scalars['numeric'] | null),presaleDepositFormatted?: (Scalars['String'] | null),presaleDepositRaw?: (Scalars['numeric'] | null),presaleLeverage?: (Scalars['numeric'] | null),stakedAmountFormatted?: (Scalars['String'] | null),stakedAmountRaw?: (Scalars['numeric'] | null),totalDebtFormatted?: (Scalars['String'] | null),totalDebtRaw?: (Scalars['numeric'] | null),user_id?: (Scalars['String'] | null)}
 
 
 /** order by sum() on columns of table "UserMarketPosition" */
@@ -3119,6 +2978,43 @@ export interface UserMarketPosition_var_samp_order_by {claimableRewardsRaw?: (or
 
 /** order by variance() on columns of table "UserMarketPosition" */
 export interface UserMarketPosition_variance_order_by {claimableRewardsRaw?: (order_by | null),lastUpdatedAt?: (order_by | null),lockedCollateralRaw?: (order_by | null),netFTokenChangeRaw?: (order_by | null),presaleDepositRaw?: (order_by | null),presaleLeverage?: (order_by | null),stakedAmountRaw?: (order_by | null),totalDebtRaw?: (order_by | null)}
+
+
+/** columns and relationships of "_meta" */
+export interface _metaGenqlSelection{
+    bufferBlock?: boolean | number
+    chainId?: boolean | number
+    endBlock?: boolean | number
+    eventsProcessed?: boolean | number
+    firstEventBlock?: boolean | number
+    isReady?: boolean | number
+    progressBlock?: boolean | number
+    readyAt?: boolean | number
+    sourceBlock?: boolean | number
+    startBlock?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+
+/** Boolean expression to filter rows from the table "_meta". All fields are combined with a logical 'AND'. */
+export interface _meta_bool_exp {_and?: (_meta_bool_exp[] | null),_not?: (_meta_bool_exp | null),_or?: (_meta_bool_exp[] | null),bufferBlock?: (Int_comparison_exp | null),chainId?: (Int_comparison_exp | null),endBlock?: (Int_comparison_exp | null),eventsProcessed?: (Int_comparison_exp | null),firstEventBlock?: (Int_comparison_exp | null),isReady?: (Boolean_comparison_exp | null),progressBlock?: (Int_comparison_exp | null),readyAt?: (timestamptz_comparison_exp | null),sourceBlock?: (Int_comparison_exp | null),startBlock?: (Int_comparison_exp | null)}
+
+
+/** Ordering options when selecting data from "_meta". */
+export interface _meta_order_by {bufferBlock?: (order_by | null),chainId?: (order_by | null),endBlock?: (order_by | null),eventsProcessed?: (order_by | null),firstEventBlock?: (order_by | null),isReady?: (order_by | null),progressBlock?: (order_by | null),readyAt?: (order_by | null),sourceBlock?: (order_by | null),startBlock?: (order_by | null)}
+
+
+/** Streaming cursor of the table "_meta" */
+export interface _meta_stream_cursor_input {
+/** Stream column input with initial value */
+initial_value: _meta_stream_cursor_value_input,
+/** cursor ordering */
+ordering?: (cursor_ordering | null)}
+
+
+/** Initial value of the column from where the streaming should start */
+export interface _meta_stream_cursor_value_input {bufferBlock?: (Scalars['Int'] | null),chainId?: (Scalars['Int'] | null),endBlock?: (Scalars['Int'] | null),eventsProcessed?: (Scalars['Int'] | null),firstEventBlock?: (Scalars['Int'] | null),isReady?: (Scalars['Boolean'] | null),progressBlock?: (Scalars['Int'] | null),readyAt?: (Scalars['timestamptz'] | null),sourceBlock?: (Scalars['Int'] | null),startBlock?: (Scalars['Int'] | null)}
 
 
 /** Boolean expression to compare columns of type "candleperiod". All fields are combined with logical 'AND'. */
@@ -3162,109 +3058,6 @@ ordering?: (cursor_ordering | null)}
 /** Initial value of the column from where the streaming should start */
 export interface chain_metadata_stream_cursor_value_input {block_height?: (Scalars['Int'] | null),chain_id?: (Scalars['Int'] | null),end_block?: (Scalars['Int'] | null),first_event_block_number?: (Scalars['Int'] | null),is_hyper_sync?: (Scalars['Boolean'] | null),latest_fetched_block_number?: (Scalars['Int'] | null),latest_processed_block?: (Scalars['Int'] | null),num_batches_fetched?: (Scalars['Int'] | null),num_events_processed?: (Scalars['Int'] | null),start_block?: (Scalars['Int'] | null),timestamp_caught_up_to_head_or_endblock?: (Scalars['timestamptz'] | null)}
 
-
-/** Boolean expression to compare columns of type "contract_type". All fields are combined with logical 'AND'. */
-export interface contract_type_comparison_exp {_eq?: (Scalars['contract_type'] | null),_gt?: (Scalars['contract_type'] | null),_gte?: (Scalars['contract_type'] | null),_in?: (Scalars['contract_type'][] | null),_is_null?: (Scalars['Boolean'] | null),_lt?: (Scalars['contract_type'] | null),_lte?: (Scalars['contract_type'] | null),_neq?: (Scalars['contract_type'] | null),_nin?: (Scalars['contract_type'][] | null)}
-
-
-/** columns and relationships of "dynamic_contract_registry" */
-export interface dynamic_contract_registryGenqlSelection{
-    chain_id?: boolean | number
-    contract_address?: boolean | number
-    contract_type?: boolean | number
-    id?: boolean | number
-    registering_event_block_number?: boolean | number
-    registering_event_block_timestamp?: boolean | number
-    registering_event_contract_name?: boolean | number
-    registering_event_log_index?: boolean | number
-    registering_event_name?: boolean | number
-    registering_event_src_address?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-
-/** Boolean expression to filter rows from the table "dynamic_contract_registry". All fields are combined with a logical 'AND'. */
-export interface dynamic_contract_registry_bool_exp {_and?: (dynamic_contract_registry_bool_exp[] | null),_not?: (dynamic_contract_registry_bool_exp | null),_or?: (dynamic_contract_registry_bool_exp[] | null),chain_id?: (Int_comparison_exp | null),contract_address?: (String_comparison_exp | null),contract_type?: (contract_type_comparison_exp | null),id?: (String_comparison_exp | null),registering_event_block_number?: (Int_comparison_exp | null),registering_event_block_timestamp?: (Int_comparison_exp | null),registering_event_contract_name?: (String_comparison_exp | null),registering_event_log_index?: (Int_comparison_exp | null),registering_event_name?: (String_comparison_exp | null),registering_event_src_address?: (String_comparison_exp | null)}
-
-
-/** Ordering options when selecting data from "dynamic_contract_registry". */
-export interface dynamic_contract_registry_order_by {chain_id?: (order_by | null),contract_address?: (order_by | null),contract_type?: (order_by | null),id?: (order_by | null),registering_event_block_number?: (order_by | null),registering_event_block_timestamp?: (order_by | null),registering_event_contract_name?: (order_by | null),registering_event_log_index?: (order_by | null),registering_event_name?: (order_by | null),registering_event_src_address?: (order_by | null)}
-
-
-/** Streaming cursor of the table "dynamic_contract_registry" */
-export interface dynamic_contract_registry_stream_cursor_input {
-/** Stream column input with initial value */
-initial_value: dynamic_contract_registry_stream_cursor_value_input,
-/** cursor ordering */
-ordering?: (cursor_ordering | null)}
-
-
-/** Initial value of the column from where the streaming should start */
-export interface dynamic_contract_registry_stream_cursor_value_input {chain_id?: (Scalars['Int'] | null),contract_address?: (Scalars['String'] | null),contract_type?: (Scalars['contract_type'] | null),id?: (Scalars['String'] | null),registering_event_block_number?: (Scalars['Int'] | null),registering_event_block_timestamp?: (Scalars['Int'] | null),registering_event_contract_name?: (Scalars['String'] | null),registering_event_log_index?: (Scalars['Int'] | null),registering_event_name?: (Scalars['String'] | null),registering_event_src_address?: (Scalars['String'] | null)}
-
-
-/** columns and relationships of "end_of_block_range_scanned_data" */
-export interface end_of_block_range_scanned_dataGenqlSelection{
-    block_hash?: boolean | number
-    block_number?: boolean | number
-    chain_id?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-
-/** Boolean expression to filter rows from the table "end_of_block_range_scanned_data". All fields are combined with a logical 'AND'. */
-export interface end_of_block_range_scanned_data_bool_exp {_and?: (end_of_block_range_scanned_data_bool_exp[] | null),_not?: (end_of_block_range_scanned_data_bool_exp | null),_or?: (end_of_block_range_scanned_data_bool_exp[] | null),block_hash?: (String_comparison_exp | null),block_number?: (Int_comparison_exp | null),chain_id?: (Int_comparison_exp | null)}
-
-
-/** Ordering options when selecting data from "end_of_block_range_scanned_data". */
-export interface end_of_block_range_scanned_data_order_by {block_hash?: (order_by | null),block_number?: (order_by | null),chain_id?: (order_by | null)}
-
-
-/** Streaming cursor of the table "end_of_block_range_scanned_data" */
-export interface end_of_block_range_scanned_data_stream_cursor_input {
-/** Stream column input with initial value */
-initial_value: end_of_block_range_scanned_data_stream_cursor_value_input,
-/** cursor ordering */
-ordering?: (cursor_ordering | null)}
-
-
-/** Initial value of the column from where the streaming should start */
-export interface end_of_block_range_scanned_data_stream_cursor_value_input {block_hash?: (Scalars['String'] | null),block_number?: (Scalars['Int'] | null),chain_id?: (Scalars['Int'] | null)}
-
-
-/** columns and relationships of "event_sync_state" */
-export interface event_sync_stateGenqlSelection{
-    block_number?: boolean | number
-    block_timestamp?: boolean | number
-    chain_id?: boolean | number
-    is_pre_registering_dynamic_contracts?: boolean | number
-    log_index?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-
-/** Boolean expression to filter rows from the table "event_sync_state". All fields are combined with a logical 'AND'. */
-export interface event_sync_state_bool_exp {_and?: (event_sync_state_bool_exp[] | null),_not?: (event_sync_state_bool_exp | null),_or?: (event_sync_state_bool_exp[] | null),block_number?: (Int_comparison_exp | null),block_timestamp?: (Int_comparison_exp | null),chain_id?: (Int_comparison_exp | null),is_pre_registering_dynamic_contracts?: (Boolean_comparison_exp | null),log_index?: (Int_comparison_exp | null)}
-
-
-/** Ordering options when selecting data from "event_sync_state". */
-export interface event_sync_state_order_by {block_number?: (order_by | null),block_timestamp?: (order_by | null),chain_id?: (order_by | null),is_pre_registering_dynamic_contracts?: (order_by | null),log_index?: (order_by | null)}
-
-
-/** Streaming cursor of the table "event_sync_state" */
-export interface event_sync_state_stream_cursor_input {
-/** Stream column input with initial value */
-initial_value: event_sync_state_stream_cursor_value_input,
-/** cursor ordering */
-ordering?: (cursor_ordering | null)}
-
-
-/** Initial value of the column from where the streaming should start */
-export interface event_sync_state_stream_cursor_value_input {block_number?: (Scalars['Int'] | null),block_timestamp?: (Scalars['Int'] | null),chain_id?: (Scalars['Int'] | null),is_pre_registering_dynamic_contracts?: (Scalars['Boolean'] | null),log_index?: (Scalars['Int'] | null)}
-
 export interface jsonb_cast_exp {String?: (String_comparison_exp | null)}
 
 
@@ -3291,48 +3084,7 @@ export interface marketstatus_comparison_exp {_eq?: (Scalars['marketstatus'] | n
 
 
 /** Boolean expression to compare columns of type "numeric". All fields are combined with logical 'AND'. */
-export interface numeric_array_comparison_exp {
-/** is the array contained in the given array value */
-_contained_in?: (Scalars['numeric'][] | null),
-/** does the array contain the given value */
-_contains?: (Scalars['numeric'][] | null),_eq?: (Scalars['numeric'][] | null),_gt?: (Scalars['numeric'][] | null),_gte?: (Scalars['numeric'][] | null),_in?: (Scalars['numeric'][][] | null),_is_null?: (Scalars['Boolean'] | null),_lt?: (Scalars['numeric'][] | null),_lte?: (Scalars['numeric'][] | null),_neq?: (Scalars['numeric'][] | null),_nin?: (Scalars['numeric'][][] | null)}
-
-
-/** Boolean expression to compare columns of type "numeric". All fields are combined with logical 'AND'. */
 export interface numeric_comparison_exp {_eq?: (Scalars['numeric'] | null),_gt?: (Scalars['numeric'] | null),_gte?: (Scalars['numeric'] | null),_in?: (Scalars['numeric'][] | null),_is_null?: (Scalars['Boolean'] | null),_lt?: (Scalars['numeric'] | null),_lte?: (Scalars['numeric'] | null),_neq?: (Scalars['numeric'] | null),_nin?: (Scalars['numeric'][] | null)}
-
-
-/** columns and relationships of "persisted_state" */
-export interface persisted_stateGenqlSelection{
-    abi_files_hash?: boolean | number
-    config_hash?: boolean | number
-    envio_version?: boolean | number
-    handler_files_hash?: boolean | number
-    id?: boolean | number
-    schema_hash?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-
-/** Boolean expression to filter rows from the table "persisted_state". All fields are combined with a logical 'AND'. */
-export interface persisted_state_bool_exp {_and?: (persisted_state_bool_exp[] | null),_not?: (persisted_state_bool_exp | null),_or?: (persisted_state_bool_exp[] | null),abi_files_hash?: (String_comparison_exp | null),config_hash?: (String_comparison_exp | null),envio_version?: (String_comparison_exp | null),handler_files_hash?: (String_comparison_exp | null),id?: (Int_comparison_exp | null),schema_hash?: (String_comparison_exp | null)}
-
-
-/** Ordering options when selecting data from "persisted_state". */
-export interface persisted_state_order_by {abi_files_hash?: (order_by | null),config_hash?: (order_by | null),envio_version?: (order_by | null),handler_files_hash?: (order_by | null),id?: (order_by | null),schema_hash?: (order_by | null)}
-
-
-/** Streaming cursor of the table "persisted_state" */
-export interface persisted_state_stream_cursor_input {
-/** Stream column input with initial value */
-initial_value: persisted_state_stream_cursor_value_input,
-/** cursor ordering */
-ordering?: (cursor_ordering | null)}
-
-
-/** Initial value of the column from where the streaming should start */
-export interface persisted_state_stream_cursor_value_input {abi_files_hash?: (Scalars['String'] | null),config_hash?: (Scalars['String'] | null),envio_version?: (Scalars['String'] | null),handler_files_hash?: (Scalars['String'] | null),id?: (Scalars['Int'] | null),schema_hash?: (Scalars['String'] | null)}
 
 
 /** Boolean expression to compare columns of type "presaleclaimtype". All fields are combined with logical 'AND'. */
@@ -3731,6 +3483,18 @@ export interface query_rootGenqlSelection{
     where?: (UserMarketPosition_bool_exp | null)} })
     /** fetch data from the table: "UserMarketPosition" using primary key columns */
     UserMarketPosition_by_pk?: (UserMarketPositionGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table: "_meta" */
+    _meta?: (_metaGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (_meta_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (_meta_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (_meta_bool_exp | null)} })
     /** fetch data from the table: "chain_metadata" */
     chain_metadata?: (chain_metadataGenqlSelection & { __args?: {
     /** distinct select on columns */
@@ -3743,64 +3507,6 @@ export interface query_rootGenqlSelection{
     order_by?: (chain_metadata_order_by[] | null), 
     /** filter the rows returned */
     where?: (chain_metadata_bool_exp | null)} })
-    /** fetch data from the table: "chain_metadata" using primary key columns */
-    chain_metadata_by_pk?: (chain_metadataGenqlSelection & { __args: {chain_id: Scalars['Int']} })
-    /** fetch data from the table: "dynamic_contract_registry" */
-    dynamic_contract_registry?: (dynamic_contract_registryGenqlSelection & { __args?: {
-    /** distinct select on columns */
-    distinct_on?: (dynamic_contract_registry_select_column[] | null), 
-    /** limit the number of rows returned */
-    limit?: (Scalars['Int'] | null), 
-    /** skip the first n rows. Use only with order_by */
-    offset?: (Scalars['Int'] | null), 
-    /** sort the rows by one or more columns */
-    order_by?: (dynamic_contract_registry_order_by[] | null), 
-    /** filter the rows returned */
-    where?: (dynamic_contract_registry_bool_exp | null)} })
-    /** fetch data from the table: "dynamic_contract_registry" using primary key columns */
-    dynamic_contract_registry_by_pk?: (dynamic_contract_registryGenqlSelection & { __args: {id: Scalars['String']} })
-    /** fetch data from the table: "end_of_block_range_scanned_data" */
-    end_of_block_range_scanned_data?: (end_of_block_range_scanned_dataGenqlSelection & { __args?: {
-    /** distinct select on columns */
-    distinct_on?: (end_of_block_range_scanned_data_select_column[] | null), 
-    /** limit the number of rows returned */
-    limit?: (Scalars['Int'] | null), 
-    /** skip the first n rows. Use only with order_by */
-    offset?: (Scalars['Int'] | null), 
-    /** sort the rows by one or more columns */
-    order_by?: (end_of_block_range_scanned_data_order_by[] | null), 
-    /** filter the rows returned */
-    where?: (end_of_block_range_scanned_data_bool_exp | null)} })
-    /** fetch data from the table: "end_of_block_range_scanned_data" using primary key columns */
-    end_of_block_range_scanned_data_by_pk?: (end_of_block_range_scanned_dataGenqlSelection & { __args: {block_number: Scalars['Int'], chain_id: Scalars['Int']} })
-    /** fetch data from the table: "event_sync_state" */
-    event_sync_state?: (event_sync_stateGenqlSelection & { __args?: {
-    /** distinct select on columns */
-    distinct_on?: (event_sync_state_select_column[] | null), 
-    /** limit the number of rows returned */
-    limit?: (Scalars['Int'] | null), 
-    /** skip the first n rows. Use only with order_by */
-    offset?: (Scalars['Int'] | null), 
-    /** sort the rows by one or more columns */
-    order_by?: (event_sync_state_order_by[] | null), 
-    /** filter the rows returned */
-    where?: (event_sync_state_bool_exp | null)} })
-    /** fetch data from the table: "event_sync_state" using primary key columns */
-    event_sync_state_by_pk?: (event_sync_stateGenqlSelection & { __args: {chain_id: Scalars['Int']} })
-    /** fetch data from the table: "persisted_state" */
-    persisted_state?: (persisted_stateGenqlSelection & { __args?: {
-    /** distinct select on columns */
-    distinct_on?: (persisted_state_select_column[] | null), 
-    /** limit the number of rows returned */
-    limit?: (Scalars['Int'] | null), 
-    /** skip the first n rows. Use only with order_by */
-    offset?: (Scalars['Int'] | null), 
-    /** sort the rows by one or more columns */
-    order_by?: (persisted_state_order_by[] | null), 
-    /** filter the rows returned */
-    where?: (persisted_state_bool_exp | null)} })
-    /** fetch data from the table: "persisted_state" using primary key columns */
-    persisted_state_by_pk?: (persisted_stateGenqlSelection & { __args: {id: Scalars['Int']} })
     /** fetch data from the table: "raw_events" */
     raw_events?: (raw_eventsGenqlSelection & { __args?: {
     /** distinct select on columns */
@@ -3830,7 +3536,6 @@ export interface raw_eventsGenqlSelection{
     block_timestamp?: boolean | number
     chain_id?: boolean | number
     contract_name?: boolean | number
-    db_write_timestamp?: boolean | number
     event_id?: boolean | number
     event_name?: boolean | number
     log_index?: boolean | number
@@ -3848,11 +3553,11 @@ export interface raw_eventsGenqlSelection{
 
 
 /** Boolean expression to filter rows from the table "raw_events". All fields are combined with a logical 'AND'. */
-export interface raw_events_bool_exp {_and?: (raw_events_bool_exp[] | null),_not?: (raw_events_bool_exp | null),_or?: (raw_events_bool_exp[] | null),block_fields?: (jsonb_comparison_exp | null),block_hash?: (String_comparison_exp | null),block_number?: (Int_comparison_exp | null),block_timestamp?: (Int_comparison_exp | null),chain_id?: (Int_comparison_exp | null),contract_name?: (String_comparison_exp | null),db_write_timestamp?: (timestamp_comparison_exp | null),event_id?: (numeric_comparison_exp | null),event_name?: (String_comparison_exp | null),log_index?: (Int_comparison_exp | null),params?: (jsonb_comparison_exp | null),serial?: (Int_comparison_exp | null),src_address?: (String_comparison_exp | null),transaction_fields?: (jsonb_comparison_exp | null)}
+export interface raw_events_bool_exp {_and?: (raw_events_bool_exp[] | null),_not?: (raw_events_bool_exp | null),_or?: (raw_events_bool_exp[] | null),block_fields?: (jsonb_comparison_exp | null),block_hash?: (String_comparison_exp | null),block_number?: (Int_comparison_exp | null),block_timestamp?: (Int_comparison_exp | null),chain_id?: (Int_comparison_exp | null),contract_name?: (String_comparison_exp | null),event_id?: (numeric_comparison_exp | null),event_name?: (String_comparison_exp | null),log_index?: (Int_comparison_exp | null),params?: (jsonb_comparison_exp | null),serial?: (Int_comparison_exp | null),src_address?: (String_comparison_exp | null),transaction_fields?: (jsonb_comparison_exp | null)}
 
 
 /** Ordering options when selecting data from "raw_events". */
-export interface raw_events_order_by {block_fields?: (order_by | null),block_hash?: (order_by | null),block_number?: (order_by | null),block_timestamp?: (order_by | null),chain_id?: (order_by | null),contract_name?: (order_by | null),db_write_timestamp?: (order_by | null),event_id?: (order_by | null),event_name?: (order_by | null),log_index?: (order_by | null),params?: (order_by | null),serial?: (order_by | null),src_address?: (order_by | null),transaction_fields?: (order_by | null)}
+export interface raw_events_order_by {block_fields?: (order_by | null),block_hash?: (order_by | null),block_number?: (order_by | null),block_timestamp?: (order_by | null),chain_id?: (order_by | null),contract_name?: (order_by | null),event_id?: (order_by | null),event_name?: (order_by | null),log_index?: (order_by | null),params?: (order_by | null),serial?: (order_by | null),src_address?: (order_by | null),transaction_fields?: (order_by | null)}
 
 
 /** Streaming cursor of the table "raw_events" */
@@ -3864,7 +3569,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface raw_events_stream_cursor_value_input {block_fields?: (Scalars['jsonb'] | null),block_hash?: (Scalars['String'] | null),block_number?: (Scalars['Int'] | null),block_timestamp?: (Scalars['Int'] | null),chain_id?: (Scalars['Int'] | null),contract_name?: (Scalars['String'] | null),db_write_timestamp?: (Scalars['timestamp'] | null),event_id?: (Scalars['numeric'] | null),event_name?: (Scalars['String'] | null),log_index?: (Scalars['Int'] | null),params?: (Scalars['jsonb'] | null),serial?: (Scalars['Int'] | null),src_address?: (Scalars['String'] | null),transaction_fields?: (Scalars['jsonb'] | null)}
+export interface raw_events_stream_cursor_value_input {block_fields?: (Scalars['jsonb'] | null),block_hash?: (Scalars['String'] | null),block_number?: (Scalars['Int'] | null),block_timestamp?: (Scalars['Int'] | null),chain_id?: (Scalars['Int'] | null),contract_name?: (Scalars['String'] | null),event_id?: (Scalars['numeric'] | null),event_name?: (Scalars['String'] | null),log_index?: (Scalars['Int'] | null),params?: (Scalars['jsonb'] | null),serial?: (Scalars['Int'] | null),src_address?: (Scalars['String'] | null),transaction_fields?: (Scalars['jsonb'] | null)}
 
 
 /** Boolean expression to compare columns of type "stakestatus". All fields are combined with logical 'AND'. */
@@ -4487,6 +4192,26 @@ export interface subscription_rootGenqlSelection{
     cursor: (UserMarketPosition_stream_cursor_input | null)[], 
     /** filter the rows returned */
     where?: (UserMarketPosition_bool_exp | null)} })
+    /** fetch data from the table: "_meta" */
+    _meta?: (_metaGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (_meta_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (_meta_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (_meta_bool_exp | null)} })
+    /** fetch data from the table in a streaming manner: "_meta" */
+    _meta_stream?: (_metaGenqlSelection & { __args: {
+    /** maximum number of rows returned in a single batch */
+    batch_size: Scalars['Int'], 
+    /** cursor to stream the results returned by the query */
+    cursor: (_meta_stream_cursor_input | null)[], 
+    /** filter the rows returned */
+    where?: (_meta_bool_exp | null)} })
     /** fetch data from the table: "chain_metadata" */
     chain_metadata?: (chain_metadataGenqlSelection & { __args?: {
     /** distinct select on columns */
@@ -4499,8 +4224,6 @@ export interface subscription_rootGenqlSelection{
     order_by?: (chain_metadata_order_by[] | null), 
     /** filter the rows returned */
     where?: (chain_metadata_bool_exp | null)} })
-    /** fetch data from the table: "chain_metadata" using primary key columns */
-    chain_metadata_by_pk?: (chain_metadataGenqlSelection & { __args: {chain_id: Scalars['Int']} })
     /** fetch data from the table in a streaming manner: "chain_metadata" */
     chain_metadata_stream?: (chain_metadataGenqlSelection & { __args: {
     /** maximum number of rows returned in a single batch */
@@ -4509,94 +4232,6 @@ export interface subscription_rootGenqlSelection{
     cursor: (chain_metadata_stream_cursor_input | null)[], 
     /** filter the rows returned */
     where?: (chain_metadata_bool_exp | null)} })
-    /** fetch data from the table: "dynamic_contract_registry" */
-    dynamic_contract_registry?: (dynamic_contract_registryGenqlSelection & { __args?: {
-    /** distinct select on columns */
-    distinct_on?: (dynamic_contract_registry_select_column[] | null), 
-    /** limit the number of rows returned */
-    limit?: (Scalars['Int'] | null), 
-    /** skip the first n rows. Use only with order_by */
-    offset?: (Scalars['Int'] | null), 
-    /** sort the rows by one or more columns */
-    order_by?: (dynamic_contract_registry_order_by[] | null), 
-    /** filter the rows returned */
-    where?: (dynamic_contract_registry_bool_exp | null)} })
-    /** fetch data from the table: "dynamic_contract_registry" using primary key columns */
-    dynamic_contract_registry_by_pk?: (dynamic_contract_registryGenqlSelection & { __args: {id: Scalars['String']} })
-    /** fetch data from the table in a streaming manner: "dynamic_contract_registry" */
-    dynamic_contract_registry_stream?: (dynamic_contract_registryGenqlSelection & { __args: {
-    /** maximum number of rows returned in a single batch */
-    batch_size: Scalars['Int'], 
-    /** cursor to stream the results returned by the query */
-    cursor: (dynamic_contract_registry_stream_cursor_input | null)[], 
-    /** filter the rows returned */
-    where?: (dynamic_contract_registry_bool_exp | null)} })
-    /** fetch data from the table: "end_of_block_range_scanned_data" */
-    end_of_block_range_scanned_data?: (end_of_block_range_scanned_dataGenqlSelection & { __args?: {
-    /** distinct select on columns */
-    distinct_on?: (end_of_block_range_scanned_data_select_column[] | null), 
-    /** limit the number of rows returned */
-    limit?: (Scalars['Int'] | null), 
-    /** skip the first n rows. Use only with order_by */
-    offset?: (Scalars['Int'] | null), 
-    /** sort the rows by one or more columns */
-    order_by?: (end_of_block_range_scanned_data_order_by[] | null), 
-    /** filter the rows returned */
-    where?: (end_of_block_range_scanned_data_bool_exp | null)} })
-    /** fetch data from the table: "end_of_block_range_scanned_data" using primary key columns */
-    end_of_block_range_scanned_data_by_pk?: (end_of_block_range_scanned_dataGenqlSelection & { __args: {block_number: Scalars['Int'], chain_id: Scalars['Int']} })
-    /** fetch data from the table in a streaming manner: "end_of_block_range_scanned_data" */
-    end_of_block_range_scanned_data_stream?: (end_of_block_range_scanned_dataGenqlSelection & { __args: {
-    /** maximum number of rows returned in a single batch */
-    batch_size: Scalars['Int'], 
-    /** cursor to stream the results returned by the query */
-    cursor: (end_of_block_range_scanned_data_stream_cursor_input | null)[], 
-    /** filter the rows returned */
-    where?: (end_of_block_range_scanned_data_bool_exp | null)} })
-    /** fetch data from the table: "event_sync_state" */
-    event_sync_state?: (event_sync_stateGenqlSelection & { __args?: {
-    /** distinct select on columns */
-    distinct_on?: (event_sync_state_select_column[] | null), 
-    /** limit the number of rows returned */
-    limit?: (Scalars['Int'] | null), 
-    /** skip the first n rows. Use only with order_by */
-    offset?: (Scalars['Int'] | null), 
-    /** sort the rows by one or more columns */
-    order_by?: (event_sync_state_order_by[] | null), 
-    /** filter the rows returned */
-    where?: (event_sync_state_bool_exp | null)} })
-    /** fetch data from the table: "event_sync_state" using primary key columns */
-    event_sync_state_by_pk?: (event_sync_stateGenqlSelection & { __args: {chain_id: Scalars['Int']} })
-    /** fetch data from the table in a streaming manner: "event_sync_state" */
-    event_sync_state_stream?: (event_sync_stateGenqlSelection & { __args: {
-    /** maximum number of rows returned in a single batch */
-    batch_size: Scalars['Int'], 
-    /** cursor to stream the results returned by the query */
-    cursor: (event_sync_state_stream_cursor_input | null)[], 
-    /** filter the rows returned */
-    where?: (event_sync_state_bool_exp | null)} })
-    /** fetch data from the table: "persisted_state" */
-    persisted_state?: (persisted_stateGenqlSelection & { __args?: {
-    /** distinct select on columns */
-    distinct_on?: (persisted_state_select_column[] | null), 
-    /** limit the number of rows returned */
-    limit?: (Scalars['Int'] | null), 
-    /** skip the first n rows. Use only with order_by */
-    offset?: (Scalars['Int'] | null), 
-    /** sort the rows by one or more columns */
-    order_by?: (persisted_state_order_by[] | null), 
-    /** filter the rows returned */
-    where?: (persisted_state_bool_exp | null)} })
-    /** fetch data from the table: "persisted_state" using primary key columns */
-    persisted_state_by_pk?: (persisted_stateGenqlSelection & { __args: {id: Scalars['Int']} })
-    /** fetch data from the table in a streaming manner: "persisted_state" */
-    persisted_state_stream?: (persisted_stateGenqlSelection & { __args: {
-    /** maximum number of rows returned in a single batch */
-    batch_size: Scalars['Int'], 
-    /** cursor to stream the results returned by the query */
-    cursor: (persisted_state_stream_cursor_input | null)[], 
-    /** filter the rows returned */
-    where?: (persisted_state_bool_exp | null)} })
     /** fetch data from the table: "raw_events" */
     raw_events?: (raw_eventsGenqlSelection & { __args?: {
     /** distinct select on columns */
@@ -4622,10 +4257,6 @@ export interface subscription_rootGenqlSelection{
     __typename?: boolean | number
     __scalar?: boolean | number
 }
-
-
-/** Boolean expression to compare columns of type "timestamp". All fields are combined with logical 'AND'. */
-export interface timestamp_comparison_exp {_eq?: (Scalars['timestamp'] | null),_gt?: (Scalars['timestamp'] | null),_gte?: (Scalars['timestamp'] | null),_in?: (Scalars['timestamp'][] | null),_is_null?: (Scalars['Boolean'] | null),_lt?: (Scalars['timestamp'] | null),_lte?: (Scalars['timestamp'] | null),_neq?: (Scalars['timestamp'] | null),_nin?: (Scalars['timestamp'][] | null)}
 
 
 /** Boolean expression to compare columns of type "timestamptz". All fields are combined with logical 'AND'. */
@@ -4863,42 +4494,18 @@ export type SubscriptionGenqlSelection = subscription_rootGenqlSelection
     
 
 
+    const _meta_possibleTypes: string[] = ['_meta']
+    export const is_meta = (obj?: { __typename?: any } | null): obj is _meta => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "is_meta"')
+      return _meta_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
     const chain_metadata_possibleTypes: string[] = ['chain_metadata']
     export const ischain_metadata = (obj?: { __typename?: any } | null): obj is chain_metadata => {
       if (!obj?.__typename) throw new Error('__typename is missing in "ischain_metadata"')
       return chain_metadata_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-    const dynamic_contract_registry_possibleTypes: string[] = ['dynamic_contract_registry']
-    export const isdynamic_contract_registry = (obj?: { __typename?: any } | null): obj is dynamic_contract_registry => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isdynamic_contract_registry"')
-      return dynamic_contract_registry_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-    const end_of_block_range_scanned_data_possibleTypes: string[] = ['end_of_block_range_scanned_data']
-    export const isend_of_block_range_scanned_data = (obj?: { __typename?: any } | null): obj is end_of_block_range_scanned_data => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isend_of_block_range_scanned_data"')
-      return end_of_block_range_scanned_data_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-    const event_sync_state_possibleTypes: string[] = ['event_sync_state']
-    export const isevent_sync_state = (obj?: { __typename?: any } | null): obj is event_sync_state => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isevent_sync_state"')
-      return event_sync_state_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-    const persisted_state_possibleTypes: string[] = ['persisted_state']
-    export const ispersisted_state = (obj?: { __typename?: any } | null): obj is persisted_state => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "ispersisted_state"')
-      return persisted_state_possibleTypes.includes(obj.__typename)
     }
     
 
@@ -4927,13 +4534,11 @@ export type SubscriptionGenqlSelection = subscription_rootGenqlSelection
     
 
 export const enumAccountSelectColumn = {
-   db_write_timestamp: 'db_write_timestamp' as const,
    id: 'id' as const
 }
 
 export const enumAuthorizerContractSelectColumn = {
    createdAt: 'createdAt' as const,
-   db_write_timestamp: 'db_write_timestamp' as const,
    floor: 'floor' as const,
    id: 'id' as const,
    lastAssignedRoleId: 'lastAssignedRoleId' as const,
@@ -4944,7 +4549,6 @@ export const enumCreditFacilityContractSelectColumn = {
    borrowToken_id: 'borrowToken_id' as const,
    collateralToken_id: 'collateralToken_id' as const,
    createdAt: 'createdAt' as const,
-   db_write_timestamp: 'db_write_timestamp' as const,
    id: 'id' as const,
    lastUpdatedAt: 'lastUpdatedAt' as const,
    market_id: 'market_id' as const,
@@ -4960,7 +4564,6 @@ export const enumCreditFacilityContractSelectColumn = {
 export const enumFeeSplitterPaymentSelectColumn = {
    amountFormatted: 'amountFormatted' as const,
    amountRaw: 'amountRaw' as const,
-   db_write_timestamp: 'db_write_timestamp' as const,
    id: 'id' as const,
    isFloorFee: 'isFloorFee' as const,
    market_id: 'market_id' as const,
@@ -4974,7 +4577,6 @@ export const enumFeeSplitterPaymentSelectColumn = {
 export const enumFeeSplitterReceiptSelectColumn = {
    amountFormatted: 'amountFormatted' as const,
    amountRaw: 'amountRaw' as const,
-   db_write_timestamp: 'db_write_timestamp' as const,
    id: 'id' as const,
    market_id: 'market_id' as const,
    sender: 'sender' as const,
@@ -4985,7 +4587,6 @@ export const enumFeeSplitterReceiptSelectColumn = {
 }
 
 export const enumFloorElevationSelectColumn = {
-   db_write_timestamp: 'db_write_timestamp' as const,
    deployedAmountFormatted: 'deployedAmountFormatted' as const,
    deployedAmountRaw: 'deployedAmountRaw' as const,
    id: 'id' as const,
@@ -5000,7 +4601,6 @@ export const enumFloorElevationSelectColumn = {
 
 export const enumGlobalRegistrySelectColumn = {
    createdAt: 'createdAt' as const,
-   db_write_timestamp: 'db_write_timestamp' as const,
    floorFactoryAddress: 'floorFactoryAddress' as const,
    id: 'id' as const,
    lastUpdatedAt: 'lastUpdatedAt' as const,
@@ -5009,7 +4609,6 @@ export const enumGlobalRegistrySelectColumn = {
 
 export const enumGlobalStatsSelectColumn = {
    activeMarkets: 'activeMarkets' as const,
-   db_write_timestamp: 'db_write_timestamp' as const,
    id: 'id' as const,
    lastUpdatedAt: 'lastUpdatedAt' as const,
    totalLockedCollateralFormatted: 'totalLockedCollateralFormatted' as const,
@@ -5022,7 +4621,6 @@ export const enumGlobalStatsSelectColumn = {
 }
 
 export const enumLoanStatusHistorySelectColumn = {
-   db_write_timestamp: 'db_write_timestamp' as const,
    id: 'id' as const,
    loan_id: 'loan_id' as const,
    lockedCollateralFormatted: 'lockedCollateralFormatted' as const,
@@ -5039,7 +4637,6 @@ export const enumLoanSelectColumn = {
    borrowAmountRaw: 'borrowAmountRaw' as const,
    borrower_id: 'borrower_id' as const,
    closedAt: 'closedAt' as const,
-   db_write_timestamp: 'db_write_timestamp' as const,
    facility_id: 'facility_id' as const,
    floorPriceAtBorrowFormatted: 'floorPriceAtBorrowFormatted' as const,
    floorPriceAtBorrowRaw: 'floorPriceAtBorrowRaw' as const,
@@ -5060,7 +4657,6 @@ export const enumLoanSelectColumn = {
 export const enumMarketRollingStatsSelectColumn = {
    averagePriceFormatted: 'averagePriceFormatted' as const,
    averagePriceRaw: 'averagePriceRaw' as const,
-   db_write_timestamp: 'db_write_timestamp' as const,
    id: 'id' as const,
    lastUpdatedAt: 'lastUpdatedAt' as const,
    market_id: 'market_id' as const,
@@ -5071,7 +4667,6 @@ export const enumMarketRollingStatsSelectColumn = {
 }
 
 export const enumMarketSnapshotSelectColumn = {
-   db_write_timestamp: 'db_write_timestamp' as const,
    floorPriceFormatted: 'floorPriceFormatted' as const,
    floorPriceRaw: 'floorPriceRaw' as const,
    id: 'id' as const,
@@ -5094,7 +4689,6 @@ export const enumMarketSelectColumn = {
    creator_id: 'creator_id' as const,
    currentPriceFormatted: 'currentPriceFormatted' as const,
    currentPriceRaw: 'currentPriceRaw' as const,
-   db_write_timestamp: 'db_write_timestamp' as const,
    factory_id: 'factory_id' as const,
    floorPriceFormatted: 'floorPriceFormatted' as const,
    floorPriceRaw: 'floorPriceRaw' as const,
@@ -5122,7 +4716,6 @@ export const enumMarketSelectColumn = {
 
 export const enumModuleAddressSelectColumn = {
    createdAt: 'createdAt' as const,
-   db_write_timestamp: 'db_write_timestamp' as const,
    id: 'id' as const,
    lastUpdatedAt: 'lastUpdatedAt' as const,
    market_id: 'market_id' as const,
@@ -5133,7 +4726,6 @@ export const enumModuleRegistrySelectColumn = {
    authorizer: 'authorizer' as const,
    createdAt: 'createdAt' as const,
    creditFacility: 'creditFacility' as const,
-   db_write_timestamp: 'db_write_timestamp' as const,
    feeTreasury: 'feeTreasury' as const,
    floor: 'floor' as const,
    id: 'id' as const,
@@ -5147,7 +4739,6 @@ export const enumPreSaleContractSelectColumn = {
    commissionBps: 'commissionBps' as const,
    createdAt: 'createdAt' as const,
    currentState: 'currentState' as const,
-   db_write_timestamp: 'db_write_timestamp' as const,
    endTime: 'endTime' as const,
    feeTreasury: 'feeTreasury' as const,
    globalDepositCapFormatted: 'globalDepositCapFormatted' as const,
@@ -5176,7 +4767,6 @@ export const enumPresaleClaimSelectColumn = {
    amountFormatted: 'amountFormatted' as const,
    amountRaw: 'amountRaw' as const,
    claimType: 'claimType' as const,
-   db_write_timestamp: 'db_write_timestamp' as const,
    id: 'id' as const,
    loanId: 'loanId' as const,
    positionId: 'positionId' as const,
@@ -5187,7 +4777,6 @@ export const enumPresaleClaimSelectColumn = {
 }
 
 export const enumPresaleParticipationSelectColumn = {
-   db_write_timestamp: 'db_write_timestamp' as const,
    depositAmountFormatted: 'depositAmountFormatted' as const,
    depositAmountRaw: 'depositAmountRaw' as const,
    id: 'id' as const,
@@ -5205,7 +4794,6 @@ export const enumPresaleParticipationSelectColumn = {
 export const enumPriceCandleSelectColumn = {
    closeFormatted: 'closeFormatted' as const,
    closeRaw: 'closeRaw' as const,
-   db_write_timestamp: 'db_write_timestamp' as const,
    highFormatted: 'highFormatted' as const,
    highRaw: 'highRaw' as const,
    id: 'id' as const,
@@ -5222,7 +4810,6 @@ export const enumPriceCandleSelectColumn = {
 }
 
 export const enumRoleMemberSelectColumn = {
-   db_write_timestamp: 'db_write_timestamp' as const,
    grantedAt: 'grantedAt' as const,
    grantedBy: 'grantedBy' as const,
    id: 'id' as const,
@@ -5233,7 +4820,6 @@ export const enumRoleMemberSelectColumn = {
 
 export const enumRolePermissionSelectColumn = {
    addedAt: 'addedAt' as const,
-   db_write_timestamp: 'db_write_timestamp' as const,
    id: 'id' as const,
    role_id: 'role_id' as const,
    selector: 'selector' as const,
@@ -5247,7 +4833,6 @@ export const enumRoleSelectColumn = {
    adminRoleName: 'adminRoleName' as const,
    authorizer_id: 'authorizer_id' as const,
    createdAt: 'createdAt' as const,
-   db_write_timestamp: 'db_write_timestamp' as const,
    id: 'id' as const,
    isAdminBurned: 'isAdminBurned' as const,
    lastUpdatedAt: 'lastUpdatedAt' as const,
@@ -5259,7 +4844,6 @@ export const enumStakeSelectColumn = {
    amountFormatted: 'amountFormatted' as const,
    amountRaw: 'amountRaw' as const,
    contract_id: 'contract_id' as const,
-   db_write_timestamp: 'db_write_timestamp' as const,
    id: 'id' as const,
    lockDuration: 'lockDuration' as const,
    status: 'status' as const,
@@ -5270,7 +4854,6 @@ export const enumStakeSelectColumn = {
 
 export const enumStakingContractSelectColumn = {
    createdAt: 'createdAt' as const,
-   db_write_timestamp: 'db_write_timestamp' as const,
    id: 'id' as const,
    rewardToken_id: 'rewardToken_id' as const,
    stakingToken_id: 'stakingToken_id' as const,
@@ -5281,7 +4864,6 @@ export const enumStakingContractSelectColumn = {
 }
 
 export const enumTokenSelectColumn = {
-   db_write_timestamp: 'db_write_timestamp' as const,
    decimals: 'decimals' as const,
    id: 'id' as const,
    maxSupplyFormatted: 'maxSupplyFormatted' as const,
@@ -5291,7 +4873,6 @@ export const enumTokenSelectColumn = {
 }
 
 export const enumTradeSelectColumn = {
-   db_write_timestamp: 'db_write_timestamp' as const,
    feeFormatted: 'feeFormatted' as const,
    feeRaw: 'feeRaw' as const,
    id: 'id' as const,
@@ -5310,7 +4891,6 @@ export const enumTradeSelectColumn = {
 
 export const enumTreasurySelectColumn = {
    createdAt: 'createdAt' as const,
-   db_write_timestamp: 'db_write_timestamp' as const,
    id: 'id' as const,
    lastUpdatedAt: 'lastUpdatedAt' as const,
    market_id: 'market_id' as const,
@@ -5324,7 +4904,6 @@ export const enumTreasurySelectColumn = {
 export const enumUserMarketPositionSelectColumn = {
    claimableRewardsFormatted: 'claimableRewardsFormatted' as const,
    claimableRewardsRaw: 'claimableRewardsRaw' as const,
-   db_write_timestamp: 'db_write_timestamp' as const,
    id: 'id' as const,
    lastUpdatedAt: 'lastUpdatedAt' as const,
    lockedCollateralFormatted: 'lockedCollateralFormatted' as const,
@@ -5340,6 +4919,19 @@ export const enumUserMarketPositionSelectColumn = {
    totalDebtFormatted: 'totalDebtFormatted' as const,
    totalDebtRaw: 'totalDebtRaw' as const,
    user_id: 'user_id' as const
+}
+
+export const enum_metaSelectColumn = {
+   bufferBlock: 'bufferBlock' as const,
+   chainId: 'chainId' as const,
+   endBlock: 'endBlock' as const,
+   eventsProcessed: 'eventsProcessed' as const,
+   firstEventBlock: 'firstEventBlock' as const,
+   isReady: 'isReady' as const,
+   progressBlock: 'progressBlock' as const,
+   readyAt: 'readyAt' as const,
+   sourceBlock: 'sourceBlock' as const,
+   startBlock: 'startBlock' as const
 }
 
 export const enumChainMetadataSelectColumn = {
@@ -5361,33 +4953,6 @@ export const enumCursorOrdering = {
    DESC: 'DESC' as const
 }
 
-export const enumDynamicContractRegistrySelectColumn = {
-   chain_id: 'chain_id' as const,
-   contract_address: 'contract_address' as const,
-   contract_type: 'contract_type' as const,
-   id: 'id' as const,
-   registering_event_block_number: 'registering_event_block_number' as const,
-   registering_event_block_timestamp: 'registering_event_block_timestamp' as const,
-   registering_event_contract_name: 'registering_event_contract_name' as const,
-   registering_event_log_index: 'registering_event_log_index' as const,
-   registering_event_name: 'registering_event_name' as const,
-   registering_event_src_address: 'registering_event_src_address' as const
-}
-
-export const enumEndOfBlockRangeScannedDataSelectColumn = {
-   block_hash: 'block_hash' as const,
-   block_number: 'block_number' as const,
-   chain_id: 'chain_id' as const
-}
-
-export const enumEventSyncStateSelectColumn = {
-   block_number: 'block_number' as const,
-   block_timestamp: 'block_timestamp' as const,
-   chain_id: 'chain_id' as const,
-   is_pre_registering_dynamic_contracts: 'is_pre_registering_dynamic_contracts' as const,
-   log_index: 'log_index' as const
-}
-
 export const enumOrderBy = {
    asc: 'asc' as const,
    asc_nulls_first: 'asc_nulls_first' as const,
@@ -5397,15 +4962,6 @@ export const enumOrderBy = {
    desc_nulls_last: 'desc_nulls_last' as const
 }
 
-export const enumPersistedStateSelectColumn = {
-   abi_files_hash: 'abi_files_hash' as const,
-   config_hash: 'config_hash' as const,
-   envio_version: 'envio_version' as const,
-   handler_files_hash: 'handler_files_hash' as const,
-   id: 'id' as const,
-   schema_hash: 'schema_hash' as const
-}
-
 export const enumRawEventsSelectColumn = {
    block_fields: 'block_fields' as const,
    block_hash: 'block_hash' as const,
@@ -5413,7 +4969,6 @@ export const enumRawEventsSelectColumn = {
    block_timestamp: 'block_timestamp' as const,
    chain_id: 'chain_id' as const,
    contract_name: 'contract_name' as const,
-   db_write_timestamp: 'db_write_timestamp' as const,
    event_id: 'event_id' as const,
    event_name: 'event_name' as const,
    log_index: 'log_index' as const,

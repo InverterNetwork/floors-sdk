@@ -12,7 +12,6 @@ export const globalStatsQuery = {
     totalOutstandingDebtRaw: true,
     totalVolumeRaw: true,
     activeMarkets: true,
-    db_write_timestamp: true,
   },
 } satisfies GraphQLQueryArgs
 
@@ -32,7 +31,6 @@ export interface TGlobalStats {
   totalOutstandingDebtRaw: string | null
   totalVolumeRaw: string | null
   activeMarkets: number | null
-  dbWriteTimestamp: string | null
 }
 
 export const mapGlobalStats = (stats?: TGraphQLGlobalStats | null): TGlobalStats | null => {
@@ -51,6 +49,5 @@ export const mapGlobalStats = (stats?: TGraphQLGlobalStats | null): TGlobalStats
     totalOutstandingDebtRaw: stats.totalOutstandingDebtRaw ?? null,
     totalVolumeRaw: stats.totalVolumeRaw ?? null,
     activeMarkets: stats.activeMarkets ?? null,
-    dbWriteTimestamp: stats.db_write_timestamp ?? null,
   }
 }

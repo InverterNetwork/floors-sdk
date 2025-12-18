@@ -8,7 +8,6 @@ export const accountsQuery = {
       order_by: [{ id: 'desc' }],
     },
     id: true,
-    db_write_timestamp: true,
     marketsCreated: {
       __args: {
         order_by: [{ createdAt: 'desc' }],

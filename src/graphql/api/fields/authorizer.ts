@@ -18,7 +18,6 @@ export const authorizerRolesQuery = {
     authorizer_id: true,
     createdAt: true,
     lastUpdatedAt: true,
-    db_write_timestamp: true,
     members: {
       __args: {
         order_by: [{ grantedAt: 'desc' }],
@@ -30,7 +29,6 @@ export const authorizerRolesQuery = {
       grantedAt: true,
       role_id: true,
       transactionHash: true,
-      db_write_timestamp: true,
       __typename: true,
     },
     permissions: {
@@ -45,7 +43,6 @@ export const authorizerRolesQuery = {
       selectorName: true,
       addedAt: true,
       transactionHash: true,
-      db_write_timestamp: true,
       __typename: true,
     },
     __typename: true,

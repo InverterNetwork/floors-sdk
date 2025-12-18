@@ -16,7 +16,6 @@ export const presaleQuery = {
     timeSafeguardTs: true,
     saleToken_id: true,
     saleToken: {
-      db_write_timestamp: true,
       decimals: true,
       id: true,
       maxSupplyFormatted: true,
@@ -27,7 +26,6 @@ export const presaleQuery = {
     purchaseToken_id: true,
     purchaseToken: {
       decimals: true,
-      db_write_timestamp: true,
       id: true,
       maxSupplyFormatted: true,
       maxSupplyRaw: true,
@@ -47,7 +45,6 @@ export const presaleQuery = {
     globalDepositCapFormatted: true,
     feeTreasury: true,
     endTime: true,
-    db_write_timestamp: true,
     currentState: true,
     createdAt: true,
     commissionBps: true,

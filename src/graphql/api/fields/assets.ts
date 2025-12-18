@@ -47,7 +47,6 @@ export const marketsQuery = {
     lastUpdatedAt: true,
     lastTradeTimestamp: true,
     lastElevationTimestamp: true,
-    db_write_timestamp: true,
     trades: {
       __args: {
         order_by: [{ timestamp: 'desc' }],
@@ -83,7 +82,6 @@ export const marketsQuery = {
       deployedAmountFormatted: true,
       timestamp: true,
       transactionHash: true,
-      db_write_timestamp: true,
       __typename: true,
     },
     __typename: true,

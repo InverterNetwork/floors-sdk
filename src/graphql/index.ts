@@ -9,13 +9,27 @@ export type GraphQLQueryResult<T extends GraphQLQueryArgs> = QueryResult<T>
 export const query = async <T extends GraphQLQueryArgs>(
   fields: T
 ): Promise<GraphQLQueryResult<T>> => {
-  const { query, variables } = generateQueryOp(fields)
+  const { query: queryString, variables } = generateQueryOp(fields)
 
   const client = Client.get()
 
-  const data = await client.query(query, variables)
+  const result = await client.query(queryString, variables)
 
-  return data.data
+  // Log errors for debugging
+  if (result.error) {
+    console.error('[GraphQL Query Error]', {
+      message: result.error.message,
+      graphQLErrors: result.error.graphQLErrors,
+      networkError: result.error.networkError,
+    })
+    throw new Error(result.error.message || 'GraphQL query failed')
+  }
+
+  if (!result.data) {
+    console.warn('[GraphQL Query Warning] No data returned', { query: queryString })
+  }
+
+  return result.data
 }
 
 export type GraphQLSubscriptionArgs = subscription_rootGenqlSelection & {

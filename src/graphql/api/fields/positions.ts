@@ -26,7 +26,6 @@ export const userMarketPositionQuery = {
     claimableRewardsRaw: true,
     claimableRewardsFormatted: true,
     lastUpdatedAt: true,
-    db_write_timestamp: true,
     __typename: true,
   },
 } satisfies GraphQLQueryArgs

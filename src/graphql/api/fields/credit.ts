@@ -28,7 +28,6 @@ export const loansQuery = {
     closedAt: true,
     lastUpdatedAt: true,
     transactionHash: true,
-    db_write_timestamp: true,
     __typename: true,
   },
 } satisfies GraphQLQueryArgs
@@ -58,7 +57,6 @@ export const creditFacilitiesQuery = {
     totalLockedCollateralFormatted: true,
     createdAt: true,
     lastUpdatedAt: true,
-    db_write_timestamp: true,
     loans: {
       __args: {
         order_by: [{ openedAt: 'desc' }],
