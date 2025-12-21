@@ -125,7 +125,28 @@ export async function fetchMarketById(id: string): Promise<TFloorAssetData | nul
 
   const moduleRegistry = registryResponse.ModuleRegistry_by_pk
 
-  return mapMarketToFloorAssetData(market, moduleRegistry)
+  // Fetch daily volume candles for volume chart
+  const priceCandlesResponse = await query(
+    buildPriceCandleQuery({
+      where: {
+        market_id: { _eq: id },
+        period: { _eq: 'ONE_DAY' },
+      },
+      order_by: [{ timestamp: 'desc' }],
+      limit: 365, // Max 1 year of daily candles
+    })
+  )
+
+  // Reverse to get chronological order (oldest first for chart)
+  const priceCandles = (priceCandlesResponse.PriceCandle ?? []).reverse()
+
+  const mappedMarket = mapMarketToFloorAssetData(market, moduleRegistry)
+
+  // Add priceCandles to the mapped market data (already reversed to chronological order)
+  return {
+    ...mappedMarket,
+    priceCandles: priceCandles,
+  } as TFloorAssetData
 }
 
 export async function fetchPlatformMetrics(): Promise<TPlatformMetrics> {

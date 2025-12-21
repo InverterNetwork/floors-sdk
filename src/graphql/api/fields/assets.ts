@@ -211,6 +211,26 @@ export interface TComputedAssetData {
   isFloorElevating: boolean
 }
 
+// PriceCandle type for volume charts
+export interface TPriceCandle {
+  id: string
+  market_id: string
+  period: 'ONE_HOUR' | 'FOUR_HOURS' | 'ONE_DAY'
+  timestamp: string
+  openRaw: string
+  openFormatted: string
+  highRaw: string
+  highFormatted: string
+  lowRaw: string
+  lowFormatted: string
+  closeRaw: string
+  closeFormatted: string
+  volumeRaw: string
+  volumeFormatted: string
+  trades: string
+  __typename?: 'PriceCandle'
+}
+
 // Extended type that combines GraphQL Market data with computed UI fields
 export interface TFloorAssetData extends TGraphQLMarket, TComputedAssetData {
   userPosition?: TUserAssetPosition
@@ -221,4 +241,6 @@ export interface TFloorAssetData extends TGraphQLMarket, TComputedAssetData {
   // Module addresses from ModuleRegistry
   creditFacility?: string | null
   authorizer?: string | null
+  // PriceCandles for volume charts
+  priceCandles?: TPriceCandle[]
 }
