@@ -336,8 +336,30 @@ export function mapPresaleToPresaleData(presale: TGraphQLPresale): TPresale {
     : []
   const currentPrice = priceBreakpoints.length > 0 ? priceBreakpoints[0] : 0
 
+  // Deduplicate participations by transaction hash
+  // The contract emits both PresaleBought and PositionCreated events for each purchase.
+  // We prefer the PositionCreated record (has positionId) over PresaleBought (positionId is null)
+  // when both exist for the same transaction hash.
+  const deduplicatedParticipations = (presale.participations ?? [])
+    .filter((p): p is NonNullable<typeof p> => p !== null)
+    .reduce((acc, participation) => {
+      const txHash = participation.transactionHash
+      const existing = acc.get(txHash)
+
+      // If no existing record, or current has positionId and existing doesn't, use current
+      if (!existing || (participation.positionId != null && existing.positionId == null)) {
+        acc.set(txHash, participation)
+      }
+      // Otherwise keep existing (it has positionId or we already have a better record)
+
+      return acc
+    }, new Map<string, NonNullable<(typeof presale.participations)[0]>>())
+
   return {
     ...presale,
+    participations: Array.from(
+      deduplicatedParticipations.values()
+    ) as typeof presale.participations,
     progressPercent: Math.min(100, Math.max(0, progressPercent)),
     timeRemaining,
     isActive,
