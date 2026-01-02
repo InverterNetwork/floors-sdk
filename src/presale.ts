@@ -6,21 +6,54 @@ import Presale_v1 from './abis/Presale_v1'
 import type { TPresale } from './graphql/api'
 import type { PopPublicClient, PopWalletClient } from './types'
 
+// ============================================================================
+// Transaction Lifecycle Types
+// ============================================================================
+
+export type TransactionStage =
+  | 'idle'
+  | 'pending_wallet' // Waiting for user to sign in wallet
+  | 'submitted' // Transaction submitted to mempool (has hash)
+  | 'pending_confirmation' // Waiting for block confirmation
+  | 'confirmed' // Transaction confirmed
+  | 'failed' // Transaction failed or reverted
+
+export interface TransactionLifecycleCallbacks {
+  /** Called when waiting for user to sign in wallet */
+  onPendingWallet?: () => void
+  /** Called when transaction is submitted (has hash) */
+  onSubmitted?: (hash: `0x${string}`) => void
+  /** Called when waiting for blockchain confirmation */
+  onPendingConfirmation?: (hash: `0x${string}`) => void
+  /** Called when transaction is confirmed */
+  onConfirmed?: (receipt: TransactionReceipt) => void
+  /** Called when transaction fails */
+  onFailed?: (error: Error) => void
+}
+
 export interface TPresaleBuyParams {
   depositAmount: bigint
+  /** Optional lifecycle callbacks for multi-stage feedback */
+  lifecycle?: TransactionLifecycleCallbacks
 }
 
 export interface TPresaleBuyWithLeverageParams {
   depositAmount: bigint
   leverageIndex: number
+  /** Optional lifecycle callbacks for multi-stage feedback */
+  lifecycle?: TransactionLifecycleCallbacks
 }
 
 export interface TPresaleClaimParams {
   positionId: bigint
+  /** Optional lifecycle callbacks for multi-stage feedback */
+  lifecycle?: TransactionLifecycleCallbacks
 }
 
 export interface TPresaleApproveParams {
   amount: bigint
+  /** Optional lifecycle callbacks for multi-stage feedback */
+  lifecycle?: TransactionLifecycleCallbacks
 }
 
 export type TPresaleMutationResult = TransactionReceipt
@@ -372,10 +405,13 @@ export class Presale {
 
   /**
    * @description Buy presale without leverage
-   * @param params Deposit amount
-   * @returns Transaction hash and position details
+   * @param params Deposit amount and optional lifecycle callbacks
+   * @returns Transaction receipt after confirmation
    */
-  public async buyPresale({ depositAmount }: TPresaleBuyParams): Promise<TransactionReceipt> {
+  public async buyPresale({
+    depositAmount,
+    lifecycle,
+  }: TPresaleBuyParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
     this.assertPositiveAmount(depositAmount)
 
@@ -397,27 +433,49 @@ export class Presale {
       )
     }
 
-    const hash = await walletClient.writeContract({
-      address: this.address,
-      abi: Presale_v1,
-      functionName: 'buyPresale',
-      args: [depositAmount],
-      account: accountAddress,
-    })
+    try {
+      // Stage 1: Pending wallet signature
+      lifecycle?.onPendingWallet?.()
 
-    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'buyPresale',
+        args: [depositAmount],
+        account: accountAddress,
+      })
 
-    return receipt
+      // Stage 2: Transaction submitted
+      lifecycle?.onSubmitted?.(hash)
+
+      // Stage 3: Pending confirmation
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      // Stage 4: Confirmed or Failed based on status
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
   }
 
   /**
    * @description Buy presale with leverage
-   * @param params Deposit amount and leverage index
-   * @returns Transaction hash and position details
+   * @param params Deposit amount, leverage index, and optional lifecycle callbacks
+   * @returns Transaction receipt after confirmation
    */
   public async buyPresaleWithLeverage({
     depositAmount,
     leverageIndex,
+    lifecycle,
   }: TPresaleBuyWithLeverageParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
     this.assertPositiveAmount(depositAmount)
@@ -444,61 +502,119 @@ export class Presale {
       )
     }
 
-    const hash = await walletClient.writeContract({
-      address: this.address,
-      abi: Presale_v1,
-      functionName: 'buyPresaleWithLeverage',
-      args: [depositAmount, BigInt(leverageIndex)],
-      account: accountAddress,
-    })
+    try {
+      // Stage 1: Pending wallet signature
+      lifecycle?.onPendingWallet?.()
 
-    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-    return receipt
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'buyPresaleWithLeverage',
+        args: [depositAmount, BigInt(leverageIndex)],
+        account: accountAddress,
+      })
+
+      // Stage 2: Transaction submitted
+      lifecycle?.onSubmitted?.(hash)
+
+      // Stage 3: Pending confirmation
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      // Stage 4: Confirmed or Failed based on status
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
   }
 
   /**
    * @description Claim all unlocked tokens from a position
-   * @param params Position ID
-   * @returns Transaction hash
+   * @param params Position ID and optional lifecycle callbacks
+   * @returns Transaction receipt after confirmation
    */
-  public async claimAll({ positionId }: TPresaleClaimParams): Promise<TransactionReceipt> {
+  public async claimAll({
+    positionId,
+    lifecycle,
+  }: TPresaleClaimParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
 
-    const hash = await walletClient.writeContract({
-      address: this.address,
-      abi: Presale_v1,
-      functionName: 'claimAll',
-      args: [positionId],
-      account: this.getWalletAddress(walletClient),
-    })
+    try {
+      lifecycle?.onPendingWallet?.()
 
-    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'claimAll',
+        args: [positionId],
+        account: this.getWalletAddress(walletClient),
+      })
 
-    return receipt
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
   }
 
   /**
    * @description Approve purchase token for presale contract
-   * @param params Approval amount
-   * @returns Transaction hash
+   * @param params Approval amount and optional lifecycle callbacks
+   * @returns Transaction receipt after confirmation
    */
   public async approvePurchaseToken({
     amount,
+    lifecycle,
   }: TPresaleApproveParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
     this.assertPositiveAmount(amount)
 
-    const hash = await walletClient.writeContract({
-      address: this.purchaseTokenAddress,
-      abi: ERC20Issuance_v1,
-      functionName: 'approve',
-      args: [this.address, amount],
-      account: this.getWalletAddress(walletClient),
-    })
+    try {
+      lifecycle?.onPendingWallet?.()
 
-    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+      const hash = await walletClient.writeContract({
+        address: this.purchaseTokenAddress,
+        abi: ERC20Issuance_v1,
+        functionName: 'approve',
+        args: [this.address, amount],
+        account: this.getWalletAddress(walletClient),
+      })
 
-    return receipt
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Approval transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
   }
 
   // =========================================================================

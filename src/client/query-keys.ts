@@ -69,3 +69,25 @@ export const userLoansQueryKey = (
  */
 export const allUserLoansQueryKey = (userAddress: string | null | undefined) =>
   ['user-loans', 'all', userAddress?.toLowerCase() ?? ''] as const
+
+// ============================================================================
+// Subscription Keys
+// ============================================================================
+
+/**
+ * @description Parameterized subscription key for presale participations.
+ */
+export const presaleParticipationsSubKey = (presaleId: string | null | undefined) =>
+  ['subscription', 'presale-participations', presaleId ?? ''] as const
+
+/**
+ * @description Parameterized subscription key for presale claims.
+ */
+export const presaleClaimsSubKey = (presaleId: string | null | undefined) =>
+  ['subscription', 'presale-claims', presaleId ?? ''] as const
+
+/**
+ * @description Parameterized subscription key for market trades.
+ */
+export const marketTradesSubKey = (marketId: string | null | undefined) =>
+  ['subscription', 'market-trades', marketId ?? ''] as const

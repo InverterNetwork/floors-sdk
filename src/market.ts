@@ -2,35 +2,48 @@ import type { Address, TransactionReceipt } from 'viem'
 
 import { CreditFacility_v1, ERC20Issuance_v1, Floor_v1 } from './abis'
 import type { TFloorAssetData } from './graphql/api'
+import type { TransactionLifecycleCallbacks } from './presale'
 import type { PopPublicClient, PopWalletClient } from './types'
 
 export interface TMarketBuyParams {
   depositAmount: bigint
   slippageBps?: number
+  /** Optional lifecycle callbacks for multi-stage feedback */
+  lifecycle?: TransactionLifecycleCallbacks
 }
 
 export interface TMarketSellParams {
   depositAmount: bigint
   slippageBps?: number
+  /** Optional lifecycle callbacks for multi-stage feedback */
+  lifecycle?: TransactionLifecycleCallbacks
 }
 
 export interface TMarketApproveParams {
   amount: bigint
+  /** Optional lifecycle callbacks for multi-stage feedback */
+  lifecycle?: TransactionLifecycleCallbacks
 }
 
 export interface TMarketBorrowParams {
   borrowAmount: bigint
+  /** Optional lifecycle callbacks for multi-stage feedback */
+  lifecycle?: TransactionLifecycleCallbacks
 }
 
 export interface TMarketBuyAndBorrowParams {
   amount: bigint
   leverage: number
   consolidate?: boolean
+  /** Optional lifecycle callbacks for multi-stage feedback */
+  lifecycle?: TransactionLifecycleCallbacks
 }
 
 export interface TMarketRepayParams {
   repayAmount: bigint
   loanId: bigint
+  /** Optional lifecycle callbacks for multi-stage feedback */
+  lifecycle?: TransactionLifecycleCallbacks
 }
 
 export type TMarketMutationResult = TransactionReceipt
@@ -151,6 +164,7 @@ export class Market {
   public async buy({
     depositAmount,
     slippageBps = 50,
+    lifecycle,
   }: TMarketBuyParams): Promise<TMarketMutationResult> {
     const walletClient = this.requireWalletClient()
     this.assertPositiveAmount(depositAmount)
@@ -159,21 +173,39 @@ export class Market {
     const expectedOut = await this.previewBuy(depositAmount)
     const minAmountOut = this.applySlippage(expectedOut, normalizedSlippage)
 
-    const hash = await walletClient.writeContract({
-      address: this.address,
-      abi: Floor_v1,
-      functionName: 'buy',
-      args: [depositAmount, minAmountOut],
-      account: this.getWalletAddress(walletClient),
-    })
-    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+    try {
+      lifecycle?.onPendingWallet?.()
 
-    return receipt
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Floor_v1,
+        functionName: 'buy',
+        args: [depositAmount, minAmountOut],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
   }
 
   public async sell({
     depositAmount,
     slippageBps = 50,
+    lifecycle,
   }: TMarketSellParams): Promise<TMarketMutationResult> {
     const walletClient = this.requireWalletClient()
     this.assertPositiveAmount(depositAmount)
@@ -215,17 +247,33 @@ export class Market {
     const expectedOut = await this.previewSell(depositAmount)
     const minAmountOut = this.applySlippage(expectedOut, normalizedSlippage)
 
-    const hash = await walletClient.writeContract({
-      address: this.address,
-      abi: Floor_v1,
-      functionName: 'sell',
-      args: [depositAmount, minAmountOut],
-      account: accountAddress,
-    })
+    try {
+      lifecycle?.onPendingWallet?.()
 
-    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Floor_v1,
+        functionName: 'sell',
+        args: [depositAmount, minAmountOut],
+        account: accountAddress,
+      })
 
-    return receipt
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
   }
 
   public async approveFToken({ amount }: TMarketApproveParams): Promise<TMarketMutationResult> {

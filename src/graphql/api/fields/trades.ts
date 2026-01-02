@@ -1,4 +1,32 @@
-import type { GraphQLQueryArgs, GraphQLQueryResult } from '../..'
+import type { GraphQLQueryArgs, GraphQLQueryResult, GraphQLSubscriptionArgs } from '../..'
+
+// ============================================================================
+// Shared Field Definitions (reusable for both queries and subscriptions)
+// ============================================================================
+
+/**
+ * @description Base fields for trade entity
+ */
+export const tradeFields = {
+  id: true,
+  market_id: true,
+  user_id: true,
+  tradeType: true,
+  tokenAmountRaw: true,
+  tokenAmountFormatted: true,
+  reserveAmountRaw: true,
+  reserveAmountFormatted: true,
+  feeRaw: true,
+  feeFormatted: true,
+  newPriceRaw: true,
+  newPriceFormatted: true,
+  timestamp: true,
+  transactionHash: true,
+} as const
+
+// ============================================================================
+// Query Definitions
+// ============================================================================
 
 // GraphQL Query Args for Trades
 export const tradesQuery = {
@@ -7,23 +35,31 @@ export const tradesQuery = {
       order_by: [{ timestamp: 'desc' }],
       limit: 100,
     },
-    id: true,
-    market_id: true,
-    user_id: true,
-    tradeType: true,
-    tokenAmountRaw: true,
-    tokenAmountFormatted: true,
-    reserveAmountRaw: true,
-    reserveAmountFormatted: true,
-    feeRaw: true,
-    feeFormatted: true,
-    newPriceRaw: true,
-    newPriceFormatted: true,
-    timestamp: true,
-    transactionHash: true,
+    ...tradeFields,
     __typename: true,
   },
 } satisfies GraphQLQueryArgs
+
+// ============================================================================
+// Subscription Builders
+// ============================================================================
+
+/**
+ * @description Builds subscription fields for market trades
+ */
+export const buildTradeSubscription = (marketId: string, limit: number = 100) =>
+  ({
+    Trade: {
+      __args: {
+        where: { market_id: { _eq: marketId } },
+        order_by: [{ timestamp: 'desc' as const }],
+        limit,
+      },
+      ...tradeFields,
+    },
+  }) satisfies GraphQLSubscriptionArgs
+
+export type TradeSubscriptionFields = ReturnType<typeof buildTradeSubscription>
 
 export type TradesQueryType = typeof tradesQuery
 export type TradesQueryResultType = GraphQLQueryResult<typeof tradesQuery>

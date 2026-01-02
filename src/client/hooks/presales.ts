@@ -5,14 +5,35 @@ import {
   type UseQueryOptions,
   type UseQueryResult,
 } from '@tanstack/react-query'
+import { useCallback, useMemo } from 'react'
+import type { Address } from 'viem'
+import { usePublicClient, useWalletClient } from 'wagmi'
 
 import {
+  buildPresaleClaimSubscription,
+  buildPresaleParticipationSubscription,
   fetchPresaleById,
   fetchPresales,
   fetchPresalesByMarket,
   type TPresale,
 } from '../../graphql/api'
-import { presaleQueryKey, presalesQueryKey } from '../query-keys'
+import {
+  Presale,
+  type TPresaleApproveParams,
+  type TPresaleBuyParams,
+  type TPresaleBuyWithLeverageParams,
+  type TPresaleClaimParams,
+  type TPresaleMutationResult,
+  type TPresalePositionWithState,
+} from '../../presale'
+import { useFloors } from '../floors-context'
+import {
+  presaleClaimsSubKey,
+  presaleParticipationsSubKey,
+  presaleQueryKey,
+  presalesQueryKey,
+} from '../query-keys'
+import { dedupeByTxHash, useGraphQLQuery, useSubscription } from './subscriptions'
 
 export type UsePresalesQueryOptions<TData = TPresale[]> = Omit<
   UseQueryOptions<TPresale[], Error, TData, typeof presalesQueryKey>,
@@ -88,21 +109,6 @@ export const usePresalesByMarketQuery = <TData = TPresale[]>(
     staleTime,
   })
 }
-
-import { useCallback, useMemo } from 'react'
-import type { Address } from 'viem'
-import { usePublicClient, useWalletClient } from 'wagmi'
-
-import {
-  Presale,
-  type TPresaleApproveParams,
-  type TPresaleBuyParams,
-  type TPresaleBuyWithLeverageParams,
-  type TPresaleClaimParams,
-  type TPresaleMutationResult,
-  type TPresalePositionWithState,
-} from '../../presale'
-import { useFloors } from '../floors-context'
 
 export type UsePresalePositionsQueryOptions = Omit<
   UseQueryOptions<TPresalePositionWithState[], Error>,
@@ -294,5 +300,181 @@ export const usePresaleMutations = (): UsePresaleMutationsReturnType => {
     getPositionState,
     getBaseCommissionBps,
     getPriceBreakpoints,
+  }
+}
+
+// ============================================================================
+// Presale Data Hooks (Unified Query + Subscription)
+// ============================================================================
+
+/**
+ * @description Data type for presale participation
+ */
+export type TPresaleParticipationData = {
+  id: string
+  user_id: string
+  presale_id: string
+  positionId: string | null
+  depositAmountRaw: string
+  depositAmountFormatted: string
+  mintedAmountRaw: string | null
+  mintedAmountFormatted: string | null
+  loopCount: string | null
+  leverage: string
+  timestamp: string
+  transactionHash: string
+}
+
+export type UsePresaleParticipationsParams = {
+  presaleId: string | null | undefined
+  type?: 'query' | 'subscription'
+  enabled?: boolean
+  limit?: number
+}
+
+export type UsePresaleParticipationsResult = {
+  key: ReturnType<typeof presaleParticipationsSubKey>
+  participations: TPresaleParticipationData[]
+  error: string | null
+  isLoading: boolean
+  type: 'query' | 'subscription'
+}
+
+/**
+ * @description Unified hook for presale participations - supports both query and subscription
+ * @example
+ * ```tsx
+ * const { participations } = usePresaleParticipations({
+ *   presaleId,
+ *   type: 'subscription',
+ * })
+ * ```
+ */
+export const usePresaleParticipations = ({
+  presaleId,
+  type = 'subscription',
+  enabled = true,
+  limit = 100,
+}: UsePresaleParticipationsParams): UsePresaleParticipationsResult => {
+  const isEnabled = enabled && Boolean(presaleId)
+  const key = presaleParticipationsSubKey(presaleId)
+
+  const fields = useMemo(
+    () => (isEnabled && presaleId ? buildPresaleParticipationSubscription(presaleId, limit) : null),
+    [isEnabled, presaleId, limit]
+  )
+
+  // Query mode
+  const queryResult = useGraphQLQuery({
+    fields: fields ?? ({} as NonNullable<typeof fields>),
+    queryKey: key,
+    enabled: type === 'query' && isEnabled && fields !== null,
+  })
+
+  // Subscription mode
+  const subResult = useSubscription({
+    fields: fields ?? ({} as NonNullable<typeof fields>),
+    enabled: type === 'subscription' && isEnabled && fields !== null,
+  })
+
+  const result = type === 'query' ? queryResult : subResult
+
+  const participations = useMemo(() => {
+    const raw = result.data?.PresaleParticipation
+    if (!raw) return []
+    return dedupeByTxHash(raw as TPresaleParticipationData[])
+  }, [result.data])
+
+  return {
+    key,
+    participations,
+    error: result.error,
+    isLoading: result.isLoading,
+    type,
+  }
+}
+
+/**
+ * @description Data type for presale claim
+ */
+export type TPresaleClaimData = {
+  id: string
+  presale_id: string
+  positionId: string | null
+  claimType: string
+  amountRaw: string
+  amountFormatted: string
+  trancheIndex: string | null
+  loanId: string | null
+  timestamp: string
+  transactionHash: string
+}
+
+export type UsePresaleClaimsParams = {
+  presaleId: string | null | undefined
+  type?: 'query' | 'subscription'
+  enabled?: boolean
+  limit?: number
+}
+
+export type UsePresaleClaimsResult = {
+  key: ReturnType<typeof presaleClaimsSubKey>
+  claims: TPresaleClaimData[]
+  error: string | null
+  isLoading: boolean
+  type: 'query' | 'subscription'
+}
+
+/**
+ * @description Unified hook for presale claims - supports both query and subscription
+ * @example
+ * ```tsx
+ * const { claims } = usePresaleClaims({
+ *   presaleId,
+ *   type: 'subscription',
+ * })
+ * ```
+ */
+export const usePresaleClaims = ({
+  presaleId,
+  type = 'subscription',
+  enabled = true,
+  limit = 100,
+}: UsePresaleClaimsParams): UsePresaleClaimsResult => {
+  const isEnabled = enabled && Boolean(presaleId)
+  const key = presaleClaimsSubKey(presaleId)
+
+  const fields = useMemo(
+    () => (isEnabled && presaleId ? buildPresaleClaimSubscription(presaleId, limit) : null),
+    [isEnabled, presaleId, limit]
+  )
+
+  // Query mode
+  const queryResult = useGraphQLQuery({
+    fields: fields ?? ({} as NonNullable<typeof fields>),
+    queryKey: key,
+    enabled: type === 'query' && isEnabled && fields !== null,
+  })
+
+  // Subscription mode
+  const subResult = useSubscription({
+    fields: fields ?? ({} as NonNullable<typeof fields>),
+    enabled: type === 'subscription' && isEnabled && fields !== null,
+  })
+
+  const result = type === 'query' ? queryResult : subResult
+
+  const claims = useMemo(() => {
+    const raw = result.data?.PresaleClaim
+    if (!raw) return []
+    return dedupeByTxHash(raw as TPresaleClaimData[])
+  }, [result.data])
+
+  return {
+    key,
+    claims,
+    error: result.error,
+    isLoading: result.isLoading,
+    type,
   }
 }
