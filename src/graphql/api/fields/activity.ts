@@ -152,12 +152,24 @@ export interface TMarketActivityData {
 
 /**
  * @description Transforms a GraphQL trade to unified activity format
+ * @param trade - The trade entity from GraphQL
+ * @param priceBefore - Optional price before the trade (from previous trade's newPrice)
  */
-export function tradeToActivity(trade: TGraphQLTradeActivity): TMarketActivityData {
+export function tradeToActivity(
+  trade: TGraphQLTradeActivity,
+  priceBefore?: number
+): TMarketActivityData {
   const tokenAmount = Number.parseFloat(trade.tokenAmountFormatted) || 0
   const reserveAmount = Number.parseFloat(trade.reserveAmountFormatted) || 0
   const fee = Number.parseFloat(trade.feeFormatted) || 0
   const newPrice = Number.parseFloat(trade.newPriceFormatted) || 0
+
+  // Calculate price impact if we have the before price
+  // Price impact = (priceAfter - priceBefore) / priceBefore
+  let priceImpact = 0
+  if (priceBefore && priceBefore > 0) {
+    priceImpact = Math.abs((newPrice - priceBefore) / priceBefore)
+  }
 
   return {
     id: trade.id,
@@ -180,9 +192,9 @@ export function tradeToActivity(trade: TGraphQLTradeActivity): TMarketActivityDa
       fee,
     },
     prices: {
-      before: 0, // Not available in current schema
+      before: priceBefore ?? 0,
       after: newPrice,
-      priceImpact: 0, // Calculate if needed
+      priceImpact,
     },
     timestampDate: new Date(Number.parseInt(trade.timestamp) * 1000),
     status: 'confirmed',
@@ -269,6 +281,7 @@ export function loanToActivity(
 /**
  * @description Combines and sorts trades and loans into unified activity list
  * Detects "loop" transactions by matching BUY trades with loans that share the same txHash
+ * Calculates price impact by comparing each trade's newPrice with the previous trade's newPrice
  */
 export function combineMarketActivity(
   trades: TGraphQLTradeActivity[],
@@ -278,17 +291,29 @@ export function combineMarketActivity(
   // These are loans created in the same tx as a buy (indicating a loop/buyAndBorrow)
   const loanTxHashes = new Set(loans.map((loan) => loan.transactionHash.toLowerCase()))
 
-  // Transform trades - detect loops by checking if a BUY trade has a matching loan tx
-  const tradeActivities = trades.map((trade) => {
-    const activity = tradeToActivity(trade)
+  // Sort trades by timestamp ascending (oldest first) to calculate price impact
+  // Each trade's "before price" is the previous trade's "newPrice"
+  const sortedTrades = [...trades].sort(
+    (a, b) => Number.parseInt(a.timestamp) - Number.parseInt(b.timestamp)
+  )
+
+  // Transform trades with price impact calculation
+  const tradeActivities: TMarketActivityData[] = []
+  for (let i = 0; i < sortedTrades.length; i++) {
+    const trade = sortedTrades[i]
+    // Use previous trade's newPrice as the price before this trade
+    const priceBefore =
+      i > 0 ? Number.parseFloat(sortedTrades[i - 1].newPriceFormatted) || undefined : undefined
+
+    const activity = tradeToActivity(trade, priceBefore)
 
     // If this is a BUY and there's a loan with the same txHash, it's a loop
     if (trade.tradeType === 'BUY' && loanTxHashes.has(trade.transactionHash.toLowerCase())) {
-      return { ...activity, type: 'loop' as TActivityType }
+      tradeActivities.push({ ...activity, type: 'loop' as TActivityType })
+    } else {
+      tradeActivities.push(activity)
     }
-
-    return activity
-  })
+  }
 
   // For loans, skip creating "borrow" activity if it was part of a loop (same txHash as a BUY trade)
   const tradeTxHashes = new Set(
