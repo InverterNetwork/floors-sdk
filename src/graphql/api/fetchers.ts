@@ -1,39 +1,40 @@
 import { getAddress } from 'viem'
 
 import { query } from '..'
-import type {
-  AccountsQueryType,
-  GlobalStatsQueryType,
-  LoansQueryType,
-  MarketSnapshotQueryType,
-  MarketsQueryType,
-  PriceCandleQueryType,
-  TAuthorizerRole,
-  TCreditPositionData,
-  TFloorAssetData,
-  TGlobalStats,
-  TGraphQLAccount,
-  TGraphQLLoan,
-  TGraphQLUserMarketPosition,
-  TPlatformMetrics,
-  TPresale,
-  TradesQueryType,
-  TTradeData,
-  TUserAssetPosition,
-} from './fields'
 import {
   accountsQuery,
+  type AccountsQueryType,
   buildAuthorizerRolesQuery,
+  buildMarketActivityQuery,
   buildPresalesQuery,
+  combineMarketActivity,
   computePlatformMetrics,
   globalStatsQuery,
+  type GlobalStatsQueryType,
   loansQuery,
+  type LoansQueryType,
   mapGlobalStats,
   marketSnapshotQuery,
+  type MarketSnapshotQueryType,
   marketsQuery,
+  type MarketsQueryType,
   platformMetricsQuery,
   priceCandleQuery,
+  type PriceCandleQueryType,
+  type TAuthorizerRole,
+  type TCreditPositionData,
+  type TFloorAssetData,
+  type TGlobalStats,
+  type TGraphQLAccount,
+  type TGraphQLLoan,
+  type TGraphQLUserMarketPosition,
+  type TMarketActivityData,
+  type TPlatformMetrics,
+  type TPresale,
   tradesQuery,
+  type TradesQueryType,
+  type TTradeData,
+  type TUserAssetPosition,
   userMarketPositionQuery,
 } from './fields'
 import {
@@ -45,8 +46,7 @@ import {
   mapRolesToAuthorizerRoles,
   mapTradeToTradeData,
 } from './mappers'
-import type { ExtendableQueryArgs } from './utils'
-import { cloneQuery, mergeFieldArgs } from './utils'
+import { cloneQuery, type ExtendableQueryArgs, mergeFieldArgs } from './utils'
 
 export const buildMarketsQuery = (
   args?: ExtendableQueryArgs<MarketsQueryType['Market']['__args']>
@@ -382,5 +382,34 @@ export async function fetchPremiumChange24h(
   } catch (error) {
     console.error('Error fetching premium change 24h:', error)
     return null
+  }
+}
+
+/**
+ * Fetch all market activity (trades + loans) in a single query
+ * @param marketId - The market ID
+ * @param limit - Maximum number of items per entity type (default: 100)
+ * @returns Combined and sorted array of market activity
+ */
+export async function fetchMarketActivity(
+  marketId: string,
+  limit: number = 100
+): Promise<TMarketActivityData[]> {
+  if (!marketId) return []
+
+  try {
+    const normalizedMarketId = getAddress(marketId as `0x${string}`)
+
+    // Single GraphQL query fetching both trades and loans
+    const response = await query(buildMarketActivityQuery(normalizedMarketId, limit))
+
+    const trades = response.Trade ?? []
+    const loans = response.Loan ?? []
+
+    // Combine and sort by timestamp
+    return combineMarketActivity(trades, loans)
+  } catch (error) {
+    console.error('Error fetching market activity:', error)
+    return []
   }
 }

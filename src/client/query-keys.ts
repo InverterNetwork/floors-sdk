@@ -70,6 +70,12 @@ export const userLoansQueryKey = (
 export const allUserLoansQueryKey = (userAddress: string | null | undefined) =>
   ['user-loans', 'all', userAddress?.toLowerCase() ?? ''] as const
 
+/**
+ * @description Parameterized query key for market activity (trades + loans combined).
+ */
+export const marketActivityQueryKey = (marketId: string | null | undefined) =>
+  ['market-activity', marketId ?? ''] as const
+
 // ============================================================================
 // Subscription Keys
 // ============================================================================
