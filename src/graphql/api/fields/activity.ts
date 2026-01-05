@@ -22,6 +22,7 @@ export const loanActivityFields = {
   status: true,
   openedAt: true,
   closedAt: true,
+  lastUpdatedAt: true,
   transactionHash: true,
 } as const
 
@@ -215,6 +216,7 @@ export function loanToActivity(
   const activities: TMarketActivityData[] = []
   const collateralAmount = Number.parseFloat(loan.lockedCollateralFormatted) || 0
   const borrowAmount = Number.parseFloat(loan.borrowAmountFormatted) || 0
+  const remainingDebt = Number.parseFloat(loan.remainingDebtFormatted) || 0
   const fee = Number.parseFloat(loan.originationFeeFormatted) || 0
 
   // Create borrow activity for loan creation (unless it's part of a loop)
@@ -246,33 +248,119 @@ export function loanToActivity(
     })
   }
 
-  // If loan is repaid/closed, create a repay activity
-  if (loan.status === 'REPAID' && loan.closedAt) {
-    activities.push({
-      id: `${loan.id}-repay`,
-      market_id: loan.market_id,
-      user_id: loan.borrower_id,
-      type: 'repay',
-      timestamp: loan.closedAt,
-      tokenAmountRaw: loan.lockedCollateralRaw,
-      tokenAmountFormatted: loan.lockedCollateralFormatted,
-      reserveAmountRaw: loan.borrowAmountRaw,
-      reserveAmountFormatted: loan.borrowAmountFormatted,
-      feeRaw: '0',
-      feeFormatted: '0',
-      newPriceRaw: null,
-      newPriceFormatted: null,
-      transactionHash: loan.transactionHash, // Ideally would be the repay tx
-      amounts: {
-        input: borrowAmount, // Amount repaid
-        output: collateralAmount, // Collateral unlocked
-        fee: 0,
-      },
-      prices: null,
-      timestampDate: new Date(Number.parseInt(loan.closedAt) * 1000),
-      status: 'confirmed',
-      source: 'loan',
-    })
+  // Create repay activities from status history (tracks individual repay transactions)
+  const statusHistory = (loan as any).statusHistory || []
+  if (statusHistory.length > 0) {
+    // Sort by timestamp ascending to process chronologically
+    const sortedHistory = [...statusHistory].sort(
+      (a, b) => Number.parseInt(a.timestamp) - Number.parseInt(b.timestamp)
+    )
+
+    // Track previous debt to calculate repay amount
+    let previousDebt = borrowAmount
+
+    for (const historyEntry of sortedHistory) {
+      const currentDebt = Number.parseFloat(historyEntry.remainingDebtFormatted) || 0
+      const repayAmount = previousDebt - currentDebt
+
+      // Only create activity if there was an actual repayment (debt decreased)
+      if (repayAmount > 0 && historyEntry.status === 'ACTIVE') {
+        // Calculate proportional collateral unlocked (simplified - assumes linear relationship)
+        const collateralUnlocked = (repayAmount / borrowAmount) * collateralAmount
+
+        activities.push({
+          id: `${loan.id}-repay-${historyEntry.id}`,
+          market_id: loan.market_id,
+          user_id: loan.borrower_id,
+          type: 'repay',
+          timestamp: historyEntry.timestamp,
+          tokenAmountRaw: String(Math.round(collateralUnlocked * 1e18)), // Approximate
+          tokenAmountFormatted: collateralUnlocked.toFixed(6),
+          reserveAmountRaw: String(Math.round(repayAmount * 1e18)), // Approximate
+          reserveAmountFormatted: repayAmount.toFixed(6),
+          feeRaw: '0',
+          feeFormatted: '0',
+          newPriceRaw: null,
+          newPriceFormatted: null,
+          transactionHash: historyEntry.transactionHash,
+          amounts: {
+            input: repayAmount, // Amount repaid
+            output: collateralUnlocked, // Collateral unlocked (approximate)
+            fee: 0,
+          },
+          prices: null,
+          timestampDate: new Date(Number.parseInt(historyEntry.timestamp) * 1000),
+          status: 'confirmed',
+          source: 'loan',
+        })
+      }
+
+      previousDebt = currentDebt
+    }
+  } else {
+    // Fallback: If no status history, create a single repay activity if loan has been repaid
+    // This handles loans that were fully repaid before status history tracking was added
+    if (loan.status === 'REPAID' && loan.closedAt) {
+      const totalRepaid = borrowAmount - remainingDebt
+      if (totalRepaid > 0) {
+        activities.push({
+          id: `${loan.id}-repay`,
+          market_id: loan.market_id,
+          user_id: loan.borrower_id,
+          type: 'repay',
+          timestamp: loan.closedAt,
+          tokenAmountRaw: loan.lockedCollateralRaw,
+          tokenAmountFormatted: loan.lockedCollateralFormatted,
+          reserveAmountRaw: String(Math.round(totalRepaid * 1e18)),
+          reserveAmountFormatted: totalRepaid.toFixed(6),
+          feeRaw: '0',
+          feeFormatted: '0',
+          newPriceRaw: null,
+          newPriceFormatted: null,
+          transactionHash: loan.transactionHash,
+          amounts: {
+            input: totalRepaid, // Amount repaid
+            output: collateralAmount, // Collateral unlocked
+            fee: 0,
+          },
+          prices: null,
+          timestampDate: new Date(Number.parseInt(loan.closedAt) * 1000),
+          status: 'confirmed',
+          source: 'loan',
+        })
+      }
+    } else if (remainingDebt < borrowAmount && loan.lastUpdatedAt) {
+      // Partial repayment detected (remainingDebt < borrowAmount) but no status history
+      // Use lastUpdatedAt as timestamp for the repay activity
+      const totalRepaid = borrowAmount - remainingDebt
+      const collateralUnlocked = (totalRepaid / borrowAmount) * collateralAmount
+
+      activities.push({
+        id: `${loan.id}-repay-partial`,
+        market_id: loan.market_id,
+        user_id: loan.borrower_id,
+        type: 'repay',
+        timestamp: loan.lastUpdatedAt,
+        tokenAmountRaw: String(Math.round(collateralUnlocked * 1e18)),
+        tokenAmountFormatted: collateralUnlocked.toFixed(6),
+        reserveAmountRaw: String(Math.round(totalRepaid * 1e18)),
+        reserveAmountFormatted: totalRepaid.toFixed(6),
+        feeRaw: '0',
+        feeFormatted: '0',
+        newPriceRaw: null,
+        newPriceFormatted: null,
+        transactionHash: loan.transactionHash,
+        amounts: {
+          input: totalRepaid, // Amount repaid
+          output: collateralUnlocked, // Collateral unlocked (approximate)
+          fee: 0,
+        },
+        prices: null,
+        timestampDate: new Date(Number.parseInt(loan.lastUpdatedAt) * 1000),
+        status: 'confirmed',
+        source: 'loan',
+      })
+    }
   }
 
   return activities
