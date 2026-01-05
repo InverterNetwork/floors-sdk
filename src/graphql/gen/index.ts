@@ -29,7 +29,7 @@ export interface Client {
 
 export const createClient = function (options?: ClientOptions): Client {
   return createClientOriginal({
-    url: 'https://indexer.hyperindex.xyz/cada10d/v1/graphql',
+    url: 'https://indexer.hyperindex.xyz/874f7d3/v1/graphql',
 
     ...options,
     queryRoot: typeMap.Query!,

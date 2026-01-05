@@ -1199,6 +1199,122 @@ type GlobalStats {
 }
 
 """
+columns and relationships of "GlobalStatsSnapshot"
+"""
+type GlobalStatsSnapshot {
+  activeMarkets: numeric!
+  id: String!
+  period: snapshotperiod!
+  periodVolumeFormatted: String!
+  periodVolumeRaw: numeric!
+  timestamp: numeric!
+  totalMarketCapFormatted: String!
+  totalMarketCapRaw: numeric!
+  totalMarkets: numeric!
+  totalValueLockedFormatted: String!
+  totalValueLockedRaw: numeric!
+}
+
+"""
+Boolean expression to filter rows from the table "GlobalStatsSnapshot". All fields are combined with a logical 'AND'.
+"""
+input GlobalStatsSnapshot_bool_exp {
+  _and: [GlobalStatsSnapshot_bool_exp!]
+  _not: GlobalStatsSnapshot_bool_exp
+  _or: [GlobalStatsSnapshot_bool_exp!]
+  activeMarkets: numeric_comparison_exp
+  id: String_comparison_exp
+  period: snapshotperiod_comparison_exp
+  periodVolumeFormatted: String_comparison_exp
+  periodVolumeRaw: numeric_comparison_exp
+  timestamp: numeric_comparison_exp
+  totalMarketCapFormatted: String_comparison_exp
+  totalMarketCapRaw: numeric_comparison_exp
+  totalMarkets: numeric_comparison_exp
+  totalValueLockedFormatted: String_comparison_exp
+  totalValueLockedRaw: numeric_comparison_exp
+}
+
+"""Ordering options when selecting data from "GlobalStatsSnapshot"."""
+input GlobalStatsSnapshot_order_by {
+  activeMarkets: order_by
+  id: order_by
+  period: order_by
+  periodVolumeFormatted: order_by
+  periodVolumeRaw: order_by
+  timestamp: order_by
+  totalMarketCapFormatted: order_by
+  totalMarketCapRaw: order_by
+  totalMarkets: order_by
+  totalValueLockedFormatted: order_by
+  totalValueLockedRaw: order_by
+}
+
+"""
+select columns of table "GlobalStatsSnapshot"
+"""
+enum GlobalStatsSnapshot_select_column {
+  """column name"""
+  activeMarkets
+
+  """column name"""
+  id
+
+  """column name"""
+  period
+
+  """column name"""
+  periodVolumeFormatted
+
+  """column name"""
+  periodVolumeRaw
+
+  """column name"""
+  timestamp
+
+  """column name"""
+  totalMarketCapFormatted
+
+  """column name"""
+  totalMarketCapRaw
+
+  """column name"""
+  totalMarkets
+
+  """column name"""
+  totalValueLockedFormatted
+
+  """column name"""
+  totalValueLockedRaw
+}
+
+"""
+Streaming cursor of the table "GlobalStatsSnapshot"
+"""
+input GlobalStatsSnapshot_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: GlobalStatsSnapshot_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input GlobalStatsSnapshot_stream_cursor_value_input {
+  activeMarkets: numeric
+  id: String
+  period: snapshotperiod
+  periodVolumeFormatted: String
+  periodVolumeRaw: numeric
+  timestamp: numeric
+  totalMarketCapFormatted: String
+  totalMarketCapRaw: numeric
+  totalMarkets: numeric
+  totalValueLockedFormatted: String
+  totalValueLockedRaw: numeric
+}
+
+"""
 Boolean expression to filter rows from the table "GlobalStats". All fields are combined with a logical 'AND'.
 """
 input GlobalStats_bool_exp {
@@ -6222,6 +6338,31 @@ type query_root {
     where: GlobalStats_bool_exp
   ): [GlobalStats!]!
 
+  """
+  fetch data from the table: "GlobalStatsSnapshot"
+  """
+  GlobalStatsSnapshot(
+    """distinct select on columns"""
+    distinct_on: [GlobalStatsSnapshot_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [GlobalStatsSnapshot_order_by!]
+
+    """filter the rows returned"""
+    where: GlobalStatsSnapshot_bool_exp
+  ): [GlobalStatsSnapshot!]!
+
+  """
+  fetch data from the table: "GlobalStatsSnapshot" using primary key columns
+  """
+  GlobalStatsSnapshot_by_pk(id: String!): GlobalStatsSnapshot
+
   """fetch data from the table: "GlobalStats" using primary key columns"""
   GlobalStats_by_pk(id: String!): GlobalStats
 
@@ -6896,6 +7037,23 @@ input raw_events_stream_cursor_value_input {
   transaction_fields: jsonb
 }
 
+scalar snapshotperiod
+
+"""
+Boolean expression to compare columns of type "snapshotperiod". All fields are combined with logical 'AND'.
+"""
+input snapshotperiod_comparison_exp {
+  _eq: snapshotperiod
+  _gt: snapshotperiod
+  _gte: snapshotperiod
+  _in: [snapshotperiod!]
+  _is_null: Boolean
+  _lt: snapshotperiod
+  _lte: snapshotperiod
+  _neq: snapshotperiod
+  _nin: [snapshotperiod!]
+}
+
 scalar stakestatus
 
 """
@@ -7200,6 +7358,45 @@ type subscription_root {
     """filter the rows returned"""
     where: GlobalStats_bool_exp
   ): [GlobalStats!]!
+
+  """
+  fetch data from the table: "GlobalStatsSnapshot"
+  """
+  GlobalStatsSnapshot(
+    """distinct select on columns"""
+    distinct_on: [GlobalStatsSnapshot_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [GlobalStatsSnapshot_order_by!]
+
+    """filter the rows returned"""
+    where: GlobalStatsSnapshot_bool_exp
+  ): [GlobalStatsSnapshot!]!
+
+  """
+  fetch data from the table: "GlobalStatsSnapshot" using primary key columns
+  """
+  GlobalStatsSnapshot_by_pk(id: String!): GlobalStatsSnapshot
+
+  """
+  fetch data from the table in a streaming manner: "GlobalStatsSnapshot"
+  """
+  GlobalStatsSnapshot_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [GlobalStatsSnapshot_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: GlobalStatsSnapshot_bool_exp
+  ): [GlobalStatsSnapshot!]!
 
   """fetch data from the table: "GlobalStats" using primary key columns"""
   GlobalStats_by_pk(id: String!): GlobalStats

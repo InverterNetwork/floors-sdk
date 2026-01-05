@@ -50,7 +50,6 @@ export const marketsQuery = {
     trades: {
       __args: {
         order_by: [{ timestamp: 'desc' }],
-        limit: 100,
       },
       id: true,
       tradeType: true,
