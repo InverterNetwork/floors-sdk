@@ -20,6 +20,11 @@ export const platformMetricsQueryKey = ['platform-metrics'] as const
 export const globalStatsQueryKey = ['global-stats'] as const
 
 /**
+ * @description Static query key for global metrics with history (TVL, MarketCap changes + charts).
+ */
+export const globalMetricsHistoryQueryKey = ['global-metrics-history'] as const
+
+/**
  * @description Parameterized query key for trades scoped to a market.
  */
 export const marketTradesQueryKey = (marketId: string | null | undefined) =>

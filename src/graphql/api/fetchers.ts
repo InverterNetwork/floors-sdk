@@ -8,7 +8,12 @@ import {
   buildMarketActivityQuery,
   buildPresalesQuery,
   combineMarketActivity,
+  computeGlobalMetricsWithHistory,
   computePlatformMetrics,
+  createChart7dQuery,
+  createChart24hQuery,
+  createChart30dQuery,
+  createGlobalStatsHistoryQuery,
   globalStatsQuery,
   type GlobalStatsQueryType,
   loansQuery,
@@ -24,6 +29,7 @@ import {
   type TAuthorizerRole,
   type TCreditPositionData,
   type TFloorAssetData,
+  type TGlobalMetricsWithHistory,
   type TGlobalStats,
   type TGraphQLAccount,
   type TGraphQLLoan,
@@ -158,6 +164,22 @@ export async function fetchGlobalStats(): Promise<TGlobalStats | null> {
   const response = await query(buildGlobalStatsQuery())
   const stats = (response.GlobalStats ?? [])[0]
   return mapGlobalStats(stats)
+}
+
+/**
+ * Fetch global metrics with historical data for charts and change calculations
+ * Returns TVL, Market Cap, and volume with 24h/7d/30d changes + chart data
+ */
+export async function fetchGlobalMetricsWithHistory(): Promise<TGlobalMetricsWithHistory> {
+  // Fetch all data in parallel
+  const [currentData, chart24hData, chart7dData, chart30dData] = await Promise.all([
+    query(createGlobalStatsHistoryQuery()),
+    query(createChart24hQuery()),
+    query(createChart7dQuery()),
+    query(createChart30dQuery()),
+  ])
+
+  return computeGlobalMetricsWithHistory(currentData, chart24hData, chart7dData, chart30dData)
 }
 
 export async function fetchTradesByMarket(marketId: string): Promise<TTradeData[]> {
