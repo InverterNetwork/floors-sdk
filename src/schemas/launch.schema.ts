@@ -12,11 +12,11 @@ import { AddressSchema } from './base.schema'
  */
 export const SegmentConfigSchema = Schema.Struct({
   /** Starting price in 18 decimal format (e.g., 1e18 = 1 token) */
-  initialPrice: Schema.BigInt,
+  initialPrice: Schema.BigIntFromSelf,
   /** Price increase per step in 18 decimal format (0 for flat floor segment) */
-  priceIncrease: Schema.BigInt,
+  priceIncrease: Schema.BigIntFromSelf,
   /** Token supply per step in 18 decimal format */
-  supplyPerStep: Schema.BigInt,
+  supplyPerStep: Schema.BigIntFromSelf,
   /** Number of steps in this segment (must be >= 1) */
   numberOfSteps: Schema.Number.pipe(Schema.int(), Schema.greaterThan(0)),
 }).annotations({
@@ -64,7 +64,7 @@ export const TreasuryRecipientSchema = Schema.Struct({
   /** Recipient address */
   address: AddressSchema,
   /** Share amount (relative to total shares) */
-  shares: Schema.BigInt,
+  shares: Schema.BigIntFromSelf,
 }).annotations({
   title: 'TreasuryRecipient',
   description: 'Treasury recipient with share allocation',
@@ -127,15 +127,15 @@ export const PresaleConfigSchema = Schema.Struct({
   /** Credit facility address (or zero address if none) */
   creditFacilityAddress: Schema.optional(AddressSchema),
   /** Commission schedule - array of fees per leverage level in basis points */
-  baseCommissionBps: Schema.Array(Schema.BigInt).pipe(Schema.minItems(1)),
+  baseCommissionBps: Schema.Array(Schema.BigIntFromSelf).pipe(Schema.minItems(1)),
   /** Presale end timestamp (unix seconds) */
-  endTimestamp: Schema.BigInt,
+  endTimestamp: Schema.BigIntFromSelf,
   /** Global issuance cap in reserve tokens (0 = unlimited) */
-  globalIssuanceCap: Schema.BigInt,
+  globalIssuanceCap: Schema.BigIntFromSelf,
   /** Per-address issuance cap in reserve tokens (0 = unlimited) */
-  perAddressIssuanceCap: Schema.BigInt,
+  perAddressIssuanceCap: Schema.BigIntFromSelf,
   /** Price breakpoints - 2D array: [leverage level][tranche unlock price] */
-  priceBreakpoints: Schema.Array(Schema.Array(Schema.BigInt)),
+  priceBreakpoints: Schema.Array(Schema.Array(Schema.BigIntFromSelf)),
 }).annotations({
   title: 'PresaleConfig',
   description: 'Presale module configuration for leveraged presales',
@@ -179,7 +179,7 @@ export const LaunchResultSchema = Schema.Struct({
   /** Created Floor/Market address */
   floorAddress: AddressSchema,
   /** Market ID */
-  marketId: Schema.BigInt,
+  marketId: Schema.BigIntFromSelf,
   /** Transaction hash */
   transactionHash: Schema.String,
 }).annotations({

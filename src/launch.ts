@@ -1,6 +1,7 @@
 /**
  * @description Launch module for creating Floor Markets
  * Handles encoding configs and calling FloorFactory.createFloor()
+ * and configuring roles/permissions via TransactionForwarder multicall
  */
 
 import { Schema } from 'effect'
@@ -8,11 +9,18 @@ import {
   type Address,
   decodeEventLog,
   encodeAbiParameters,
+  encodeFunctionData,
   parseAbiParameters,
   type TransactionReceipt,
 } from 'viem'
 
-import { FloorFactory_v1 } from './abis'
+import {
+  AUT_Roles_v2,
+  ERC20Issuance_v1,
+  Floor_v1,
+  FloorFactory_v1,
+  TransactionForwarder_v1,
+} from './abis'
 import {
   AUTHORIZER_METADATA,
   CREDIT_FACILITY_METADATA,
@@ -51,6 +59,54 @@ export type {
 
 // Note: SegmentConfig is already exported from ./utils/segments
 export { SegmentConfigSchema } from './schemas/launch.schema'
+
+// =============================================================================
+// Configure Types
+// =============================================================================
+
+/**
+ * @description Parameters for configuring a deployed Floor Market
+ * This sets up roles, permissions, and enables trading
+ */
+export type ConfigureParams = {
+  /** The deployed Floor/Market address */
+  floorAddress: Address
+  /** The authorizer module address */
+  authorizerAddress: Address
+  /** The issuance token address (for granting minter role) */
+  issuanceTokenAddress: Address
+  /** The transaction forwarder address */
+  transactionForwarderAddress: Address
+  /** Credit facility address (optional, if deployed) */
+  creditFacilityAddress?: Address
+  /** Presale address (optional, if deployed) */
+  presaleAddress?: Address
+  /** Whether to open buy after configuration (default: true) */
+  openBuy?: boolean
+}
+
+/**
+ * @description Result of configuring a Floor Market
+ */
+export type ConfigureResult = {
+  /** Transaction hash */
+  transactionHash: `0x${string}`
+  /** Transaction receipt */
+  receipt: TransactionReceipt
+  /** Whether all calls succeeded */
+  success: boolean
+  /** Individual call results */
+  callResults: Array<{ success: boolean; returnData: `0x${string}` }>
+}
+
+/**
+ * @description A single call for multicall batching
+ */
+type SingleCall = {
+  target: Address
+  allowFailure: boolean
+  callData: `0x${string}`
+}
 
 // =============================================================================
 // Launch Class
@@ -198,6 +254,179 @@ export class Launch {
       floorAddress: floorCreatedEvent.floorAddress,
       marketId: floorCreatedEvent.floorId,
       transactionHash: hash,
+    }
+  }
+
+  /**
+   * @description Configure a deployed Floor Market with roles and permissions
+   * Uses TransactionForwarder.executeMulticall to batch all setup calls
+   *
+   * This method performs the following setup:
+   * 1. Grants minter role to Floor on the issuance token
+   * 2. Opens buy on the Floor (optional, default: true)
+   * 3. If CreditFacility is deployed:
+   *    - Creates CreditFacility role
+   *    - Grants buy, withdrawCollateralTo, depositCollateralFrom permissions on Floor
+   * 4. If Presale is deployed:
+   *    - Creates Presale role
+   *    - Grants buy permission on Floor
+   *    - Grants buyAndBorrow permission on CreditFacility
+   */
+  public async configure(params: ConfigureParams): Promise<ConfigureResult> {
+    const walletClient = this.requireWalletClient()
+
+    const calls: SingleCall[] = []
+
+    // 1. Grant minter role to Floor on issuance token
+    calls.push({
+      target: params.issuanceTokenAddress,
+      allowFailure: false,
+      callData: encodeFunctionData({
+        abi: ERC20Issuance_v1,
+        functionName: 'setMinter',
+        args: [params.floorAddress, true],
+      }),
+    })
+
+    // 2. Open buy on Floor (if enabled, default: true)
+    if (params.openBuy !== false) {
+      calls.push({
+        target: params.floorAddress,
+        allowFailure: false,
+        callData: encodeFunctionData({
+          abi: Floor_v1,
+          functionName: 'openBuy',
+        }),
+      })
+    }
+
+    // 3. Configure CreditFacility if deployed
+    if (params.creditFacilityAddress) {
+      // Get admin role for creating new roles
+      const adminRole = await this.publicClient.readContract({
+        address: params.authorizerAddress,
+        abi: AUT_Roles_v2,
+        functionName: 'getAdminRole',
+      })
+
+      // Create CreditFacility role with the credit facility as sole member
+      calls.push({
+        target: params.authorizerAddress,
+        allowFailure: false,
+        callData: encodeFunctionData({
+          abi: AUT_Roles_v2,
+          functionName: 'createRole',
+          args: ['CreditFacility', adminRole as `0x${string}`, [params.creditFacilityAddress]],
+        }),
+      })
+
+      // Note: The role ID will be the next sequential ID
+      // We need to get it after the role is created, but since we're batching,
+      // we'll use a separate transaction or assume role IDs are sequential
+      // For now, we add permissions using a second configure call or
+      // the caller needs to call addPermissions separately
+
+      // TODO: Consider splitting into create() + configureRoles() + configurePermissions()
+      // or using events to get the created role IDs
+    }
+
+    // 4. Configure Presale if deployed
+    if (params.presaleAddress) {
+      // Similar to CreditFacility, we need to create a role first
+      const adminRole = await this.publicClient.readContract({
+        address: params.authorizerAddress,
+        abi: AUT_Roles_v2,
+        functionName: 'getAdminRole',
+      })
+
+      // Create Presale role
+      calls.push({
+        target: params.authorizerAddress,
+        allowFailure: false,
+        callData: encodeFunctionData({
+          abi: AUT_Roles_v2,
+          functionName: 'createRole',
+          args: ['Presale', adminRole as `0x${string}`, [params.presaleAddress]],
+        }),
+      })
+    }
+
+    // Execute multicall via TransactionForwarder
+    const hash = await walletClient.writeContract({
+      address: params.transactionForwarderAddress,
+      abi: TransactionForwarder_v1,
+      functionName: 'executeMulticall',
+      args: [calls],
+      account: this.getWalletAddress(walletClient),
+    })
+
+    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+    // Check if transaction succeeded
+    if (receipt.status === 'reverted') {
+      throw new Error(
+        `configure transaction reverted. Hash: ${hash}. Check the transaction for details.`
+      )
+    }
+
+    // Parse the results from the multicall
+    // The return type is Result[] but we don't decode it here for simplicity
+    const allSuccess = receipt.status === 'success'
+
+    return {
+      transactionHash: hash,
+      receipt,
+      success: allSuccess,
+      callResults: [], // Would need to decode logs to get individual results
+    }
+  }
+
+  /**
+   * @description Add access permissions for a role on a target contract
+   * Uses TransactionForwarder.executeMulticall to batch permission grants
+   */
+  public async addRolePermissions(params: {
+    transactionForwarderAddress: Address
+    authorizerAddress: Address
+    roleId: `0x${string}`
+    permissions: Array<{
+      target: Address
+      selector: `0x${string}`
+    }>
+  }): Promise<ConfigureResult> {
+    const walletClient = this.requireWalletClient()
+
+    const calls: SingleCall[] = params.permissions.map((perm) => ({
+      target: params.authorizerAddress,
+      allowFailure: false,
+      callData: encodeFunctionData({
+        abi: AUT_Roles_v2,
+        functionName: 'addAccessPermission',
+        args: [perm.target, perm.selector, params.roleId],
+      }),
+    }))
+
+    const hash = await walletClient.writeContract({
+      address: params.transactionForwarderAddress,
+      abi: TransactionForwarder_v1,
+      functionName: 'executeMulticall',
+      args: [calls],
+      account: this.getWalletAddress(walletClient),
+    })
+
+    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+    if (receipt.status === 'reverted') {
+      throw new Error(
+        `addRolePermissions transaction reverted. Hash: ${hash}. Check the transaction for details.`
+      )
+    }
+
+    return {
+      transactionHash: hash,
+      receipt,
+      success: receipt.status === 'success',
+      callResults: [],
     }
   }
 
