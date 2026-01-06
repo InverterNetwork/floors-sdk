@@ -4,6 +4,7 @@
  * and configuring roles/permissions via TransactionForwarder multicall
  */
 
+import type { Abi, AbiFunction, ExtractAbiFunctionNames } from 'abitype'
 import { Schema } from 'effect'
 import {
   type Address,
@@ -11,11 +12,13 @@ import {
   encodeAbiParameters,
   encodeFunctionData,
   parseAbiParameters,
+  toFunctionSelector,
   type TransactionReceipt,
 } from 'viem'
 
 import {
   AUT_Roles_v2,
+  CreditFacility_v1,
   ERC20Issuance_v1,
   Floor_v1,
   FloorFactory_v1,
@@ -43,6 +46,75 @@ import {
   TreasuryConfigSchema,
 } from './schemas/launch.schema'
 import type { PopPublicClient, PopWalletClient } from './types'
+
+// =============================================================================
+// Function Selectors (matching Solidity interface selectors)
+// =============================================================================
+
+// =============================================================================
+// Helper to extract selector from ABI
+// =============================================================================
+
+/**
+ * @description Extract function selector from ABI with full type safety
+ * Uses abitype for compile-time function name validation
+ * @param abi The ABI to search in
+ * @param functionName The function name (must exist in ABI)
+ * @returns The 4-byte function selector
+ */
+function getSelector<const TAbi extends Abi, TFunctionName extends ExtractAbiFunctionNames<TAbi>>(
+  abi: TAbi,
+  functionName: TFunctionName
+): `0x${string}` {
+  const abiItem = abi.find(
+    (item): item is AbiFunction => item.type === 'function' && item.name === functionName
+  )
+  if (!abiItem) {
+    throw new Error(`Function ${functionName} not found in ABI`)
+  }
+  return toFunctionSelector(abiItem)
+}
+
+/**
+ * @description Floor/Issuance function selectors for permission granting
+ * Extracted from Floor_v1 ABI for type safety
+ */
+const FLOOR_SELECTORS = {
+  buy: getSelector(Floor_v1, 'buy'),
+  buyFor: getSelector(Floor_v1, 'buyFor'),
+  sell: getSelector(Floor_v1, 'sell'),
+  sellTo: getSelector(Floor_v1, 'sellTo'),
+  openBuy: getSelector(Floor_v1, 'openBuy'),
+  closeBuy: getSelector(Floor_v1, 'closeBuy'),
+  openSell: getSelector(Floor_v1, 'openSell'),
+  closeSell: getSelector(Floor_v1, 'closeSell'),
+  setBuyFee: getSelector(Floor_v1, 'setBuyFee'),
+  setSellFee: getSelector(Floor_v1, 'setSellFee'),
+  raiseFloor: getSelector(Floor_v1, 'raiseFloor'),
+  withdrawCollateralTo: getSelector(Floor_v1, 'withdrawCollateralTo'),
+  depositCollateralFrom: getSelector(Floor_v1, 'depositCollateralFrom'),
+} as const
+
+/**
+ * @description CreditFacility function selectors for permission granting
+ * Extracted from CreditFacility_v1 ABI for type safety
+ */
+const CREDIT_FACILITY_SELECTORS = {
+  borrow: getSelector(CreditFacility_v1, 'borrow'),
+  borrowFor: getSelector(CreditFacility_v1, 'borrowFor'),
+  buyAndBorrow: getSelector(CreditFacility_v1, 'buyAndBorrow'),
+  buyAndBorrowFor: getSelector(CreditFacility_v1, 'buyAndBorrowFor'),
+  repay: getSelector(CreditFacility_v1, 'repay'),
+  transferLoan: getSelector(CreditFacility_v1, 'transferLoan'),
+  rebalanceLoan: getSelector(CreditFacility_v1, 'rebalanceLoan'),
+  consolidateLoans: getSelector(CreditFacility_v1, 'consolidateLoans'),
+  setLoanToValueRatio: getSelector(CreditFacility_v1, 'setLoanToValueRatio'),
+  setBorrowingFeeRate: getSelector(CreditFacility_v1, 'setBorrowingFeeRate'),
+  setMaxLeverage: getSelector(CreditFacility_v1, 'setMaxLeverage'),
+} as const
+
+// Export selectors for external use
+export { CREDIT_FACILITY_SELECTORS, FLOOR_SELECTORS }
 
 // =============================================================================
 // Types
@@ -261,16 +333,18 @@ export class Launch {
    * @description Configure a deployed Floor Market with roles and permissions
    * Uses TransactionForwarder.executeMulticall to batch all setup calls
    *
-   * This method performs the following setup:
+   * This method performs the following setup (matching Solidity deployment scripts):
    * 1. Grants minter role to Floor on the issuance token
    * 2. Opens buy on the Floor (optional, default: true)
    * 3. If CreditFacility is deployed:
-   *    - Creates CreditFacility role
-   *    - Grants buy, withdrawCollateralTo, depositCollateralFrom permissions on Floor
-   * 4. If Presale is deployed:
-   *    - Creates Presale role
+   *    - Creates CreditFacility role with creditFacility as member
    *    - Grants buy permission on Floor
-   *    - Grants buyAndBorrow permission on CreditFacility
+   *    - Grants withdrawCollateralTo permission on Floor
+   *    - Grants depositCollateralFrom permission on Floor
+   * 4. If Presale is deployed:
+   *    - Creates Presale role with presale as member
+   *    - Grants buy permission on Floor
+   *    - Grants buyAndBorrow permission on CreditFacility (if deployed)
    */
   public async configure(params: ConfigureParams): Promise<ConfigureResult> {
     const walletClient = this.requireWalletClient()
@@ -300,14 +374,30 @@ export class Launch {
       })
     }
 
-    // 3. Configure CreditFacility if deployed
-    if (params.creditFacilityAddress) {
-      // Get admin role for creating new roles
-      const adminRole = await this.publicClient.readContract({
+    // Get admin role and last assigned role ID for predicting new role IDs
+    const [adminRole, lastRoleId] = await Promise.all([
+      this.publicClient.readContract({
         address: params.authorizerAddress,
         abi: AUT_Roles_v2,
         functionName: 'getAdminRole',
-      })
+      }),
+      this.publicClient.readContract({
+        address: params.authorizerAddress,
+        abi: AUT_Roles_v2,
+        functionName: 'getLastAssignedRoleId',
+      }),
+    ])
+
+    // Track predicted role IDs (they're sequential)
+    let nextRoleIdNumber = Number(lastRoleId as bigint) + 1
+    let creditFacilityRoleId: `0x${string}` | undefined
+    let presaleRoleId: `0x${string}` | undefined
+
+    // 3. Configure CreditFacility if deployed
+    if (params.creditFacilityAddress) {
+      // Predict the role ID (sequential)
+      creditFacilityRoleId = `0x${nextRoleIdNumber.toString(16).padStart(64, '0')}` as `0x${string}`
+      nextRoleIdNumber++
 
       // Create CreditFacility role with the credit facility as sole member
       calls.push({
@@ -320,26 +410,50 @@ export class Launch {
         }),
       })
 
-      // Note: The role ID will be the next sequential ID
-      // We need to get it after the role is created, but since we're batching,
-      // we'll use a separate transaction or assume role IDs are sequential
-      // For now, we add permissions using a second configure call or
-      // the caller needs to call addPermissions separately
+      // Grant buy permission on Floor
+      // Selector: buy(uint256,uint256) = 0xd6febde8
+      calls.push({
+        target: params.authorizerAddress,
+        allowFailure: false,
+        callData: encodeFunctionData({
+          abi: AUT_Roles_v2,
+          functionName: 'addAccessPermission',
+          args: [params.floorAddress, FLOOR_SELECTORS.buy, creditFacilityRoleId],
+        }),
+      })
 
-      // TODO: Consider splitting into create() + configureRoles() + configurePermissions()
-      // or using events to get the created role IDs
+      // Grant withdrawCollateralTo permission on Floor
+      // Selector: withdrawCollateralTo(address,uint256) = 0x...
+      calls.push({
+        target: params.authorizerAddress,
+        allowFailure: false,
+        callData: encodeFunctionData({
+          abi: AUT_Roles_v2,
+          functionName: 'addAccessPermission',
+          args: [params.floorAddress, FLOOR_SELECTORS.withdrawCollateralTo, creditFacilityRoleId],
+        }),
+      })
+
+      // Grant depositCollateralFrom permission on Floor
+      // Selector: depositCollateralFrom(address,uint256) = 0x...
+      calls.push({
+        target: params.authorizerAddress,
+        allowFailure: false,
+        callData: encodeFunctionData({
+          abi: AUT_Roles_v2,
+          functionName: 'addAccessPermission',
+          args: [params.floorAddress, FLOOR_SELECTORS.depositCollateralFrom, creditFacilityRoleId],
+        }),
+      })
     }
 
     // 4. Configure Presale if deployed
     if (params.presaleAddress) {
-      // Similar to CreditFacility, we need to create a role first
-      const adminRole = await this.publicClient.readContract({
-        address: params.authorizerAddress,
-        abi: AUT_Roles_v2,
-        functionName: 'getAdminRole',
-      })
+      // Predict the role ID (sequential)
+      presaleRoleId = `0x${nextRoleIdNumber.toString(16).padStart(64, '0')}` as `0x${string}`
+      nextRoleIdNumber++
 
-      // Create Presale role
+      // Create Presale role with the presale as sole member
       calls.push({
         target: params.authorizerAddress,
         allowFailure: false,
@@ -349,6 +463,34 @@ export class Launch {
           args: ['Presale', adminRole as `0x${string}`, [params.presaleAddress]],
         }),
       })
+
+      // Grant buy permission on Floor
+      calls.push({
+        target: params.authorizerAddress,
+        allowFailure: false,
+        callData: encodeFunctionData({
+          abi: AUT_Roles_v2,
+          functionName: 'addAccessPermission',
+          args: [params.floorAddress, FLOOR_SELECTORS.buy, presaleRoleId],
+        }),
+      })
+
+      // Grant buyAndBorrow permission on CreditFacility (if deployed)
+      if (params.creditFacilityAddress) {
+        calls.push({
+          target: params.authorizerAddress,
+          allowFailure: false,
+          callData: encodeFunctionData({
+            abi: AUT_Roles_v2,
+            functionName: 'addAccessPermission',
+            args: [
+              params.creditFacilityAddress,
+              CREDIT_FACILITY_SELECTORS.buyAndBorrow,
+              presaleRoleId,
+            ],
+          }),
+        })
+      }
     }
 
     // Execute multicall via TransactionForwarder
@@ -369,14 +511,10 @@ export class Launch {
       )
     }
 
-    // Parse the results from the multicall
-    // The return type is Result[] but we don't decode it here for simplicity
-    const allSuccess = receipt.status === 'success'
-
     return {
       transactionHash: hash,
       receipt,
-      success: allSuccess,
+      success: receipt.status === 'success',
       callResults: [], // Would need to decode logs to get individual results
     }
   }
