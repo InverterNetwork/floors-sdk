@@ -1,6 +1,7 @@
 export * from './activity'
 export * from './authorizer'
 export * from './global-stats'
+export * from './launch'
 export * from './loans'
 export * from './markets'
 export * from './platform'
