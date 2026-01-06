@@ -41,3 +41,12 @@ export {
   createTestPublicClient,
   createTestWalletClient,
 } from './clients'
+
+// Deploy utilities
+export type { TokenConfig } from './deploy'
+export {
+  DEFAULT_COLLATERAL_TOKEN_CONFIG,
+  DEFAULT_ISSUANCE_TOKEN_CONFIG,
+  deployERC20Issuance,
+  deployTestTokens,
+} from './deploy'

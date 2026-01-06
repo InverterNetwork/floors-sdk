@@ -14,6 +14,7 @@ import {
   createTestPresaleConfig,
   createTestSegments,
   createTestTreasuryConfig,
+  deployTestTokens,
   DEVNET_CONTRACTS,
   GRAPHQL_URL,
 } from './helpers/index'
@@ -316,39 +317,54 @@ describe('#Launch', () => {
   })
 
   // ---------------------------------------------------------------------------
-  // E2E Create Flow Tests (requires deployed contracts + tokens)
+  // E2E Create Flow Tests
   // ---------------------------------------------------------------------------
 
-  describe.skip('E2E Create Flow', () => {
-    // These tests require:
-    // 1. FloorFactory to be deployed
-    // 2. Issuance token to be deployed
-    // 3. Reserve token to be deployed
-    // 4. Deployer to have sufficient balance
-
-    it('should create a new floor market', async () => {
+  describe('E2E Create Flow', () => {
+    it('should create a new floor market with freshly deployed tokens', async () => {
       if (!isDevnetAvailable) {
         console.log('Devnet not available, skipping test')
         return
       }
 
-      // These would need to be deployed tokens
-      const ISSUANCE_TOKEN = '0x5FbDB2315678afecb367f032d93F642f64180aa3' as const
-      const RESERVE_TOKEN = '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512' as const
+      console.log('\n--- E2E Create Flow Test ---')
 
-      const config = createTestLaunchConfig(ISSUANCE_TOKEN, RESERVE_TOKEN)
+      // Step 1: Deploy fresh tokens for this test
+      console.log('Deploying test tokens...')
+      const { issuanceToken, collateralToken } = await deployTestTokens(
+        walletClient,
+        publicClient,
+        {
+          issuance: {
+            name: `Test Floor Token ${Date.now()}`,
+            symbol: `TFT${Date.now() % 10000}`,
+          },
+          collateral: {
+            name: 'Test USDC',
+            symbol: 'TUSDC',
+          },
+        }
+      )
+      console.log(`  Issuance token: ${issuanceToken}`)
+      console.log(`  Collateral token: ${collateralToken}`)
 
+      // Step 2: Create launch config
+      const config = createTestLaunchConfig(issuanceToken, collateralToken)
+      console.log('Launch config created')
+
+      // Step 3: Create the floor market
+      console.log('Creating floor market...')
       const result = await launch.create(config)
 
+      // Step 4: Verify result
       expect(result.floorAddress).toMatch(/^0x[0-9a-fA-F]{40}$/)
       expect(result.marketId).toBeGreaterThan(0n)
       expect(result.transactionHash).toMatch(/^0x[0-9a-fA-F]{64}$/)
 
-      console.log('Created floor:', {
-        address: result.floorAddress,
-        marketId: result.marketId.toString(),
-        txHash: result.transactionHash,
-      })
+      console.log('Floor market created successfully!')
+      console.log(`  Floor address: ${result.floorAddress}`)
+      console.log(`  Market ID: ${result.marketId.toString()}`)
+      console.log(`  Transaction hash: ${result.transactionHash}`)
     })
   })
 })
