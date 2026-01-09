@@ -22,6 +22,11 @@ export default [
         type: 'uint256',
         internalType: 'uint256',
       },
+      {
+        name: 'trustedForwarder_',
+        type: 'address',
+        internalType: 'address',
+      },
     ],
     stateMutability: 'nonpayable',
   },
@@ -151,6 +156,25 @@ export default [
         name: '',
         type: 'uint8',
         internalType: 'uint8',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'isTrustedForwarder',
+    inputs: [
+      {
+        name: 'forwarder_',
+        type: 'address',
+        internalType: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: 'isTrusted_',
+        type: 'bool',
+        internalType: 'bool',
       },
     ],
     stateMutability: 'view',
@@ -338,6 +362,19 @@ export default [
     ],
     outputs: [],
     stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'trustedForwarder',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+        internalType: 'address',
+      },
+    ],
+    stateMutability: 'view',
   },
   {
     type: 'event',

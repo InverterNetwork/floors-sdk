@@ -1,6 +1,7 @@
 export * from './abis'
 export * from './authorizer'
 export * from './constants'
+export * from './deploy'
 export * from './launch'
 export * from './market'
 export * from './presale'
