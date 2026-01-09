@@ -13,6 +13,7 @@ export type Scalars = {
     marketstatus: any,
     numeric: any,
     presaleclaimtype: any,
+    snapshotperiod: any,
     stakestatus: any,
     timestamptz: any,
     tradetype: any,
@@ -150,12 +151,13 @@ export interface GlobalRegistry {
     id: Scalars['String']
     lastUpdatedAt: Scalars['numeric']
     moduleFactoryAddress: Scalars['String']
+    trustedForwarderAddress: Scalars['String']
     __typename: 'GlobalRegistry'
 }
 
 
 /** select columns of table "GlobalRegistry" */
-export type GlobalRegistry_select_column = 'createdAt' | 'floorFactoryAddress' | 'id' | 'lastUpdatedAt' | 'moduleFactoryAddress'
+export type GlobalRegistry_select_column = 'createdAt' | 'floorFactoryAddress' | 'id' | 'lastUpdatedAt' | 'moduleFactoryAddress' | 'trustedForwarderAddress'
 
 
 /** columns and relationships of "GlobalStats" */
@@ -172,6 +174,27 @@ export interface GlobalStats {
     totalVolumeRaw: Scalars['numeric']
     __typename: 'GlobalStats'
 }
+
+
+/** columns and relationships of "GlobalStatsSnapshot" */
+export interface GlobalStatsSnapshot {
+    activeMarkets: Scalars['numeric']
+    id: Scalars['String']
+    period: Scalars['snapshotperiod']
+    periodVolumeFormatted: Scalars['String']
+    periodVolumeRaw: Scalars['numeric']
+    timestamp: Scalars['numeric']
+    totalMarketCapFormatted: Scalars['String']
+    totalMarketCapRaw: Scalars['numeric']
+    totalMarkets: Scalars['numeric']
+    totalValueLockedFormatted: Scalars['String']
+    totalValueLockedRaw: Scalars['numeric']
+    __typename: 'GlobalStatsSnapshot'
+}
+
+
+/** select columns of table "GlobalStatsSnapshot" */
+export type GlobalStatsSnapshot_select_column = 'activeMarkets' | 'id' | 'period' | 'periodVolumeFormatted' | 'periodVolumeRaw' | 'timestamp' | 'totalMarketCapFormatted' | 'totalMarketCapRaw' | 'totalMarkets' | 'totalValueLockedFormatted' | 'totalValueLockedRaw'
 
 
 /** select columns of table "GlobalStats" */
@@ -726,6 +749,10 @@ export interface query_root {
     GlobalRegistry_by_pk: (GlobalRegistry | null)
     /** fetch data from the table: "GlobalStats" */
     GlobalStats: GlobalStats[]
+    /** fetch data from the table: "GlobalStatsSnapshot" */
+    GlobalStatsSnapshot: GlobalStatsSnapshot[]
+    /** fetch data from the table: "GlobalStatsSnapshot" using primary key columns */
+    GlobalStatsSnapshot_by_pk: (GlobalStatsSnapshot | null)
     /** fetch data from the table: "GlobalStats" using primary key columns */
     GlobalStats_by_pk: (GlobalStats | null)
     /** fetch data from the table: "Loan" */
@@ -887,6 +914,12 @@ export interface subscription_root {
     GlobalRegistry_stream: GlobalRegistry[]
     /** fetch data from the table: "GlobalStats" */
     GlobalStats: GlobalStats[]
+    /** fetch data from the table: "GlobalStatsSnapshot" */
+    GlobalStatsSnapshot: GlobalStatsSnapshot[]
+    /** fetch data from the table: "GlobalStatsSnapshot" using primary key columns */
+    GlobalStatsSnapshot_by_pk: (GlobalStatsSnapshot | null)
+    /** fetch data from the table in a streaming manner: "GlobalStatsSnapshot" */
+    GlobalStatsSnapshot_stream: GlobalStatsSnapshot[]
     /** fetch data from the table: "GlobalStats" using primary key columns */
     GlobalStats_by_pk: (GlobalStats | null)
     /** fetch data from the table in a streaming manner: "GlobalStats" */
@@ -1481,17 +1514,18 @@ export interface GlobalRegistryGenqlSelection{
     id?: boolean | number
     lastUpdatedAt?: boolean | number
     moduleFactoryAddress?: boolean | number
+    trustedForwarderAddress?: boolean | number
     __typename?: boolean | number
     __scalar?: boolean | number
 }
 
 
 /** Boolean expression to filter rows from the table "GlobalRegistry". All fields are combined with a logical 'AND'. */
-export interface GlobalRegistry_bool_exp {_and?: (GlobalRegistry_bool_exp[] | null),_not?: (GlobalRegistry_bool_exp | null),_or?: (GlobalRegistry_bool_exp[] | null),createdAt?: (numeric_comparison_exp | null),floorFactoryAddress?: (String_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),moduleFactoryAddress?: (String_comparison_exp | null)}
+export interface GlobalRegistry_bool_exp {_and?: (GlobalRegistry_bool_exp[] | null),_not?: (GlobalRegistry_bool_exp | null),_or?: (GlobalRegistry_bool_exp[] | null),createdAt?: (numeric_comparison_exp | null),floorFactoryAddress?: (String_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),moduleFactoryAddress?: (String_comparison_exp | null),trustedForwarderAddress?: (String_comparison_exp | null)}
 
 
 /** Ordering options when selecting data from "GlobalRegistry". */
-export interface GlobalRegistry_order_by {createdAt?: (order_by | null),floorFactoryAddress?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),moduleFactoryAddress?: (order_by | null)}
+export interface GlobalRegistry_order_by {createdAt?: (order_by | null),floorFactoryAddress?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),moduleFactoryAddress?: (order_by | null),trustedForwarderAddress?: (order_by | null)}
 
 
 /** Streaming cursor of the table "GlobalRegistry" */
@@ -1503,7 +1537,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface GlobalRegistry_stream_cursor_value_input {createdAt?: (Scalars['numeric'] | null),floorFactoryAddress?: (Scalars['String'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),moduleFactoryAddress?: (Scalars['String'] | null)}
+export interface GlobalRegistry_stream_cursor_value_input {createdAt?: (Scalars['numeric'] | null),floorFactoryAddress?: (Scalars['String'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),moduleFactoryAddress?: (Scalars['String'] | null),trustedForwarderAddress?: (Scalars['String'] | null)}
 
 
 /** columns and relationships of "GlobalStats" */
@@ -1521,6 +1555,44 @@ export interface GlobalStatsGenqlSelection{
     __typename?: boolean | number
     __scalar?: boolean | number
 }
+
+
+/** columns and relationships of "GlobalStatsSnapshot" */
+export interface GlobalStatsSnapshotGenqlSelection{
+    activeMarkets?: boolean | number
+    id?: boolean | number
+    period?: boolean | number
+    periodVolumeFormatted?: boolean | number
+    periodVolumeRaw?: boolean | number
+    timestamp?: boolean | number
+    totalMarketCapFormatted?: boolean | number
+    totalMarketCapRaw?: boolean | number
+    totalMarkets?: boolean | number
+    totalValueLockedFormatted?: boolean | number
+    totalValueLockedRaw?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+
+/** Boolean expression to filter rows from the table "GlobalStatsSnapshot". All fields are combined with a logical 'AND'. */
+export interface GlobalStatsSnapshot_bool_exp {_and?: (GlobalStatsSnapshot_bool_exp[] | null),_not?: (GlobalStatsSnapshot_bool_exp | null),_or?: (GlobalStatsSnapshot_bool_exp[] | null),activeMarkets?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),period?: (snapshotperiod_comparison_exp | null),periodVolumeFormatted?: (String_comparison_exp | null),periodVolumeRaw?: (numeric_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),totalMarketCapFormatted?: (String_comparison_exp | null),totalMarketCapRaw?: (numeric_comparison_exp | null),totalMarkets?: (numeric_comparison_exp | null),totalValueLockedFormatted?: (String_comparison_exp | null),totalValueLockedRaw?: (numeric_comparison_exp | null)}
+
+
+/** Ordering options when selecting data from "GlobalStatsSnapshot". */
+export interface GlobalStatsSnapshot_order_by {activeMarkets?: (order_by | null),id?: (order_by | null),period?: (order_by | null),periodVolumeFormatted?: (order_by | null),periodVolumeRaw?: (order_by | null),timestamp?: (order_by | null),totalMarketCapFormatted?: (order_by | null),totalMarketCapRaw?: (order_by | null),totalMarkets?: (order_by | null),totalValueLockedFormatted?: (order_by | null),totalValueLockedRaw?: (order_by | null)}
+
+
+/** Streaming cursor of the table "GlobalStatsSnapshot" */
+export interface GlobalStatsSnapshot_stream_cursor_input {
+/** Stream column input with initial value */
+initial_value: GlobalStatsSnapshot_stream_cursor_value_input,
+/** cursor ordering */
+ordering?: (cursor_ordering | null)}
+
+
+/** Initial value of the column from where the streaming should start */
+export interface GlobalStatsSnapshot_stream_cursor_value_input {activeMarkets?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),period?: (Scalars['snapshotperiod'] | null),periodVolumeFormatted?: (Scalars['String'] | null),periodVolumeRaw?: (Scalars['numeric'] | null),timestamp?: (Scalars['numeric'] | null),totalMarketCapFormatted?: (Scalars['String'] | null),totalMarketCapRaw?: (Scalars['numeric'] | null),totalMarkets?: (Scalars['numeric'] | null),totalValueLockedFormatted?: (Scalars['String'] | null),totalValueLockedRaw?: (Scalars['numeric'] | null)}
 
 
 /** Boolean expression to filter rows from the table "GlobalStats". All fields are combined with a logical 'AND'. */
@@ -3201,6 +3273,20 @@ export interface query_rootGenqlSelection{
     order_by?: (GlobalStats_order_by[] | null), 
     /** filter the rows returned */
     where?: (GlobalStats_bool_exp | null)} })
+    /** fetch data from the table: "GlobalStatsSnapshot" */
+    GlobalStatsSnapshot?: (GlobalStatsSnapshotGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (GlobalStatsSnapshot_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (GlobalStatsSnapshot_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (GlobalStatsSnapshot_bool_exp | null)} })
+    /** fetch data from the table: "GlobalStatsSnapshot" using primary key columns */
+    GlobalStatsSnapshot_by_pk?: (GlobalStatsSnapshotGenqlSelection & { __args: {id: Scalars['String']} })
     /** fetch data from the table: "GlobalStats" using primary key columns */
     GlobalStats_by_pk?: (GlobalStatsGenqlSelection & { __args: {id: Scalars['String']} })
     /** fetch data from the table: "Loan" */
@@ -3572,6 +3658,10 @@ ordering?: (cursor_ordering | null)}
 export interface raw_events_stream_cursor_value_input {block_fields?: (Scalars['jsonb'] | null),block_hash?: (Scalars['String'] | null),block_number?: (Scalars['Int'] | null),block_timestamp?: (Scalars['Int'] | null),chain_id?: (Scalars['Int'] | null),contract_name?: (Scalars['String'] | null),event_id?: (Scalars['numeric'] | null),event_name?: (Scalars['String'] | null),log_index?: (Scalars['Int'] | null),params?: (Scalars['jsonb'] | null),serial?: (Scalars['Int'] | null),src_address?: (Scalars['String'] | null),transaction_fields?: (Scalars['jsonb'] | null)}
 
 
+/** Boolean expression to compare columns of type "snapshotperiod". All fields are combined with logical 'AND'. */
+export interface snapshotperiod_comparison_exp {_eq?: (Scalars['snapshotperiod'] | null),_gt?: (Scalars['snapshotperiod'] | null),_gte?: (Scalars['snapshotperiod'] | null),_in?: (Scalars['snapshotperiod'][] | null),_is_null?: (Scalars['Boolean'] | null),_lt?: (Scalars['snapshotperiod'] | null),_lte?: (Scalars['snapshotperiod'] | null),_neq?: (Scalars['snapshotperiod'] | null),_nin?: (Scalars['snapshotperiod'][] | null)}
+
+
 /** Boolean expression to compare columns of type "stakestatus". All fields are combined with logical 'AND'. */
 export interface stakestatus_comparison_exp {_eq?: (Scalars['stakestatus'] | null),_gt?: (Scalars['stakestatus'] | null),_gte?: (Scalars['stakestatus'] | null),_in?: (Scalars['stakestatus'][] | null),_is_null?: (Scalars['Boolean'] | null),_lt?: (Scalars['stakestatus'] | null),_lte?: (Scalars['stakestatus'] | null),_neq?: (Scalars['stakestatus'] | null),_nin?: (Scalars['stakestatus'][] | null)}
 
@@ -3742,6 +3832,28 @@ export interface subscription_rootGenqlSelection{
     order_by?: (GlobalStats_order_by[] | null), 
     /** filter the rows returned */
     where?: (GlobalStats_bool_exp | null)} })
+    /** fetch data from the table: "GlobalStatsSnapshot" */
+    GlobalStatsSnapshot?: (GlobalStatsSnapshotGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (GlobalStatsSnapshot_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (GlobalStatsSnapshot_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (GlobalStatsSnapshot_bool_exp | null)} })
+    /** fetch data from the table: "GlobalStatsSnapshot" using primary key columns */
+    GlobalStatsSnapshot_by_pk?: (GlobalStatsSnapshotGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table in a streaming manner: "GlobalStatsSnapshot" */
+    GlobalStatsSnapshot_stream?: (GlobalStatsSnapshotGenqlSelection & { __args: {
+    /** maximum number of rows returned in a single batch */
+    batch_size: Scalars['Int'], 
+    /** cursor to stream the results returned by the query */
+    cursor: (GlobalStatsSnapshot_stream_cursor_input | null)[], 
+    /** filter the rows returned */
+    where?: (GlobalStatsSnapshot_bool_exp | null)} })
     /** fetch data from the table: "GlobalStats" using primary key columns */
     GlobalStats_by_pk?: (GlobalStatsGenqlSelection & { __args: {id: Scalars['String']} })
     /** fetch data from the table in a streaming manner: "GlobalStats" */
@@ -4334,6 +4446,14 @@ export type SubscriptionGenqlSelection = subscription_rootGenqlSelection
     
 
 
+    const GlobalStatsSnapshot_possibleTypes: string[] = ['GlobalStatsSnapshot']
+    export const isGlobalStatsSnapshot = (obj?: { __typename?: any } | null): obj is GlobalStatsSnapshot => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isGlobalStatsSnapshot"')
+      return GlobalStatsSnapshot_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
     const Loan_possibleTypes: string[] = ['Loan']
     export const isLoan = (obj?: { __typename?: any } | null): obj is Loan => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isLoan"')
@@ -4604,7 +4724,22 @@ export const enumGlobalRegistrySelectColumn = {
    floorFactoryAddress: 'floorFactoryAddress' as const,
    id: 'id' as const,
    lastUpdatedAt: 'lastUpdatedAt' as const,
-   moduleFactoryAddress: 'moduleFactoryAddress' as const
+   moduleFactoryAddress: 'moduleFactoryAddress' as const,
+   trustedForwarderAddress: 'trustedForwarderAddress' as const
+}
+
+export const enumGlobalStatsSnapshotSelectColumn = {
+   activeMarkets: 'activeMarkets' as const,
+   id: 'id' as const,
+   period: 'period' as const,
+   periodVolumeFormatted: 'periodVolumeFormatted' as const,
+   periodVolumeRaw: 'periodVolumeRaw' as const,
+   timestamp: 'timestamp' as const,
+   totalMarketCapFormatted: 'totalMarketCapFormatted' as const,
+   totalMarketCapRaw: 'totalMarketCapRaw' as const,
+   totalMarkets: 'totalMarkets' as const,
+   totalValueLockedFormatted: 'totalValueLockedFormatted' as const,
+   totalValueLockedRaw: 'totalValueLockedRaw' as const
 }
 
 export const enumGlobalStatsSelectColumn = {
