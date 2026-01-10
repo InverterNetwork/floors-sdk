@@ -1768,6 +1768,9 @@ export default {
             "moduleFactoryAddress": [
                 287
             ],
+            "trustedForwarderAddress": [
+                287
+            ],
             "__typename": [
                 287
             ]
@@ -1797,6 +1800,9 @@ export default {
             "moduleFactoryAddress": [
                 289
             ],
+            "trustedForwarderAddress": [
+                289
+            ],
             "__typename": [
                 287
             ]
@@ -1815,6 +1821,9 @@ export default {
                 360
             ],
             "moduleFactoryAddress": [
+                360
+            ],
+            "trustedForwarderAddress": [
                 360
             ],
             "__typename": [
@@ -1847,6 +1856,9 @@ export default {
                 358
             ],
             "moduleFactoryAddress": [
+                287
+            ],
+            "trustedForwarderAddress": [
                 287
             ],
             "__typename": [

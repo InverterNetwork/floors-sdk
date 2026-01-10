@@ -38,7 +38,7 @@
     "build:esm": "tsc --project ./tsconfig.esm.json && tsc-alias --outDir ./dist/esm && ts-add-js-extension --dir=dist/esm --showprogress=false",
     "build:types": "tsc --project ./tsconfig.types.json && tsc-alias --outDir ./dist/types",
     "clean": "rm -rf dist tsconfig.tsbuildinfo node_modules bun.lockb",
-    "compile:genql": "bunx genql --endpoint \"https://indexer.hyperindex.xyz/874f7d3/v1/graphql\" --output src/graphql/gen && prettier --write src/graphql/gen/**/*.ts && eslint --fix src/graphql/gen/**/*.ts",
+    "compile:genql": "bunx genql --endpoint \"https://indexer.hyperindex.xyz/cada10d/v1/graphql\" --output src/graphql/gen && prettier --write src/graphql/gen/**/*.ts && eslint --fix src/graphql/gen/**/*.ts",
     "postinstall": "husky || true",
     "prepack": "pinst --disable",
     "package": "bun run build && npm pack",
