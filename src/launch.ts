@@ -155,6 +155,8 @@ export type ConfigureParams = {
   presaleAddress?: Address
   /** Whether to open buy after configuration (default: true) */
   openBuy?: boolean
+  /** Whether to open sell after configuration (default: false) */
+  openSell?: boolean
 }
 
 /**
@@ -336,12 +338,13 @@ export class Launch {
    * This method performs the following setup (matching Solidity deployment scripts):
    * 1. Grants minter role to Floor on the issuance token
    * 2. Opens buy on the Floor (optional, default: true)
-   * 3. If CreditFacility is deployed:
+   * 3. Opens sell on the Floor (optional, default: false)
+   * 4. If CreditFacility is deployed:
    *    - Creates CreditFacility role with creditFacility as member
    *    - Grants buy permission on Floor
    *    - Grants withdrawCollateralTo permission on Floor
    *    - Grants depositCollateralFrom permission on Floor
-   * 4. If Presale is deployed:
+   * 5. If Presale is deployed:
    *    - Creates Presale role with presale as member
    *    - Grants buy permission on Floor
    *    - Grants buyAndBorrow permission on CreditFacility (if deployed)
@@ -374,6 +377,18 @@ export class Launch {
       })
     }
 
+    // 3. Open sell on Floor (if enabled, default: false)
+    if (params.openSell === true) {
+      calls.push({
+        target: params.floorAddress,
+        allowFailure: false,
+        callData: encodeFunctionData({
+          abi: Floor_v1,
+          functionName: 'openSell',
+        }),
+      })
+    }
+
     // Get admin role and last assigned role ID for predicting new role IDs
     const [adminRole, lastRoleId] = await Promise.all([
       this.publicClient.readContract({
@@ -393,7 +408,7 @@ export class Launch {
     let creditFacilityRoleId: `0x${string}` | undefined
     let presaleRoleId: `0x${string}` | undefined
 
-    // 3. Configure CreditFacility if deployed
+    // 4. Configure CreditFacility if deployed
     if (params.creditFacilityAddress) {
       // Predict the role ID (sequential)
       creditFacilityRoleId = `0x${nextRoleIdNumber.toString(16).padStart(64, '0')}` as `0x${string}`
@@ -447,7 +462,7 @@ export class Launch {
       })
     }
 
-    // 4. Configure Presale if deployed
+    // 5. Configure Presale if deployed
     if (params.presaleAddress) {
       // Predict the role ID (sequential)
       presaleRoleId = `0x${nextRoleIdNumber.toString(16).padStart(64, '0')}` as `0x${string}`
