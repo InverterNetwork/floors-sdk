@@ -844,14 +844,17 @@ export const usePresaleTransition = (
   const enablePublicBorrowing = useMutation({
     mutationFn: async (overrides: Partial<TEnablePublicBorrowingParams>) => {
       const client = ensurePresale()
-      if (!creditFacilityAddress && !overrides.creditFacilityAddress) {
+      // Resolve credit facility address - overrides take precedence if defined
+      const resolvedCreditFacilityAddress = overrides.creditFacilityAddress ?? creditFacilityAddress
+      if (!resolvedCreditFacilityAddress) {
         throw new Error('Credit facility address is required for enabling public borrowing.')
       }
+      // Spread overrides first, then set resolved values to prevent undefined override
       const fullParams: TEnablePublicBorrowingParams = {
-        transactionForwarderAddress: requireTransactionForwarder(),
-        creditFacilityAddress: creditFacilityAddress!,
-        authorizerAddress: requireAuthorizerAddress(),
         ...overrides,
+        transactionForwarderAddress: requireTransactionForwarder(),
+        creditFacilityAddress: resolvedCreditFacilityAddress,
+        authorizerAddress: requireAuthorizerAddress(),
       }
       return client.enablePublicBorrowing(fullParams)
     },
