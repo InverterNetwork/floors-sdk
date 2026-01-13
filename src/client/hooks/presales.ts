@@ -19,12 +19,23 @@ import {
 } from '../../graphql/api'
 import {
   Presale,
+  PresaleState,
+  type TEnablePublicBorrowingParams,
+  type TEnablePublicTradingParams,
+  type TGetTransitionStatusParams,
+  type TGoLiveParams,
   type TPresaleApproveParams,
   type TPresaleBuyParams,
   type TPresaleBuyWithLeverageParams,
   type TPresaleClaimParams,
   type TPresaleMutationResult,
   type TPresalePositionWithState,
+  type TPresaleTransitionStatus,
+  type TSetCapsParams,
+  type TSetEndTimestampParams,
+  type TSetLiveFeesParams,
+  type TSetPresaleStateParams,
+  type TWhitelistParams,
 } from '../../presale'
 import { useFloors } from '../floors-context'
 import {
@@ -478,3 +489,409 @@ export const usePresaleClaims = ({
     type,
   }
 }
+
+// ============================================================================
+// Presale Admin Hooks
+// ============================================================================
+
+export type UsePresaleAdminReturnType = {
+  /** Set presale state (NotOpen, Whitelist, Public, Closed) */
+  setPresaleState: UseMutationResult<TPresaleMutationResult, Error, TSetPresaleStateParams>
+  /** Set global and per-address issuance caps */
+  setCaps: UseMutationResult<TPresaleMutationResult, Error, TSetCapsParams>
+  /** Set presale end timestamp */
+  setEndTimestamp: UseMutationResult<TPresaleMutationResult, Error, TSetEndTimestampParams>
+  /** Add addresses to whitelist */
+  addToWhitelist: UseMutationResult<TPresaleMutationResult, Error, TWhitelistParams>
+  /** Remove addresses from whitelist */
+  removeFromWhitelist: UseMutationResult<TPresaleMutationResult, Error, TWhitelistParams>
+  /** Whether any admin operation is pending */
+  isPending: boolean
+}
+
+/**
+ * @description Hook for presale admin operations
+ * Provides mutations for managing presale state, caps, and whitelist
+ *
+ * @example
+ * ```tsx
+ * const { setPresaleState, setCaps, addToWhitelist, isPending } = usePresaleAdmin()
+ *
+ * // Close the presale
+ * await setPresaleState.mutateAsync({ state: PresaleState.Closed })
+ *
+ * // Set caps
+ * await setCaps.mutateAsync({ globalCap: 1000000n, perAddressCap: 10000n })
+ * ```
+ */
+export const usePresaleAdmin = (): UsePresaleAdminReturnType => {
+  const floorsContext = useFloors()
+  const resolvedPresale = floorsContext.presale.data ?? null
+  const {
+    refetch: { presale: refetchPresale },
+  } = floorsContext
+  const publicClient = usePublicClient()
+  const { data: walletClient } = useWalletClient()
+
+  const presaleClient = useMemo(() => {
+    if (!resolvedPresale || !publicClient) return null
+    return new Presale({
+      data: resolvedPresale,
+      publicClient,
+      walletClient: walletClient ?? undefined,
+    })
+  }, [resolvedPresale, publicClient, walletClient])
+
+  const ensurePresale = useCallback(() => {
+    if (!presaleClient)
+      throw new Error(
+        'Presale client unavailable. Wait for FloorsProvider presale query to resolve.'
+      )
+    return presaleClient
+  }, [presaleClient])
+
+  const refetchAfterMutation = useCallback(async () => {
+    await Promise.allSettled([refetchPresale()])
+  }, [refetchPresale])
+
+  const setPresaleState = useMutation({
+    mutationFn: (params: TSetPresaleStateParams) => ensurePresale().setPresaleState(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+    },
+  })
+
+  const setCaps = useMutation({
+    mutationFn: (params: TSetCapsParams) => ensurePresale().setCaps(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+    },
+  })
+
+  const setEndTimestamp = useMutation({
+    mutationFn: (params: TSetEndTimestampParams) => ensurePresale().setEndTimestamp(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+    },
+  })
+
+  const addToWhitelist = useMutation({
+    mutationFn: (params: TWhitelistParams) => ensurePresale().addToWhitelist(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+    },
+  })
+
+  const removeFromWhitelist = useMutation({
+    mutationFn: (params: TWhitelistParams) => ensurePresale().removeFromWhitelist(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+    },
+  })
+
+  const isPending =
+    setPresaleState.isPending ||
+    setCaps.isPending ||
+    setEndTimestamp.isPending ||
+    addToWhitelist.isPending ||
+    removeFromWhitelist.isPending
+
+  return {
+    setPresaleState,
+    setCaps,
+    setEndTimestamp,
+    addToWhitelist,
+    removeFromWhitelist,
+    isPending,
+  }
+}
+
+// ============================================================================
+// Presale Transition Hooks
+// ============================================================================
+
+/** Query key for transition status */
+const presaleTransitionStatusKey = (presaleId: string | null | undefined) =>
+  ['presale', presaleId, 'transitionStatus'] as const
+
+export type UsePresaleTransitionParams = {
+  /** Floor/Market contract address */
+  floorAddress?: Address
+  /** Authorizer contract address */
+  authorizerAddress?: Address
+  /** Credit facility contract address (optional) */
+  creditFacilityAddress?: Address
+  /** Transaction forwarder address (required for transition mutations) */
+  transactionForwarderAddress?: Address
+}
+
+export type UsePresaleTransitionReturnType = {
+  /** Current transition status query */
+  status: UseQueryResult<TPresaleTransitionStatus | null, Error>
+  /** Atomic goLive transition - executes all steps in one transaction */
+  goLive: UseMutationResult<TPresaleMutationResult, Error, Partial<TGoLiveParams>>
+  /** Close the presale (set state to Closed) */
+  closePresale: UseMutationResult<TPresaleMutationResult, Error, void>
+  /** Set live phase fees */
+  setLiveFees: UseMutationResult<TPresaleMutationResult, Error, Partial<TSetLiveFeesParams>>
+  /** Enable public trading on Floor */
+  enablePublicTrading: UseMutationResult<
+    TPresaleMutationResult,
+    Error,
+    Partial<TEnablePublicTradingParams>
+  >
+  /** Enable public borrowing on CreditFacility */
+  enablePublicBorrowing: UseMutationResult<
+    TPresaleMutationResult,
+    Error,
+    Partial<TEnablePublicBorrowingParams>
+  >
+  /** Whether any transition operation is pending */
+  isTransitioning: boolean
+  /** Combined error from any transition operation */
+  transitionError: Error | null
+  /** Refetch the transition status */
+  refetchStatus: () => Promise<void>
+}
+
+/**
+ * @description Hook for presale to live phase transition
+ * Provides status query and mutations for transitioning from presale to live phase
+ *
+ * @example
+ * ```tsx
+ * const {
+ *   status,
+ *   goLive,
+ *   closePresale,
+ *   enablePublicTrading,
+ *   isTransitioning
+ * } = usePresaleTransition({
+ *   floorAddress: '0x...',
+ *   authorizerAddress: '0x...',
+ *   transactionForwarderAddress: '0x...',
+ * })
+ *
+ * // Check current status
+ * if (status.data?.readyForLive) {
+ *   console.log('Already live!')
+ * } else {
+ *   console.log('Missing steps:', status.data?.missingSteps)
+ * }
+ *
+ * // Execute atomic transition
+ * await goLive.mutateAsync({})
+ * ```
+ */
+export const usePresaleTransition = (
+  params?: UsePresaleTransitionParams
+): UsePresaleTransitionReturnType => {
+  const floorsContext = useFloors()
+  const resolvedPresale = floorsContext.presale.data ?? null
+  const {
+    refetch: { presale: refetchPresale },
+  } = floorsContext
+  const publicClient = usePublicClient()
+  const { data: walletClient } = useWalletClient()
+
+  // Merge params with context data
+  const floorAddress = params?.floorAddress
+  const authorizerAddress = params?.authorizerAddress
+  const creditFacilityAddress = params?.creditFacilityAddress
+  const transactionForwarderAddress = params?.transactionForwarderAddress
+
+  const presaleClient = useMemo(() => {
+    if (!resolvedPresale || !publicClient) return null
+    return new Presale({
+      data: resolvedPresale,
+      publicClient,
+      walletClient: walletClient ?? undefined,
+      floorAddress,
+      authorizerAddress,
+      creditFacilityAddress,
+    })
+  }, [
+    resolvedPresale,
+    publicClient,
+    walletClient,
+    floorAddress,
+    authorizerAddress,
+    creditFacilityAddress,
+  ])
+
+  const ensurePresale = useCallback(() => {
+    if (!presaleClient)
+      throw new Error(
+        'Presale client unavailable. Wait for FloorsProvider presale query to resolve.'
+      )
+    return presaleClient
+  }, [presaleClient])
+
+  const requireTransactionForwarder = useCallback(() => {
+    if (!transactionForwarderAddress) {
+      throw new Error('Transaction forwarder address is required for transition operations.')
+    }
+    return transactionForwarderAddress
+  }, [transactionForwarderAddress])
+
+  const requireFloorAddress = useCallback(() => {
+    if (!floorAddress) {
+      throw new Error('Floor address is required for transition operations.')
+    }
+    return floorAddress
+  }, [floorAddress])
+
+  const requireAuthorizerAddress = useCallback(() => {
+    if (!authorizerAddress) {
+      throw new Error('Authorizer address is required for transition operations.')
+    }
+    return authorizerAddress
+  }, [authorizerAddress])
+
+  const refetchAfterMutation = useCallback(async () => {
+    await Promise.allSettled([refetchPresale()])
+  }, [refetchPresale])
+
+  // Transition status query
+  const statusParams: TGetTransitionStatusParams | null = useMemo(() => {
+    if (!floorAddress || !authorizerAddress) return null
+    return {
+      floorAddress,
+      authorizerAddress,
+      creditFacilityAddress,
+    }
+  }, [floorAddress, authorizerAddress, creditFacilityAddress])
+
+  const status = useQuery({
+    queryKey: presaleTransitionStatusKey(resolvedPresale?.id),
+    queryFn: async () => {
+      if (!presaleClient || !statusParams) return null
+      return presaleClient.getTransitionStatus(statusParams)
+    },
+    enabled: Boolean(presaleClient && statusParams),
+    staleTime: 30_000,
+    refetchOnWindowFocus: true,
+  })
+
+  // Atomic goLive transition
+  const goLive = useMutation({
+    mutationFn: async (overrides: Partial<TGoLiveParams>) => {
+      const client = ensurePresale()
+      const fullParams: TGoLiveParams = {
+        transactionForwarderAddress: requireTransactionForwarder(),
+        floorAddress: requireFloorAddress(),
+        authorizerAddress: requireAuthorizerAddress(),
+        creditFacilityAddress,
+        ...overrides,
+      }
+      return client.goLive(fullParams)
+    },
+    onSuccess: async () => {
+      await refetchAfterMutation()
+      await status.refetch()
+    },
+  })
+
+  // Close presale
+  const closePresale = useMutation({
+    mutationFn: async () => {
+      const client = ensurePresale()
+      return client.closePresale()
+    },
+    onSuccess: async () => {
+      await refetchAfterMutation()
+      await status.refetch()
+    },
+  })
+
+  // Set live fees
+  const setLiveFees = useMutation({
+    mutationFn: async (overrides: Partial<TSetLiveFeesParams>) => {
+      const client = ensurePresale()
+      const fullParams: TSetLiveFeesParams = {
+        transactionForwarderAddress: requireTransactionForwarder(),
+        floorAddress: requireFloorAddress(),
+        creditFacilityAddress,
+        ...overrides,
+      }
+      return client.setLiveFees(fullParams)
+    },
+    onSuccess: async () => {
+      await refetchAfterMutation()
+      await status.refetch()
+    },
+  })
+
+  // Enable public trading
+  const enablePublicTrading = useMutation({
+    mutationFn: async (overrides: Partial<TEnablePublicTradingParams>) => {
+      const client = ensurePresale()
+      const fullParams: TEnablePublicTradingParams = {
+        transactionForwarderAddress: requireTransactionForwarder(),
+        floorAddress: requireFloorAddress(),
+        authorizerAddress: requireAuthorizerAddress(),
+        ...overrides,
+      }
+      return client.enablePublicTrading(fullParams)
+    },
+    onSuccess: async () => {
+      await refetchAfterMutation()
+      await status.refetch()
+    },
+  })
+
+  // Enable public borrowing
+  const enablePublicBorrowing = useMutation({
+    mutationFn: async (overrides: Partial<TEnablePublicBorrowingParams>) => {
+      const client = ensurePresale()
+      if (!creditFacilityAddress && !overrides.creditFacilityAddress) {
+        throw new Error('Credit facility address is required for enabling public borrowing.')
+      }
+      const fullParams: TEnablePublicBorrowingParams = {
+        transactionForwarderAddress: requireTransactionForwarder(),
+        creditFacilityAddress: creditFacilityAddress!,
+        authorizerAddress: requireAuthorizerAddress(),
+        ...overrides,
+      }
+      return client.enablePublicBorrowing(fullParams)
+    },
+    onSuccess: async () => {
+      await refetchAfterMutation()
+      await status.refetch()
+    },
+  })
+
+  const isTransitioning =
+    goLive.isPending ||
+    closePresale.isPending ||
+    setLiveFees.isPending ||
+    enablePublicTrading.isPending ||
+    enablePublicBorrowing.isPending
+
+  const transitionError =
+    goLive.error ||
+    closePresale.error ||
+    setLiveFees.error ||
+    enablePublicTrading.error ||
+    enablePublicBorrowing.error ||
+    null
+
+  const refetchStatus = useCallback(async () => {
+    await status.refetch()
+  }, [status])
+
+  return {
+    status,
+    goLive,
+    closePresale,
+    setLiveFees,
+    enablePublicTrading,
+    enablePublicBorrowing,
+    isTransitioning,
+    transitionError,
+    refetchStatus,
+  }
+}
+
+// Re-export PresaleState for convenience
+export { PresaleState }

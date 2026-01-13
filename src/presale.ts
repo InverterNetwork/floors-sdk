@@ -1,10 +1,23 @@
 import type { Address, TransactionReceipt } from 'viem'
-import { getAddress } from 'viem'
+import { encodeFunctionData, getAddress } from 'viem'
 
+import { AUT_Roles_v2, CreditFacility_v1, Floor_v1, TransactionForwarder_v1 } from './abis'
 import ERC20Issuance_v1 from './abis/ERC20Issuance_v1'
 import Presale_v1 from './abis/Presale_v1'
 import type { TPresale } from './graphql/api'
 import type { PopPublicClient, PopWalletClient } from './types'
+import {
+  CREDIT_FACILITY_SELECTORS,
+  DEFAULT_LIVE_BORROW_FEE_BPS,
+  DEFAULT_LIVE_BUY_FEE_BPS,
+  FLOOR_SELECTORS,
+  PRESALE_SELECTORS,
+  PUBLIC_ROLE,
+  type SingleCall,
+} from './utils/selectors'
+
+// Re-export presale selectors for convenience
+export { PRESALE_SELECTORS }
 
 // ============================================================================
 // Transaction Lifecycle Types
@@ -78,10 +91,199 @@ export interface TPresalePositionWithState extends TPresalePosition {
   state: TPresalePositionState
 }
 
+// ============================================================================
+// Presale State Enum (matches contract IPresale_v1.PresaleState)
+// ============================================================================
+
+/**
+ * @description Presale state enum matching the contract's PresaleState
+ */
+export enum PresaleState {
+  NotOpen = 0,
+  Whitelist = 1,
+  Public = 2,
+  Closed = 3,
+}
+
+// ============================================================================
+// Transition Types
+// ============================================================================
+
+/**
+ * @description Permission status for a specific function
+ */
+export interface TPermissionStatus {
+  /** Whether PUBLIC_ROLE has permission */
+  isPublic: boolean
+  /** Role IDs that have permission */
+  roleIds: `0x${string}`[]
+}
+
+/**
+ * @description Current transition status showing what's configured vs what's needed for live
+ */
+export interface TPresaleTransitionStatus {
+  /** Current presale state */
+  presaleState: PresaleState
+  /** Whether presale is closed */
+  isPresaleClosed: boolean
+  /** Current Floor buy fee in basis points */
+  floorBuyFee: number
+  /** Whether Floor sell is open */
+  floorSellOpen: boolean
+  /** Current CreditFacility borrow fee in basis points (0 if no credit facility) */
+  creditFacilityBorrowFee: number
+  /** Permission status for key functions */
+  permissions: {
+    floorBuyPublic: boolean
+    floorBuyForPublic: boolean
+    floorSellPublic: boolean
+    floorSellToPublic: boolean
+    cfBorrowPublic: boolean
+    cfBorrowForPublic: boolean
+    cfBuyAndBorrowPublic: boolean
+    cfBuyAndBorrowForPublic: boolean
+  }
+  /** Whether all conditions are met for live phase */
+  readyForLive: boolean
+  /** List of steps still required to go live */
+  missingSteps: string[]
+}
+
+/**
+ * @description Parameters for getting transition status
+ */
+export interface TGetTransitionStatusParams {
+  /** Floor/Market contract address */
+  floorAddress: Address
+  /** Authorizer contract address */
+  authorizerAddress: Address
+  /** Credit facility contract address (optional) */
+  creditFacilityAddress?: Address
+}
+
+/**
+ * @description Parameters for the atomic goLive transition
+ */
+export interface TGoLiveParams {
+  /** TransactionForwarder contract address for multicall */
+  transactionForwarderAddress: Address
+  /** Floor/Market contract address */
+  floorAddress: Address
+  /** Authorizer contract address */
+  authorizerAddress: Address
+  /** Credit facility contract address (optional, if deployed) */
+  creditFacilityAddress?: Address
+  /** Live buy fee in basis points (default: 50 = 0.5%) */
+  liveBuyFeeBps?: number
+  /** Live borrow fee in basis points (default: 600 = 6%) */
+  liveBorrowFeeBps?: number
+  /** Optional lifecycle callbacks for multi-stage feedback */
+  lifecycle?: TransactionLifecycleCallbacks
+}
+
+/**
+ * @description Parameters for setting live fees
+ */
+export interface TSetLiveFeesParams {
+  /** TransactionForwarder contract address for multicall */
+  transactionForwarderAddress: Address
+  /** Floor/Market contract address */
+  floorAddress: Address
+  /** Credit facility contract address (optional) */
+  creditFacilityAddress?: Address
+  /** Buy fee in basis points (default: 50 = 0.5%) */
+  buyFeeBps?: number
+  /** Borrow fee in basis points (default: 600 = 6%) */
+  borrowFeeBps?: number
+  /** Optional lifecycle callbacks */
+  lifecycle?: TransactionLifecycleCallbacks
+}
+
+/**
+ * @description Parameters for enabling public trading
+ */
+export interface TEnablePublicTradingParams {
+  /** TransactionForwarder contract address for multicall */
+  transactionForwarderAddress: Address
+  /** Floor/Market contract address */
+  floorAddress: Address
+  /** Authorizer contract address */
+  authorizerAddress: Address
+  /** Optional lifecycle callbacks */
+  lifecycle?: TransactionLifecycleCallbacks
+}
+
+/**
+ * @description Parameters for enabling public borrowing
+ */
+export interface TEnablePublicBorrowingParams {
+  /** TransactionForwarder contract address for multicall */
+  transactionForwarderAddress: Address
+  /** Credit facility contract address */
+  creditFacilityAddress: Address
+  /** Authorizer contract address */
+  authorizerAddress: Address
+  /** Optional lifecycle callbacks */
+  lifecycle?: TransactionLifecycleCallbacks
+}
+
+/**
+ * @description Admin parameters for setting presale state
+ */
+export interface TSetPresaleStateParams {
+  /** New presale state */
+  state: PresaleState
+  /** Optional lifecycle callbacks */
+  lifecycle?: TransactionLifecycleCallbacks
+}
+
+/**
+ * @description Admin parameters for setting caps
+ */
+export interface TSetCapsParams {
+  /** Global issuance cap (0 to disable) */
+  globalCap: bigint
+  /** Per-address issuance cap (0 to disable) */
+  perAddressCap: bigint
+  /** Optional lifecycle callbacks */
+  lifecycle?: TransactionLifecycleCallbacks
+}
+
+/**
+ * @description Admin parameters for setting end timestamp
+ */
+export interface TSetEndTimestampParams {
+  /** End timestamp in seconds */
+  endTimestamp: bigint
+  /** Optional lifecycle callbacks */
+  lifecycle?: TransactionLifecycleCallbacks
+}
+
+/**
+ * @description Admin parameters for whitelist management
+ */
+export interface TWhitelistParams {
+  /** Addresses to add/remove */
+  addresses: Address[]
+  /** Optional lifecycle callbacks */
+  lifecycle?: TransactionLifecycleCallbacks
+}
+
+// ============================================================================
+// Internal Types
+// ============================================================================
+
 interface PresaleConstructorArgs {
   data: TPresale
   publicClient: PopPublicClient
   walletClient?: PopWalletClient
+  /** Floor/Market contract address (for transition operations) */
+  floorAddress?: Address
+  /** Authorizer contract address (for transition operations) */
+  authorizerAddress?: Address
+  /** Credit facility contract address (for transition operations) */
+  creditFacilityAddress?: Address
 }
 
 const ZERO_AMOUNT = BigInt(0)
@@ -90,18 +292,34 @@ const ZERO_AMOUNT = BigInt(0)
  * @description Pure utility class for interacting with Presale contracts via viem.
  *              This class contains no React or wagmi dependencies so it can be
  *              reused across server and client runtimes.
+ *
+ *              Supports both user operations (buy, claim) and admin operations
+ *              (state management, transition to live phase).
  */
 export class Presale {
   private readonly address: Address
   private readonly purchaseTokenAddress: Address
   private readonly publicClient: PopPublicClient
   private readonly walletClient?: PopWalletClient
+  private readonly floorAddress?: Address
+  private readonly authorizerAddress?: Address
+  private readonly creditFacilityAddress?: Address
 
-  constructor({ data, publicClient, walletClient }: PresaleConstructorArgs) {
+  constructor({
+    data,
+    publicClient,
+    walletClient,
+    floorAddress,
+    authorizerAddress,
+    creditFacilityAddress,
+  }: PresaleConstructorArgs) {
     this.address = Presale.resolvePresaleAddress(data)
     this.purchaseTokenAddress = Presale.resolvePurchaseTokenAddress(data)
     this.publicClient = publicClient
     this.walletClient = walletClient
+    this.floorAddress = floorAddress
+    this.authorizerAddress = authorizerAddress
+    this.creditFacilityAddress = creditFacilityAddress
   }
 
   public getAddress(): Address {
@@ -110,6 +328,18 @@ export class Presale {
 
   public getPurchaseTokenAddress(): Address {
     return this.purchaseTokenAddress
+  }
+
+  public getFloorAddress(): Address | undefined {
+    return this.floorAddress
+  }
+
+  public getAuthorizerAddress(): Address | undefined {
+    return this.authorizerAddress
+  }
+
+  public getCreditFacilityAddress(): Address | undefined {
+    return this.creditFacilityAddress
   }
 
   // =========================================================================
@@ -608,6 +838,815 @@ export class Presale {
         lifecycle?.onConfirmed?.(receipt)
       } else {
         lifecycle?.onFailed?.(new Error('Approval transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  // =========================================================================
+  // ADMIN WRITE METHODS (Permissioned Functions)
+  // =========================================================================
+
+  /**
+   * @description Set the presale state (Admin only)
+   * @param params State and optional lifecycle callbacks
+   * @returns Transaction receipt after confirmation
+   */
+  public async setPresaleState({
+    state,
+    lifecycle,
+  }: TSetPresaleStateParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'setPresaleState',
+        args: [state],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('setPresaleState transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Set global and per-address issuance caps (Admin only)
+   * @param params Caps and optional lifecycle callbacks
+   * @returns Transaction receipt after confirmation
+   */
+  public async setCaps({
+    globalCap,
+    perAddressCap,
+    lifecycle,
+  }: TSetCapsParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'setCaps',
+        args: [globalCap, perAddressCap],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('setCaps transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Set presale end timestamp (Admin only)
+   * @param params Timestamp and optional lifecycle callbacks
+   * @returns Transaction receipt after confirmation
+   */
+  public async setEndTimestamp({
+    endTimestamp,
+    lifecycle,
+  }: TSetEndTimestampParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'setEndTimestamp',
+        args: [endTimestamp],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('setEndTimestamp transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Add addresses to whitelist (Admin only)
+   * @param params Addresses and optional lifecycle callbacks
+   * @returns Transaction receipt after confirmation
+   */
+  public async addToWhitelist({
+    addresses,
+    lifecycle,
+  }: TWhitelistParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    if (addresses.length === 0) {
+      throw new Error('At least one address is required')
+    }
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'addToWhitelist',
+        args: [addresses],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('addToWhitelist transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Remove addresses from whitelist (Admin only)
+   * @param params Addresses and optional lifecycle callbacks
+   * @returns Transaction receipt after confirmation
+   */
+  public async removeFromWhitelist({
+    addresses,
+    lifecycle,
+  }: TWhitelistParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    if (addresses.length === 0) {
+      throw new Error('At least one address is required')
+    }
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'removeFromWhitelist',
+        args: [addresses],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('removeFromWhitelist transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  // =========================================================================
+  // TRANSITION STATUS METHODS
+  // =========================================================================
+
+  /**
+   * @description Get the current transition status showing what's configured vs what's needed for live
+   * @param params Floor, authorizer, and optionally credit facility addresses
+   * @returns Detailed status of presale transition readiness
+   */
+  public async getTransitionStatus(
+    params?: TGetTransitionStatusParams
+  ): Promise<TPresaleTransitionStatus> {
+    const floorAddress = params?.floorAddress ?? this.floorAddress
+    const authorizerAddress = params?.authorizerAddress ?? this.authorizerAddress
+    const creditFacilityAddress = params?.creditFacilityAddress ?? this.creditFacilityAddress
+
+    if (!floorAddress) {
+      throw new Error(
+        'Floor address is required for transition status. Provide it in params or constructor.'
+      )
+    }
+    if (!authorizerAddress) {
+      throw new Error(
+        'Authorizer address is required for transition status. Provide it in params or constructor.'
+      )
+    }
+
+    // Fetch current presale state
+    const presaleStateRaw = await this.getPresaleState()
+    const presaleState = presaleStateRaw as PresaleState
+    const isPresaleClosed = presaleState === PresaleState.Closed
+
+    // Fetch Floor state
+    const [floorBuyFee, floorSellOpen] = await Promise.all([
+      this.publicClient.readContract({
+        address: floorAddress,
+        abi: Floor_v1,
+        functionName: 'getBuyFee',
+      }) as Promise<bigint>,
+      this.publicClient.readContract({
+        address: floorAddress,
+        abi: Floor_v1,
+        functionName: 'isSellOpen',
+      }) as Promise<boolean>,
+    ])
+
+    // Fetch CreditFacility borrow fee if available
+    let creditFacilityBorrowFee = 0
+    if (creditFacilityAddress) {
+      try {
+        const borrowFee = (await this.publicClient.readContract({
+          address: creditFacilityAddress,
+          abi: CreditFacility_v1,
+          functionName: 'getBorrowingFeeRate',
+        })) as bigint
+        creditFacilityBorrowFee = Number(borrowFee)
+      } catch {
+        // CreditFacility may not exist or function may not be available
+        creditFacilityBorrowFee = 0
+      }
+    }
+
+    // Check permissions using authorizer
+    const permissions = await this.checkLivePermissions(
+      authorizerAddress,
+      floorAddress,
+      creditFacilityAddress
+    )
+
+    // Determine missing steps
+    const missingSteps: string[] = []
+
+    if (!isPresaleClosed) {
+      missingSteps.push('Close presale (setPresaleState to Closed)')
+    }
+
+    if (Number(floorBuyFee) === 0) {
+      missingSteps.push('Set Floor buy fee (setBuyFee)')
+    }
+
+    if (!floorSellOpen) {
+      missingSteps.push('Open Floor sell (openSell)')
+    }
+
+    if (!permissions.floorBuyPublic) {
+      missingSteps.push('Grant PUBLIC_ROLE permission for Floor.buy')
+    }
+    if (!permissions.floorBuyForPublic) {
+      missingSteps.push('Grant PUBLIC_ROLE permission for Floor.buyFor')
+    }
+    if (!permissions.floorSellPublic) {
+      missingSteps.push('Grant PUBLIC_ROLE permission for Floor.sell')
+    }
+    if (!permissions.floorSellToPublic) {
+      missingSteps.push('Grant PUBLIC_ROLE permission for Floor.sellTo')
+    }
+
+    if (creditFacilityAddress) {
+      if (creditFacilityBorrowFee === 0) {
+        missingSteps.push('Set CreditFacility borrow fee (setBorrowingFeeRate)')
+      }
+      if (!permissions.cfBorrowPublic) {
+        missingSteps.push('Grant PUBLIC_ROLE permission for CreditFacility.borrow')
+      }
+      if (!permissions.cfBorrowForPublic) {
+        missingSteps.push('Grant PUBLIC_ROLE permission for CreditFacility.borrowFor')
+      }
+      if (!permissions.cfBuyAndBorrowPublic) {
+        missingSteps.push('Grant PUBLIC_ROLE permission for CreditFacility.buyAndBorrow')
+      }
+      if (!permissions.cfBuyAndBorrowForPublic) {
+        missingSteps.push('Grant PUBLIC_ROLE permission for CreditFacility.buyAndBorrowFor')
+      }
+    }
+
+    const readyForLive = missingSteps.length === 0
+
+    return {
+      presaleState,
+      isPresaleClosed,
+      floorBuyFee: Number(floorBuyFee),
+      floorSellOpen,
+      creditFacilityBorrowFee,
+      permissions,
+      readyForLive,
+      missingSteps,
+    }
+  }
+
+  /**
+   * @description Validate that the presale is ready for live phase transition
+   * @param params Floor, authorizer, and optionally credit facility addresses
+   * @throws Error if not ready for live, listing all missing steps
+   * @returns The transition status if ready
+   */
+  public async validateReadyForLive(
+    params?: TGetTransitionStatusParams
+  ): Promise<TPresaleTransitionStatus> {
+    const status = await this.getTransitionStatus(params)
+
+    if (!status.readyForLive) {
+      throw new Error(
+        `Presale is not ready for live phase. Missing steps:\n${status.missingSteps.map((s) => `  - ${s}`).join('\n')}`
+      )
+    }
+
+    return status
+  }
+
+  /**
+   * @description Check if a function has PUBLIC_ROLE permission
+   * @param authorizerAddress Authorizer contract address
+   * @param target Target contract address
+   * @param selector Function selector (bytes4)
+   * @returns Whether PUBLIC_ROLE has permission for this function
+   */
+  private async hasPublicPermission(
+    authorizerAddress: Address,
+    target: Address,
+    selector: `0x${string}`
+  ): Promise<boolean> {
+    try {
+      const isPublic = (await this.publicClient.readContract({
+        address: authorizerAddress,
+        abi: AUT_Roles_v2,
+        functionName: 'isRolePermissioned',
+        args: [target, selector, PUBLIC_ROLE],
+      })) as boolean
+      return isPublic
+    } catch {
+      return false
+    }
+  }
+
+  /**
+   * @description Check all live phase permissions
+   */
+  private async checkLivePermissions(
+    authorizerAddress: Address,
+    floorAddress: Address,
+    creditFacilityAddress?: Address
+  ): Promise<TPresaleTransitionStatus['permissions']> {
+    // Check Floor permissions
+    const [floorBuyPublic, floorBuyForPublic, floorSellPublic, floorSellToPublic] =
+      await Promise.all([
+        this.hasPublicPermission(authorizerAddress, floorAddress, FLOOR_SELECTORS.buy),
+        this.hasPublicPermission(authorizerAddress, floorAddress, FLOOR_SELECTORS.buyFor),
+        this.hasPublicPermission(authorizerAddress, floorAddress, FLOOR_SELECTORS.sell),
+        this.hasPublicPermission(authorizerAddress, floorAddress, FLOOR_SELECTORS.sellTo),
+      ])
+
+    // Check CreditFacility permissions if available
+    let cfBorrowPublic = false
+    let cfBorrowForPublic = false
+    let cfBuyAndBorrowPublic = false
+    let cfBuyAndBorrowForPublic = false
+
+    if (creditFacilityAddress) {
+      const cfPermissions = await Promise.all([
+        this.hasPublicPermission(
+          authorizerAddress,
+          creditFacilityAddress,
+          CREDIT_FACILITY_SELECTORS.borrow
+        ),
+        this.hasPublicPermission(
+          authorizerAddress,
+          creditFacilityAddress,
+          CREDIT_FACILITY_SELECTORS.borrowFor
+        ),
+        this.hasPublicPermission(
+          authorizerAddress,
+          creditFacilityAddress,
+          CREDIT_FACILITY_SELECTORS.buyAndBorrow
+        ),
+        this.hasPublicPermission(
+          authorizerAddress,
+          creditFacilityAddress,
+          CREDIT_FACILITY_SELECTORS.buyAndBorrowFor
+        ),
+      ])
+
+      cfBorrowPublic = cfPermissions[0]
+      cfBorrowForPublic = cfPermissions[1]
+      cfBuyAndBorrowPublic = cfPermissions[2]
+      cfBuyAndBorrowForPublic = cfPermissions[3]
+    }
+
+    return {
+      floorBuyPublic,
+      floorBuyForPublic,
+      floorSellPublic,
+      floorSellToPublic,
+      cfBorrowPublic,
+      cfBorrowForPublic,
+      cfBuyAndBorrowPublic,
+      cfBuyAndBorrowForPublic,
+    }
+  }
+
+  // =========================================================================
+  // TRANSITION METHODS (Presale → Live Phase)
+  // =========================================================================
+
+  /**
+   * @description Atomically transition from presale to live phase
+   * Executes all required steps in a single multicall transaction:
+   * 1. Close presale (setPresaleState to Closed)
+   * 2. Set Floor buy fee (default: 0.5%)
+   * 3. Set CreditFacility borrow fee (default: 6%) - if credit facility exists
+   * 4. Grant PUBLIC_ROLE permissions for Floor (buy, buyFor, sell, sellTo)
+   * 5. Open Floor sell
+   * 6. Grant PUBLIC_ROLE permissions for CreditFacility (borrow, borrowFor, buyAndBorrow, buyAndBorrowFor) - if credit facility exists
+   *
+   * @param params Transition parameters including contract addresses and optional fee overrides
+   * @returns Transaction receipt after confirmation
+   */
+  public async goLive(params: TGoLiveParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+    const { lifecycle } = params
+
+    const liveBuyFeeBps = params.liveBuyFeeBps ?? DEFAULT_LIVE_BUY_FEE_BPS
+    const liveBorrowFeeBps = params.liveBorrowFeeBps ?? DEFAULT_LIVE_BORROW_FEE_BPS
+
+    const calls: SingleCall[] = []
+
+    // 1. Close presale
+    calls.push({
+      target: this.address,
+      allowFailure: false,
+      callData: encodeFunctionData({
+        abi: Presale_v1,
+        functionName: 'setPresaleState',
+        args: [PresaleState.Closed],
+      }),
+    })
+
+    // 2. Set Floor buy fee
+    calls.push({
+      target: params.floorAddress,
+      allowFailure: false,
+      callData: encodeFunctionData({
+        abi: Floor_v1,
+        functionName: 'setBuyFee',
+        args: [BigInt(liveBuyFeeBps)],
+      }),
+    })
+
+    // 3. Set CreditFacility borrow fee (if credit facility exists)
+    if (params.creditFacilityAddress) {
+      calls.push({
+        target: params.creditFacilityAddress,
+        allowFailure: false,
+        callData: encodeFunctionData({
+          abi: CreditFacility_v1,
+          functionName: 'setBorrowingFeeRate',
+          args: [BigInt(liveBorrowFeeBps)],
+        }),
+      })
+    }
+
+    // 4. Grant PUBLIC_ROLE permissions for Floor
+    const floorPermissions: `0x${string}`[] = [
+      FLOOR_SELECTORS.buy,
+      FLOOR_SELECTORS.buyFor,
+      FLOOR_SELECTORS.sell,
+      FLOOR_SELECTORS.sellTo,
+    ]
+
+    for (const selector of floorPermissions) {
+      calls.push({
+        target: params.authorizerAddress,
+        allowFailure: false,
+        callData: encodeFunctionData({
+          abi: AUT_Roles_v2,
+          functionName: 'addAccessPermission',
+          args: [params.floorAddress, selector, PUBLIC_ROLE],
+        }),
+      })
+    }
+
+    // 5. Open Floor sell
+    calls.push({
+      target: params.floorAddress,
+      allowFailure: false,
+      callData: encodeFunctionData({
+        abi: Floor_v1,
+        functionName: 'openSell',
+      }),
+    })
+
+    // 6. Grant PUBLIC_ROLE permissions for CreditFacility (if exists)
+    if (params.creditFacilityAddress) {
+      const cfPermissions: `0x${string}`[] = [
+        CREDIT_FACILITY_SELECTORS.borrow,
+        CREDIT_FACILITY_SELECTORS.borrowFor,
+        CREDIT_FACILITY_SELECTORS.buyAndBorrow,
+        CREDIT_FACILITY_SELECTORS.buyAndBorrowFor,
+      ]
+
+      for (const selector of cfPermissions) {
+        calls.push({
+          target: params.authorizerAddress,
+          allowFailure: false,
+          callData: encodeFunctionData({
+            abi: AUT_Roles_v2,
+            functionName: 'addAccessPermission',
+            args: [params.creditFacilityAddress, selector, PUBLIC_ROLE],
+          }),
+        })
+      }
+    }
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: params.transactionForwarderAddress,
+        abi: TransactionForwarder_v1,
+        functionName: 'executeMulticall',
+        args: [calls],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('goLive transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Close the presale (set state to Closed)
+   * Convenience method that wraps setPresaleState with PresaleState.Closed
+   * @param lifecycle Optional lifecycle callbacks
+   * @returns Transaction receipt after confirmation
+   */
+  public async closePresale(
+    lifecycle?: TransactionLifecycleCallbacks
+  ): Promise<TransactionReceipt> {
+    return this.setPresaleState({ state: PresaleState.Closed, lifecycle })
+  }
+
+  /**
+   * @description Set live phase fees for Floor and optionally CreditFacility
+   * @param params Fee parameters and contract addresses
+   * @returns Transaction receipt after confirmation
+   */
+  public async setLiveFees(params: TSetLiveFeesParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+    const { lifecycle } = params
+
+    const buyFeeBps = params.buyFeeBps ?? DEFAULT_LIVE_BUY_FEE_BPS
+    const borrowFeeBps = params.borrowFeeBps ?? DEFAULT_LIVE_BORROW_FEE_BPS
+
+    const calls: SingleCall[] = []
+
+    // Set Floor buy fee
+    calls.push({
+      target: params.floorAddress,
+      allowFailure: false,
+      callData: encodeFunctionData({
+        abi: Floor_v1,
+        functionName: 'setBuyFee',
+        args: [BigInt(buyFeeBps)],
+      }),
+    })
+
+    // Set CreditFacility borrow fee (if credit facility exists)
+    if (params.creditFacilityAddress) {
+      calls.push({
+        target: params.creditFacilityAddress,
+        allowFailure: false,
+        callData: encodeFunctionData({
+          abi: CreditFacility_v1,
+          functionName: 'setBorrowingFeeRate',
+          args: [BigInt(borrowFeeBps)],
+        }),
+      })
+    }
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: params.transactionForwarderAddress,
+        abi: TransactionForwarder_v1,
+        functionName: 'executeMulticall',
+        args: [calls],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('setLiveFees transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Enable public trading on Floor
+   * Grants PUBLIC_ROLE permissions for buy, buyFor, sell, sellTo and opens sell
+   * @param params Contract addresses and optional lifecycle callbacks
+   * @returns Transaction receipt after confirmation
+   */
+  public async enablePublicTrading(
+    params: TEnablePublicTradingParams
+  ): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+    const { lifecycle } = params
+
+    const calls: SingleCall[] = []
+
+    // Grant PUBLIC_ROLE permissions for Floor trading functions
+    const floorPermissions: `0x${string}`[] = [
+      FLOOR_SELECTORS.buy,
+      FLOOR_SELECTORS.buyFor,
+      FLOOR_SELECTORS.sell,
+      FLOOR_SELECTORS.sellTo,
+    ]
+
+    for (const selector of floorPermissions) {
+      calls.push({
+        target: params.authorizerAddress,
+        allowFailure: false,
+        callData: encodeFunctionData({
+          abi: AUT_Roles_v2,
+          functionName: 'addAccessPermission',
+          args: [params.floorAddress, selector, PUBLIC_ROLE],
+        }),
+      })
+    }
+
+    // Open sell
+    calls.push({
+      target: params.floorAddress,
+      allowFailure: false,
+      callData: encodeFunctionData({
+        abi: Floor_v1,
+        functionName: 'openSell',
+      }),
+    })
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: params.transactionForwarderAddress,
+        abi: TransactionForwarder_v1,
+        functionName: 'executeMulticall',
+        args: [calls],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('enablePublicTrading transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Enable public borrowing on CreditFacility
+   * Grants PUBLIC_ROLE permissions for borrow, borrowFor, buyAndBorrow, buyAndBorrowFor
+   * @param params Contract addresses and optional lifecycle callbacks
+   * @returns Transaction receipt after confirmation
+   */
+  public async enablePublicBorrowing(
+    params: TEnablePublicBorrowingParams
+  ): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+    const { lifecycle } = params
+
+    const calls: SingleCall[] = []
+
+    // Grant PUBLIC_ROLE permissions for CreditFacility borrowing functions
+    const cfPermissions: `0x${string}`[] = [
+      CREDIT_FACILITY_SELECTORS.borrow,
+      CREDIT_FACILITY_SELECTORS.borrowFor,
+      CREDIT_FACILITY_SELECTORS.buyAndBorrow,
+      CREDIT_FACILITY_SELECTORS.buyAndBorrowFor,
+    ]
+
+    for (const selector of cfPermissions) {
+      calls.push({
+        target: params.authorizerAddress,
+        allowFailure: false,
+        callData: encodeFunctionData({
+          abi: AUT_Roles_v2,
+          functionName: 'addAccessPermission',
+          args: [params.creditFacilityAddress, selector, PUBLIC_ROLE],
+        }),
+      })
+    }
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: params.transactionForwarderAddress,
+        abi: TransactionForwarder_v1,
+        functionName: 'executeMulticall',
+        args: [calls],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('enablePublicBorrowing transaction reverted'))
       }
 
       return receipt

@@ -4,7 +4,6 @@
  * and configuring roles/permissions via TransactionForwarder multicall
  */
 
-import type { Abi, AbiFunction, ExtractAbiFunctionNames } from 'abitype'
 import { Schema } from 'effect'
 import {
   type Address,
@@ -12,13 +11,11 @@ import {
   encodeAbiParameters,
   encodeFunctionData,
   parseAbiParameters,
-  toFunctionSelector,
   type TransactionReceipt,
 } from 'viem'
 
 import {
   AUT_Roles_v2,
-  CreditFacility_v1,
   ERC20Issuance_v1,
   Floor_v1,
   FloorFactory_v1,
@@ -46,74 +43,9 @@ import {
   TreasuryConfigSchema,
 } from './schemas/launch.schema'
 import type { PopPublicClient, PopWalletClient } from './types'
+import { CREDIT_FACILITY_SELECTORS, FLOOR_SELECTORS, type SingleCall } from './utils/selectors'
 
-// =============================================================================
-// Function Selectors (matching Solidity interface selectors)
-// =============================================================================
-
-// =============================================================================
-// Helper to extract selector from ABI
-// =============================================================================
-
-/**
- * @description Extract function selector from ABI with full type safety
- * Uses abitype for compile-time function name validation
- * @param abi The ABI to search in
- * @param functionName The function name (must exist in ABI)
- * @returns The 4-byte function selector
- */
-function getSelector<const TAbi extends Abi, TFunctionName extends ExtractAbiFunctionNames<TAbi>>(
-  abi: TAbi,
-  functionName: TFunctionName
-): `0x${string}` {
-  const abiItem = abi.find(
-    (item): item is AbiFunction => item.type === 'function' && item.name === functionName
-  )
-  if (!abiItem) {
-    throw new Error(`Function ${functionName} not found in ABI`)
-  }
-  return toFunctionSelector(abiItem)
-}
-
-/**
- * @description Floor/Issuance function selectors for permission granting
- * Extracted from Floor_v1 ABI for type safety
- */
-const FLOOR_SELECTORS = {
-  buy: getSelector(Floor_v1, 'buy'),
-  buyFor: getSelector(Floor_v1, 'buyFor'),
-  sell: getSelector(Floor_v1, 'sell'),
-  sellTo: getSelector(Floor_v1, 'sellTo'),
-  openBuy: getSelector(Floor_v1, 'openBuy'),
-  closeBuy: getSelector(Floor_v1, 'closeBuy'),
-  openSell: getSelector(Floor_v1, 'openSell'),
-  closeSell: getSelector(Floor_v1, 'closeSell'),
-  setBuyFee: getSelector(Floor_v1, 'setBuyFee'),
-  setSellFee: getSelector(Floor_v1, 'setSellFee'),
-  raiseFloor: getSelector(Floor_v1, 'raiseFloor'),
-  withdrawCollateralTo: getSelector(Floor_v1, 'withdrawCollateralTo'),
-  depositCollateralFrom: getSelector(Floor_v1, 'depositCollateralFrom'),
-} as const
-
-/**
- * @description CreditFacility function selectors for permission granting
- * Extracted from CreditFacility_v1 ABI for type safety
- */
-const CREDIT_FACILITY_SELECTORS = {
-  borrow: getSelector(CreditFacility_v1, 'borrow'),
-  borrowFor: getSelector(CreditFacility_v1, 'borrowFor'),
-  buyAndBorrow: getSelector(CreditFacility_v1, 'buyAndBorrow'),
-  buyAndBorrowFor: getSelector(CreditFacility_v1, 'buyAndBorrowFor'),
-  repay: getSelector(CreditFacility_v1, 'repay'),
-  transferLoan: getSelector(CreditFacility_v1, 'transferLoan'),
-  rebalanceLoan: getSelector(CreditFacility_v1, 'rebalanceLoan'),
-  consolidateLoans: getSelector(CreditFacility_v1, 'consolidateLoans'),
-  setLoanToValueRatio: getSelector(CreditFacility_v1, 'setLoanToValueRatio'),
-  setBorrowingFeeRate: getSelector(CreditFacility_v1, 'setBorrowingFeeRate'),
-  setMaxLeverage: getSelector(CreditFacility_v1, 'setMaxLeverage'),
-} as const
-
-// Export selectors for external use
+// Re-export selectors for backwards compatibility
 export { CREDIT_FACILITY_SELECTORS, FLOOR_SELECTORS }
 
 // =============================================================================
@@ -171,15 +103,6 @@ export type ConfigureResult = {
   success: boolean
   /** Individual call results */
   callResults: Array<{ success: boolean; returnData: `0x${string}` }>
-}
-
-/**
- * @description A single call for multicall batching
- */
-type SingleCall = {
-  target: Address
-  allowFailure: boolean
-  callData: `0x${string}`
 }
 
 // =============================================================================
