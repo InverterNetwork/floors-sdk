@@ -93,7 +93,10 @@ export function getFallbackPeriods(preferredPeriod: CandlePeriodKey): CandlePeri
 
 /** Transform raw price candles to chart-ready format */
 export function transformCandlesToChartData(candles: TPriceCandle[]): TransformedCandleData[] {
-  return candles.map((candle) => {
+  // Sort candles by timestamp ascending to ensure consistent chart rendering
+  const sortedCandles = [...candles].sort((a, b) => Number(a.timestamp) - Number(b.timestamp))
+
+  return sortedCandles.map((candle) => {
     const timestamp = Number(candle.timestamp) * 1000
     const open = parseFloat(candle.openFormatted || String(candle.openRaw || 0))
     const high = parseFloat(candle.highFormatted || String(candle.highRaw || 0))
