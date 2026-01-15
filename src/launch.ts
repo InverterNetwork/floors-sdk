@@ -85,10 +85,14 @@ export type ConfigureParams = {
   creditFacilityAddress?: Address
   /** Presale address (optional, if deployed) */
   presaleAddress?: Address
+  /** Whether to grant minter role to Floor on issuance token (default: true) */
+  grantMinterRole?: boolean
   /** Whether to open buy after configuration (default: true) */
   openBuy?: boolean
   /** Whether to open sell after configuration (default: false) */
   openSell?: boolean
+  /** Whether to enable public borrowing (default: false) */
+  openBorrow?: boolean
 }
 
 /**
@@ -259,15 +263,16 @@ export class Launch {
    * Uses TransactionForwarder.executeMulticall to batch all setup calls
    *
    * This method performs the following setup (matching Solidity deployment scripts):
-   * 1. Grants minter role to Floor on the issuance token
+   * 1. Grants minter role to Floor on the issuance token (if grantMinterRole is true)
    * 2. Opens buy on the Floor (optional, default: true)
    * 3. Opens sell on the Floor (optional, default: false)
-   * 4. If CreditFacility is deployed:
+   * 4. Grants PUBLIC_ROLE permissions for buy/sell/borrow based on options
+   * 5. If CreditFacility is deployed:
    *    - Creates CreditFacility role with creditFacility as member
    *    - Grants buy permission on Floor
    *    - Grants withdrawCollateralTo permission on Floor
    *    - Grants depositCollateralFrom permission on Floor
-   * 5. If Presale is deployed:
+   * 6. If Presale is deployed:
    *    - Creates Presale role with presale as member
    *    - Grants buy permission on Floor
    *    - Grants buyAndBorrow permission on CreditFacility (if deployed)
@@ -277,16 +282,21 @@ export class Launch {
 
     const calls: SingleCall[] = []
 
-    // 1. Grant minter role to Floor on issuance token
-    calls.push({
-      target: params.issuanceTokenAddress,
-      allowFailure: false,
-      callData: encodeFunctionData({
-        abi: ERC20Issuance_v1,
-        functionName: 'setMinter',
-        args: [params.floorAddress, true],
-      }),
-    })
+    // PUBLIC_ROLE is always roleId 1 in AUT_Roles_v2
+    const PUBLIC_ROLE = `0x${'0'.repeat(63)}1` as `0x${string}`
+
+    // 1. Grant minter role to Floor on issuance token (if enabled, default: true)
+    if (params.grantMinterRole !== false) {
+      calls.push({
+        target: params.issuanceTokenAddress,
+        allowFailure: false,
+        callData: encodeFunctionData({
+          abi: ERC20Issuance_v1,
+          functionName: 'setMinter',
+          args: [params.floorAddress, true],
+        }),
+      })
+    }
 
     // 2. Open buy on Floor (if enabled, default: true)
     if (params.openBuy !== false) {
@@ -296,6 +306,17 @@ export class Launch {
         callData: encodeFunctionData({
           abi: Floor_v1,
           functionName: 'openBuy',
+        }),
+      })
+
+      // Grant PUBLIC_ROLE permission to call buy
+      calls.push({
+        target: params.authorizerAddress,
+        allowFailure: false,
+        callData: encodeFunctionData({
+          abi: AUT_Roles_v2,
+          functionName: 'addAccessPermission',
+          args: [params.floorAddress, FLOOR_SELECTORS.buy, PUBLIC_ROLE],
         }),
       })
     }
@@ -308,6 +329,42 @@ export class Launch {
         callData: encodeFunctionData({
           abi: Floor_v1,
           functionName: 'openSell',
+        }),
+      })
+
+      // Grant PUBLIC_ROLE permission to call sell
+      calls.push({
+        target: params.authorizerAddress,
+        allowFailure: false,
+        callData: encodeFunctionData({
+          abi: AUT_Roles_v2,
+          functionName: 'addAccessPermission',
+          args: [params.floorAddress, FLOOR_SELECTORS.sell, PUBLIC_ROLE],
+        }),
+      })
+    }
+
+    // 4. Enable public borrowing on CreditFacility (if enabled and facility exists)
+    if (params.openBorrow === true && params.creditFacilityAddress) {
+      // Grant PUBLIC_ROLE permission to call borrow
+      calls.push({
+        target: params.authorizerAddress,
+        allowFailure: false,
+        callData: encodeFunctionData({
+          abi: AUT_Roles_v2,
+          functionName: 'addAccessPermission',
+          args: [params.creditFacilityAddress, CREDIT_FACILITY_SELECTORS.borrow, PUBLIC_ROLE],
+        }),
+      })
+
+      // Also grant repay permission for public
+      calls.push({
+        target: params.authorizerAddress,
+        allowFailure: false,
+        callData: encodeFunctionData({
+          abi: AUT_Roles_v2,
+          functionName: 'addAccessPermission',
+          args: [params.creditFacilityAddress, CREDIT_FACILITY_SELECTORS.repay, PUBLIC_ROLE],
         }),
       })
     }

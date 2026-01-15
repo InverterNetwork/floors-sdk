@@ -97,6 +97,7 @@ export type TActivityType =
   | 'loan_closed'
   | 'stake'
   | 'unstake'
+  | 'claim'
   | 'floor_elevation'
 
 /**

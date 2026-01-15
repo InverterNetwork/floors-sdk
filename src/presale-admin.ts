@@ -1,0 +1,519 @@
+/**
+ * @description PresaleAdmin class for admin configuration of Presale contracts
+ * Provides methods for state management, caps, whitelist, and commission settings
+ */
+
+import type { Address, TransactionReceipt } from 'viem'
+
+import { Presale_v1 } from './abis'
+import { PresaleState, type TransactionLifecycleCallbacks } from './presale'
+import type { PopPublicClient, PopWalletClient } from './types'
+
+// Re-export PresaleState for convenience (already exported from presale.ts)
+export { PresaleState }
+
+// =============================================================================
+// Types
+// =============================================================================
+
+export interface TPresaleAdminParams {
+  /** Optional lifecycle callbacks for multi-stage feedback */
+  lifecycle?: TransactionLifecycleCallbacks
+}
+
+export interface TPresaleAdminSetStateParams extends TPresaleAdminParams {
+  /** Target presale state */
+  state: PresaleState
+}
+
+export interface TPresaleAdminSetCapsParams extends TPresaleAdminParams {
+  /** Global issuance cap in reserve tokens (0 = unlimited) */
+  globalCap: bigint
+  /** Per-address issuance cap in reserve tokens (0 = unlimited) */
+  perAddressCap: bigint
+}
+
+export interface TPresaleAdminSetEndTimestampParams extends TPresaleAdminParams {
+  /** Unix timestamp in seconds for presale end time */
+  timestamp: bigint
+}
+
+export interface TPresaleAdminWhitelistParams extends TPresaleAdminParams {
+  /** Array of addresses to add/remove */
+  addresses: Address[]
+}
+
+export interface TPresaleAdminSetCommissionParams extends TPresaleAdminParams {
+  /** Array of commission rates in basis points per leverage level */
+  baseCommissionBps: bigint[]
+  /** 2D array of price breakpoints per leverage level */
+  priceBreakpoints: bigint[][]
+}
+
+export interface TPresaleAdminState {
+  /** Current presale state (0=Closed, 1=Whitelist, 2=Live) */
+  currentState: PresaleState
+  /** Unix timestamp for presale end time */
+  endTimestamp: bigint
+  /** Global issuance cap */
+  globalIssuanceCap: bigint
+  /** Per-address issuance cap */
+  perAddressIssuanceCap: bigint
+  /** Total amount raised so far */
+  globalIssuance: bigint
+  /** Number of whitelisted addresses */
+  whitelistCount: number
+  /** Commission rates per leverage level */
+  baseCommissionBps: number[]
+  /** Price breakpoints per leverage level */
+  priceBreakpoints: bigint[][]
+}
+
+interface PresaleAdminConstructorArgs {
+  /** Presale contract address */
+  address: Address
+  /** Public client for reading */
+  publicClient: PopPublicClient
+  /** Wallet client for writing (optional, required for mutations) */
+  walletClient?: PopWalletClient
+}
+
+// =============================================================================
+// PresaleAdmin Class
+// =============================================================================
+
+/**
+ * @description Admin utility class for configuring Presale contracts
+ * Provides methods for:
+ * - Setting presale state (Closed, Whitelist, Live)
+ * - Managing issuance caps
+ * - Updating end timestamp
+ * - Managing whitelist
+ * - Configuring commission schedule
+ *
+ * @example
+ * ```typescript
+ * const presaleAdmin = new PresaleAdmin({
+ *   address: '0x...',
+ *   publicClient,
+ *   walletClient,
+ * })
+ *
+ * // Transition to live phase
+ * await presaleAdmin.goLive()
+ *
+ * // Add addresses to whitelist
+ * await presaleAdmin.addToWhitelist({ addresses: ['0x...', '0x...'] })
+ * ```
+ */
+export class PresaleAdmin {
+  private readonly address: Address
+  private readonly publicClient: PopPublicClient
+  private readonly walletClient?: PopWalletClient
+
+  constructor({ address, publicClient, walletClient }: PresaleAdminConstructorArgs) {
+    this.address = address
+    this.publicClient = publicClient
+    this.walletClient = walletClient
+  }
+
+  // ===========================================================================
+  // Read Methods
+  // ===========================================================================
+
+  /**
+   * @description Get the current presale admin state
+   */
+  public async getPresaleState(): Promise<TPresaleAdminState> {
+    const [
+      currentState,
+      endTimestamp,
+      globalIssuanceCap,
+      perAddressIssuanceCap,
+      globalIssuance,
+      baseCommissionBps,
+      priceBreakpoints,
+    ] = await Promise.all([
+      this.publicClient.readContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'getPresaleState',
+      }) as Promise<number>,
+      this.publicClient.readContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'getEndTimestamp',
+      }) as Promise<bigint>,
+      this.publicClient.readContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'getGlobalIssuanceCap',
+      }) as Promise<bigint>,
+      this.publicClient.readContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'getPerAddressIssuanceCap',
+      }) as Promise<bigint>,
+      this.publicClient.readContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'getGlobalIssuance',
+      }) as Promise<bigint>,
+      this.publicClient.readContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'getBaseCommissionBps',
+      }) as Promise<number[]>,
+      this.publicClient.readContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'getPriceBreakpoints',
+      }) as Promise<bigint[][]>,
+    ])
+
+    return {
+      currentState: currentState as PresaleState,
+      endTimestamp,
+      globalIssuanceCap,
+      perAddressIssuanceCap,
+      globalIssuance,
+      whitelistCount: 0, // Not available from contract, would need to fetch from indexer
+      baseCommissionBps,
+      priceBreakpoints,
+    }
+  }
+
+  /**
+   * @description Check if an address is whitelisted
+   */
+  public async isWhitelisted(address: Address): Promise<boolean> {
+    return (await this.publicClient.readContract({
+      address: this.address,
+      abi: Presale_v1,
+      functionName: 'isWhitelisted',
+      args: [address],
+    })) as boolean
+  }
+
+  /**
+   * @description Get current presale state enum value
+   */
+  public async getCurrentState(): Promise<PresaleState> {
+    const state = (await this.publicClient.readContract({
+      address: this.address,
+      abi: Presale_v1,
+      functionName: 'getPresaleState',
+    })) as number
+    return state as PresaleState
+  }
+
+  // ===========================================================================
+  // Write Methods - State Management
+  // ===========================================================================
+
+  /**
+   * @description Set the presale state
+   * @param params Target state and optional lifecycle callbacks
+   */
+  public async setPresaleState({
+    state,
+    lifecycle,
+  }: TPresaleAdminSetStateParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'setPresaleState',
+        args: [state],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Transition presale to Public (live) state
+   * Convenience method for setPresaleState(Public)
+   */
+  public async goLive(params?: TPresaleAdminParams): Promise<TransactionReceipt> {
+    return this.setPresaleState({ state: PresaleState.Public, lifecycle: params?.lifecycle })
+  }
+
+  /**
+   * @description Close the presale
+   * Convenience method for setPresaleState(Closed)
+   */
+  public async closePresale(params?: TPresaleAdminParams): Promise<TransactionReceipt> {
+    return this.setPresaleState({ state: PresaleState.Closed, lifecycle: params?.lifecycle })
+  }
+
+  /**
+   * @description Set presale to whitelist phase
+   * Convenience method for setPresaleState(Whitelist)
+   */
+  public async setWhitelistPhase(params?: TPresaleAdminParams): Promise<TransactionReceipt> {
+    return this.setPresaleState({ state: PresaleState.Whitelist, lifecycle: params?.lifecycle })
+  }
+
+  /**
+   * @description Set presale to not open state
+   * Convenience method for setPresaleState(NotOpen)
+   */
+  public async setNotOpen(params?: TPresaleAdminParams): Promise<TransactionReceipt> {
+    return this.setPresaleState({ state: PresaleState.NotOpen, lifecycle: params?.lifecycle })
+  }
+
+  // ===========================================================================
+  // Write Methods - Cap Configuration
+  // ===========================================================================
+
+  /**
+   * @description Set global and per-address issuance caps
+   */
+  public async setCaps({
+    globalCap,
+    perAddressCap,
+    lifecycle,
+  }: TPresaleAdminSetCapsParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'setCaps',
+        args: [globalCap, perAddressCap],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  // ===========================================================================
+  // Write Methods - End Timestamp
+  // ===========================================================================
+
+  /**
+   * @description Set the presale end timestamp
+   */
+  public async setEndTimestamp({
+    timestamp,
+    lifecycle,
+  }: TPresaleAdminSetEndTimestampParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'setEndTimestamp',
+        args: [timestamp],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  // ===========================================================================
+  // Write Methods - Whitelist Management
+  // ===========================================================================
+
+  /**
+   * @description Add addresses to the whitelist
+   */
+  public async addToWhitelist({
+    addresses,
+    lifecycle,
+  }: TPresaleAdminWhitelistParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    if (addresses.length === 0) {
+      throw new Error('At least one address is required')
+    }
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'addToWhitelist',
+        args: [addresses],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Remove addresses from the whitelist
+   */
+  public async removeFromWhitelist({
+    addresses,
+    lifecycle,
+  }: TPresaleAdminWhitelistParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    if (addresses.length === 0) {
+      throw new Error('At least one address is required')
+    }
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'removeFromWhitelist',
+        args: [addresses],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  // ===========================================================================
+  // Write Methods - Commission Configuration
+  // ===========================================================================
+
+  /**
+   * @description Set base commission rates and price breakpoints
+   */
+  public async setBaseCommissionAndPriceBreakpoints({
+    baseCommissionBps,
+    priceBreakpoints,
+    lifecycle,
+  }: TPresaleAdminSetCommissionParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'setBaseCommissionBpsAndPriceBreakpoints',
+        args: [baseCommissionBps.map((b) => Number(b)), priceBreakpoints],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  // ===========================================================================
+  // Private Helpers
+  // ===========================================================================
+
+  private requireWalletClient(): PopWalletClient {
+    if (!this.walletClient) {
+      throw new Error('Wallet not connected. Please connect your wallet to continue.')
+    }
+    return this.walletClient
+  }
+
+  private getWalletAddress(walletClient: PopWalletClient): Address {
+    const account = walletClient.account
+    if (!account?.address) {
+      throw new Error('Wallet not connected. Please connect your wallet to continue.')
+    }
+    return account.address as Address
+  }
+}
