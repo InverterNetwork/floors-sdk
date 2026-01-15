@@ -11,11 +11,17 @@ export const platformMetricsQuery = {
     id: true,
     totalSupplyRaw: true,
     totalSupplyFormatted: true,
+    marketSupplyRaw: true,
+    marketSupplyFormatted: true,
     currentPriceRaw: true,
     currentPriceFormatted: true,
     floorPriceRaw: true,
     floorPriceFormatted: true,
     createdAt: true,
+    reserveToken: {
+      id: true,
+      symbol: true,
+    },
     trades: {
       __args: {
         where: {
@@ -75,15 +81,21 @@ export function computePlatformMetrics(data: PlatformMetricsQueryResultType): TP
   const accounts = data.Account || []
   const loans = data.Loan || []
 
-  // Calculate TVL from market supplies and prices
+  // Calculate TVL from total supply and prices (includes locked tokens)
   const totalValueLocked = markets.reduce((sum, market) => {
     const supply = parseFloat(market.totalSupplyFormatted || market.totalSupplyRaw || '0')
     const price = parseFloat(market.currentPriceFormatted || market.currentPriceRaw || '0')
     return sum + supply * price
   }, 0)
 
-  // Calculate total market cap (same as TVL for fToken markets)
-  const totalMarketCap = totalValueLocked
+  // Calculate total market cap from market supply (circulating tokens only)
+  // Market Cap = marketSupply × marketPrice (in reserve asset terms)
+  // Note: USD conversion happens in frontend using reserve token USD price
+  const totalMarketCap = markets.reduce((sum, market) => {
+    const marketSupply = parseFloat(market.marketSupplyFormatted || market.marketSupplyRaw || '0')
+    const price = parseFloat(market.currentPriceFormatted || market.currentPriceRaw || '0')
+    return sum + marketSupply * price
+  }, 0)
 
   // Calculate 24h volume from trades
   const volume24h = markets.reduce((sum, market) => {
