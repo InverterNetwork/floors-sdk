@@ -131,27 +131,56 @@ export async function fetchMarketById(id: string): Promise<TFloorAssetData | nul
 
   const moduleRegistry = registryResponse.ModuleRegistry_by_pk
 
-  // Fetch daily volume candles for volume chart
-  const priceCandlesResponse = await query(
-    buildPriceCandleQuery({
-      where: {
-        market_id: { _eq: id },
-        period: { _eq: 'ONE_DAY' },
-      },
-      order_by: [{ timestamp: 'desc' }],
-      limit: 365, // Max 1 year of daily candles
-    })
-  )
+  // Fetch all candle periods in parallel for different timeframes
+  // ONE_HOUR: for 1D timeframe (24 data points per day)
+  // FOUR_HOURS: for 1W timeframe (42 data points per week)
+  // ONE_DAY: for 1M+ timeframes (30-365 data points)
+  const [hourlyResponse, fourHourResponse, dailyResponse] = await Promise.all([
+    query(
+      buildPriceCandleQuery({
+        where: {
+          market_id: { _eq: id },
+          period: { _eq: 'ONE_HOUR' },
+        },
+        order_by: [{ timestamp: 'desc' }],
+        limit: 168, // 7 days of hourly data (7 * 24)
+      })
+    ),
+    query(
+      buildPriceCandleQuery({
+        where: {
+          market_id: { _eq: id },
+          period: { _eq: 'FOUR_HOURS' },
+        },
+        order_by: [{ timestamp: 'desc' }],
+        limit: 84, // ~14 days of 4-hour data (14 * 6)
+      })
+    ),
+    query(
+      buildPriceCandleQuery({
+        where: {
+          market_id: { _eq: id },
+          period: { _eq: 'ONE_DAY' },
+        },
+        order_by: [{ timestamp: 'desc' }],
+        limit: 365, // Max 1 year of daily candles
+      })
+    ),
+  ])
 
   // Reverse to get chronological order (oldest first for chart)
-  const priceCandles = (priceCandlesResponse.PriceCandle ?? []).reverse()
+  const priceCandles = {
+    hourly: (hourlyResponse.PriceCandle ?? []).reverse(),
+    fourHour: (fourHourResponse.PriceCandle ?? []).reverse(),
+    daily: (dailyResponse.PriceCandle ?? []).reverse(),
+  }
 
   const mappedMarket = mapMarketToFloorAssetData(market, moduleRegistry)
 
-  // Add priceCandles to the mapped market data (already reversed to chronological order)
+  // Add priceCandles organized by period to the mapped market data
   return {
     ...mappedMarket,
-    priceCandles: priceCandles,
+    priceCandles,
   } as TFloorAssetData
 }
 

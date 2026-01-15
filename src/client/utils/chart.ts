@@ -1,206 +1,216 @@
-import type { TFloorAssetData } from '../../graphql/api'
+import type { TPriceCandle, TPriceCandlesByPeriod } from '../../graphql/api'
 
-export interface ChartDataPoint {
+export type { TPriceCandle, TPriceCandlesByPeriod }
+
+/** UI timeframe options for chart display */
+export type ChartTimeframe = '1D' | '1W' | '1M' | '3M' | '6M' | '1Y' | 'ALL'
+
+/** Candle period keys matching TPriceCandlesByPeriod */
+export type CandlePeriodKey = keyof TPriceCandlesByPeriod
+
+/** Transformed candle data for chart rendering */
+export interface TransformedCandleData {
   date: string
   timestamp: number
   floorPrice: number
   marketPrice: number
-  volume?: number
-  elevationEvent?: ElevationAnnotation
+  open: number
+  high: number
+  low: number
+  close: number
+  volume: number
+  trades: number
 }
+
+/** Result from getBestAvailableCandles */
+export interface CandlesWithPeriod {
+  candles: TPriceCandle[]
+  period: CandlePeriodKey
+}
+
+/** Minimum data points needed for a meaningful chart line */
+const MIN_CHART_POINTS = 2
 
 /**
- * @description Generate historical price data based on floor elevation events
- * @param {TFloorAssetData} asset - The asset data
- * @returns {ChartDataPoint[]} The chart data points
+ * Maps UI timeframe to the appropriate candle period
+ * - 1D: hourly candles
+ * - 1W: fourHour candles
+ * - 1M+: daily candles
  */
-export function generateHistoricalData(asset: TFloorAssetData): ChartDataPoint[] {
-  const data: ChartDataPoint[] = []
-  const now = new Date()
-  const daysAgo = 365 // Generate 1 year of data to support all time ranges
-  const priceState = getInitialPriceState(asset)
+export function getCandlePeriodForTimeframe(timeframe: ChartTimeframe): CandlePeriodKey {
+  switch (timeframe) {
+    case '1D':
+      return 'hourly'
+    case '1W':
+      return 'fourHour'
+    default:
+      return 'daily'
+  }
+}
 
-  for (let i = daysAgo; i >= 0; i--) {
-    const date = new Date(now)
-    date.setDate(date.getDate() - i)
-    const elevationEvent = findElevationEvent(asset, date, 'daily')
+/** Get the time cutoff in milliseconds for a given timeframe */
+export function getTimeframeCutoff(timeframe: ChartTimeframe): number {
+  if (timeframe === 'ALL') return 0
 
-    if (elevationEvent) {
-      applyElevationEventToState(priceState, elevationEvent, 'daily')
-    } else {
-      applyMarketDriftToState(priceState, 'daily')
+  const now = Date.now()
+  const MS_PER_DAY = 24 * 60 * 60 * 1000
+
+  const cutoffs: Record<string, number> = {
+    '1D': now - MS_PER_DAY,
+    '1W': now - 7 * MS_PER_DAY,
+    '1M': now - 30 * MS_PER_DAY,
+    '3M': now - 90 * MS_PER_DAY,
+    '6M': now - 180 * MS_PER_DAY,
+    '1Y': now - 365 * MS_PER_DAY,
+  }
+
+  return cutoffs[timeframe] ?? 0
+}
+
+/** Filter candles by timeframe cutoff */
+export function filterCandlesByTimeframe(
+  candles: TPriceCandle[],
+  timeframe: ChartTimeframe
+): TPriceCandle[] {
+  if (timeframe === 'ALL') return candles
+  const cutoff = getTimeframeCutoff(timeframe)
+  return candles.filter((candle) => Number(candle.timestamp) * 1000 >= cutoff)
+}
+
+/** Get fallback order for candle periods when preferred period has insufficient data */
+export function getFallbackPeriods(preferredPeriod: CandlePeriodKey): CandlePeriodKey[] {
+  switch (preferredPeriod) {
+    case 'hourly':
+      return ['hourly', 'fourHour', 'daily']
+    case 'fourHour':
+      return ['fourHour', 'hourly', 'daily']
+    case 'daily':
+      return ['daily', 'fourHour', 'hourly']
+    default:
+      return ['daily']
+  }
+}
+
+/** Transform raw price candles to chart-ready format */
+export function transformCandlesToChartData(candles: TPriceCandle[]): TransformedCandleData[] {
+  return candles.map((candle) => {
+    const timestamp = Number(candle.timestamp) * 1000
+    const open = parseFloat(candle.openFormatted || String(candle.openRaw || 0))
+    const high = parseFloat(candle.highFormatted || String(candle.highRaw || 0))
+    const low = parseFloat(candle.lowFormatted || String(candle.lowRaw || 0))
+    const close = parseFloat(candle.closeFormatted || String(candle.closeRaw || 0))
+    const volume = parseFloat(candle.volumeFormatted || String(candle.volumeRaw || 0))
+    const trades = Number(candle.trades || 0)
+
+    return {
+      date: formatCandleDate(timestamp, candle.period),
+      timestamp,
+      marketPrice: close,
+      floorPrice: 0, // Set by consumer from asset data
+      open,
+      high,
+      low,
+      close,
+      volume,
+      trades,
     }
-
-    data.push({
-      date: date.toISOString().split('T')[0],
-      timestamp: date.getTime(),
-      floorPrice: priceState.floorPrice,
-      marketPrice: priceState.marketPrice,
-      volume: getVolumeForPoint(asset, date, Boolean(elevationEvent), 'daily'),
-      elevationEvent: formatElevationEventForChart(elevationEvent),
-    })
-  }
-
-  return data
-}
-
-/**
- * @description Generate hourly historical price data for the past 7 days (168 hours)
- * @param {TFloorAssetData} asset - The asset data
- * @returns {ChartDataPoint[]} The chart data points
- */
-export function generateHourlyHistoricalData(asset: TFloorAssetData): ChartDataPoint[] {
-  const data: ChartDataPoint[] = []
-  const now = new Date()
-  const hoursAgo = 7 * 24 // 7 days × 24 hours = 168 hours
-  const priceState = getInitialPriceState(asset)
-
-  for (let i = hoursAgo; i >= 0; i--) {
-    const date = new Date(now)
-    date.setHours(date.getHours() - i, 0, 0, 0) // Set to exact hour
-    const elevationEvent = findElevationEvent(asset, date, 'hourly')
-
-    if (elevationEvent) {
-      applyElevationEventToState(priceState, elevationEvent, 'hourly')
-    } else {
-      applyMarketDriftToState(priceState, 'hourly')
-    }
-
-    data.push({
-      date: date.toISOString(),
-      timestamp: date.getTime(),
-      floorPrice: priceState.floorPrice,
-      marketPrice: priceState.marketPrice,
-      volume: getVolumeForPoint(asset, date, Boolean(elevationEvent), 'hourly'),
-      elevationEvent: formatElevationEventForChart(elevationEvent),
-    })
-  }
-
-  return data
-}
-
-// -----------------------------------------------------------------------------
-// Helper utilities
-// -----------------------------------------------------------------------------
-
-export interface ElevationAnnotation {
-  feesDeployed: number
-  priceIncrease: number
-  transactionHash: string
-}
-
-type ChartGranularity = 'daily' | 'hourly'
-type ElevationHistoryEvent = TFloorAssetData['floorElevation']['elevationHistory'][number]
-
-interface PriceState {
-  floorPrice: number
-  marketPrice: number
-}
-
-const INITIAL_MARKET_PREMIUM = 1.15
-const MARKET_VOLATILITY: Record<ChartGranularity, number> = {
-  daily: 0.02,
-  hourly: 0.008,
-}
-
-const EVENT_MARKET_PREMIUM_RANGE: Record<ChartGranularity, { base: number; spread: number }> = {
-  daily: {
-    base: 1.1,
-    spread: 0.2,
-  },
-  hourly: {
-    base: 1.1,
-    spread: 0.15,
-  },
-}
-
-function getInitialPriceState(asset: TFloorAssetData): PriceState {
-  const priceIncreaseTotal = (asset.floorElevation.elevationHistory ?? []).reduce(
-    (sum, event) => sum + event.priceIncrease,
-    0
-  )
-
-  const floorPrice = asset.pricing.currentFloorPrice - priceIncreaseTotal
-
-  return {
-    floorPrice,
-    marketPrice: floorPrice * INITIAL_MARKET_PREMIUM,
-  }
-}
-
-function findElevationEvent(
-  asset: TFloorAssetData,
-  date: Date,
-  granularity: ChartGranularity
-): ElevationHistoryEvent | undefined {
-  const events = asset.floorElevation.elevationHistory ?? []
-
-  if (granularity === 'daily') {
-    const dateString = date.toISOString().split('T')[0]
-    return events.find((event) => {
-      const eventDate = new Date(event.timestamp)
-      return eventDate.toISOString().split('T')[0] === dateString
-    })
-  }
-
-  const targetHour = new Date(date)
-  targetHour.setMinutes(0, 0, 0)
-
-  return events.find((event) => {
-    const eventHour = new Date(event.timestamp)
-    eventHour.setMinutes(0, 0, 0)
-    return eventHour.getTime() === targetHour.getTime()
   })
 }
 
-const getRandomPremium = (granularity: ChartGranularity): number => {
-  const config = EVENT_MARKET_PREMIUM_RANGE[granularity]
-  return config.base + Math.random() * config.spread
-}
+function formatCandleDate(timestamp: number, period: TPriceCandle['period']): string {
+  const date = new Date(timestamp)
 
-function applyElevationEventToState(
-  state: PriceState,
-  event: ElevationHistoryEvent,
-  granularity: ChartGranularity
-): void {
-  state.floorPrice = event.newFloorPrice
-  state.marketPrice = state.floorPrice * getRandomPremium(granularity)
-}
-
-function applyMarketDriftToState(state: PriceState, granularity: ChartGranularity): void {
-  const volatility = MARKET_VOLATILITY[granularity]
-  const marketChange = (Math.random() - 0.5) * volatility
-
-  state.marketPrice = Math.max(state.marketPrice * (1 + marketChange), state.floorPrice)
-}
-
-function getVolumeForPoint(
-  asset: TFloorAssetData,
-  date: Date,
-  hasElevationEvent: boolean,
-  granularity: ChartGranularity
-): number {
-  if (granularity === 'daily') {
-    const baseVolume = asset.metrics.volume24h * (0.7 + Math.random() * 0.6)
-    return hasElevationEvent ? baseVolume * 2.5 : baseVolume
+  if (period === 'ONE_HOUR' || period === 'FOUR_HOURS') {
+    return date.toLocaleTimeString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    })
   }
 
-  const hour = date.getHours()
-  const isBusinessHour = hour >= 9 && hour <= 17
-  const baseVolume = asset.metrics.volume24h / 24
-  const hourlyMultiplier = isBusinessHour ? 1.3 + Math.random() * 0.4 : 0.7 + Math.random() * 0.6
-
-  return hasElevationEvent ? baseVolume * hourlyMultiplier * 3 : baseVolume * hourlyMultiplier
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  })
 }
 
-function formatElevationEventForChart(
-  event?: ElevationHistoryEvent
-): ElevationAnnotation | undefined {
-  if (!event) return undefined
+/**
+ * Get chart data for a specific timeframe with fallback to other periods
+ * Requires minimum data points for a meaningful chart line
+ */
+export function getChartDataForTimeframe(
+  priceCandles: TPriceCandlesByPeriod | undefined,
+  timeframe: ChartTimeframe
+): TransformedCandleData[] {
+  if (!priceCandles) return []
 
-  return {
-    feesDeployed: event.feesDeployed,
-    priceIncrease: event.priceIncrease,
-    transactionHash: event.transactionHash,
+  const preferredPeriod = getCandlePeriodForTimeframe(timeframe)
+  const fallbackOrder = getFallbackPeriods(preferredPeriod)
+
+  // Try each period until we find enough data points
+  for (let i = 0; i < fallbackOrder.length; i++) {
+    const periodKey = fallbackOrder[i]
+    const candles = priceCandles[periodKey] ?? []
+    const isPreferredPeriod = i === 0
+
+    // Apply timeframe cutoff only to preferred period
+    const filteredCandles = isPreferredPeriod
+      ? filterCandlesByTimeframe(candles, timeframe)
+      : candles
+
+    if (filteredCandles.length >= MIN_CHART_POINTS) {
+      return transformCandlesToChartData(filteredCandles)
+    }
   }
+
+  // Fallback: return any available data
+  for (const periodKey of fallbackOrder) {
+    const candles = priceCandles[periodKey] ?? []
+    if (candles.length > 0) {
+      return transformCandlesToChartData(candles)
+    }
+  }
+
+  return []
+}
+
+/**
+ * Get the best available candles for a timeframe with fallback
+ * Returns both the candles and their period for proper formatting
+ */
+export function getBestAvailableCandles(
+  priceCandles: TPriceCandlesByPeriod | undefined,
+  timeframe: ChartTimeframe
+): CandlesWithPeriod | null {
+  if (!priceCandles) return null
+
+  const preferredPeriod = getCandlePeriodForTimeframe(timeframe)
+  const fallbackOrder = getFallbackPeriods(preferredPeriod)
+
+  // Try each period until we find enough data points
+  for (let i = 0; i < fallbackOrder.length; i++) {
+    const periodKey = fallbackOrder[i]
+    const candles = priceCandles[periodKey] ?? []
+    const isPreferredPeriod = i === 0
+
+    const filteredCandles = isPreferredPeriod
+      ? filterCandlesByTimeframe(candles, timeframe)
+      : candles
+
+    if (filteredCandles.length >= MIN_CHART_POINTS) {
+      return { candles: filteredCandles, period: periodKey }
+    }
+  }
+
+  // Fallback: return any available data
+  for (const periodKey of fallbackOrder) {
+    const candles = priceCandles[periodKey] ?? []
+    if (candles.length > 0) {
+      return { candles, period: periodKey }
+    }
+  }
+
+  return null
 }

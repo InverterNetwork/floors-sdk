@@ -210,7 +210,7 @@ export interface TComputedAssetData {
   isFloorElevating: boolean
 }
 
-// PriceCandle type for volume charts
+// PriceCandle type for OHLCV chart data
 export interface TPriceCandle {
   id: string
   market_id: string
@@ -230,6 +230,18 @@ export interface TPriceCandle {
   __typename?: 'PriceCandle'
 }
 
+/**
+ * Organized price candles by period for different chart timeframes
+ * - hourly: ONE_HOUR candles for 1D timeframe (24 points/day)
+ * - fourHour: FOUR_HOURS candles for 1W timeframe (42 points/week)
+ * - daily: ONE_DAY candles for 1M+ timeframes (30-365 points)
+ */
+export interface TPriceCandlesByPeriod {
+  hourly: TPriceCandle[]
+  fourHour: TPriceCandle[]
+  daily: TPriceCandle[]
+}
+
 // Extended type that combines GraphQL Market data with computed UI fields
 export interface TFloorAssetData extends TGraphQLMarket, TComputedAssetData {
   userPosition?: TUserAssetPosition
@@ -240,6 +252,6 @@ export interface TFloorAssetData extends TGraphQLMarket, TComputedAssetData {
   // Module addresses from ModuleRegistry
   creditFacility?: string | null
   authorizer?: string | null
-  // PriceCandles for volume charts
-  priceCandles?: TPriceCandle[]
+  // PriceCandles organized by period for different chart timeframes
+  priceCandles?: TPriceCandlesByPeriod
 }
