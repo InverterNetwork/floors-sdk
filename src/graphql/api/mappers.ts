@@ -29,7 +29,12 @@ import {
 
 export function mapMarketToFloorAssetData(
   market: TGraphQLMarket,
-  moduleRegistry?: { creditFacility: string | null; authorizer: string | null } | null
+  moduleRegistry?: {
+    creditFacility: string | null
+    authorizer: string | null
+    presale: string | null
+    feeTreasury: string | null
+  } | null
 ): TFloorAssetData {
   const floorPrice = toNumber(market.floorPriceFormatted || market.floorPriceRaw)
   const marketPrice = toNumber(market.currentPriceFormatted || market.currentPriceRaw)
@@ -199,6 +204,8 @@ export function mapMarketToFloorAssetData(
   // Extract addresses from ModuleRegistry
   const creditFacilityAddress = moduleRegistry?.creditFacility ?? null
   const authorizerAddress = moduleRegistry?.authorizer ?? null
+  const presaleAddress = moduleRegistry?.presale ?? null
+  const treasuryAddress = moduleRegistry?.feeTreasury ?? null
 
   return {
     ...market,
@@ -223,6 +230,8 @@ export function mapMarketToFloorAssetData(
     // Add addresses from ModuleRegistry
     creditFacility: creditFacilityAddress,
     authorizer: authorizerAddress,
+    presale: presaleAddress,
+    treasury: treasuryAddress,
   }
 }
 

@@ -252,6 +252,8 @@ export interface TFloorAssetData extends TGraphQLMarket, TComputedAssetData {
   // Module addresses from ModuleRegistry
   creditFacility?: string | null
   authorizer?: string | null
+  presale?: string | null
+  treasury?: string | null
   // PriceCandles organized by period for different chart timeframes
   priceCandles?: TPriceCandlesByPeriod
 }
