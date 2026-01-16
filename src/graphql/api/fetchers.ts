@@ -437,7 +437,7 @@ export async function fetchPremiumChange24h(
 }
 
 /**
- * Fetch all market activity (trades + loans) in a single query
+ * Fetch all market activity (trades + loans + floor elevations) in a single query
  * @param marketId - The market ID
  * @param limit - Maximum number of items per entity type (default: 100)
  * @returns Combined and sorted array of market activity
@@ -451,14 +451,15 @@ export async function fetchMarketActivity(
   try {
     const normalizedMarketId = getAddress(marketId as `0x${string}`)
 
-    // Single GraphQL query fetching both trades and loans
+    // Single GraphQL query fetching trades, loans, and floor elevations
     const response = await query(buildMarketActivityQuery(normalizedMarketId, limit))
 
     const trades = response.Trade ?? []
     const loans = response.Loan ?? []
+    const floorElevations = response.FloorElevation ?? []
 
     // Combine and sort by timestamp
-    return combineMarketActivity(trades, loans)
+    return combineMarketActivity(trades, loans, floorElevations)
   } catch (error) {
     console.error('Error fetching market activity:', error)
     return []

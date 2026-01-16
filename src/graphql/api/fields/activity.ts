@@ -46,13 +46,29 @@ export const tradeActivityFields = {
   transactionHash: true,
 } as const
 
+/**
+ * @description Base fields for floor elevation entity (activity view)
+ */
+export const floorElevationActivityFields = {
+  id: true,
+  market_id: true,
+  deployedAmountRaw: true,
+  deployedAmountFormatted: true,
+  oldFloorPriceRaw: true,
+  oldFloorPriceFormatted: true,
+  newFloorPriceRaw: true,
+  newFloorPriceFormatted: true,
+  timestamp: true,
+  transactionHash: true,
+} as const
+
 // ============================================================================
 // Combined Query Definition
 // ============================================================================
 
 /**
- * @description Builds a combined query for market activity (trades + loans)
- * This fetches both in a single GraphQL request for efficiency
+ * @description Builds a combined query for market activity (trades + loans + floor elevations)
+ * This fetches all in a single GraphQL request for efficiency
  */
 export const buildMarketActivityQuery = (marketId: string, limit: number = 100) =>
   ({
@@ -72,6 +88,14 @@ export const buildMarketActivityQuery = (marketId: string, limit: number = 100) 
       },
       ...loanActivityFields,
     },
+    FloorElevation: {
+      __args: {
+        where: { market_id: { _eq: marketId } },
+        order_by: [{ timestamp: 'desc' as const }],
+        limit,
+      },
+      ...floorElevationActivityFields,
+    },
   }) satisfies GraphQLQueryArgs
 
 export type MarketActivityQueryType = ReturnType<typeof buildMarketActivityQuery>
@@ -80,6 +104,9 @@ export type MarketActivityQueryResultType = GraphQLQueryResult<MarketActivityQue
 // Type aliases for individual entities from GraphQL result
 export type TGraphQLTradeActivity = NonNullable<MarketActivityQueryResultType['Trade']>[0]
 export type TGraphQLLoanActivity = NonNullable<MarketActivityQueryResultType['Loan']>[0]
+export type TGraphQLFloorElevationActivity = NonNullable<
+  MarketActivityQueryResultType['FloorElevation']
+>[0]
 
 // ============================================================================
 // Unified Activity Types
@@ -145,7 +172,7 @@ export interface TMarketActivityData {
   status: 'pending' | 'confirmed' | 'failed'
 
   // Source indicator
-  source: 'trade' | 'loan'
+  source: 'trade' | 'loan' | 'floor_elevation'
 }
 
 // ============================================================================
@@ -368,13 +395,50 @@ export function loanToActivity(
 }
 
 /**
- * @description Combines and sorts trades and loans into unified activity list
+ * @description Transforms a GraphQL floor elevation to unified activity format
+ * @param elevation - The floor elevation entity from GraphQL
+ */
+export function floorElevationToActivity(
+  elevation: TGraphQLFloorElevationActivity
+): TMarketActivityData {
+  const deployedAmount = Number.parseFloat(elevation.deployedAmountFormatted) || 0
+
+  return {
+    id: elevation.id,
+    market_id: elevation.market_id,
+    user_id: '0x0000000000000000000000000000000000000000', // System action, no user
+    type: 'floor_elevation',
+    timestamp: String(elevation.timestamp),
+    tokenAmountRaw: '0',
+    tokenAmountFormatted: '0',
+    reserveAmountRaw: String(elevation.deployedAmountRaw),
+    reserveAmountFormatted: elevation.deployedAmountFormatted,
+    feeRaw: '0',
+    feeFormatted: '0',
+    newPriceRaw: String(elevation.newFloorPriceRaw),
+    newPriceFormatted: elevation.newFloorPriceFormatted,
+    transactionHash: elevation.transactionHash,
+    amounts: {
+      input: deployedAmount, // Amount injected
+      output: 0,
+      fee: 0,
+    },
+    prices: null,
+    timestampDate: new Date(Number.parseInt(String(elevation.timestamp)) * 1000),
+    status: 'confirmed',
+    source: 'floor_elevation',
+  }
+}
+
+/**
+ * @description Combines and sorts trades, loans, and floor elevations into unified activity list
  * Detects "loop" transactions by matching BUY trades with loans that share the same txHash
  * Calculates price impact by comparing each trade's newPrice with the previous trade's newPrice
  */
 export function combineMarketActivity(
   trades: TGraphQLTradeActivity[],
-  loans: TGraphQLLoanActivity[]
+  loans: TGraphQLLoanActivity[],
+  floorElevations: TGraphQLFloorElevationActivity[] = []
 ): TMarketActivityData[] {
   // Create a set of loan transaction hashes for quick lookup
   // These are loans created in the same tx as a buy (indicating a loop/buyAndBorrow)
@@ -416,8 +480,11 @@ export function combineMarketActivity(
     return loanToActivity(loan, isLoopLoan)
   })
 
+  // Transform floor elevations
+  const floorElevationActivities = floorElevations.map(floorElevationToActivity)
+
   // Combine and sort by timestamp (newest first)
-  return [...tradeActivities, ...loanActivities].sort(
+  return [...tradeActivities, ...loanActivities, ...floorElevationActivities].sort(
     (a, b) => Number.parseInt(b.timestamp) - Number.parseInt(a.timestamp)
   )
 }
