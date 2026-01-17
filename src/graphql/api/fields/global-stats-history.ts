@@ -252,6 +252,165 @@ function aggregateSnapshotsByTimestamp(
 }
 
 /**
+ * Time bucket intervals for different time ranges (in seconds)
+ */
+export const TIME_BUCKET_INTERVALS = {
+  '24h': 10 * 60, // 10 minutes for 24h view (144 points)
+  '7d': 60 * 60, // 1 hour for 7d view (168 points)
+  '30d': 4 * 60 * 60, // 4 hours for 30d view (180 points)
+} as const
+
+export type TimeRange = keyof typeof TIME_BUCKET_INTERVALS
+
+/**
+ * Fill gaps in chart data with interpolated values
+ *
+ * This function takes sparse data points and creates a dense time series
+ * with regular intervals. Missing values are filled using linear interpolation
+ * between the nearest known points.
+ *
+ * @param data - Sparse data points (may have gaps)
+ * @param timeRange - The time range ('24h', '7d', '30d')
+ * @param currentValues - Optional current values to use as the last point
+ * @returns Dense array of data points at regular intervals
+ */
+export function fillChartDataGaps(
+  data: TChartDataPoint[],
+  timeRange: TimeRange,
+  currentValues?: { tvl: number; marketCap: number; volume: number }
+): TChartDataPoint[] {
+  const interval = TIME_BUCKET_INTERVALS[timeRange]
+  const currentTime = now()
+
+  // Calculate start time based on range
+  const rangeDuration = {
+    '24h': DAY,
+    '7d': WEEK,
+    '30d': MONTH,
+  }[timeRange]
+
+  const startTime = currentTime - rangeDuration
+  // Round start time down to nearest interval
+  const alignedStart = Math.floor(startTime / interval) * interval
+
+  // Generate all time buckets
+  const buckets: number[] = []
+  for (let t = alignedStart; t <= currentTime; t += interval) {
+    buckets.push(t)
+  }
+
+  // If no data at all, return empty buckets or fill with current values if provided
+  if (data.length === 0) {
+    if (currentValues) {
+      // Fill all buckets with current values (flat line)
+      return buckets.map((timestamp) => ({
+        timestamp,
+        tvl: currentValues.tvl,
+        marketCap: currentValues.marketCap,
+        volume: currentValues.volume,
+      }))
+    }
+    return []
+  }
+
+  // Create a map of existing data points for quick lookup
+  // Map to nearest bucket
+  const dataMap = new Map<number, TChartDataPoint>()
+  for (const point of data) {
+    const bucketTs = Math.round(point.timestamp / interval) * interval
+    // If multiple points fall into same bucket, keep the latest
+    const existing = dataMap.get(bucketTs)
+    if (!existing || point.timestamp > existing.timestamp) {
+      dataMap.set(bucketTs, { ...point, timestamp: bucketTs })
+    }
+  }
+
+  // Add current values as the last data point if provided
+  if (currentValues) {
+    const lastBucket = buckets[buckets.length - 1]
+    if (!dataMap.has(lastBucket) || lastBucket >= currentTime - interval) {
+      dataMap.set(lastBucket, {
+        timestamp: lastBucket,
+        ...currentValues,
+      })
+    }
+  }
+
+  // Sort known points by timestamp
+  const knownPoints = Array.from(dataMap.values()).sort((a, b) => a.timestamp - b.timestamp)
+
+  if (knownPoints.length === 0) {
+    return []
+  }
+
+  // If only one point, fill all buckets with that value (flat line)
+  if (knownPoints.length === 1) {
+    const singlePoint = knownPoints[0]
+    return buckets.map((timestamp) => ({
+      timestamp,
+      tvl: singlePoint.tvl,
+      marketCap: singlePoint.marketCap,
+      volume: singlePoint.volume,
+    }))
+  }
+
+  // Fill gaps using linear interpolation
+  const result: TChartDataPoint[] = []
+
+  for (const bucketTs of buckets) {
+    // Check if we have exact data for this bucket
+    const exactData = dataMap.get(bucketTs)
+    if (exactData) {
+      result.push(exactData)
+      continue
+    }
+
+    // Find surrounding known points for interpolation
+    let prevPoint: TChartDataPoint | null = null
+    let nextPoint: TChartDataPoint | null = null
+
+    for (const point of knownPoints) {
+      if (point.timestamp <= bucketTs) {
+        prevPoint = point
+      } else if (point.timestamp > bucketTs && !nextPoint) {
+        nextPoint = point
+        break
+      }
+    }
+
+    // Interpolate or extrapolate
+    if (prevPoint && nextPoint) {
+      // Linear interpolation between two points
+      const ratio = (bucketTs - prevPoint.timestamp) / (nextPoint.timestamp - prevPoint.timestamp)
+      result.push({
+        timestamp: bucketTs,
+        tvl: prevPoint.tvl + (nextPoint.tvl - prevPoint.tvl) * ratio,
+        marketCap: prevPoint.marketCap + (nextPoint.marketCap - prevPoint.marketCap) * ratio,
+        volume: prevPoint.volume + (nextPoint.volume - prevPoint.volume) * ratio,
+      })
+    } else if (prevPoint) {
+      // No next point - use last known value (forward fill)
+      result.push({
+        timestamp: bucketTs,
+        tvl: prevPoint.tvl,
+        marketCap: prevPoint.marketCap,
+        volume: prevPoint.volume,
+      })
+    } else if (nextPoint) {
+      // No previous point - use first known value (backward fill)
+      result.push({
+        timestamp: bucketTs,
+        tvl: nextPoint.tvl,
+        marketCap: nextPoint.marketCap,
+        volume: nextPoint.volume,
+      })
+    }
+  }
+
+  return result
+}
+
+/**
  * Compute global metrics from current markets and historical snapshots
  */
 export function computeGlobalMetricsWithHistory(
@@ -310,18 +469,30 @@ export function computeGlobalMetricsWithHistory(
     marketCap24hAgo += marketSupply * price
   }
 
-  // Aggregate chart data
-  const chartData24h = chart24hData
+  // Aggregate raw chart data from snapshots
+  const rawChartData24h = chart24hData
     ? aggregateSnapshotsByTimestamp(chart24hData.MarketSnapshot || [])
     : []
 
-  const chartData7d = chart7dData
+  const rawChartData7d = chart7dData
     ? aggregateSnapshotsByTimestamp(chart7dData.MarketSnapshot || [])
     : []
 
-  const chartData30d = chart30dData
+  const rawChartData30d = chart30dData
     ? aggregateSnapshotsByTimestamp(chart30dData.MarketSnapshot || [])
     : []
+
+  // Current values for filling gaps to present time
+  const currentValues = {
+    tvl: currentTVL,
+    marketCap: currentMarketCap,
+    volume: 0, // Volume is cumulative, not a point-in-time value
+  }
+
+  // Fill gaps in chart data with interpolated values at regular intervals
+  const chartData24h = fillChartDataGaps(rawChartData24h, '24h', currentValues)
+  const chartData7d = fillChartDataGaps(rawChartData7d, '7d', currentValues)
+  const chartData30d = fillChartDataGaps(rawChartData30d, '30d', currentValues)
 
   return {
     totalValueLocked: currentTVL,
