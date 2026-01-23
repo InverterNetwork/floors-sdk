@@ -38,9 +38,9 @@ export interface TPresaleAdminSetEndTimestampParams extends TPresaleAdminParams 
   timestamp: bigint
 }
 
-export interface TPresaleAdminWhitelistParams extends TPresaleAdminParams {
-  /** Array of addresses to add/remove */
-  addresses: Address[]
+export interface TPresaleAdminSetMerkleRootParams extends TPresaleAdminParams {
+  /** The Merkle root hash (bytes32) */
+  merkleRoot: `0x${string}`
 }
 
 export interface TPresaleAdminSetCommissionParams extends TPresaleAdminParams {
@@ -63,6 +63,8 @@ export interface TPresaleAdminState {
   globalIssuance: bigint
   /** Number of whitelisted addresses */
   whitelistCount: number
+  /** Current on-chain merkle root */
+  merkleRoot: `0x${string}`
   /** Commission rates per leverage level */
   baseCommissionBps: number[]
   /** Price breakpoints per leverage level */
@@ -103,7 +105,7 @@ interface PresaleAdminConstructorArgs {
  * await presaleAdmin.goLive()
  *
  * // Add addresses to whitelist
- * await presaleAdmin.addToWhitelist({ addresses: ['0x...', '0x...'] })
+ * await presaleAdmin.setMerkleRoot({ merkleRoot: '0x...' })
  * ```
  */
 export class PresaleAdmin {
@@ -131,6 +133,7 @@ export class PresaleAdmin {
       globalIssuanceCap,
       perAddressIssuanceCap,
       globalIssuance,
+      merkleRoot,
       baseCommissionBps,
       priceBreakpoints,
     ] = await Promise.all([
@@ -162,6 +165,11 @@ export class PresaleAdmin {
       this.publicClient.readContract({
         address: this.address,
         abi: Presale_v1,
+        functionName: 'getMerkleRoot',
+      }) as Promise<`0x${string}`>,
+      this.publicClient.readContract({
+        address: this.address,
+        abi: Presale_v1,
         functionName: 'getBaseCommissionBps',
       }) as Promise<number[]>,
       this.publicClient.readContract({
@@ -178,21 +186,33 @@ export class PresaleAdmin {
       perAddressIssuanceCap,
       globalIssuance,
       whitelistCount: 0, // Not available from contract, would need to fetch from indexer
+      merkleRoot,
       baseCommissionBps,
       priceBreakpoints,
     }
   }
 
   /**
-   * @description Check if an address is whitelisted
+   * @description Check if an address is registered via Merkle proof
    */
-  public async isWhitelisted(address: Address): Promise<boolean> {
+  public async isMerkleWhitelisted(account: Address): Promise<boolean> {
     return (await this.publicClient.readContract({
       address: this.address,
       abi: Presale_v1,
-      functionName: 'isWhitelisted',
-      args: [address],
+      functionName: 'isMerkleWhitelisted',
+      args: [account],
     })) as boolean
+  }
+
+  /**
+   * @description Get the current Merkle root
+   */
+  public async getMerkleRoot(): Promise<`0x${string}`> {
+    return (await this.publicClient.readContract({
+      address: this.address,
+      abi: Presale_v1,
+      functionName: 'getMerkleRoot',
+    })) as `0x${string}`
   }
 
   /**
@@ -368,21 +388,18 @@ export class PresaleAdmin {
   }
 
   // ===========================================================================
-  // Write Methods - Whitelist Management
+  // Write Methods - Merkle Whitelist Management
   // ===========================================================================
 
   /**
-   * @description Add addresses to the whitelist
+   * @description Set the Merkle root for whitelist verification
+   * Must be called before presale starts (NotOpen state).
    */
-  public async addToWhitelist({
-    addresses,
+  public async setMerkleRoot({
+    merkleRoot,
     lifecycle,
-  }: TPresaleAdminWhitelistParams): Promise<TransactionReceipt> {
+  }: TPresaleAdminSetMerkleRootParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
-
-    if (addresses.length === 0) {
-      throw new Error('At least one address is required')
-    }
 
     try {
       lifecycle?.onPendingWallet?.()
@@ -390,50 +407,8 @@ export class PresaleAdmin {
       const hash = await walletClient.writeContract({
         address: this.address,
         abi: Presale_v1,
-        functionName: 'addToWhitelist',
-        args: [addresses],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
-  }
-
-  /**
-   * @description Remove addresses from the whitelist
-   */
-  public async removeFromWhitelist({
-    addresses,
-    lifecycle,
-  }: TPresaleAdminWhitelistParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
-
-    if (addresses.length === 0) {
-      throw new Error('At least one address is required')
-    }
-
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Presale_v1,
-        functionName: 'removeFromWhitelist',
-        args: [addresses],
+        functionName: 'setMerkleRoot',
+        args: [merkleRoot],
         account: this.getWalletAddress(walletClient),
       })
 

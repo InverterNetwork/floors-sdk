@@ -302,21 +302,12 @@ export const PERMISSION_MAP: Record<`0x${string}`, PermissionMapEntry> = {
     contract: 'Presale_v1',
   },
 
-  // addToWhitelist(address[])
-  '0x7286e5e5': {
-    functionName: 'addToWhitelist',
-    description: 'Add addresses to whitelist',
+  // setMerkleRoot(bytes32)
+  '0x7cb64759': {
+    functionName: 'setMerkleRoot',
+    description: 'Set Merkle root for whitelist verification',
     requiredRole: 'ADMIN_ROLE',
-    roleDescription: 'Only administrators can manage whitelist',
-    contract: 'Presale_v1',
-  },
-
-  // removeFromWhitelist(address[])
-  '0x548db174': {
-    functionName: 'removeFromWhitelist',
-    description: 'Remove addresses from whitelist',
-    requiredRole: 'ADMIN_ROLE',
-    roleDescription: 'Only administrators can manage whitelist',
+    roleDescription: 'Only administrators can set the Merkle root',
     contract: 'Presale_v1',
   },
 

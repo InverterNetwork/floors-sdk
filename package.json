@@ -22,6 +22,11 @@
       "require": "./src/client/index.ts",
       "import": "./src/client/index.ts",
       "types": "./src/client/index.ts"
+    },
+    "./server": {
+      "require": "./src/server/index.ts",
+      "import": "./src/server/index.ts",
+      "types": "./src/server/index.ts"
     }
   },
   "files": [

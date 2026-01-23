@@ -261,11 +261,21 @@ export interface TSetEndTimestampParams {
 }
 
 /**
- * @description Admin parameters for whitelist management
+ * @description Admin parameters for setting Merkle root
  */
-export interface TWhitelistParams {
-  /** Addresses to add/remove */
-  addresses: Address[]
+export interface TSetMerkleRootParams {
+  /** The Merkle root hash (bytes32) */
+  merkleRoot: `0x${string}`
+  /** Optional lifecycle callbacks */
+  lifecycle?: TransactionLifecycleCallbacks
+}
+
+/**
+ * @description User parameters for self-registering with Merkle proof
+ */
+export interface TAddToWhitelistWithProofParams {
+  /** The Merkle proof (array of bytes32 hashes) */
+  proof: `0x${string}`[]
   /** Optional lifecycle callbacks */
   lifecycle?: TransactionLifecycleCallbacks
 }
@@ -359,17 +369,29 @@ export class Presale {
   }
 
   /**
-   * @description Check if user is whitelisted
+   * @description Check if user is registered via Merkle proof whitelist
    * @param userAddress User address to check
    * @returns Boolean indicating whitelist status
    */
-  public async isWhitelisted(userAddress: Address): Promise<boolean> {
+  public async isMerkleWhitelisted(userAddress: Address): Promise<boolean> {
     return (await this.publicClient.readContract({
       address: this.address,
       abi: Presale_v1,
-      functionName: 'isWhitelisted',
+      functionName: 'isMerkleWhitelisted',
       args: [userAddress],
     })) as boolean
+  }
+
+  /**
+   * @description Get the current Merkle root for whitelist verification
+   * @returns The current merkle root (bytes32(0) means disabled)
+   */
+  public async getMerkleRoot(): Promise<`0x${string}`> {
+    return (await this.publicClient.readContract({
+      address: this.address,
+      abi: Presale_v1,
+      functionName: 'getMerkleRoot',
+    })) as `0x${string}`
   }
 
   /**
@@ -973,19 +995,15 @@ export class Presale {
   }
 
   /**
-   * @description Add addresses to whitelist (Admin only)
-   * @param params Addresses and optional lifecycle callbacks
+   * @description Set the Merkle root for whitelist verification (Admin only)
+   * @param params Merkle root and optional lifecycle callbacks
    * @returns Transaction receipt after confirmation
    */
-  public async addToWhitelist({
-    addresses,
+  public async setMerkleRoot({
+    merkleRoot,
     lifecycle,
-  }: TWhitelistParams): Promise<TransactionReceipt> {
+  }: TSetMerkleRootParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
-
-    if (addresses.length === 0) {
-      throw new Error('At least one address is required')
-    }
 
     try {
       lifecycle?.onPendingWallet?.()
@@ -993,8 +1011,8 @@ export class Presale {
       const hash = await walletClient.writeContract({
         address: this.address,
         abi: Presale_v1,
-        functionName: 'addToWhitelist',
-        args: [addresses],
+        functionName: 'setMerkleRoot',
+        args: [merkleRoot],
         account: this.getWalletAddress(walletClient),
       })
 
@@ -1006,7 +1024,7 @@ export class Presale {
       if (receipt.status === 'success') {
         lifecycle?.onConfirmed?.(receipt)
       } else {
-        lifecycle?.onFailed?.(new Error('addToWhitelist transaction reverted'))
+        lifecycle?.onFailed?.(new Error('setMerkleRoot transaction reverted'))
       }
 
       return receipt
@@ -1017,18 +1035,19 @@ export class Presale {
   }
 
   /**
-   * @description Remove addresses from whitelist (Admin only)
-   * @param params Addresses and optional lifecycle callbacks
+   * @description Self-register to whitelist using a Merkle proof (User)
+   * User must call this before buying in Whitelist phase.
+   * @param params Merkle proof and optional lifecycle callbacks
    * @returns Transaction receipt after confirmation
    */
-  public async removeFromWhitelist({
-    addresses,
+  public async addToWhitelistWithProof({
+    proof,
     lifecycle,
-  }: TWhitelistParams): Promise<TransactionReceipt> {
+  }: TAddToWhitelistWithProofParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
 
-    if (addresses.length === 0) {
-      throw new Error('At least one address is required')
+    if (proof.length === 0) {
+      throw new Error('Merkle proof is required')
     }
 
     try {
@@ -1037,8 +1056,8 @@ export class Presale {
       const hash = await walletClient.writeContract({
         address: this.address,
         abi: Presale_v1,
-        functionName: 'removeFromWhitelist',
-        args: [addresses],
+        functionName: 'addToWhitelistWithProof',
+        args: [proof],
         account: this.getWalletAddress(walletClient),
       })
 
@@ -1050,7 +1069,7 @@ export class Presale {
       if (receipt.status === 'success') {
         lifecycle?.onConfirmed?.(receipt)
       } else {
-        lifecycle?.onFailed?.(new Error('removeFromWhitelist transaction reverted'))
+        lifecycle?.onFailed?.(new Error('addToWhitelistWithProof transaction reverted'))
       }
 
       return receipt

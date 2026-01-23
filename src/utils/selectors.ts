@@ -119,8 +119,8 @@ export const PRESALE_SELECTORS = {
   setPresaleState: getSelector(Presale_v1, 'setPresaleState'),
   setCaps: getSelector(Presale_v1, 'setCaps'),
   setEndTimestamp: getSelector(Presale_v1, 'setEndTimestamp'),
-  addToWhitelist: getSelector(Presale_v1, 'addToWhitelist'),
-  removeFromWhitelist: getSelector(Presale_v1, 'removeFromWhitelist'),
+  setMerkleRoot: getSelector(Presale_v1, 'setMerkleRoot'),
+  addToWhitelistWithProof: getSelector(Presale_v1, 'addToWhitelistWithProof'),
 } as const
 
 // =============================================================================
@@ -305,16 +305,16 @@ export const SELECTOR_REGISTRY: RegisteredSelector[] = [
     description: 'Set presale end time',
   },
   {
-    name: 'addToWhitelist',
-    selector: PRESALE_SELECTORS.addToWhitelist,
+    name: 'setMerkleRoot',
+    selector: PRESALE_SELECTORS.setMerkleRoot,
     module: 'presale',
-    description: 'Add address to whitelist',
+    description: 'Set Merkle root for whitelist verification',
   },
   {
-    name: 'removeFromWhitelist',
-    selector: PRESALE_SELECTORS.removeFromWhitelist,
+    name: 'addToWhitelistWithProof',
+    selector: PRESALE_SELECTORS.addToWhitelistWithProof,
     module: 'presale',
-    description: 'Remove address from whitelist',
+    description: 'Self-register to whitelist with Merkle proof',
   },
 ] as const
 

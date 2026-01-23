@@ -33,8 +33,11 @@ export type UsePresaleAdminConfigOptions = {
   >
   /** Mutation options for setEndTimestamp */
   setEndTimestampOptions?: Omit<UseMutationOptions<TransactionReceipt, Error, bigint>, 'mutationFn'>
-  /** Mutation options for whitelist operations */
-  whitelistOptions?: Omit<UseMutationOptions<TransactionReceipt, Error, Address[]>, 'mutationFn'>
+  /** Mutation options for setMerkleRoot */
+  setMerkleRootOptions?: Omit<
+    UseMutationOptions<TransactionReceipt, Error, `0x${string}`>,
+    'mutationFn'
+  >
 }
 
 // =============================================================================
@@ -52,15 +55,14 @@ export type UsePresaleAdminConfigOptions = {
  *   goLive,
  *   closePresale,
  *   setCaps,
- *   addToWhitelist,
- *   removeFromWhitelist,
+ *   setMerkleRoot,
  * } = usePresaleAdminConfig({ presaleAddress: '0x...' })
  *
  * // Transition to live
  * await goLive.mutateAsync()
  *
- * // Add addresses to whitelist
- * await addToWhitelist.mutateAsync(['0x...', '0x...'])
+ * // Set merkle root for whitelist
+ * await setMerkleRoot.mutateAsync('0x...')
  * ```
  */
 export function usePresaleAdminConfig(options: UsePresaleAdminConfigOptions) {
@@ -177,23 +179,15 @@ export function usePresaleAdminConfig(options: UsePresaleAdminConfigOptions) {
   })
 
   // ===========================================================================
-  // Mutations - Whitelist Management
+  // Mutations - Merkle Whitelist Management
   // ===========================================================================
 
-  const addToWhitelistMutation = useMutation({
-    mutationFn: async (addresses: Address[]): Promise<TransactionReceipt> => {
+  const setMerkleRootMutation = useMutation({
+    mutationFn: async (merkleRoot: `0x${string}`): Promise<TransactionReceipt> => {
       const admin = getPresaleAdminInstance()
-      return admin.addToWhitelist({ addresses })
+      return admin.setMerkleRoot({ merkleRoot })
     },
-    ...options.whitelistOptions,
-  })
-
-  const removeFromWhitelistMutation = useMutation({
-    mutationFn: async (addresses: Address[]): Promise<TransactionReceipt> => {
-      const admin = getPresaleAdminInstance()
-      return admin.removeFromWhitelist({ addresses })
-    },
-    ...options.whitelistOptions,
+    ...options.setMerkleRootOptions,
   })
 
   // ===========================================================================
@@ -219,7 +213,7 @@ export function usePresaleAdminConfig(options: UsePresaleAdminConfigOptions) {
       if (!instance) {
         throw new Error('Public client not available')
       }
-      return instance.isWhitelisted(address)
+      return instance.isMerkleWhitelisted(address)
     },
   })
 
@@ -234,8 +228,7 @@ export function usePresaleAdminConfig(options: UsePresaleAdminConfigOptions) {
     setWhitelistPhaseMutation.isPending ||
     setCapsMutation.isPending ||
     setEndTimestampMutation.isPending ||
-    addToWhitelistMutation.isPending ||
-    removeFromWhitelistMutation.isPending ||
+    setMerkleRootMutation.isPending ||
     setCommissionMutation.isPending
 
   return {
@@ -257,9 +250,8 @@ export function usePresaleAdminConfig(options: UsePresaleAdminConfigOptions) {
     // End timestamp
     setEndTimestamp: setEndTimestampMutation,
 
-    // Whitelist management
-    addToWhitelist: addToWhitelistMutation,
-    removeFromWhitelist: removeFromWhitelistMutation,
+    // Merkle whitelist management
+    setMerkleRoot: setMerkleRootMutation,
     checkWhitelist: checkWhitelistMutation,
 
     // Commission configuration
@@ -275,8 +267,7 @@ export function usePresaleAdminConfig(options: UsePresaleAdminConfigOptions) {
     isSettingWhitelistPhase: setWhitelistPhaseMutation.isPending,
     isSettingCaps: setCapsMutation.isPending,
     isSettingEndTimestamp: setEndTimestampMutation.isPending,
-    isAddingToWhitelist: addToWhitelistMutation.isPending,
-    isRemovingFromWhitelist: removeFromWhitelistMutation.isPending,
+    isSettingMerkleRoot: setMerkleRootMutation.isPending,
     isSettingCommission: setCommissionMutation.isPending,
   }
 }

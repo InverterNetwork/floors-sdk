@@ -25,12 +25,12 @@ export default [
   },
   {
     type: 'function',
-    name: 'addToWhitelist',
+    name: 'addToWhitelistWithProof',
     inputs: [
       {
-        name: 'addresses_',
-        type: 'address[]',
-        internalType: 'address[]',
+        name: 'proof_',
+        type: 'bytes32[]',
+        internalType: 'bytes32[]',
       },
     ],
     outputs: [],
@@ -435,7 +435,7 @@ export default [
   },
   {
     type: 'function',
-    name: 'isWhitelisted',
+    name: 'isMerkleWhitelisted',
     inputs: [
       {
         name: 'account_',
@@ -454,12 +454,25 @@ export default [
   },
   {
     type: 'function',
-    name: 'removeFromWhitelist',
+    name: 'getMerkleRoot',
+    inputs: [],
+    outputs: [
+      {
+        name: 'merkleRoot_',
+        type: 'bytes32',
+        internalType: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'setMerkleRoot',
     inputs: [
       {
-        name: 'addresses_',
-        type: 'address[]',
-        internalType: 'address[]',
+        name: 'merkleRoot_',
+        type: 'bytes32',
+        internalType: 'bytes32',
       },
     ],
     outputs: [],
@@ -814,19 +827,32 @@ export default [
   },
   {
     type: 'event',
-    name: 'WhitelistUpdated',
+    name: 'MerkleRootUpdated',
     inputs: [
       {
-        name: 'addresses_',
-        type: 'address[]',
+        name: 'oldRoot_',
+        type: 'bytes32',
         indexed: false,
-        internalType: 'address[]',
+        internalType: 'bytes32',
       },
       {
-        name: 'added_',
-        type: 'bool',
+        name: 'newRoot_',
+        type: 'bytes32',
         indexed: false,
-        internalType: 'bool',
+        internalType: 'bytes32',
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'MerkleWhitelistRegistered',
+    inputs: [
+      {
+        name: 'account_',
+        type: 'address',
+        indexed: true,
+        internalType: 'address',
       },
     ],
     anonymous: false,
@@ -942,7 +968,17 @@ export default [
   },
   {
     type: 'error',
-    name: 'Presale__NotWhitelisted',
+    name: 'Module__MerkleWhitelistBase__MerkleRootNotSettable',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'Module__MerkleWhitelistBase__NotWhitelisted',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'Module__MerkleWhitelistBase__AlreadyWhitelisted',
     inputs: [],
   },
   {

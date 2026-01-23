@@ -20,6 +20,7 @@ import {
 import {
   Presale,
   PresaleState,
+  type TAddToWhitelistWithProofParams,
   type TEnablePublicBorrowingParams,
   type TEnablePublicTradingParams,
   type TGetTransitionStatusParams,
@@ -34,8 +35,8 @@ import {
   type TSetCapsParams,
   type TSetEndTimestampParams,
   type TSetLiveFeesParams,
+  type TSetMerkleRootParams,
   type TSetPresaleStateParams,
-  type TWhitelistParams,
 } from '../../presale'
 import { useFloors } from '../floors-context'
 import {
@@ -267,7 +268,7 @@ export const usePresaleMutations = (): UsePresaleMutationsReturnType => {
 
   const isWhitelisted = useMutation({
     mutationFn: async (userAddress?: Address) =>
-      ensurePresale().isWhitelisted(ensureWalletAddress(userAddress)),
+      ensurePresale().isMerkleWhitelisted(ensureWalletAddress(userAddress)),
   })
 
   const getIssuanceBy = useMutation({
@@ -501,10 +502,14 @@ export type UsePresaleAdminReturnType = {
   setCaps: UseMutationResult<TPresaleMutationResult, Error, TSetCapsParams>
   /** Set presale end timestamp */
   setEndTimestamp: UseMutationResult<TPresaleMutationResult, Error, TSetEndTimestampParams>
-  /** Add addresses to whitelist */
-  addToWhitelist: UseMutationResult<TPresaleMutationResult, Error, TWhitelistParams>
-  /** Remove addresses from whitelist */
-  removeFromWhitelist: UseMutationResult<TPresaleMutationResult, Error, TWhitelistParams>
+  /** Set Merkle root for whitelist verification */
+  setMerkleRoot: UseMutationResult<TPresaleMutationResult, Error, TSetMerkleRootParams>
+  /** Self-register to whitelist using a Merkle proof */
+  addToWhitelistWithProof: UseMutationResult<
+    TPresaleMutationResult,
+    Error,
+    TAddToWhitelistWithProofParams
+  >
   /** Whether any admin operation is pending */
   isPending: boolean
 }
@@ -515,7 +520,7 @@ export type UsePresaleAdminReturnType = {
  *
  * @example
  * ```tsx
- * const { setPresaleState, setCaps, addToWhitelist, isPending } = usePresaleAdmin()
+ * const { setPresaleState, setCaps, setMerkleRoot, isPending } = usePresaleAdmin()
  *
  * // Close the presale
  * await setPresaleState.mutateAsync({ state: PresaleState.Closed })
@@ -575,15 +580,16 @@ export const usePresaleAdmin = (): UsePresaleAdminReturnType => {
     },
   })
 
-  const addToWhitelist = useMutation({
-    mutationFn: (params: TWhitelistParams) => ensurePresale().addToWhitelist(params),
+  const setMerkleRoot = useMutation({
+    mutationFn: (params: TSetMerkleRootParams) => ensurePresale().setMerkleRoot(params),
     onSuccess: async () => {
       await refetchAfterMutation()
     },
   })
 
-  const removeFromWhitelist = useMutation({
-    mutationFn: (params: TWhitelistParams) => ensurePresale().removeFromWhitelist(params),
+  const addToWhitelistWithProof = useMutation({
+    mutationFn: (params: TAddToWhitelistWithProofParams) =>
+      ensurePresale().addToWhitelistWithProof(params),
     onSuccess: async () => {
       await refetchAfterMutation()
     },
@@ -593,15 +599,15 @@ export const usePresaleAdmin = (): UsePresaleAdminReturnType => {
     setPresaleState.isPending ||
     setCaps.isPending ||
     setEndTimestamp.isPending ||
-    addToWhitelist.isPending ||
-    removeFromWhitelist.isPending
+    setMerkleRoot.isPending ||
+    addToWhitelistWithProof.isPending
 
   return {
     setPresaleState,
     setCaps,
     setEndTimestamp,
-    addToWhitelist,
-    removeFromWhitelist,
+    setMerkleRoot,
+    addToWhitelistWithProof,
     isPending,
   }
 }
