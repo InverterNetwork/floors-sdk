@@ -338,25 +338,47 @@ export class Market {
   /**
    * @description Borrow reserve tokens using fTokens as collateral
    * @param borrowAmount Amount of reserve tokens to borrow
-   * @returns Transaction hash
+   * @param lifecycle Optional lifecycle callbacks for multi-stage feedback
+   * @returns Transaction receipt
    * @note User must first approve fTokens to the Credit Facility using approveFTokenForCreditFacility()
    */
-  public async borrow({ borrowAmount }: TMarketBorrowParams): Promise<TMarketMutationResult> {
+  public async borrow({
+    borrowAmount,
+    lifecycle,
+  }: TMarketBorrowParams): Promise<TMarketMutationResult> {
     const walletClient = this.requireWalletClient()
     const creditFacility = this.requireCreditFacility()
     this.assertPositiveAmount(borrowAmount)
 
-    const hash = await walletClient.writeContract({
-      address: creditFacility,
-      abi: CreditFacility_v1,
-      functionName: 'borrow',
-      args: [borrowAmount],
-      account: this.getWalletAddress(walletClient),
-    })
+    try {
+      lifecycle?.onPendingWallet?.()
 
-    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+      const hash = await walletClient.writeContract({
+        address: creditFacility,
+        abi: CreditFacility_v1,
+        functionName: 'borrow',
+        args: [borrowAmount],
+        account: this.getWalletAddress(walletClient),
+      })
 
-    return receipt
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        const error = new Error('Borrow transaction reverted')
+        lifecycle?.onFailed?.(error)
+        throw error
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
   }
 
   /**
@@ -364,13 +386,15 @@ export class Market {
    * @param amount Initial amount of reserve tokens to invest
    * @param leverage Leverage multiplier (e.g., 2 = 2x leverage)
    * @param consolidate Whether to consolidate with existing loans (default: false)
-   * @returns Transaction hash
+   * @param lifecycle Optional lifecycle callbacks for multi-stage feedback
+   * @returns Transaction receipt
    * @note This creates a leveraged loop position, not a simple buy+borrow
    */
   public async buyAndBorrow({
     amount,
     leverage,
     consolidate = false,
+    lifecycle,
   }: TMarketBuyAndBorrowParams): Promise<TMarketMutationResult> {
     const walletClient = this.requireWalletClient()
     const creditFacility = this.requireCreditFacility()
@@ -383,41 +407,82 @@ export class Market {
     // Contract expects loop count (iterations), not BPS
     const loops = BigInt(Math.floor(leverage))
 
-    const hash = await walletClient.writeContract({
-      address: creditFacility,
-      abi: CreditFacility_v1,
-      functionName: 'buyAndBorrow',
-      args: [amount, loops, consolidate],
-      account: this.getWalletAddress(walletClient),
-    })
+    try {
+      lifecycle?.onPendingWallet?.()
 
-    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+      const hash = await walletClient.writeContract({
+        address: creditFacility,
+        abi: CreditFacility_v1,
+        functionName: 'buyAndBorrow',
+        args: [amount, loops, consolidate],
+        account: this.getWalletAddress(walletClient),
+      })
 
-    return receipt
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        const error = new Error('Buy and borrow transaction reverted')
+        lifecycle?.onFailed?.(error)
+        throw error
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
   }
 
   /**
    * @description Repay an outstanding loan
    * @param repayAmount Amount of reserve tokens to repay
    * @param loanId ID of the loan to repay (use 0 for oldest loan)
-   * @returns Transaction hash
+   * @param lifecycle Optional lifecycle callbacks for multi-stage feedback
+   * @returns Transaction receipt
    */
-  public async repay({ repayAmount, loanId }: TMarketRepayParams): Promise<TMarketMutationResult> {
+  public async repay({
+    repayAmount,
+    loanId,
+    lifecycle,
+  }: TMarketRepayParams): Promise<TMarketMutationResult> {
     const walletClient = this.requireWalletClient()
     const creditFacility = this.requireCreditFacility()
     this.assertPositiveAmount(repayAmount)
 
-    const hash = await walletClient.writeContract({
-      address: creditFacility,
-      abi: CreditFacility_v1,
-      functionName: 'repay',
-      args: [loanId, repayAmount],
-      account: this.getWalletAddress(walletClient),
-    })
+    try {
+      lifecycle?.onPendingWallet?.()
 
-    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+      const hash = await walletClient.writeContract({
+        address: creditFacility,
+        abi: CreditFacility_v1,
+        functionName: 'repay',
+        args: [loanId, repayAmount],
+        account: this.getWalletAddress(walletClient),
+      })
 
-    return receipt
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        const error = new Error('Repay transaction reverted')
+        lifecycle?.onFailed?.(error)
+        throw error
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
   }
 
   /**

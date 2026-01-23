@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from 'react'
 import type { TransactionReceipt } from 'viem'
 
 import type { TransactionLifecycleCallbacks, TransactionStage } from '../../presale'
+import { type EnhancedParsedError, getParsedError } from '../../utils'
 
 export interface UseTransactionToastOptions {
   /** Messages for each stage */
@@ -22,6 +23,10 @@ export interface UseTransactionToastOptions {
     error: (message: string, options?: { id?: string }) => void
     dismiss: (id: string | number) => void
   }
+  /** Optional: Show suggestion as secondary toast */
+  showSuggestions?: boolean
+  /** Optional: Custom error handler for advanced UX */
+  onParsedError?: (error: EnhancedParsedError) => void
   /** Optional chain ID for explorer links */
   chainId?: number
 }
@@ -37,6 +42,8 @@ export interface UseTransactionToastReturn {
   lifecycle: TransactionLifecycleCallbacks
   /** Reset the state */
   reset: () => void
+  /** Last parsed error (if any) */
+  lastError: EnhancedParsedError | null
 }
 
 /**
@@ -58,9 +65,12 @@ export interface UseTransactionToastReturn {
 export const useTransactionToast = ({
   messages = {},
   toast,
+  showSuggestions = true,
+  onParsedError,
 }: UseTransactionToastOptions): UseTransactionToastReturn => {
   const [stage, setStage] = useState<TransactionStage>('idle')
   const [txHash, setTxHash] = useState<`0x${string}` | null>(null)
+  const [lastError, setLastError] = useState<EnhancedParsedError | null>(null)
   const toastIdRef = useRef<string | number | null>(null)
 
   const {
@@ -68,7 +78,7 @@ export const useTransactionToast = ({
     submitted = 'Transaction submitted',
     pendingConfirmation = 'Waiting for confirmation...',
     confirmed = 'Transaction confirmed!',
-    failed = 'Transaction failed',
+    failed: _failedMsg = 'Transaction failed',
     cancelled = 'Transaction cancelled',
   } = messages
 
@@ -83,6 +93,7 @@ export const useTransactionToast = ({
     dismissCurrentToast()
     setStage('idle')
     setTxHash(null)
+    setLastError(null)
   }, [dismissCurrentToast])
 
   const lifecycle: TransactionLifecycleCallbacks = {
@@ -127,19 +138,34 @@ export const useTransactionToast = ({
 
     onFailed: useCallback(
       (error: Error) => {
-        const isUserRejection =
-          error.message.includes('User rejected') || error.message.includes('User denied')
+        // Parse the error with enhanced UX information
+        const parsed = getParsedError({ error })
+        setLastError(parsed)
 
         setStage('failed')
         dismissCurrentToast()
 
-        if (isUserRejection) {
+        // Call custom handler if provided
+        onParsedError?.(parsed)
+
+        if (parsed.isUserRejection) {
+          // User cancelled - show mild message
           toast.error(cancelled)
         } else {
-          toast.error(`${failed}: ${error.message}`)
+          // Show user-friendly error message
+          toast.error(parsed.prettyMessage)
+
+          // Optionally show suggestion as follow-up
+          if (showSuggestions && parsed.suggestion) {
+            // Use setTimeout to show suggestion after error
+            setTimeout(() => {
+              toast.loading(parsed.suggestion!, { id: 'suggestion' })
+              setTimeout(() => toast.dismiss('suggestion'), 5000)
+            }, 500)
+          }
         }
       },
-      [dismissCurrentToast, toast, failed, cancelled]
+      [dismissCurrentToast, toast, cancelled, showSuggestions, onParsedError]
     ),
   }
 
@@ -151,5 +177,6 @@ export const useTransactionToast = ({
     isProcessing,
     lifecycle,
     reset,
+    lastError,
   }
 }

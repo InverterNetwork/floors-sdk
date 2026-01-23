@@ -1,111 +1,202 @@
-import type { Abi, AbiItem } from 'viem'
+/**
+ * @fileoverview Comprehensive error handling for Floor Markets protocol.
+ *
+ * This module provides:
+ * - Decoding of contract errors using auto-generated signatures
+ * - User-friendly error messages with actionable suggestions
+ * - Permission-aware error context for ACL errors
+ * - Recovery actions for better UX
+ *
+ * @example
+ * ```ts
+ * import { getParsedError, isUserRejection } from '@floorsfi/sdk'
+ *
+ * try {
+ *   await buyTokens(amount)
+ * } catch (error) {
+ *   const parsed = getParsedError({ error })
+ *
+ *   if (parsed.isUserRejection) return // User cancelled
+ *
+ *   toast.error(parsed.prettyMessage)
+ *   console.error('Details:', parsed.message)
+ *
+ *   // Show recovery actions
+ *   parsed.recoveryActions.forEach(action => {
+ *     console.log(`Suggestion: ${action.label}`)
+ *   })
+ * }
+ * ```
+ */
+
+import type { Abi, AbiItem, Hex } from 'viem'
 import { decodeErrorResult } from 'viem'
 
 import * as abis from '../abis'
+import {
+  ERROR_METADATA,
+  isKnownErrorSignature,
+  type KnownErrorSignature,
+} from './error-signatures.generated'
+import type {
+  EnhancedParsedError,
+  ErrorCategory,
+  ErrorContext,
+  HandleErrorParams,
+  RecoveryAction,
+} from './error-types'
+import { ERROR_UX_MAPPINGS, hasUXMapping } from './error-ux-mappings'
+import { getPermissionErrorMessage } from './permission-map'
 
-/**
- * Standard ERC20 ABI errors for common token operations
- * @internal
- */
-const ERC20_ABI = [
-  {
-    type: 'error',
-    name: 'ERC20InsufficientAllowance',
-    inputs: [
-      { name: 'spender', type: 'address', internalType: 'address' },
-      { name: 'allowance', type: 'uint256', internalType: 'uint256' },
-      { name: 'needed', type: 'uint256', internalType: 'uint256' },
-    ],
-  },
-  {
-    type: 'error',
-    name: 'ERC20InsufficientBalance',
-    inputs: [
-      { name: 'sender', type: 'address', internalType: 'address' },
-      { name: 'balance', type: 'uint256', internalType: 'uint256' },
-      { name: 'needed', type: 'uint256', internalType: 'uint256' },
-    ],
-  },
-] as const
+// ============================================================================
+// Constants
+// ============================================================================
 
-/**
- * Error signature to human-readable name mapping for common ERC20 errors
- * @internal
- */
-const KNOWN_ERROR_SIGNATURES: Record<`0x${string}`, string> = {
-  '0xfb8f41b2': 'ERC20InsufficientAllowance',
-  '0xe450d38c': 'ERC20InsufficientBalance',
-}
+/** Module permission error signature */
+const CALLER_NOT_PERMISSIONED_SIG = '0x7ea9d542' as KnownErrorSignature
 
-/**
- * Parsed error result containing both detailed and pretty error messages
- */
-export type ParsedError = {
-  /** Detailed error message with contract call info (for logging/debugging) */
-  message: string
-  /** Short, user-friendly message suitable for toasts */
+// ============================================================================
+// Wallet/Network Error Patterns
+// ============================================================================
+
+type WalletErrorPattern = {
+  patterns: string[]
   prettyMessage: string
-  /** The parsed error name if available */
-  errorName: string | null
-  /** Whether this was a user rejection */
-  isUserRejection: boolean
+  category: ErrorCategory
+  isRejection: boolean
+  recoveryActions: RecoveryAction[]
 }
 
+const WALLET_ERROR_PATTERNS: WalletErrorPattern[] = [
+  // User rejection
+  {
+    patterns: [
+      'user rejected',
+      'user denied',
+      'user cancelled',
+      'rejected by user',
+      'rejected the request',
+      'denied transaction',
+    ],
+    prettyMessage: 'Transaction cancelled',
+    category: 'wallet',
+    isRejection: true,
+    recoveryActions: [],
+  },
+  // Network errors
+  {
+    patterns: ['network request failed', 'failed to fetch', 'network error'],
+    prettyMessage: 'Network connection failed',
+    category: 'network',
+    isRejection: false,
+    recoveryActions: [{ label: 'Check connection', type: 'retry', primary: true }],
+  },
+  // RPC errors
+  {
+    patterns: ['internal json-rpc error'],
+    prettyMessage: 'RPC server error',
+    category: 'network',
+    isRejection: false,
+    recoveryActions: [{ label: 'Try again', type: 'retry', primary: true }],
+  },
+  // Gas errors
+  {
+    patterns: ['insufficient funds'],
+    prettyMessage: 'Insufficient ETH for gas',
+    category: 'wallet',
+    isRejection: false,
+    recoveryActions: [{ label: 'Add ETH', type: 'add_gas', primary: true }],
+  },
+  {
+    patterns: ['gas required exceeds allowance'],
+    prettyMessage: 'Gas limit exceeded',
+    category: 'network',
+    isRejection: false,
+    recoveryActions: [{ label: 'Try again', type: 'retry', primary: true }],
+  },
+  {
+    patterns: ['max fee per gas less than block base fee', 'transaction underpriced'],
+    prettyMessage: 'Gas price too low',
+    category: 'network',
+    isRejection: false,
+    recoveryActions: [{ label: 'Try again', type: 'retry', primary: true }],
+  },
+  {
+    patterns: ['replacement transaction underpriced'],
+    prettyMessage: 'Replacement gas too low',
+    category: 'network',
+    isRejection: false,
+    recoveryActions: [{ label: 'Wait and retry', type: 'wait', primary: true }],
+  },
+  {
+    patterns: ['nonce'],
+    prettyMessage: 'Transaction nonce error',
+    category: 'network',
+    isRejection: false,
+    recoveryActions: [{ label: 'Refresh and retry', type: 'refresh', primary: true }],
+  },
+  // Execution/contract revert errors - these should NOT match here
+  // They need to go through the contract error parsing to extract signatures
+  // Only match generic reverts as a last resort
+  // Note: specific contract reverts are handled in parseError after signature extraction
+  {
+    patterns: ['out of gas'],
+    prettyMessage: 'Out of gas',
+    category: 'network',
+    isRejection: false,
+    recoveryActions: [{ label: 'Try again', type: 'retry', primary: true }],
+  },
+  // Timeout
+  {
+    patterns: ['timeout', 'timed out'],
+    prettyMessage: 'Request timed out',
+    category: 'network',
+    isRejection: false,
+    recoveryActions: [{ label: 'Try again', type: 'retry', primary: true }],
+  },
+]
+
+// ============================================================================
+// Internal Helpers
+// ============================================================================
+
 /**
- * Parses an error name into a human-readable pretty message.
- * Handles various naming conventions:
- * - PascalCase: "InsufficientBalance" -> "Insufficient balance"
- * - Double underscore prefixes: "Module__Floor__InvalidFloorSegment" -> "Invalid floor segment"
- * - camelCase: "insufficientFunds" -> "Insufficient funds"
- *
- * @internal
+ * Parses error name to human-readable format.
+ * Handles conventions like "Module__Floor__InvalidFloorSegment" -> "Invalid floor segment"
  */
 function parseErrorNameToPrettyMessage(errorName: string): string {
-  // Handle double underscore prefixes (e.g., "Module__Floor__InvalidFloorSegment")
-  // Take only the last part after the final "__"
+  // Handle double underscore prefixes - take last part
   const parts = errorName.split('__')
   const relevantPart = parts[parts.length - 1]
 
-  // Handle library prefixes like "DiscreteCurveMathLib__NoSegmentsConfigured"
-  // Already handled by the split above
-
   // Convert PascalCase/camelCase to words
-  // Insert space before uppercase letters, handling consecutive caps
   const withSpaces = relevantPart
-    // Handle acronyms followed by words (e.g., "ERC20Insufficient" -> "ERC20 Insufficient")
     .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
-    // Handle lowercase followed by uppercase (e.g., "insufficientBalance" -> "insufficient Balance")
     .replace(/([a-z])([A-Z])/g, '$1 $2')
-    // Handle numbers followed by letters
     .replace(/(\d)([A-Za-z])/g, '$1 $2')
-    // Handle letters followed by numbers
     .replace(/([A-Za-z])(\d)/g, '$1 $2')
 
-  // Capitalize first letter, lowercase the rest of each word except acronyms
+  // Format words
   const words = withSpaces.split(' ')
-  const formatted = words
+  return words
     .map((word, index) => {
-      // Keep short acronyms uppercase (2-4 chars all caps)
       if (word.length <= 4 && word === word.toUpperCase() && /^[A-Z]+$/.test(word)) {
         return word
       }
-      // First word: capitalize first letter
       if (index === 0) {
         return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
       }
-      // Other words: lowercase
       return word.toLowerCase()
     })
     .join(' ')
-
-  return formatted
 }
 
 /**
- * Parses a viem error message to extract a pretty message
- * @internal
+ * Checks for wallet/network error patterns.
  */
-function parseViemErrorToPretty(error: unknown): { message: string; isRejection: boolean } | null {
+function matchWalletErrorPattern(
+  error: unknown
+): { pattern: WalletErrorPattern; message: string } | null {
   if (!error || typeof error !== 'object') return null
 
   const errorMessage = 'message' in error && typeof error.message === 'string' ? error.message : ''
@@ -113,153 +204,166 @@ function parseViemErrorToPretty(error: unknown): { message: string; isRejection:
   const lowerMessage = errorMessage.toLowerCase()
   const lowerName = errorName.toLowerCase()
 
-  // User rejection patterns
-  const rejectionPatterns = [
-    'user rejected',
-    'user denied',
-    'user cancelled',
-    'rejected by user',
-    'rejected the request',
-    'denied transaction',
-  ]
-
-  for (const pattern of rejectionPatterns) {
-    if (lowerMessage.includes(pattern) || lowerName.includes(pattern)) {
-      return { message: 'Transaction cancelled', isRejection: true }
+  for (const pattern of WALLET_ERROR_PATTERNS) {
+    for (const p of pattern.patterns) {
+      if (lowerMessage.includes(p) || lowerName.includes(p)) {
+        return { pattern, message: errorMessage }
+      }
     }
-  }
-
-  // Network/connection patterns
-  if (
-    lowerMessage.includes('network request failed') ||
-    lowerMessage.includes('failed to fetch') ||
-    lowerMessage.includes('network error')
-  ) {
-    return { message: 'Network connection failed', isRejection: false }
-  }
-
-  if (lowerMessage.includes('internal json-rpc error')) {
-    return { message: 'RPC server error', isRejection: false }
-  }
-
-  // Gas/fee patterns
-  if (lowerMessage.includes('insufficient funds')) {
-    return { message: 'Insufficient funds for gas', isRejection: false }
-  }
-
-  if (lowerMessage.includes('gas required exceeds allowance')) {
-    return { message: 'Gas limit exceeded', isRejection: false }
-  }
-
-  if (
-    lowerMessage.includes('max fee per gas less than block base fee') ||
-    lowerMessage.includes('transaction underpriced')
-  ) {
-    return { message: 'Gas price too low', isRejection: false }
-  }
-
-  if (lowerMessage.includes('replacement transaction underpriced')) {
-    return { message: 'Replacement gas too low', isRejection: false }
-  }
-
-  if (lowerMessage.includes('nonce')) {
-    return { message: 'Transaction nonce error', isRejection: false }
-  }
-
-  // Execution patterns
-  if (lowerMessage.includes('execution reverted')) {
-    return { message: 'Transaction reverted', isRejection: false }
-  }
-
-  if (lowerMessage.includes('out of gas')) {
-    return { message: 'Out of gas', isRejection: false }
-  }
-
-  // Timeout patterns
-  if (lowerMessage.includes('timeout') || lowerMessage.includes('timed out')) {
-    return { message: 'Request timed out', isRejection: false }
   }
 
   return null
 }
 
 /**
- * Extracts contract call details from an error message into a formatted string
- * @internal
+ * Recursively extracts error signature from viem's deeply nested error structure.
+ * Viem errors can have multiple levels of cause wrapping.
  */
-function extractContractCallBlockAsString(errorMessage: string, errorName: string | null): string {
-  const block: {
-    address: string | null
-    functionName: string | null
-    functionSignature: string | null
-    args: string[]
-    sender: string | null
-    signature: string | null
-    docs: string | null
-    version: string | null
-  } = {
-    address: null,
-    functionName: null,
-    functionSignature: null,
-    args: [],
-    sender: null,
-    signature: null,
-    docs: null,
-    version: null,
+function extractErrorSignature(error: unknown, depth = 0): Hex | null {
+  // Prevent infinite recursion
+  if (depth > 10 || !error || typeof error !== 'object') return null
+
+  const err = error as Record<string, unknown>
+
+  // Check for signature directly on this object
+  if ('signature' in err && typeof err.signature === 'string' && err.signature.startsWith('0x')) {
+    return err.signature as Hex
   }
 
-  // Extract the contract address
-  const addressMatch = errorMessage.match(/address:\s+([0-9a-fA-Fx]+)/)
-  block.address = addressMatch ? addressMatch[1] : null
+  // Check for data field (full revert data, first 4 bytes are selector)
+  if (
+    'data' in err &&
+    typeof err.data === 'string' &&
+    err.data.startsWith('0x') &&
+    err.data.length >= 10
+  ) {
+    return err.data.slice(0, 10) as Hex
+  }
 
-  // Extract the function name
-  const functionMatch = errorMessage.match(/function:\s+([a-zA-Z0-9_]+)\((.*)\)/)
-  block.functionName = functionMatch ? functionMatch[1] : null
-  block.functionSignature = functionMatch ? functionMatch[2] : null
+  // Check walk property (viem sometimes uses this)
+  if ('walk' in err && typeof err.walk === 'function') {
+    try {
+      const walked = (err.walk as (fn: (e: unknown) => boolean) => unknown)((e): boolean => {
+        return !!(e && typeof e === 'object' && ('data' in e || 'signature' in e))
+      })
+      if (walked) {
+        const result = extractErrorSignature(walked, depth + 1)
+        if (result) return result
+      }
+    } catch {
+      // Walk failed, continue with other methods
+    }
+  }
 
-  // Extract the arguments
-  const argsMatch = errorMessage.match(/args:\s+\((.*)\)/)
-  block.args = argsMatch ? argsMatch[1].split(', ') : []
+  // Recursively check cause chain
+  if ('cause' in err && err.cause) {
+    const result = extractErrorSignature(err.cause, depth + 1)
+    if (result) return result
+  }
 
-  // Extract the sender address
-  const senderMatch = errorMessage.match(/sender:\s+([0-9a-fA-Fx]+)/)
-  block.sender = senderMatch ? senderMatch[1] : null
+  // Check metaMessages for error signature (viem includes this)
+  if ('metaMessages' in err && Array.isArray(err.metaMessages)) {
+    for (const msg of err.metaMessages) {
+      if (typeof msg === 'string') {
+        // Look for "data: 0x..." pattern
+        const dataMatch = msg.match(/data:\s*(0x[a-fA-F0-9]+)/i)
+        if (dataMatch && dataMatch[1].length >= 10) {
+          return dataMatch[1].slice(0, 10) as Hex
+        }
+      }
+    }
+  }
 
-  // Extract the error signature (if available)
-  const signatureMatch = errorMessage.match(/0x[a-fA-F0-9]{8}/)
-  block.signature = signatureMatch ? signatureMatch[0] : null
+  // Check shortMessage for error name
+  if ('shortMessage' in err && typeof err.shortMessage === 'string') {
+    // Look for revert reason with selector
+    const match = err.shortMessage.match(/reverted with.*?(0x[a-fA-F0-9]{8})/i)
+    if (match) return match[1] as Hex
+  }
 
-  // Extract the docs link
-  const docsMatch = errorMessage.match(/Docs:\s+(https?:\/\/[^\s]+)/)
-  block.docs = docsMatch ? docsMatch[1] : null
+  // Try to extract from message as last resort
+  if ('message' in err && typeof err.message === 'string') {
+    // Look for "error: ErrorName(0x...)" or just "0x..." patterns
+    const patterns = [
+      /reverted with the following reason:\s*(\w+)\s*\(?(0x[a-fA-F0-9]{8})/i,
+      /error:\s*(\w+).*?(0x[a-fA-F0-9]{8})/i,
+      /selector:\s*(0x[a-fA-F0-9]{8})/i,
+      /data:\s*(0x[a-fA-F0-9]{8,})/i,
+    ]
 
-  // Extract the version
-  const versionMatch = errorMessage.match(/Version:\s+([^\s]+)/)
-  block.version = versionMatch ? versionMatch[1] : null
+    for (const pattern of patterns) {
+      const match = err.message.match(pattern)
+      if (match) {
+        // Return the hex value (might be in group 1 or 2)
+        const hex = match[2]?.startsWith('0x') ? match[2] : match[1]
+        if (hex?.startsWith('0x') && hex.length >= 10) {
+          return hex.slice(0, 10) as Hex
+        }
+      }
+    }
 
-  // Format as a single string
-  return `
-    Contract Call Block:
-    Error Name: ${errorName || 'Unknown'}
-    Address: ${block.address || 'N/A'}
-    Function: ${block.functionName || 'N/A'}
-    Function Signature: ${block.functionSignature || 'N/A'}
-    Arguments: ${block.args.length > 0 ? block.args.join(', ') : 'N/A'}
-    Sender: ${block.sender || 'N/A'}
-    Error Signature: ${block.signature || 'N/A'}
-    Docs: ${block.docs || 'N/A'}
-    Version: ${block.version || 'N/A'}
-  `.trim()
+    // Generic 4-byte selector pattern (be careful not to match addresses)
+    const genericMatch = err.message.match(/(?<![a-fA-F0-9])(0x[a-fA-F0-9]{8})(?![a-fA-F0-9])/g)
+    if (genericMatch && genericMatch.length > 0) {
+      // Prefer selectors that appear later in the message (more likely to be error selector)
+      return genericMatch[genericMatch.length - 1] as Hex
+    }
+  }
+
+  return null
 }
 
 /**
- * Gets all ABIs from the SDK including common ERC20 errors
- * @internal
+ * Extracts contract call details from error message.
+ */
+function extractContractCallDetails(errorMessage: string, errorName: string | null): string {
+  const details: Record<string, string | null> = {
+    errorName: errorName || 'Unknown',
+    address: null,
+    function: null,
+    args: null,
+    sender: null,
+    signature: null,
+  }
+
+  // Extract address
+  const addressMatch = errorMessage.match(/address:\s+([0-9a-fA-Fx]+)/)
+  if (addressMatch) details.address = addressMatch[1]
+
+  // Extract function
+  const functionMatch = errorMessage.match(/function:\s+([a-zA-Z0-9_]+)\((.*?)\)/)
+  if (functionMatch) {
+    details.function = functionMatch[1]
+    if (functionMatch[2]) details.args = functionMatch[2]
+  }
+
+  // Extract sender
+  const senderMatch = errorMessage.match(/sender:\s+([0-9a-fA-Fx]+)/)
+  if (senderMatch) details.sender = senderMatch[1]
+
+  // Extract signature
+  const signatureMatch = errorMessage.match(/0x[a-fA-F0-9]{8}/)
+  if (signatureMatch) details.signature = signatureMatch[0]
+
+  // Format output
+  const lines = [
+    `Error: ${details.errorName}`,
+    details.address && `Contract: ${details.address}`,
+    details.function && `Function: ${details.function}`,
+    details.args && `Args: ${details.args}`,
+    details.sender && `Sender: ${details.sender}`,
+    details.signature && `Signature: ${details.signature}`,
+  ].filter(Boolean)
+
+  return lines.join('\n')
+}
+
+/**
+ * Gets all ABIs for error decoding.
  */
 function getAllAbis(): Abi[] {
-  const allAbis: Abi[] = [ERC20_ABI as unknown as Abi]
+  const allAbis: Abi[] = []
 
-  // Dynamically collect all ABIs from the abis module
   for (const value of Object.values(abis)) {
     if (Array.isArray(value)) {
       allAbis.push(value as Abi)
@@ -270,198 +374,352 @@ function getAllAbis(): Abi[] {
 }
 
 /**
- * Extracts all error definitions from an array of ABIs
- * @internal
+ * Extracts error definitions from ABIs.
  */
 function extractErrors(abiList: Abi[]): AbiItem[] {
   return abiList.flatMap((abi) => abi.filter((item) => item.type === 'error'))
 }
 
 /**
- * Parameters for the handleError function
+ * Decodes error arguments from signature and data.
  */
-export type HandleErrorParams = {
-  /** The error to handle */
-  error: unknown
-  /** Optional additional ABI to include for error decoding */
-  abi?: Abi
-}
-
-/**
- * Parses an error into a structured result with both detailed and pretty messages.
- *
- * @internal
- */
-function parseError(params: HandleErrorParams): ParsedError {
-  const { error, abi } = params
-
-  // Check for viem-specific errors first (user rejection, network, etc.)
-  const viemParsed = parseViemErrorToPretty(error)
-  if (viemParsed) {
-    return {
-      message: viemParsed.message,
-      prettyMessage: viemParsed.message,
-      errorName: null,
-      isUserRejection: viemParsed.isRejection,
-    }
-  }
-
-  // If error doesn't have message, return generic
-  if (
-    !error ||
-    typeof error !== 'object' ||
-    !('message' in error) ||
-    typeof error.message !== 'string'
-  ) {
-    const msg = error instanceof Error ? error.message : String(error)
-    return {
-      message: msg,
-      prettyMessage: 'An error occurred',
-      errorName: null,
-      isUserRejection: false,
-    }
-  }
-
-  const errorMessage = error.message
-
-  // Check if this is a signature decoding error
-  if (!errorMessage.includes('Unable to decode signature')) {
-    // Try to extract useful info even without signature
-    const viemFallback = parseViemErrorToPretty(error)
-    if (viemFallback) {
-      return {
-        message: viemFallback.message,
-        prettyMessage: viemFallback.message,
-        errorName: null,
-        isUserRejection: viemFallback.isRejection,
-      }
-    }
-    return {
-      message: errorMessage,
-      prettyMessage: 'Transaction failed',
-      errorName: null,
-      isUserRejection: false,
-    }
-  }
-
-  // Extract error signature from cause
-  const signature =
-    'cause' in error && error.cause && typeof error.cause === 'object' && 'signature' in error.cause
-      ? (error.cause.signature as `0x${string}`)
-      : null
-
-  if (!signature) {
-    return {
-      message: errorMessage,
-      prettyMessage: 'Transaction failed',
-      errorName: null,
-      isUserRejection: false,
-    }
-  }
-
-  // Check known error signatures first
-  if (signature in KNOWN_ERROR_SIGNATURES) {
-    const knownErrorName = KNOWN_ERROR_SIGNATURES[signature]
-    return {
-      message: extractContractCallBlockAsString(errorMessage, knownErrorName),
-      prettyMessage: parseErrorNameToPrettyMessage(knownErrorName),
-      errorName: knownErrorName,
-      isUserRejection: false,
-    }
-  }
-
-  // Collect all ABIs for decoding
-  const allAbis = getAllAbis()
-  if (abi) {
-    allAbis.push(abi)
-  }
-
-  const errors = extractErrors(allAbis)
-
-  let errorName: string | null = null
+function decodeErrorArgs(
+  signature: Hex,
+  _errorName: string,
+  fullData?: Hex
+): Record<string, unknown> | null {
+  if (!fullData || fullData.length <= 10) return null
 
   try {
-    const value = decodeErrorResult({
+    const allAbis = getAllAbis()
+    const errors = extractErrors(allAbis)
+
+    const decoded = decodeErrorResult({
       abi: errors,
-      data: signature,
+      data: fullData,
     })
 
-    if (value.errorName) {
-      errorName = value.errorName
+    if (decoded.args && Array.isArray(decoded.args)) {
+      const metadata = isKnownErrorSignature(signature) ? ERROR_METADATA[signature] : null
+      const argNames = metadata?.inputs?.map((i) => i.name) || []
+
+      const args: Record<string, unknown> = {}
+      decoded.args.forEach((arg, i) => {
+        const name = argNames[i] || `arg${i}`
+        args[name] = arg
+      })
+
+      return args
     }
   } catch {
-    // Decoding failed, continue without error name
+    // Decoding failed
   }
 
-  if (!errorName) {
+  return null
+}
+
+// ============================================================================
+// Main Parsing Functions
+// ============================================================================
+
+/**
+ * Parses any error into an enhanced error object with UX information.
+ */
+function parseError(params: HandleErrorParams): EnhancedParsedError {
+  const { error, abi, context } = params
+
+  // Default result for unknown errors
+  const defaultResult: EnhancedParsedError = {
+    message: 'An unknown error occurred',
+    prettyMessage: 'Something went wrong',
+    errorName: null,
+    isUserRejection: false,
+    category: 'unknown',
+    severity: 'error',
+    suggestion: 'Please try again',
+    recoveryActions: [{ label: 'Try again', type: 'retry', primary: true }],
+    originalError: error,
+    context,
+  }
+
+  // Handle non-error values
+  if (!error) {
+    return defaultResult
+  }
+
+  // Check for wallet/network patterns first
+  const walletMatch = matchWalletErrorPattern(error)
+  if (walletMatch) {
     return {
-      message: errorMessage,
-      prettyMessage: 'Contract error',
+      message: walletMatch.message,
+      prettyMessage: walletMatch.pattern.prettyMessage,
       errorName: null,
-      isUserRejection: false,
+      isUserRejection: walletMatch.pattern.isRejection,
+      category: walletMatch.pattern.category,
+      severity: walletMatch.pattern.isRejection ? 'info' : 'error',
+      suggestion: walletMatch.pattern.isRejection ? null : 'Check your connection and try again',
+      recoveryActions: walletMatch.pattern.recoveryActions,
+      originalError: error,
+      context,
     }
   }
 
+  // Get error message
+  const errorMessage =
+    error && typeof error === 'object' && 'message' in error && typeof error.message === 'string'
+      ? error.message
+      : String(error)
+
+  // Extract error signature
+  const signature = extractErrorSignature(error)
+
+  if (!signature) {
+    // No signature found - try to provide better context based on error type
+    const lowerMessage = errorMessage.toLowerCase()
+
+    // Check for contract revert patterns
+    if (lowerMessage.includes('reverted') || lowerMessage.includes('revert')) {
+      // Try to extract function name from error
+      const functionMatch = errorMessage.match(/function[:\s]+["']?(\w+)/i)
+      const functionName = functionMatch?.[1]
+
+      // Check for permission-related reverts
+      if (
+        lowerMessage.includes('permission') ||
+        lowerMessage.includes('unauthorized') ||
+        lowerMessage.includes('access')
+      ) {
+        return {
+          ...defaultResult,
+          message: errorMessage,
+          prettyMessage: 'Not authorized for this action',
+          suggestion: 'You may need special permissions to perform this action',
+          category: 'permission',
+          recoveryActions: [
+            { label: 'Check permissions', type: 'check_whitelist', primary: true },
+            { label: 'Contact support', type: 'contact_support' },
+          ],
+        }
+      }
+
+      // Check for insufficient balance/allowance
+      if (
+        lowerMessage.includes('insufficient') ||
+        lowerMessage.includes('balance') ||
+        lowerMessage.includes('allowance')
+      ) {
+        return {
+          ...defaultResult,
+          message: errorMessage,
+          prettyMessage: 'Insufficient funds or allowance',
+          suggestion: 'Check your balance and token approvals',
+          category: 'token',
+          recoveryActions: [
+            { label: 'Check balance', type: 'refresh', primary: true },
+            { label: 'Approve token', type: 'approve_token' },
+          ],
+        }
+      }
+
+      // Generic contract revert with function context
+      if (functionName) {
+        return {
+          ...defaultResult,
+          message: errorMessage,
+          prettyMessage: `Transaction to ${functionName} was rejected`,
+          suggestion: 'The contract rejected this transaction. Check your inputs and permissions.',
+          category: 'system',
+          recoveryActions: [
+            { label: 'Try again', type: 'retry', primary: true },
+            { label: 'Contact support', type: 'contact_support' },
+          ],
+        }
+      }
+
+      // Generic contract revert
+      return {
+        ...defaultResult,
+        message: errorMessage,
+        prettyMessage: 'Contract rejected transaction',
+        suggestion:
+          'The smart contract rejected this transaction. This may be due to permissions, insufficient funds, or invalid parameters.',
+        category: 'system',
+        recoveryActions: [
+          { label: 'Try again', type: 'retry', primary: true },
+          { label: 'Contact support', type: 'contact_support' },
+        ],
+      }
+    }
+
+    // No signature and not a clear revert - return generic
+    return {
+      ...defaultResult,
+      message: errorMessage,
+      prettyMessage: 'Transaction failed',
+      suggestion: 'Please try again or contact support if the issue persists',
+    }
+  }
+
+  // Check if we have UX mapping for this signature
+  if (hasUXMapping(signature)) {
+    const uxMapping = ERROR_UX_MAPPINGS[signature as KnownErrorSignature]
+    const metadata = ERROR_METADATA[signature as KnownErrorSignature]
+
+    // Try to decode error args for dynamic messages
+    const fullData = extractFullErrorData(error)
+    const decodedArgs = decodeErrorArgs(signature, metadata.name, fullData)
+
+    // Generate message (use dynamic if available)
+    let prettyMessage = uxMapping.prettyMessage
+    let suggestion = uxMapping.suggestion
+
+    if (decodedArgs) {
+      if (uxMapping.dynamicMessage) {
+        try {
+          prettyMessage = uxMapping.dynamicMessage(decodedArgs)
+        } catch {
+          // Use static message
+        }
+      }
+      if (uxMapping.dynamicSuggestion) {
+        try {
+          suggestion = uxMapping.dynamicSuggestion(decodedArgs)
+        } catch {
+          // Use static suggestion
+        }
+      }
+    }
+
+    // Special handling for permission errors
+    if (signature === CALLER_NOT_PERMISSIONED_SIG && context?.functionName) {
+      const permissionMsg = getPermissionErrorMessage(`0x${context.functionName}` as `0x${string}`)
+      prettyMessage = permissionMsg.prettyMessage
+      suggestion = permissionMsg.suggestion
+    }
+
+    return {
+      message: extractContractCallDetails(errorMessage, metadata.name),
+      prettyMessage,
+      errorName: metadata.name,
+      isUserRejection: false,
+      category: uxMapping.category,
+      severity: uxMapping.severity,
+      suggestion,
+      recoveryActions: uxMapping.recoveryActions,
+      originalError: error,
+      signature,
+      decodedArgs: decodedArgs ?? undefined,
+      context,
+    }
+  }
+
+  // Signature not in registry - try to decode with provided ABI
+  if (abi) {
+    try {
+      const allAbis = [...getAllAbis(), abi as Abi]
+      const errors = extractErrors(allAbis)
+
+      const decoded = decodeErrorResult({
+        abi: errors,
+        data: signature,
+      })
+
+      if (decoded.errorName) {
+        return {
+          message: extractContractCallDetails(errorMessage, decoded.errorName),
+          prettyMessage: parseErrorNameToPrettyMessage(decoded.errorName),
+          errorName: decoded.errorName,
+          isUserRejection: false,
+          category: 'unknown',
+          severity: 'error',
+          suggestion: 'This error is not yet documented. Please report it.',
+          recoveryActions: [{ label: 'Report issue', type: 'contact_support' }],
+          originalError: error,
+          signature,
+          context,
+        }
+      }
+    } catch {
+      // Decoding failed
+    }
+  }
+
+  // Unknown error with signature
   return {
-    message: extractContractCallBlockAsString(errorMessage, errorName),
-    prettyMessage: parseErrorNameToPrettyMessage(errorName),
-    errorName,
-    isUserRejection: false,
+    ...defaultResult,
+    message: extractContractCallDetails(errorMessage, null),
+    prettyMessage: 'Contract error',
+    suggestion: `Unknown error (${signature}). Please report this.`,
+    signature,
   }
 }
 
 /**
- * Handles and transforms blockchain errors into user-friendly error objects.
- *
- * This utility provides comprehensive error handling for:
- * - Contract revert errors (decoded from ABIs in packages/sdk/src/abis/)
- * - Common viem/wallet errors (user rejection, network issues, gas errors)
- * - ERC20-specific errors (insufficient balance, allowance)
- *
- * @description
- * The function attempts to decode contract errors using all registered ABIs,
- * parse common viem error patterns, and return a user-friendly error message.
- * It automatically includes all ABIs from the SDK for error decoding.
- *
- * @param params - The error handling parameters
- * @param params.error - The error to handle (from viem, wagmi, or contract calls)
- * @param params.abi - Optional additional ABI for custom contract error decoding
- *
- * @returns An Error object with a detailed message
+ * Recursively extracts full error data (signature + args) from nested viem errors.
+ */
+function extractFullErrorData(error: unknown, depth = 0): Hex | undefined {
+  // Prevent infinite recursion
+  if (depth > 10 || !error || typeof error !== 'object') return undefined
+
+  const err = error as Record<string, unknown>
+
+  // Check data directly on this object
+  if ('data' in err && typeof err.data === 'string' && err.data.startsWith('0x')) {
+    return err.data as Hex
+  }
+
+  // Check walk property
+  if ('walk' in err && typeof err.walk === 'function') {
+    try {
+      const walked = (err.walk as (fn: (e: unknown) => boolean) => unknown)((e): boolean => {
+        return !!(e && typeof e === 'object' && 'data' in e)
+      })
+      if (walked && typeof walked === 'object' && 'data' in walked) {
+        const data = (walked as Record<string, unknown>).data
+        if (typeof data === 'string' && data.startsWith('0x')) {
+          return data as Hex
+        }
+      }
+    } catch {
+      // Walk failed
+    }
+  }
+
+  // Recursively check cause
+  if ('cause' in err && err.cause) {
+    const result = extractFullErrorData(err.cause, depth + 1)
+    if (result) return result
+  }
+
+  return undefined
+}
+
+// ============================================================================
+// Public API
+// ============================================================================
+
+/**
+ * Legacy ParsedError type for backward compatibility.
+ */
+export type ParsedError = {
+  message: string
+  prettyMessage: string
+  errorName: string | null
+  isUserRejection: boolean
+}
+
+/**
+ * Handles an error and returns an Error object with detailed message.
+ * Use this in catch blocks when you want to re-throw.
  *
  * @example
- * // Basic usage in a server function
- * import { handleError } from '@/utils/handle-error'
- *
- * async function buyTokens(amount: bigint) {
- *   try {
- *     const tx = await walletClient.writeContract({
- *       address: floorAddress,
- *       abi: Floor_v1,
- *       functionName: 'buy',
- *       args: [amount, 0n],
- *     })
- *     return { success: true, hash: tx }
- *   } catch (error) {
- *     throw handleError({ error })
- *   }
+ * ```ts
+ * try {
+ *   await buyTokens(amount)
+ * } catch (error) {
+ *   throw handleError({ error })
  * }
- *
- * @example
- * // With additional custom ABI
- * import { handleError } from '@/utils/handle-error'
- * import { CustomContractAbi } from './custom-abi'
- *
- * async function customOperation() {
- *   try {
- *     await doSomething()
- *   } catch (error) {
- *     throw handleError({
- *       error,
- *       abi: CustomContractAbi,
- *     })
- *   }
- * }
+ * ```
  */
 export function handleError(params: HandleErrorParams): Error {
   const parsed = parseError(params)
@@ -469,131 +727,128 @@ export function handleError(params: HandleErrorParams): Error {
 }
 
 /**
- * Parses an error and returns both detailed and pretty (toast-friendly) messages.
- *
- * Use this when you need both a detailed error for logging and a short message for UI.
- *
- * @param params - The error handling parameters
- * @param params.error - The error to handle (from viem, wagmi, or contract calls)
- * @param params.abi - Optional additional ABI for custom contract error decoding
- *
- * @returns A ParsedError object with message, prettyMessage, errorName, and isUserRejection
+ * Parses an error and returns detailed UX information.
+ * Use this when you need both UI messages and recovery actions.
  *
  * @example
- * // Usage in a mutation handler
- * import { getParsedError } from '@/utils/handle-error'
+ * ```ts
+ * const parsed = getParsedError({ error })
  *
- * const { mutate } = useMutation({
- *   mutationFn: buyTokens,
- *   onError: (error) => {
- *     const parsed = getParsedError({ error })
- *
- *     // Show short message in toast
- *     if (!parsed.isUserRejection) {
- *       toast.error(parsed.prettyMessage)
- *     }
- *
- *     // Log detailed message for debugging
- *     console.error('Transaction failed:', parsed.message)
- *   },
- * })
- *
- * @example
- * // In a try-catch block
- * try {
- *   await sellTokens(amount)
- * } catch (error) {
- *   const { prettyMessage, isUserRejection } = getParsedError({ error })
- *
- *   if (isUserRejection) {
- *     // User cancelled, no need to show error
- *     return
- *   }
- *
- *   toast.error(prettyMessage) // Shows: "Insufficient balance" instead of full error
+ * if (!parsed.isUserRejection) {
+ *   toast.error(parsed.prettyMessage)
+ *   console.log('Suggestion:', parsed.suggestion)
  * }
+ * ```
  */
-export function getParsedError(params: HandleErrorParams): ParsedError {
+export function getParsedError(params: HandleErrorParams): EnhancedParsedError {
   return parseError(params)
 }
 
 /**
- * Handles errors when the context (specific ABI) is unknown.
- *
- * This function attempts to decode contract errors by searching through
- * ALL registered ABIs in the SDK. Use this when you don't know which
- * contract produced the error.
- *
- * @description
- * Iterates through all ABIs from packages/sdk/src/abis/ to find matching
- * error definitions. This is more expensive than handleError with a specific
- * ABI but useful for catch-all error handling scenarios.
- *
- * @param error - The error to handle
- *
- * @returns An Error object with a user-friendly message
- *
- * @example
- * // Usage in a global error handler
- * import { handleErrorWithUnknownContext } from '@/utils/handle-error'
- *
- * function globalErrorHandler(error: unknown) {
- *   const handledError = handleErrorWithUnknownContext(error)
- *   console.error('Unhandled error:', handledError.message)
- *   return handledError
- * }
- *
- * @example
- * // In a React error boundary or global handler
- * const queryClient = new QueryClient({
- *   queryCache: new QueryCache({
- *     onError: (error) => {
- *       const handled = handleErrorWithUnknownContext(error)
- *       toast.error(handled.message)
- *     },
- *   }),
- * })
+ * Legacy function that returns simplified ParsedError.
+ * @deprecated Use getParsedError for full functionality
+ */
+export function getParsedErrorLegacy(params: HandleErrorParams): ParsedError {
+  const enhanced = parseError(params)
+  return {
+    message: enhanced.message,
+    prettyMessage: enhanced.prettyMessage,
+    errorName: enhanced.errorName,
+    isUserRejection: enhanced.isUserRejection,
+  }
+}
+
+/**
+ * Handles errors without knowing the specific ABI context.
+ * Searches all registered ABIs for matching errors.
  */
 export function handleErrorWithUnknownContext(error: unknown): Error {
   return handleError({ error })
 }
 
 /**
- * Parses an error with unknown context and returns both detailed and pretty messages.
- *
- * @param error - The error to parse
- *
- * @returns A ParsedError object with message, prettyMessage, errorName, and isUserRejection
- *
- * @example
- * // In a global error handler
- * const parsed = getParsedErrorWithUnknownContext(error)
- * if (!parsed.isUserRejection) {
- *   toast.error(parsed.prettyMessage)
- * }
+ * Parses an error without knowing the specific ABI context.
  */
-export function getParsedErrorWithUnknownContext(error: unknown): ParsedError {
+export function getParsedErrorWithUnknownContext(error: unknown): EnhancedParsedError {
   return parseError({ error })
 }
 
 /**
- * Type guard to check if an error is a user rejection error
- *
- * @param error - The error to check
- * @returns true if the error was caused by user rejecting the transaction
+ * Type guard to check if an error was caused by user rejection.
  *
  * @example
+ * ```ts
  * try {
  *   await buyTokens(amount)
  * } catch (error) {
  *   if (isUserRejection(error)) {
- *     // Don't show error toast for user cancellation
- *     return
+ *     return // Don't show error toast
  *   }
- *   toast.error(handleError({ error }).message)
+ *   toast.error('Transaction failed')
  * }
+ * ```
  */
 export function isUserRejection(error: unknown): boolean {
-  const parsed = parseViemErrorToPretty(error)
-  return parsed?.isRejection ?? false
+  const walletMatch = matchWalletErrorPattern(error)
+  return walletMatch?.pattern.isRejection ?? false
 }
+
+/**
+ * Gets recovery actions for an error.
+ * Useful when you want to show actionable buttons.
+ *
+ * @example
+ * ```ts
+ * const actions = getRecoveryActions(error)
+ * actions.forEach(action => {
+ *   if (action.type === 'approve_token') {
+ *     // Show approve button
+ *   }
+ * })
+ * ```
+ */
+export function getRecoveryActions(error: unknown): RecoveryAction[] {
+  const parsed = parseError({ error })
+  return parsed.recoveryActions
+}
+
+/**
+ * Gets the error category for analytics/logging.
+ */
+export function getErrorCategory(error: unknown): ErrorCategory {
+  const parsed = parseError({ error })
+  return parsed.category
+}
+
+/**
+ * Checks if an error is a specific known error by name.
+ *
+ * @example
+ * ```ts
+ * if (isErrorType(error, 'ERC20InsufficientBalance')) {
+ *   // Handle insufficient balance
+ * }
+ * ```
+ */
+export function isErrorType(error: unknown, errorName: string): boolean {
+  const parsed = parseError({ error })
+  return parsed.errorName === errorName
+}
+
+/**
+ * Checks if an error is a permission error.
+ */
+export function isPermissionError(error: unknown): boolean {
+  const parsed = parseError({ error })
+  return parsed.category === 'permission'
+}
+
+// ============================================================================
+// Re-exports
+// ============================================================================
+
+export type { EnhancedParsedError, ErrorCategory, ErrorContext, HandleErrorParams, RecoveryAction }
+export type { KnownErrorSignature } from './error-signatures.generated'
+export { ERROR_METADATA, isKnownErrorSignature } from './error-signatures.generated'
+export { ERROR_UX_MAPPINGS, hasUXMapping } from './error-ux-mappings'
+export { getPermissionErrorMessage, getPermissionInfo, PERMISSION_MAP } from './permission-map'

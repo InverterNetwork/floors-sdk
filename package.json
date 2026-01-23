@@ -33,6 +33,7 @@
     "format": "prettier --write .",
     "lint": "eslint",
     "fill-placeholders": "sh ./script/fill-placeholders.sh",
+    "generate:errors": "bun run script/generate-error-signatures.ts",
     "build": "bun build:cjs && bun build:esm && bun build:types",
     "build:cjs": "tsc --project ./tsconfig.cjs.json && tsc-alias --outDir ./dist/cjs && ts-add-js-extension --dir=dist/cjs --showprogress=false",
     "build:esm": "tsc --project ./tsconfig.esm.json && tsc-alias --outDir ./dist/esm && ts-add-js-extension --dir=dist/esm --showprogress=false",

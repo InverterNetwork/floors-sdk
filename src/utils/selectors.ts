@@ -122,3 +122,244 @@ export const PRESALE_SELECTORS = {
   addToWhitelist: getSelector(Presale_v1, 'addToWhitelist'),
   removeFromWhitelist: getSelector(Presale_v1, 'removeFromWhitelist'),
 } as const
+
+// =============================================================================
+// Selector Registry (for UI dropdowns and lookups)
+// =============================================================================
+
+/**
+ * @description Module types for categorizing selectors
+ */
+export type SelectorModuleType = 'floor' | 'creditFacility' | 'presale'
+
+/**
+ * @description A registered function selector with metadata
+ */
+export interface RegisteredSelector {
+  name: string
+  selector: `0x${string}`
+  module: SelectorModuleType
+  description: string
+}
+
+/**
+ * @description Registry of all known function selectors with human-readable names
+ * Used for UI dropdowns and permission displays
+ */
+export const SELECTOR_REGISTRY: RegisteredSelector[] = [
+  // Floor/Issuance functions
+  { name: 'buy', selector: FLOOR_SELECTORS.buy, module: 'floor', description: 'Buy tokens' },
+  {
+    name: 'buyFor',
+    selector: FLOOR_SELECTORS.buyFor,
+    module: 'floor',
+    description: 'Buy tokens for another address',
+  },
+  { name: 'sell', selector: FLOOR_SELECTORS.sell, module: 'floor', description: 'Sell tokens' },
+  {
+    name: 'sellTo',
+    selector: FLOOR_SELECTORS.sellTo,
+    module: 'floor',
+    description: 'Sell tokens to another address',
+  },
+  {
+    name: 'openBuy',
+    selector: FLOOR_SELECTORS.openBuy,
+    module: 'floor',
+    description: 'Enable buying',
+  },
+  {
+    name: 'closeBuy',
+    selector: FLOOR_SELECTORS.closeBuy,
+    module: 'floor',
+    description: 'Disable buying',
+  },
+  {
+    name: 'openSell',
+    selector: FLOOR_SELECTORS.openSell,
+    module: 'floor',
+    description: 'Enable selling',
+  },
+  {
+    name: 'closeSell',
+    selector: FLOOR_SELECTORS.closeSell,
+    module: 'floor',
+    description: 'Disable selling',
+  },
+  {
+    name: 'setBuyFee',
+    selector: FLOOR_SELECTORS.setBuyFee,
+    module: 'floor',
+    description: 'Set buy fee percentage',
+  },
+  {
+    name: 'setSellFee',
+    selector: FLOOR_SELECTORS.setSellFee,
+    module: 'floor',
+    description: 'Set sell fee percentage',
+  },
+  {
+    name: 'raiseFloor',
+    selector: FLOOR_SELECTORS.raiseFloor,
+    module: 'floor',
+    description: 'Elevate floor price',
+  },
+  {
+    name: 'withdrawCollateralTo',
+    selector: FLOOR_SELECTORS.withdrawCollateralTo,
+    module: 'floor',
+    description: 'Withdraw collateral to address',
+  },
+  {
+    name: 'depositCollateralFrom',
+    selector: FLOOR_SELECTORS.depositCollateralFrom,
+    module: 'floor',
+    description: 'Deposit collateral from address',
+  },
+
+  // Credit Facility functions
+  {
+    name: 'borrow',
+    selector: CREDIT_FACILITY_SELECTORS.borrow,
+    module: 'creditFacility',
+    description: 'Borrow funds',
+  },
+  {
+    name: 'borrowFor',
+    selector: CREDIT_FACILITY_SELECTORS.borrowFor,
+    module: 'creditFacility',
+    description: 'Borrow for another address',
+  },
+  {
+    name: 'buyAndBorrow',
+    selector: CREDIT_FACILITY_SELECTORS.buyAndBorrow,
+    module: 'creditFacility',
+    description: 'Buy and borrow in one transaction',
+  },
+  {
+    name: 'buyAndBorrowFor',
+    selector: CREDIT_FACILITY_SELECTORS.buyAndBorrowFor,
+    module: 'creditFacility',
+    description: 'Buy and borrow for another address',
+  },
+  {
+    name: 'repay',
+    selector: CREDIT_FACILITY_SELECTORS.repay,
+    module: 'creditFacility',
+    description: 'Repay loan',
+  },
+  {
+    name: 'transferLoan',
+    selector: CREDIT_FACILITY_SELECTORS.transferLoan,
+    module: 'creditFacility',
+    description: 'Transfer loan to another address',
+  },
+  {
+    name: 'rebalanceLoan',
+    selector: CREDIT_FACILITY_SELECTORS.rebalanceLoan,
+    module: 'creditFacility',
+    description: 'Rebalance loan collateral',
+  },
+  {
+    name: 'consolidateLoans',
+    selector: CREDIT_FACILITY_SELECTORS.consolidateLoans,
+    module: 'creditFacility',
+    description: 'Consolidate multiple loans',
+  },
+  {
+    name: 'setLoanToValueRatio',
+    selector: CREDIT_FACILITY_SELECTORS.setLoanToValueRatio,
+    module: 'creditFacility',
+    description: 'Set LTV ratio',
+  },
+  {
+    name: 'setBorrowingFeeRate',
+    selector: CREDIT_FACILITY_SELECTORS.setBorrowingFeeRate,
+    module: 'creditFacility',
+    description: 'Set borrowing fee rate',
+  },
+  {
+    name: 'setMaxLeverage',
+    selector: CREDIT_FACILITY_SELECTORS.setMaxLeverage,
+    module: 'creditFacility',
+    description: 'Set maximum leverage',
+  },
+
+  // Presale functions
+  {
+    name: 'setPresaleState',
+    selector: PRESALE_SELECTORS.setPresaleState,
+    module: 'presale',
+    description: 'Set presale state',
+  },
+  {
+    name: 'setCaps',
+    selector: PRESALE_SELECTORS.setCaps,
+    module: 'presale',
+    description: 'Set deposit caps',
+  },
+  {
+    name: 'setEndTimestamp',
+    selector: PRESALE_SELECTORS.setEndTimestamp,
+    module: 'presale',
+    description: 'Set presale end time',
+  },
+  {
+    name: 'addToWhitelist',
+    selector: PRESALE_SELECTORS.addToWhitelist,
+    module: 'presale',
+    description: 'Add address to whitelist',
+  },
+  {
+    name: 'removeFromWhitelist',
+    selector: PRESALE_SELECTORS.removeFromWhitelist,
+    module: 'presale',
+    description: 'Remove address from whitelist',
+  },
+] as const
+
+/**
+ * @description Map from selector hash to registered selector info
+ */
+export const SELECTOR_BY_HASH = new Map<string, RegisteredSelector>(
+  SELECTOR_REGISTRY.map((s) => [s.selector.toLowerCase(), s])
+)
+
+/**
+ * @description Get human-readable function name from selector hash
+ * @param selector - The 4-byte function selector (e.g., "0xd6febde8")
+ * @returns Human-readable function name or the selector if unknown
+ */
+export function getSelectorName(selector: string): string {
+  const info = SELECTOR_BY_HASH.get(selector.toLowerCase())
+  return info?.name ?? selector
+}
+
+/**
+ * @description Get full selector info from hash
+ * @param selector - The 4-byte function selector
+ * @returns RegisteredSelector or undefined if unknown
+ */
+export function getSelectorInfo(selector: string): RegisteredSelector | undefined {
+  return SELECTOR_BY_HASH.get(selector.toLowerCase())
+}
+
+/**
+ * @description Get selectors grouped by module type
+ */
+export function getSelectorsByModule(): Record<SelectorModuleType, RegisteredSelector[]> {
+  return {
+    floor: SELECTOR_REGISTRY.filter((s) => s.module === 'floor'),
+    creditFacility: SELECTOR_REGISTRY.filter((s) => s.module === 'creditFacility'),
+    presale: SELECTOR_REGISTRY.filter((s) => s.module === 'presale'),
+  }
+}
+
+/**
+ * @description Module type display names for UI
+ */
+export const MODULE_DISPLAY_NAMES: Record<SelectorModuleType, string> = {
+  floor: 'Floor (Issuance)',
+  creditFacility: 'Credit Facility',
+  presale: 'Presale',
+}

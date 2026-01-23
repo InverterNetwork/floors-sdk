@@ -193,11 +193,39 @@ export function tradeToActivity(
   const fee = Number.parseFloat(trade.feeFormatted) || 0
   const newPrice = Number.parseFloat(trade.newPriceFormatted) || 0
 
-  // Calculate price impact if we have the before price
-  // Price impact = (priceAfter - priceBefore) / priceBefore
+  // Calculate price impact from the trade's own execution data
+  // effectivePrice = what the user actually paid/received per token
+  // newPrice = the market price after the trade
+  //
+  // For a BUY: user pushes price UP, so effectivePrice < newPrice
+  //   - Impact = (newPrice - effectivePrice) / newPrice (how much cheaper the pre-trade price was)
+  // For a SELL: user pushes price DOWN, so effectivePrice > newPrice
+  //   - Impact = (effectivePrice - newPrice) / effectivePrice (how much higher the pre-trade price was)
+  //
+  // This matches the trade form's calculation which compares expected vs actual output
   let priceImpact = 0
-  if (priceBefore && priceBefore > 0) {
-    priceImpact = Math.abs((newPrice - priceBefore) / priceBefore)
+  if (tokenAmount > 0 && newPrice > 0) {
+    const effectivePrice = reserveAmount / tokenAmount
+
+    if (trade.tradeType === 'BUY') {
+      // For buys: effectivePrice < newPrice (you paid at prices leading up to newPrice)
+      // Price impact = how much more expensive the average execution was vs the starting price
+      // Since effectivePrice is the average and newPrice is the final (higher) price,
+      // the starting price was lower than effectivePrice
+      // Approximate impact as the spread between effective and new price
+      if (effectivePrice > 0) {
+        priceImpact = Math.abs(newPrice - effectivePrice) / newPrice
+      }
+    } else {
+      // For sells: effectivePrice > newPrice (you sold at prices leading down to newPrice)
+      // Price impact = how much less you got compared to the starting price
+      // Since effectivePrice is the average and newPrice is the final (lower) price,
+      // the starting price was higher than effectivePrice
+      // Approximate impact as the spread between effective and new price
+      if (effectivePrice > 0) {
+        priceImpact = Math.abs(effectivePrice - newPrice) / effectivePrice
+      }
+    }
   }
 
   return {
@@ -433,7 +461,7 @@ export function floorElevationToActivity(
 /**
  * @description Combines and sorts trades, loans, and floor elevations into unified activity list
  * Detects "loop" transactions by matching BUY trades with loans that share the same txHash
- * Calculates price impact by comparing each trade's newPrice with the previous trade's newPrice
+ * Price impact is calculated from each trade's own execution data (effective price vs post-trade price)
  */
 export function combineMarketActivity(
   trades: TGraphQLTradeActivity[],
