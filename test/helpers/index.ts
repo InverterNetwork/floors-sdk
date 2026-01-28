@@ -50,3 +50,16 @@ export {
   deployERC20Issuance,
   deployTestTokens,
 } from './deploy'
+
+// Contract deployment script utilities
+export type { DeploymentOptions } from './deploy-contracts'
+export {
+  CONTRACTS_DIR,
+  DEPLOY_SCRIPT,
+  ENV_FILE,
+  getCollateralTokenFromEnv,
+  getFloorFactoryFromEnv,
+  runDeploymentScript,
+  startAnvil,
+  stopAnvil,
+} from './deploy-contracts'

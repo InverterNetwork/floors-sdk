@@ -12,13 +12,13 @@ import type { PopWalletClient } from '../src/types'
 import { PRESALE_SELECTORS } from '../src/utils/selectors'
 import {
   ANVIL_ADDRESSES,
-  checkDevnetAvailability,
-  createDevnetClients,
-  createDevnetWalletClient,
+  checkLocalAvailability,
+  createLocalClients,
+  createLocalWalletClient,
   createTestLaunchConfig,
   createTestPresaleConfig,
   deployTestTokens,
-  DEVNET_CONTRACTS,
+  runDeploymentScript,
 } from './helpers/index'
 
 // =============================================================================
@@ -177,25 +177,29 @@ describe('#MerklePresaleE2E', () => {
   // ---------------------------------------------------------------------------
 
   beforeAll(async () => {
-    const clients = createDevnetClients('DEPLOYER')
+    // Deploy infrastructure to local Anvil
+    const floorFactoryAddress = runDeploymentScript({ local: true })
+
+    // Create clients connected to local Anvil
+    const clients = createLocalClients('DEPLOYER')
     publicClient = clients.publicClient
     adminWalletClient = clients.walletClient
-    userWalletClient = createDevnetWalletClient('USER_1')
+    userWalletClient = createLocalWalletClient('USER_1')
 
     launch = new Launch({
-      floorFactoryAddress: DEVNET_CONTRACTS.FLOOR_FACTORY,
+      floorFactoryAddress,
       publicClient,
       walletClient: adminWalletClient,
     })
 
-    const blockNumber = await checkDevnetAvailability(publicClient)
+    const blockNumber = await checkLocalAvailability(publicClient)
     isDevnetAvailable = blockNumber !== null
     if (isDevnetAvailable) {
-      console.log(`Devnet available at block ${blockNumber}`)
+      console.log(`Local Anvil available at block ${blockNumber}`)
     } else {
-      console.warn('Devnet not available, E2E tests will be skipped')
+      console.warn('Local Anvil not available, E2E tests will be skipped')
     }
-  })
+  }, 300_000)
 
   afterAll(() => {
     console.log('\n=== Merkle E2E Test Suite Complete ===')
