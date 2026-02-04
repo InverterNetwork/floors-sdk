@@ -324,10 +324,11 @@ export function mapPresaleToPresaleData(presale: TGraphQLPresale): TPresale {
   // Calculate time remaining
   const timeRemaining = Math.max(0, endTime - now)
 
-  // Determine state
+  // Determine state (PresaleState: NotOpen=0, Whitelist=1, Public=2, Closed=3)
   const isUpcoming = now < startTime
-  const isActive = now >= startTime && now < endTime && presale.currentState === 1
-  const isEnded = now >= endTime || presale.currentState !== 1
+  const isActive =
+    now >= startTime && now < endTime && (presale.currentState === 1 || presale.currentState === 2) // Whitelist or Public
+  const isEnded = now >= endTime || presale.currentState === 3 // Closed
 
   // Calculate commission (using first commissionBps if array)
   const commissionBps = Array.isArray(presale.commissionBps)
