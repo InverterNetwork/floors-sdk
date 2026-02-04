@@ -32,7 +32,7 @@ export type TokenConfig = {
   symbol: string
   /** Token decimals (default: 18) */
   decimals: number
-  /** Maximum supply (0 = unlimited, uses max uint256) */
+  /** Maximum supply in human-readable format (0 = unlimited, e.g., 100000000 for 100M tokens) */
   maxSupply: bigint
 }
 
@@ -126,6 +126,8 @@ export class Deploy {
    * @description Deploy a new ERC20Issuance token
    * @param params Token configuration and owner address
    * @returns Deployment result with token address and receipt
+   * @note maxSupply is expected in human-readable format (e.g., 100000000 for 100M tokens)
+   *       and will be automatically scaled by 10^decimals before deployment
    */
   public async deployToken(params: DeployTokenParams): Promise<DeployTokenResult> {
     const { config, ownerAddress } = params
@@ -134,11 +136,12 @@ export class Deploy {
     const trustedForwarderAddress = await this.getTrustedForwarderAddress()
 
     // For "unlimited" supply (0), use max uint256 value
-    // ERC20Capped requires maxSupply > 0
+    // Otherwise, scale the human-readable maxSupply by 10^decimals
+    // e.g., maxSupply=100000000 with decimals=18 becomes 100000000 * 10^18
     const maxSupply =
       config.maxSupply === BigInt(0)
         ? BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff') // type(uint256).max
-        : config.maxSupply
+        : config.maxSupply * BigInt(10 ** config.decimals)
 
     // Deploy contract
     const hash = await this.walletClient.deployContract({

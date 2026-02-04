@@ -249,7 +249,12 @@ export class Launch {
     const floorCreatedEvent = this.parseFloorCreatedEvent(receipt)
 
     if (!floorCreatedEvent) {
-      throw new Error('FloorCreated event not found in transaction receipt')
+      const logSummary = receipt.logs.length
+        ? `Receipt has ${receipt.logs.length} log(s) from: ${[...new Set(receipt.logs.map((l) => l.address))].join(', ')}. `
+        : 'Receipt has no logs. '
+      throw new Error(
+        `FloorCreated event not found in transaction receipt. ${logSummary}Ensure the transaction was sent to FloorFactory at ${this.floorFactoryAddress}.`
+      )
     }
 
     return {
@@ -783,42 +788,39 @@ export class Launch {
   // ===========================================================================
 
   /**
-   * @description Parse FloorCreated event from transaction receipt
+   * @description Parse FloorCreated event from transaction receipt.
+   * Prefers logs from the configured FloorFactory address; falls back to any log if none match.
    */
   private parseFloorCreatedEvent(
     receipt: TransactionReceipt
   ): { floorId: bigint; floorAddress: Address } | null {
-    // FloorCreated event ABI
-    const floorCreatedEventAbi = {
-      type: 'event',
-      name: 'FloorCreated',
-      inputs: [
-        { name: 'floorId_', type: 'uint256', indexed: true },
-        { name: 'floorProxy_', type: 'address', indexed: true },
-      ],
-    } as const
+    const factoryAddressLower = this.floorFactoryAddress.toLowerCase()
 
-    for (const log of receipt.logs) {
-      try {
-        const decoded = decodeEventLog({
-          abi: [floorCreatedEventAbi],
-          data: log.data,
-          topics: log.topics,
-        })
-
-        if (decoded.eventName === 'FloorCreated') {
-          return {
-            floorId: decoded.args.floorId_,
-            floorAddress: decoded.args.floorProxy_,
+    const tryDecode = (logs: typeof receipt.logs) => {
+      for (const log of logs) {
+        try {
+          const decoded = decodeEventLog({
+            abi: FloorFactory_v1,
+            data: log.data,
+            topics: log.topics,
+          })
+          if (decoded.eventName === 'FloorCreated') {
+            return {
+              floorId: decoded.args.floorId_,
+              floorAddress: decoded.args.floorProxy_,
+            }
           }
+        } catch {
+          continue
         }
-      } catch {
-        // Not the event we're looking for, continue
-        continue
       }
+      return null
     }
 
-    return null
+    // Prefer logs emitted by the configured factory (handles proxy: log.address is the proxy)
+    const fromFactory = receipt.logs.filter((l) => l.address.toLowerCase() === factoryAddressLower)
+    const result = fromFactory.length > 0 ? tryDecode(fromFactory) : tryDecode(receipt.logs)
+    return result
   }
 
   private buildModuleConfig(
