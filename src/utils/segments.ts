@@ -1,7 +1,101 @@
 /**
  * @description Segment utilities for bonding curve configuration
  * PackedSegment format: bytes32 containing [initialPrice | priceIncrease | supplyPerStep | numberOfSteps]
+ *
+ * Bit layout (from LSB to MSB):
+ * - initialPrice:    72 bits  (offset 0)   - Start price for this segment
+ * - priceIncrease:   72 bits  (offset 72)  - Price step increase (0 = flat floor)
+ * - supplyPerStep:   96 bits  (offset 144) - Token amount per step
+ * - numberOfSteps:   16 bits  (offset 240) - Steps in segment (1–65,535)
  */
+
+/**
+ * @description Packed segment type (bytes32 hex string)
+ */
+export type PackedSegment = `0x${string}`
+
+/**
+ * @description Decoded segment from bytes32 PackedSegment
+ */
+export interface DecodedSegment {
+  /** Starting price (72 bits, 18 decimals) */
+  initialPrice: bigint
+  /** Price increase per step (72 bits, 18 decimals, 0 = flat floor) */
+  priceIncreasePerStep: bigint
+  /** Token supply per step (96 bits, token decimals) */
+  supplyPerStep: bigint
+  /** Number of steps in segment (16 bits, 1-65535) */
+  numberOfSteps: number
+
+  // Computed fields
+  /** Total supply for this segment */
+  totalSupply: bigint
+  /** Final price at end of segment */
+  finalPrice: bigint
+  /** Whether this is a floor segment (flat price, 1 step) */
+  isFloorSegment: boolean
+}
+
+// Bit masks for decoding
+const MASK_72 = (BigInt(1) << BigInt(72)) - BigInt(1)
+const MASK_96 = (BigInt(1) << BigInt(96)) - BigInt(1)
+const MASK_16 = (BigInt(1) << BigInt(16)) - BigInt(1)
+
+/**
+ * @description Decode a bytes32 PackedSegment into its component parts
+ * @param packed The packed segment as a hex string (bytes32)
+ * @returns Decoded segment with computed fields
+ */
+export function decodePackedSegment(packed: PackedSegment): DecodedSegment {
+  const value = BigInt(packed)
+
+  // Extract fields using bit masks and shifts
+  const initialPrice = value & MASK_72
+  const priceIncreasePerStep = (value >> BigInt(72)) & MASK_72
+  const supplyPerStep = (value >> BigInt(144)) & MASK_96
+  const numberOfSteps = Number((value >> BigInt(240)) & MASK_16)
+
+  // Compute derived fields
+  const totalSupply = supplyPerStep * BigInt(numberOfSteps)
+  const finalPrice =
+    numberOfSteps > 0
+      ? initialPrice + priceIncreasePerStep * BigInt(numberOfSteps - 1)
+      : initialPrice
+  const isFloorSegment = priceIncreasePerStep === BigInt(0) && numberOfSteps === 1
+
+  return {
+    initialPrice,
+    priceIncreasePerStep,
+    supplyPerStep,
+    numberOfSteps,
+    totalSupply,
+    finalPrice,
+    isFloorSegment,
+  }
+}
+
+/**
+ * @description Decode multiple packed segments
+ * @param packedSegments Array of packed segments
+ * @returns Array of decoded segments
+ */
+export function decodePackedSegments(packedSegments: PackedSegment[]): DecodedSegment[] {
+  return packedSegments.map(decodePackedSegment)
+}
+
+/**
+ * @description Encode a decoded segment back to bytes32 format
+ * @param segment Decoded segment to encode
+ * @returns Packed segment as hex string
+ */
+export function encodeToPackedSegment(segment: DecodedSegment): PackedSegment {
+  let value = BigInt(0)
+  value |= segment.initialPrice & MASK_72
+  value |= (segment.priceIncreasePerStep & MASK_72) << BigInt(72)
+  value |= (segment.supplyPerStep & MASK_96) << BigInt(144)
+  value |= (BigInt(segment.numberOfSteps) & MASK_16) << BigInt(240)
+  return `0x${value.toString(16).padStart(64, '0')}` as PackedSegment
+}
 
 /**
  * @description Segment configuration for bonding curve

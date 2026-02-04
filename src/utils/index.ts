@@ -5,6 +5,14 @@ export * from './error-ux-mappings'
 export * from './handle-error'
 export * from './permission-map'
 
-// Other utilities
+// Bonding curve utilities
 export * from './segments'
+
+// Credit facility utilities
+export * from './credit-facility'
+
+// Fee multiplier utilities
+export * from './multiplier'
+
+// Contract selectors
 export * from './selectors'

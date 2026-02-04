@@ -179,6 +179,19 @@ export default [
   },
   {
     type: 'function',
+    name: 'getDecayDuration',
+    inputs: [],
+    outputs: [
+      {
+        name: 'duration_',
+        type: 'uint64',
+        internalType: 'uint64',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     name: 'getEndTimestamp',
     inputs: [],
     outputs: [
@@ -218,6 +231,19 @@ export default [
   },
   {
     type: 'function',
+    name: 'getInitialMultiplier',
+    inputs: [],
+    outputs: [
+      {
+        name: 'initialMultiplier_',
+        type: 'uint32',
+        internalType: 'uint32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     name: 'getIssuanceBy',
     inputs: [
       {
@@ -229,6 +255,32 @@ export default [
     outputs: [
       {
         name: 'issuance_',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getMerkleRoot',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+        internalType: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getMultiplier',
+    inputs: [],
+    outputs: [
+      {
+        name: 'multiplier_',
         type: 'uint256',
         internalType: 'uint256',
       },
@@ -388,6 +440,19 @@ export default [
   },
   {
     type: 'function',
+    name: 'getStartTime',
+    inputs: [],
+    outputs: [
+      {
+        name: 'startTime_',
+        type: 'uint64',
+        internalType: 'uint64',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     name: 'init',
     inputs: [
       {
@@ -416,17 +481,24 @@ export default [
   },
   {
     type: 'function',
-    name: 'isTrustedForwarder',
-    inputs: [
-      {
-        name: 'forwarder',
-        type: 'address',
-        internalType: 'address',
-      },
-    ],
+    name: 'isActive',
+    inputs: [],
     outputs: [
       {
-        name: '',
+        name: 'isActive_',
+        type: 'bool',
+        internalType: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'isEnded',
+    inputs: [],
+    outputs: [
+      {
+        name: 'isEnded_',
         type: 'bool',
         internalType: 'bool',
       },
@@ -454,29 +526,22 @@ export default [
   },
   {
     type: 'function',
-    name: 'getMerkleRoot',
-    inputs: [],
+    name: 'isTrustedForwarder',
+    inputs: [
+      {
+        name: 'forwarder',
+        type: 'address',
+        internalType: 'address',
+      },
+    ],
     outputs: [
       {
-        name: 'merkleRoot_',
-        type: 'bytes32',
-        internalType: 'bytes32',
+        name: '',
+        type: 'bool',
+        internalType: 'bool',
       },
     ],
     stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    name: 'setMerkleRoot',
-    inputs: [
-      {
-        name: 'merkleRoot_',
-        type: 'bytes32',
-        internalType: 'bytes32',
-      },
-    ],
-    outputs: [],
-    stateMutability: 'nonpayable',
   },
   {
     type: 'function',
@@ -529,6 +594,19 @@ export default [
   },
   {
     type: 'function',
+    name: 'setDecayDuration',
+    inputs: [
+      {
+        name: 'duration_',
+        type: 'uint64',
+        internalType: 'uint64',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
     name: 'setEndTimestamp',
     inputs: [
       {
@@ -542,12 +620,51 @@ export default [
   },
   {
     type: 'function',
+    name: 'setInitialMultiplier',
+    inputs: [
+      {
+        name: 'multiplier_',
+        type: 'uint32',
+        internalType: 'uint32',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setMerkleRoot',
+    inputs: [
+      {
+        name: 'merkleRoot_',
+        type: 'bytes32',
+        internalType: 'bytes32',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
     name: 'setPresaleState',
     inputs: [
       {
         name: 'state_',
         type: 'uint8',
         internalType: 'enum IPresale_v1.PresaleState',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setStartTime',
+    inputs: [
+      {
+        name: 'startTime_',
+        type: 'uint64',
+        internalType: 'uint64',
       },
     ],
     outputs: [],
@@ -632,6 +749,25 @@ export default [
   },
   {
     type: 'event',
+    name: 'DecayDurationUpdated',
+    inputs: [
+      {
+        name: 'oldDuration_',
+        type: 'uint64',
+        indexed: false,
+        internalType: 'uint64',
+      },
+      {
+        name: 'newDuration_',
+        type: 'uint64',
+        indexed: false,
+        internalType: 'uint64',
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
     name: 'DirectTokensClaimed',
     inputs: [
       {
@@ -664,6 +800,44 @@ export default [
   },
   {
     type: 'event',
+    name: 'FeeMultiplierDecayReset',
+    inputs: [],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'FeeMultiplierDecayStarted',
+    inputs: [
+      {
+        name: 'startTime_',
+        type: 'uint64',
+        indexed: false,
+        internalType: 'uint64',
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'InitialMultiplierUpdated',
+    inputs: [
+      {
+        name: 'oldMultiplier_',
+        type: 'uint32',
+        indexed: false,
+        internalType: 'uint32',
+      },
+      {
+        name: 'newMultiplier_',
+        type: 'uint32',
+        indexed: false,
+        internalType: 'uint32',
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
     name: 'Initialized',
     inputs: [
       {
@@ -671,6 +845,38 @@ export default [
         type: 'uint64',
         indexed: false,
         internalType: 'uint64',
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'MerkleRootUpdated',
+    inputs: [
+      {
+        name: 'oldRoot_',
+        type: 'bytes32',
+        indexed: false,
+        internalType: 'bytes32',
+      },
+      {
+        name: 'newRoot_',
+        type: 'bytes32',
+        indexed: false,
+        internalType: 'bytes32',
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'MerkleWhitelistRegistered',
+    inputs: [
+      {
+        name: 'account_',
+        type: 'address',
+        indexed: true,
+        internalType: 'address',
       },
     ],
     anonymous: false,
@@ -771,6 +977,12 @@ export default [
         indexed: false,
         internalType: 'uint256',
       },
+      {
+        name: 'multiplier_',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
     ],
     anonymous: false,
   },
@@ -826,38 +1038,6 @@ export default [
     anonymous: false,
   },
   {
-    type: 'event',
-    name: 'MerkleRootUpdated',
-    inputs: [
-      {
-        name: 'oldRoot_',
-        type: 'bytes32',
-        indexed: false,
-        internalType: 'bytes32',
-      },
-      {
-        name: 'newRoot_',
-        type: 'bytes32',
-        indexed: false,
-        internalType: 'bytes32',
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: 'event',
-    name: 'MerkleWhitelistRegistered',
-    inputs: [
-      {
-        name: 'account_',
-        type: 'address',
-        indexed: true,
-        internalType: 'address',
-      },
-    ],
-    anonymous: false,
-  },
-  {
     type: 'error',
     name: 'InvalidInitialization',
     inputs: [],
@@ -865,6 +1045,26 @@ export default [
   {
     type: 'error',
     name: 'Module__CallerNotPermissioned',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'Module__DecayingFeeMultiplierBase__AlreadyStarted',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'Module__DecayingFeeMultiplierBase__InvalidDecayDuration',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'Module__DecayingFeeMultiplierBase__InvalidInitialMultiplier',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'Module__DecayingFeeMultiplierBase__NotStarted',
     inputs: [],
   },
   {
@@ -880,6 +1080,21 @@ export default [
   {
     type: 'error',
     name: 'Module__InvalidArrayLength',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'Module__MerkleWhitelistBase__AlreadyWhitelisted',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'Module__MerkleWhitelistBase__MerkleRootNotSettable',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'Module__MerkleWhitelistBase__NotWhitelisted',
     inputs: [],
   },
   {
@@ -968,17 +1183,7 @@ export default [
   },
   {
     type: 'error',
-    name: 'Module__MerkleWhitelistBase__MerkleRootNotSettable',
-    inputs: [],
-  },
-  {
-    type: 'error',
-    name: 'Module__MerkleWhitelistBase__NotWhitelisted',
-    inputs: [],
-  },
-  {
-    type: 'error',
-    name: 'Module__MerkleWhitelistBase__AlreadyWhitelisted',
+    name: 'Presale__NotWhitelisted',
     inputs: [],
   },
   {

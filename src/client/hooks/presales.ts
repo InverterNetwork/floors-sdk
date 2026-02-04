@@ -154,6 +154,16 @@ export const usePresalePositionsQuery = (
   })
 }
 
+/** Multiplier state returned from getMultiplierState */
+export type TMultiplierState = {
+  startTime: bigint
+  decayDuration: bigint
+  initialMultiplier: bigint
+  currentMultiplier: bigint
+  isActive: boolean
+  isEnded: boolean
+}
+
 export type UsePresaleMutationsReturnType = {
   buyPresale: UseMutationResult<TPresaleMutationResult, Error, TPresaleBuyParams>
   buyPresaleWithLeverage: UseMutationResult<
@@ -173,6 +183,15 @@ export type UsePresaleMutationsReturnType = {
   getPositionState: UseMutationResult<any, Error, bigint>
   getBaseCommissionBps: UseMutationResult<bigint[], Error, void>
   getPriceBreakpoints: UseMutationResult<bigint[][], Error, void>
+  // Multiplier/Fee Decay queries
+  getMultiplier: UseMutationResult<bigint, Error, void>
+  getInitialMultiplier: UseMutationResult<bigint, Error, void>
+  getDecayDuration: UseMutationResult<bigint, Error, void>
+  getStartTime: UseMutationResult<bigint, Error, void>
+  getEndTimestamp: UseMutationResult<bigint, Error, void>
+  isDecayActive: UseMutationResult<boolean, Error, void>
+  isDecayEnded: UseMutationResult<boolean, Error, void>
+  getMultiplierState: UseMutationResult<TMultiplierState, Error, void>
 }
 
 /**
@@ -297,6 +316,39 @@ export const usePresaleMutations = (): UsePresaleMutationsReturnType => {
     mutationFn: async () => ensurePresale().getPriceBreakpoints(),
   })
 
+  // Multiplier/Fee Decay queries
+  const getMultiplier = useMutation({
+    mutationFn: async () => ensurePresale().getMultiplier(),
+  })
+
+  const getInitialMultiplier = useMutation({
+    mutationFn: async () => ensurePresale().getInitialMultiplier(),
+  })
+
+  const getDecayDuration = useMutation({
+    mutationFn: async () => ensurePresale().getDecayDuration(),
+  })
+
+  const getStartTime = useMutation({
+    mutationFn: async () => ensurePresale().getStartTime(),
+  })
+
+  const getEndTimestamp = useMutation({
+    mutationFn: async () => ensurePresale().getEndTimestamp(),
+  })
+
+  const isDecayActive = useMutation({
+    mutationFn: async () => ensurePresale().isDecayActive(),
+  })
+
+  const isDecayEnded = useMutation({
+    mutationFn: async () => ensurePresale().isDecayEnded(),
+  })
+
+  const getMultiplierState = useMutation({
+    mutationFn: async () => ensurePresale().getMultiplierState(),
+  })
+
   return {
     buyPresale,
     buyPresaleWithLeverage,
@@ -312,6 +364,15 @@ export const usePresaleMutations = (): UsePresaleMutationsReturnType => {
     getPositionState,
     getBaseCommissionBps,
     getPriceBreakpoints,
+    // Multiplier/Fee Decay
+    getMultiplier,
+    getInitialMultiplier,
+    getDecayDuration,
+    getStartTime,
+    getEndTimestamp,
+    isDecayActive,
+    isDecayEnded,
+    getMultiplierState,
   }
 }
 

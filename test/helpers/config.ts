@@ -24,7 +24,7 @@ export const LOCAL_RPC_URL = 'http://127.0.0.1:8545'
 /**
  * GraphQL Indexer URL
  */
-export const GRAPHQL_URL = 'https://indexer.hyperindex.xyz/cada10d/v1/graphql'
+export const GRAPHQL_URL = 'https://indexer.hyperindex.xyz/84826af/v1/graphql'
 
 // =============================================================================
 // Anvil Default Accounts

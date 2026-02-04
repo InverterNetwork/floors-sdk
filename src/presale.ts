@@ -521,6 +521,182 @@ export class Presale {
     })
   }
 
+  // =========================================================================
+  // MULTIPLIER READ METHODS (Fee Decay)
+  // =========================================================================
+
+  /**
+   * @description Get current fee multiplier (decays over time)
+   * @returns Current multiplier value (10000 = 1x, 100000 = 10x)
+   */
+  public async getMultiplier(): Promise<bigint> {
+    return (await this.publicClient.readContract({
+      address: this.address,
+      abi: Presale_v1,
+      functionName: 'getMultiplier',
+    })) as bigint
+  }
+
+  /**
+   * @description Get initial multiplier (before decay starts)
+   * @returns Initial multiplier value
+   */
+  public async getInitialMultiplier(): Promise<bigint> {
+    const result = await this.publicClient.readContract({
+      address: this.address,
+      abi: Presale_v1,
+      functionName: 'getInitialMultiplier',
+    })
+    // uint32 returned - convert to bigint
+    return BigInt(result)
+  }
+
+  /**
+   * @description Get decay duration in seconds
+   * @returns Decay duration
+   */
+  public async getDecayDuration(): Promise<bigint> {
+    const result = await this.publicClient.readContract({
+      address: this.address,
+      abi: Presale_v1,
+      functionName: 'getDecayDuration',
+    })
+    // uint64 returned - convert to bigint
+    return BigInt(result)
+  }
+
+  /**
+   * @description Get decay start time (Unix timestamp)
+   * @returns Start time (0 if not started)
+   */
+  public async getStartTime(): Promise<bigint> {
+    const result = await this.publicClient.readContract({
+      address: this.address,
+      abi: Presale_v1,
+      functionName: 'getStartTime',
+    })
+    // uint64 returned - convert to bigint
+    return BigInt(result)
+  }
+
+  /**
+   * @description Get presale end timestamp
+   * @returns End timestamp (0 if not set)
+   */
+  public async getEndTimestamp(): Promise<bigint> {
+    const result = await this.publicClient.readContract({
+      address: this.address,
+      abi: Presale_v1,
+      functionName: 'getEndTimestamp',
+    })
+    // uint64 returned - convert to bigint
+    return BigInt(result)
+  }
+
+  /**
+   * @description Check if fee decay is currently active
+   * @returns True if decay has started and not ended
+   */
+  public async isDecayActive(): Promise<boolean> {
+    return (await this.publicClient.readContract({
+      address: this.address,
+      abi: Presale_v1,
+      functionName: 'isActive',
+    })) as boolean
+  }
+
+  /**
+   * @description Check if fee decay has ended
+   * @returns True if decay has completed
+   */
+  public async isDecayEnded(): Promise<boolean> {
+    return (await this.publicClient.readContract({
+      address: this.address,
+      abi: Presale_v1,
+      functionName: 'isEnded',
+    })) as boolean
+  }
+
+  /**
+   * @description Get complete multiplier state in a single batched call
+   * @returns MultiplierState object with all decay parameters
+   */
+  public async getMultiplierState(): Promise<{
+    startTime: bigint
+    decayDuration: bigint
+    initialMultiplier: bigint
+    currentMultiplier: bigint
+    isActive: boolean
+    isEnded: boolean
+  }> {
+    try {
+      // Try multicall first
+      const contracts = [
+        {
+          address: this.address,
+          abi: Presale_v1,
+          functionName: 'getStartTime' as const,
+        },
+        {
+          address: this.address,
+          abi: Presale_v1,
+          functionName: 'getDecayDuration' as const,
+        },
+        {
+          address: this.address,
+          abi: Presale_v1,
+          functionName: 'getInitialMultiplier' as const,
+        },
+        {
+          address: this.address,
+          abi: Presale_v1,
+          functionName: 'getMultiplier' as const,
+        },
+        {
+          address: this.address,
+          abi: Presale_v1,
+          functionName: 'isActive' as const,
+        },
+        {
+          address: this.address,
+          abi: Presale_v1,
+          functionName: 'isEnded' as const,
+        },
+      ]
+
+      const results = await this.publicClient.multicall({ contracts })
+
+      return {
+        startTime: BigInt((results[0].result as number) ?? 0),
+        decayDuration: BigInt((results[1].result as number) ?? 0),
+        initialMultiplier: BigInt((results[2].result as number) ?? 10000),
+        currentMultiplier: (results[3].result as bigint) ?? BigInt(10000),
+        isActive: (results[4].result as boolean) ?? false,
+        isEnded: (results[5].result as boolean) ?? true,
+      }
+    } catch {
+      // Fallback to individual calls
+      const [startTime, decayDuration, initialMultiplier, currentMultiplier, isActive, isEnded] =
+        await Promise.all([
+          this.getStartTime(),
+          this.getDecayDuration(),
+          this.getInitialMultiplier(),
+          this.getMultiplier(),
+          this.isDecayActive(),
+          this.isDecayEnded(),
+        ])
+
+      return {
+        startTime,
+        decayDuration,
+        initialMultiplier,
+        currentMultiplier,
+        isActive,
+        isEnded,
+      }
+    }
+  }
+
   /**
    * @description Get purchase token allowance for presale contract
    * @param ownerAddress Token owner address
