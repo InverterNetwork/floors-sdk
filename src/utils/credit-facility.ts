@@ -279,7 +279,7 @@ export function getCreditFacilityMode(config: CreditFacilityConfigInput): {
   label: string
   description: string
 } {
-  const { loanToValueRatio, maxLeverage, borrowingFeeRate } = config
+  const { loanToValueRatio, maxLeverage } = config
 
   // Conservative: Low LTV, low leverage, reasonable fee
   if (loanToValueRatio <= 7500 && maxLeverage <= 10) {
