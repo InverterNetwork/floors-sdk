@@ -102,3 +102,25 @@ export const presaleClaimsSubKey = (presaleId: string | null | undefined) =>
  */
 export const marketTradesSubKey = (marketId: string | null | undefined) =>
   ['subscription', 'market-trades', marketId ?? ''] as const
+
+// ============================================================================
+// Staking Keys
+// ============================================================================
+
+/**
+ * @description Parameterized query key for staking manager by market ID.
+ */
+export const stakingManagerQueryKey = (marketId: string | null | undefined) =>
+  ['staking-manager', marketId ?? ''] as const
+
+/**
+ * @description Parameterized query key for user stake positions.
+ */
+export const stakePositionsQueryKey = (userAddress: string | null | undefined) =>
+  ['stake-positions', userAddress?.toLowerCase() ?? ''] as const
+
+/**
+ * @description Parameterized query key for staking activities.
+ */
+export const stakingActivitiesQueryKey = (positionId: string | null | undefined) =>
+  ['staking-activities', positionId ?? ''] as const
