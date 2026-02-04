@@ -19,6 +19,7 @@ import {
   ERC20Issuance_v1,
   Floor_v1,
   FloorFactory_v1,
+  Presale_v1,
   TransactionForwarder_v1,
 } from './abis'
 import {
@@ -485,6 +486,18 @@ export class Launch {
             ],
           }),
         })
+
+        // Set the actual credit facility address on the presale
+        // (replaces the placeholder address(1) used during init)
+        calls.push({
+          target: params.presaleAddress,
+          allowFailure: false,
+          callData: encodeFunctionData({
+            abi: Presale_v1,
+            functionName: 'setCreditFacility',
+            args: [params.creditFacilityAddress],
+          }),
+        })
       }
     }
 
@@ -735,23 +748,32 @@ export class Launch {
 
   /**
    * @description Encode Presale module configData
-   * Format matches presaleSetup.s.sol:
-   * abi.encode(creditFacility, baseCommissionBps[], endTimestamp, globalCap, perAddressCap, priceBreakpoints[][])
+   * Format matches Presale_v1.sol init:
+   * abi.encode(creditFacility, baseCommissionBps[], endTimestamp, globalIssuanceCap,
+   *            perAddressIssuanceCap, priceBreakpoints[][], initialMultiplier, decayDuration)
+   *
+   * Note: creditFacility uses address(1) as placeholder when not provided.
+   * The actual credit facility address must be set post-deployment via setCreditFacility().
+   * Using address(0) would cause Module__InvalidAddress() error.
    */
   public encodePresaleConfig(config: PresaleConfig): `0x${string}` {
-    const zeroAddress = '0x0000000000000000000000000000000000000000' as Address
+    // Use address(1) as placeholder - contract rejects address(0)
+    // The real credit facility address is set post-deployment via setCreditFacility()
+    const placeholderAddress = '0x0000000000000000000000000000000000000001' as Address
 
     return encodeAbiParameters(
       parseAbiParameters(
-        'address creditFacility, uint16[] baseCommissionBps, uint64 endTimestamp, uint256 globalIssuanceCap, uint256 perAddressIssuanceCap, uint256[][] priceBreakpoints'
+        'address creditFacility, uint16[] baseCommissionBps, uint64 endTimestamp, uint256 globalIssuanceCap, uint256 perAddressIssuanceCap, uint256[][] priceBreakpoints, uint32 initialMultiplier, uint64 decayDuration'
       ),
       [
-        (config.creditFacilityAddress as Address) ?? zeroAddress,
+        (config.creditFacilityAddress as Address) || placeholderAddress,
         config.baseCommissionBps.map((b) => Number(b)),
         config.endTimestamp,
         config.globalIssuanceCap,
         config.perAddressIssuanceCap,
         config.priceBreakpoints,
+        Number(config.initialMultiplier),
+        config.decayDuration,
       ]
     )
   }

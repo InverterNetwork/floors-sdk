@@ -71,6 +71,10 @@ export type PresaleFormData = {
   globalIssuanceCap: bigint
   perAddressIssuanceCap: bigint
   priceBreakpoints: bigint[][]
+  /** Initial fee multiplier in BPS (10000 = 1x, 20000 = 2x) */
+  initialMultiplier: bigint
+  /** Decay duration in seconds (0 = no decay) */
+  decayDuration: bigint
 }
 
 /**
@@ -273,6 +277,8 @@ export function useLaunch(options?: UseLaunchOptions) {
           globalIssuanceCap: formData.presale.globalIssuanceCap,
           perAddressIssuanceCap: formData.presale.perAddressIssuanceCap,
           priceBreakpoints: formData.presale.priceBreakpoints,
+          initialMultiplier: formData.presale.initialMultiplier,
+          decayDuration: formData.presale.decayDuration,
         }
       }
 

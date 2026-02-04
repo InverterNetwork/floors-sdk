@@ -126,6 +126,8 @@ export const createTestPresaleConfig = (
   globalIssuanceCap: options?.globalIssuanceCap ?? BigInt(100_000e18),
   perAddressIssuanceCap: options?.perAddressIssuanceCap ?? BigInt(0),
   priceBreakpoints: options?.priceBreakpoints ?? [[BigInt(1e18)], [BigInt(1e18), BigInt(1e18)]],
+  initialMultiplier: options?.initialMultiplier ?? BigInt(10000), // 1x (no premium)
+  decayDuration: options?.decayDuration ?? BigInt(0), // No decay
 })
 
 // =============================================================================

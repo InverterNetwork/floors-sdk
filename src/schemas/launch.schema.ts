@@ -120,25 +120,30 @@ export type CreditFacilityConfig = typeof CreditFacilityConfigSchema.Type
 
 /**
  * @description Presale module configuration
- * Encoding order matches presaleSetup.s.sol:
- * abi.encode(lendingFacility, baseCommissionBps[], endTimestamp, globalCap, perAddressCap, priceBreakpoints[][])
+ * Encoding order matches Presale_v1.sol init:
+ * abi.encode(creditFacility, baseCommissionBps[], endTimestamp, globalIssuanceCap,
+ *            perAddressIssuanceCap, priceBreakpoints[][], initialMultiplier, decayDuration)
  */
 export const PresaleConfigSchema = Schema.Struct({
   /** Credit facility address (or zero address if none) */
   creditFacilityAddress: Schema.optional(AddressSchema),
-  /** Commission schedule - array of fees per leverage level in basis points */
+  /** Commission schedule - array of fees per leverage level in basis points (index 0 = direct, 1+ = leverage) */
   baseCommissionBps: Schema.Array(Schema.BigIntFromSelf).pipe(Schema.minItems(1)),
   /** Presale end timestamp (unix seconds) */
   endTimestamp: Schema.BigIntFromSelf,
-  /** Global issuance cap in reserve tokens (0 = unlimited) */
+  /** Global issuance cap in issuance tokens (0 = unlimited) */
   globalIssuanceCap: Schema.BigIntFromSelf,
-  /** Per-address issuance cap in reserve tokens (0 = unlimited) */
+  /** Per-address issuance cap in issuance tokens (0 = unlimited) */
   perAddressIssuanceCap: Schema.BigIntFromSelf,
-  /** Price breakpoints - 2D array: [leverage level][tranche unlock price] */
+  /** Price breakpoints - 2D array: [leverage level][tranche unlock price]. Length must be baseCommissionBps.length - 1 */
   priceBreakpoints: Schema.Array(Schema.Array(Schema.BigIntFromSelf)),
+  /** Initial fee multiplier in BPS (10000 = 1x, 20000 = 2x). Used with DecayingFeeMultiplier */
+  initialMultiplier: Schema.BigIntFromSelf,
+  /** Decay duration in seconds (0 = no decay). Multiplier decays from initial to 1x over this period */
+  decayDuration: Schema.BigIntFromSelf,
 }).annotations({
   title: 'PresaleConfig',
-  description: 'Presale module configuration for leveraged presales',
+  description: 'Presale module configuration for leveraged presales with decaying fee multiplier',
 })
 
 export type PresaleConfig = typeof PresaleConfigSchema.Type
