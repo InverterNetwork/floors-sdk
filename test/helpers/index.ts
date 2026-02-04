@@ -11,6 +11,7 @@ export {
   DEVNET_RPC_URL,
   devnetChain,
   GRAPHQL_URL,
+  LOCAL_GRAPHQL_URL,
   LOCAL_RPC_URL,
   localAnvilChain,
 } from './config'
@@ -32,6 +33,7 @@ export type { AnvilAccount, ClientOptions, ClientPair } from './clients'
 export {
   checkDevnetAvailability,
   checkLocalAvailability,
+  checkLocalIndexerAvailability,
   createDevnetClients,
   createDevnetPublicClient,
   createDevnetWalletClient,
@@ -40,6 +42,7 @@ export {
   createLocalWalletClient,
   createTestPublicClient,
   createTestWalletClient,
+  requireLocalDevEnvironment,
 } from './clients'
 
 // Deploy utilities
@@ -60,6 +63,4 @@ export {
   getCollateralTokenFromEnv,
   getFloorFactoryFromEnv,
   runDeploymentScript,
-  startAnvil,
-  stopAnvil,
 } from './deploy-contracts'

@@ -71,7 +71,7 @@ describe('handle-error utility', () => {
     it('should parse insufficient funds error', () => {
       const error = new Error('insufficient funds for gas')
       const result = getParsedError({ error })
-      expect(result.prettyMessage).toBe('Insufficient funds for gas')
+      expect(result.prettyMessage).toBe('Insufficient ETH for gas')
     })
 
     it('should parse gas price errors', () => {
@@ -89,7 +89,7 @@ describe('handle-error utility', () => {
     it('should parse execution reverted errors', () => {
       const error = new Error('execution reverted')
       const result = getParsedError({ error })
-      expect(result.prettyMessage).toBe('Transaction reverted')
+      expect(result.prettyMessage).toBe('Contract rejected transaction')
     })
   })
 
@@ -130,7 +130,7 @@ describe('handle-error utility', () => {
 
       const result = getParsedError({ error: mockError })
       expect(result.errorName).toBe('ERC20InsufficientAllowance')
-      expect(result.prettyMessage).toBe('ERC 20 insufficient allowance')
+      expect(result.prettyMessage).toBe('Approval needed')
     })
 
     it('should decode ERC20InsufficientBalance signature', () => {
@@ -141,7 +141,7 @@ describe('handle-error utility', () => {
 
       const result = getParsedError({ error: mockError })
       expect(result.errorName).toBe('ERC20InsufficientBalance')
-      expect(result.prettyMessage).toBe('ERC 20 insufficient balance')
+      expect(result.prettyMessage).toBe('Insufficient balance')
     })
   })
 })

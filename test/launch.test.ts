@@ -7,16 +7,15 @@ import { Launch } from '../src/launch'
 import type { PopWalletClient } from '../src/types'
 import {
   ANVIL_ADDRESSES,
-  checkDevnetAvailability,
-  createDevnetClients,
   createTestFloorConfig,
   createTestLaunchConfig,
   createTestPresaleConfig,
   createTestSegments,
   createTestTreasuryConfig,
   deployTestTokens,
-  DEVNET_CONTRACTS,
-  GRAPHQL_URL,
+  getFloorFactoryFromEnv,
+  LOCAL_GRAPHQL_URL,
+  requireLocalDevEnvironment,
 } from './helpers/index'
 
 // =============================================================================
@@ -31,36 +30,35 @@ describe('#Launch', () => {
   let publicClient: PublicClient<Transport, Chain>
   let walletClient: PopWalletClient
   let launch: Launch
-  let isDevnetAvailable = false
 
   // ---------------------------------------------------------------------------
   // Setup
   // ---------------------------------------------------------------------------
 
   beforeAll(async () => {
-    // Create clients using helpers
-    const clients = createDevnetClients('DEPLOYER')
-    publicClient = clients.publicClient
-    walletClient = clients.walletClient
+    // Require local dev environment (anvil + indexer)
+    // This will throw with clear instructions if not running
+    const env = await requireLocalDevEnvironment()
+    publicClient = env.publicClient
+    walletClient = env.walletClient
+
+    // Get FloorFactory from env (deployed by bun dev:local)
+    const floorFactoryAddress = getFloorFactoryFromEnv()
+    if (!floorFactoryAddress) {
+      throw new Error(
+        'FLOOR_FACTORY not found in contracts/.env. Run `bun dev:local` to deploy contracts.'
+      )
+    }
 
     // Create Launch instance
     launch = new Launch({
-      floorFactoryAddress: DEVNET_CONTRACTS.FLOOR_FACTORY,
+      floorFactoryAddress,
       publicClient,
       walletClient,
     })
 
-    // Configure GraphQL client to use the indexer
-    Client.updateUrl(GRAPHQL_URL)
-
-    // Check if devnet is available
-    const blockNumber = await checkDevnetAvailability(publicClient)
-    isDevnetAvailable = blockNumber !== null
-    if (isDevnetAvailable) {
-      console.log(`Devnet available at block ${blockNumber}`)
-    } else {
-      console.warn('Devnet not available, some tests will be skipped')
-    }
+    // Configure GraphQL client to use the local indexer
+    Client.updateUrl(LOCAL_GRAPHQL_URL)
   })
 
   afterAll(() => {
@@ -210,16 +208,11 @@ describe('#Launch', () => {
   })
 
   // ---------------------------------------------------------------------------
-  // RPC Read Tests (Devnet)
+  // RPC Read Tests
   // ---------------------------------------------------------------------------
 
-  describe('RPC Reads (Devnet)', () => {
-    it('should connect to devnet and get block number', async () => {
-      if (!isDevnetAvailable) {
-        console.log('Devnet not available, skipping test')
-        return
-      }
-
+  describe('RPC Reads', () => {
+    it('should connect to local anvil and get block number', async () => {
       const blockNumber = await publicClient.getBlockNumber()
       expect(typeof blockNumber).toBe('bigint')
       expect(blockNumber).toBeGreaterThan(0n)
@@ -227,42 +220,19 @@ describe('#Launch', () => {
     })
 
     it('should read floor ID counter from FloorFactory', async () => {
-      if (!isDevnetAvailable) {
-        console.log('Devnet not available, skipping test')
-        return
-      }
-
-      try {
-        const counter = await launch.getFloorIDCounter()
-        expect(typeof counter).toBe('bigint')
-        expect(counter).toBeGreaterThanOrEqual(0n)
-        console.log(`Floor ID counter: ${counter}`)
-      } catch {
-        console.log('FloorFactory not deployed at expected address')
-      }
+      const counter = await launch.getFloorIDCounter()
+      expect(typeof counter).toBe('bigint')
+      expect(counter).toBeGreaterThanOrEqual(0n)
+      console.log(`Floor ID counter: ${counter}`)
     })
 
     it('should read module factory address from FloorFactory', async () => {
-      if (!isDevnetAvailable) {
-        console.log('Devnet not available, skipping test')
-        return
-      }
-
-      try {
-        const moduleFactory = await launch.getModuleFactory()
-        expect(moduleFactory).toMatch(/^0x[0-9a-fA-F]{40}$/)
-        console.log(`Module Factory: ${moduleFactory}`)
-      } catch {
-        console.log('FloorFactory not deployed at expected address')
-      }
+      const moduleFactory = await launch.getModuleFactory()
+      expect(moduleFactory).toMatch(/^0x[0-9a-fA-F]{40}$/)
+      console.log(`Module Factory: ${moduleFactory}`)
     })
 
     it('should get deployer account balance', async () => {
-      if (!isDevnetAvailable) {
-        console.log('Devnet not available, skipping test')
-        return
-      }
-
       const balance = await publicClient.getBalance({ address: ANVIL_ADDRESSES.ADMIN })
       expect(typeof balance).toBe('bigint')
       console.log(`Deployer balance: ${balance / BigInt(1e18)} ETH`)
@@ -275,43 +245,35 @@ describe('#Launch', () => {
 
   describe('GraphQL Indexer', () => {
     it('should fetch markets from indexer', async () => {
-      try {
-        const markets = await fetchMarkets()
-        expect(Array.isArray(markets)).toBe(true)
-        console.log(`Found ${markets.length} markets in indexer`)
+      const markets = await fetchMarkets()
+      expect(Array.isArray(markets)).toBe(true)
+      console.log(`Found ${markets.length} markets in indexer`)
 
-        if (markets.length > 0) {
-          const firstMarket = markets[0]
-          console.log('First market:', {
-            id: firstMarket.id,
-            name: firstMarket.name,
-            symbol: firstMarket.symbol,
-            floorPrice: firstMarket.pricing?.currentFloorPrice,
-            marketPrice: firstMarket.pricing?.currentMarketPrice,
-            marketSupply: firstMarket.supply?.marketSupply,
-          })
-        }
-      } catch {
-        console.log('Indexer not available or no markets found')
+      if (markets.length > 0) {
+        const firstMarket = markets[0]
+        console.log('First market:', {
+          id: firstMarket.id,
+          name: firstMarket.name,
+          symbol: firstMarket.symbol,
+          floorPrice: firstMarket.pricing?.currentFloorPrice,
+          marketPrice: firstMarket.pricing?.currentMarketPrice,
+          marketSupply: firstMarket.supply?.marketSupply,
+        })
       }
     })
 
     it('should query the GraphQL endpoint directly', async () => {
-      try {
-        const client = Client.get()
-        const result = await client.query(
-          `query { Market(limit: 5) { id currentPriceRaw floorPriceRaw } }`,
-          {}
-        )
+      const client = Client.get()
+      const result = await client.query(
+        `query { Market(limit: 5) { id currentPriceRaw floorPriceRaw } }`,
+        {}
+      )
 
-        if (result.error) {
-          console.log('GraphQL query error:', result.error.message)
-        } else {
-          console.log('GraphQL response:', result.data)
-          expect(result.data).toBeDefined()
-        }
-      } catch {
-        console.log('GraphQL endpoint not available')
+      if (result.error) {
+        console.log('GraphQL query error:', result.error.message)
+      } else {
+        console.log('GraphQL response:', result.data)
+        expect(result.data).toBeDefined()
       }
     })
   })
@@ -322,11 +284,6 @@ describe('#Launch', () => {
 
   describe('E2E Create Flow', () => {
     it('should create a new floor market with freshly deployed tokens', async () => {
-      if (!isDevnetAvailable) {
-        console.log('Devnet not available, skipping test')
-        return
-      }
-
       console.log('\n--- E2E Create Flow Test ---')
 
       // Step 1: Deploy fresh tokens for this test

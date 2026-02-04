@@ -12,6 +12,7 @@ import {
   ANVIL_PRIVATE_KEYS,
   DEVNET_RPC_URL,
   devnetChain,
+  LOCAL_GRAPHQL_URL,
   LOCAL_RPC_URL,
   localAnvilChain,
 } from './config'
@@ -223,4 +224,89 @@ export const checkLocalAvailability = async (
   } catch {
     return null
   }
+}
+
+/**
+ * Checks if local indexer GraphQL is available
+ * @returns true if available, false otherwise
+ */
+export const checkLocalIndexerAvailability = async (): Promise<boolean> => {
+  try {
+    const response = await fetch(LOCAL_GRAPHQL_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: '{ __typename }',
+      }),
+    })
+    return response.ok
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Requires that both local Anvil and indexer are running.
+ * Throws a descriptive error if either is not available.
+ * Use this in beforeAll() to fail fast with clear instructions.
+ *
+ * @returns Object with block number and clients if available
+ * @throws Error with instructions to run `bun dev:local` if not available
+ */
+export const requireLocalDevEnvironment = async (): Promise<{
+  blockNumber: bigint
+  publicClient: PublicClient<Transport, Chain>
+  walletClient: PopWalletClient
+}> => {
+  const publicClient = createLocalPublicClient()
+  const walletClient = createLocalWalletClient('DEPLOYER')
+
+  // Check Anvil
+  const blockNumber = await checkLocalAvailability(publicClient)
+  if (blockNumber === null) {
+    throw new Error(
+      '\n' +
+        '═══════════════════════════════════════════════════════════════════════════════\n' +
+        '  LOCAL ANVIL NOT RUNNING\n' +
+        '═══════════════════════════════════════════════════════════════════════════════\n' +
+        '\n' +
+        '  These tests require a local development environment.\n' +
+        '\n' +
+        '  Please start the dev environment first:\n' +
+        '\n' +
+        '    bun dev:local\n' +
+        '\n' +
+        '  This will start Anvil, deploy contracts, and run the indexer.\n' +
+        '  Then run the tests again in a separate terminal.\n' +
+        '\n' +
+        '═══════════════════════════════════════════════════════════════════════════════\n'
+    )
+  }
+
+  // Check Indexer
+  const indexerAvailable = await checkLocalIndexerAvailability()
+  if (!indexerAvailable) {
+    throw new Error(
+      '\n' +
+        '═══════════════════════════════════════════════════════════════════════════════\n' +
+        '  LOCAL INDEXER NOT RUNNING\n' +
+        '═══════════════════════════════════════════════════════════════════════════════\n' +
+        '\n' +
+        '  Anvil is running but the indexer is not available at:\n' +
+        `    ${LOCAL_GRAPHQL_URL}\n` +
+        '\n' +
+        '  Please start the full dev environment:\n' +
+        '\n' +
+        '    bun dev:local\n' +
+        '\n' +
+        '  Or if Anvil is already running, start the indexer separately:\n' +
+        '\n' +
+        '    cd indexer && pnpm dev\n' +
+        '\n' +
+        '═══════════════════════════════════════════════════════════════════════════════\n'
+    )
+  }
+
+  console.log(`Local dev environment ready at block ${blockNumber}`)
+  return { blockNumber, publicClient, walletClient }
 }

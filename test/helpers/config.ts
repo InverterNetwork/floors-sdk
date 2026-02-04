@@ -22,9 +22,14 @@ export const DEVNET_RPC_URL = 'https://vfgvanuabr.eu-central-1.awsapprunner.com/
 export const LOCAL_RPC_URL = 'http://127.0.0.1:8545'
 
 /**
- * GraphQL Indexer URL
+ * GraphQL Indexer URL (remote devnet)
  */
 export const GRAPHQL_URL = 'https://indexer.hyperindex.xyz/84826af/v1/graphql'
+
+/**
+ * Local GraphQL Indexer URL
+ */
+export const LOCAL_GRAPHQL_URL = 'http://localhost:8080/v1/graphql'
 
 // =============================================================================
 // Anvil Default Accounts

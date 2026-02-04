@@ -12,9 +12,15 @@ import type {
   TGraphQLMarket,
   TGraphQLPresale,
   TGraphQLRole,
+  TGraphQLStakePosition,
+  TGraphQLStakingActivity,
+  TGraphQLStakingManager,
   TGraphQLTrade,
   TGraphQLUserMarketPosition,
   TPresale,
+  TStakePositionData,
+  TStakingActivityData,
+  TStakingManagerData,
   TTradeData,
   TUserAssetPosition,
   TUserLoanData,
@@ -579,4 +585,99 @@ export function mapMarketSnapshotToPremiumChange(
 
   // Calculate and return change
   return calculatePremiumChange24h(currentPremiumRate, premiumRate24hAgo)
+}
+
+// ============================================================
+// Staking Mappers
+// ============================================================
+
+/**
+ * @description Maps StakingManager GraphQL data to client DTO
+ * @param manager - StakingManager from GraphQL query result
+ * @returns Formatted staking manager data for UI consumption
+ */
+export function mapStakingManagerToDTO(manager: TGraphQLStakingManager): TStakingManagerData {
+  return {
+    id: manager.id,
+    marketId: manager.market_id,
+    performanceFeeBps: toNumber(manager.performanceFeeBps),
+    totalStakedIssuance: toNumber(manager.totalStakedIssuanceFormatted),
+    totalCollateralDeployed: toNumber(manager.totalCollateralDeployedFormatted),
+    totalYieldHarvested: toNumber(manager.totalYieldHarvestedFormatted),
+    totalFeesCaptured: toNumber(manager.totalFeesCapturedFormatted),
+    strategies: manager.strategies.map((s) => ({
+      id: s.id,
+      isActive: s.isActive,
+      addedAt: new Date(toNumber(s.addedAt) * 1000),
+    })),
+    createdAt: new Date(toNumber(manager.createdAt) * 1000),
+    lastUpdatedAt: new Date(toNumber(manager.lastUpdatedAt) * 1000),
+  }
+}
+
+/**
+ * @description Maps StakePosition GraphQL data to client DTO
+ * @param position - StakePosition from GraphQL query result
+ * @returns Formatted stake position data for UI consumption
+ */
+export function mapStakePositionToDTO(position: TGraphQLStakePosition): TStakePositionData {
+  return {
+    id: position.id,
+    userId: position.user_id,
+    stakingManagerId: position.stakingManager_id,
+    strategyId: position.strategy_id,
+    issuanceTokenAmount: toNumber(position.issuanceTokenAmountFormatted),
+    collateralDeployed: toNumber(position.collateralDeployedFormatted),
+    floorPriceAtStake: toNumber(position.floorPriceAtStakeFormatted),
+    totalYieldHarvested: toNumber(position.totalYieldHarvestedFormatted),
+    totalFeePaid: toNumber(position.totalFeePaidFormatted),
+    status: position.status as 'ACTIVE' | 'WITHDRAWN',
+    createdAt: new Date(toNumber(position.createdAt) * 1000),
+    lastUpdatedAt: new Date(toNumber(position.lastUpdatedAt) * 1000),
+    transactionHash: position.transactionHash,
+  }
+}
+
+/**
+ * @description Maps multiple StakePosition GraphQL data to client DTOs
+ * @param positions - Array of StakePosition from GraphQL query result
+ * @returns Array of formatted stake position data for UI consumption
+ */
+export function mapStakePositionsToDTO(positions: TGraphQLStakePosition[]): TStakePositionData[] {
+  return positions.map(mapStakePositionToDTO)
+}
+
+/**
+ * @description Maps StakingActivity GraphQL data to client DTO
+ * @param activity - StakingActivity from GraphQL query result
+ * @returns Formatted staking activity data for UI consumption
+ */
+export function mapStakingActivityToDTO(activity: TGraphQLStakingActivity): TStakingActivityData {
+  return {
+    id: activity.id,
+    positionId: activity.position_id,
+    userId: activity.user_id,
+    activityType: activity.activityType as 'STAKE' | 'HARVEST' | 'WITHDRAW' | 'REBALANCE',
+    issuanceTokenAmount: activity.issuanceTokenAmountFormatted
+      ? toNumber(activity.issuanceTokenAmountFormatted)
+      : null,
+    collateralAmount: activity.collateralAmountFormatted
+      ? toNumber(activity.collateralAmountFormatted)
+      : null,
+    yieldAmount: activity.yieldAmountFormatted ? toNumber(activity.yieldAmountFormatted) : null,
+    feeAmount: activity.feeAmountFormatted ? toNumber(activity.feeAmountFormatted) : null,
+    timestamp: new Date(toNumber(activity.timestamp) * 1000),
+    transactionHash: activity.transactionHash,
+  }
+}
+
+/**
+ * @description Maps multiple StakingActivity GraphQL data to client DTOs
+ * @param activities - Array of StakingActivity from GraphQL query result
+ * @returns Array of formatted staking activity data for UI consumption
+ */
+export function mapStakingActivitiesToDTO(
+  activities: TGraphQLStakingActivity[]
+): TStakingActivityData[] {
+  return activities.map(mapStakingActivityToDTO)
 }

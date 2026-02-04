@@ -73,9 +73,9 @@ type Account {
   ): [PresaleParticipation!]!
 
   """An array relationship"""
-  stakes(
+  stakingPositions(
     """distinct select on columns"""
-    distinct_on: [Stake_select_column!]
+    distinct_on: [StakePosition_select_column!]
 
     """limit the number of rows returned"""
     limit: Int
@@ -84,11 +84,11 @@ type Account {
     offset: Int
 
     """sort the rows by one or more columns"""
-    order_by: [Stake_order_by!]
+    order_by: [StakePosition_order_by!]
 
     """filter the rows returned"""
-    where: Stake_bool_exp
-  ): [Stake!]!
+    where: StakePosition_bool_exp
+  ): [StakePosition!]!
 
   """An array relationship"""
   trades(
@@ -138,7 +138,7 @@ input Account_bool_exp {
   loans: Loan_bool_exp
   marketsCreated: Market_bool_exp
   presaleParticipations: PresaleParticipation_bool_exp
-  stakes: Stake_bool_exp
+  stakingPositions: StakePosition_bool_exp
   trades: Trade_bool_exp
   userMarketPositions: UserMarketPosition_bool_exp
 }
@@ -149,7 +149,7 @@ input Account_order_by {
   loans_aggregate: Loan_aggregate_order_by
   marketsCreated_aggregate: Market_aggregate_order_by
   presaleParticipations_aggregate: PresaleParticipation_aggregate_order_by
-  stakes_aggregate: Stake_aggregate_order_by
+  stakingPositions_aggregate: StakePosition_aggregate_order_by
   trades_aggregate: Trade_aggregate_order_by
   userMarketPositions_aggregate: UserMarketPosition_aggregate_order_by
 }
@@ -292,10 +292,12 @@ columns and relationships of "CreditFacilityContract"
 """
 type CreditFacilityContract {
   borrowToken_id: String!
+  borrowingFeeRate: numeric!
   collateralToken_id: String!
   createdAt: numeric!
   id: String!
   lastUpdatedAt: numeric!
+  loanToValueRatio: numeric!
 
   """An array relationship"""
   loans(
@@ -315,6 +317,7 @@ type CreditFacilityContract {
     where: Loan_bool_exp
   ): [Loan!]!
   market_id: String!
+  maxLeverage: numeric!
   totalDebtFormatted: String!
   totalDebtRaw: numeric!
   totalLoans: numeric!
@@ -332,12 +335,15 @@ input CreditFacilityContract_bool_exp {
   _not: CreditFacilityContract_bool_exp
   _or: [CreditFacilityContract_bool_exp!]
   borrowToken_id: String_comparison_exp
+  borrowingFeeRate: numeric_comparison_exp
   collateralToken_id: String_comparison_exp
   createdAt: numeric_comparison_exp
   id: String_comparison_exp
   lastUpdatedAt: numeric_comparison_exp
+  loanToValueRatio: numeric_comparison_exp
   loans: Loan_bool_exp
   market_id: String_comparison_exp
+  maxLeverage: numeric_comparison_exp
   totalDebtFormatted: String_comparison_exp
   totalDebtRaw: numeric_comparison_exp
   totalLoans: numeric_comparison_exp
@@ -350,12 +356,15 @@ input CreditFacilityContract_bool_exp {
 """Ordering options when selecting data from "CreditFacilityContract"."""
 input CreditFacilityContract_order_by {
   borrowToken_id: order_by
+  borrowingFeeRate: order_by
   collateralToken_id: order_by
   createdAt: order_by
   id: order_by
   lastUpdatedAt: order_by
+  loanToValueRatio: order_by
   loans_aggregate: Loan_aggregate_order_by
   market_id: order_by
+  maxLeverage: order_by
   totalDebtFormatted: order_by
   totalDebtRaw: order_by
   totalLoans: order_by
@@ -373,6 +382,9 @@ enum CreditFacilityContract_select_column {
   borrowToken_id
 
   """column name"""
+  borrowingFeeRate
+
+  """column name"""
   collateralToken_id
 
   """column name"""
@@ -385,7 +397,13 @@ enum CreditFacilityContract_select_column {
   lastUpdatedAt
 
   """column name"""
+  loanToValueRatio
+
+  """column name"""
   market_id
+
+  """column name"""
+  maxLeverage
 
   """column name"""
   totalDebtFormatted
@@ -423,11 +441,14 @@ input CreditFacilityContract_stream_cursor_input {
 """Initial value of the column from where the streaming should start"""
 input CreditFacilityContract_stream_cursor_value_input {
   borrowToken_id: String
+  borrowingFeeRate: numeric
   collateralToken_id: String
   createdAt: numeric
   id: String
   lastUpdatedAt: numeric
+  loanToValueRatio: numeric
   market_id: String
+  maxLeverage: numeric
   totalDebtFormatted: String
   totalDebtRaw: numeric
   totalLoans: numeric
@@ -3008,15 +3029,19 @@ type PreSaleContract {
   commissionBps: [String!]
   createdAt: numeric!
   currentState: Int!
+  decayDuration: numeric
+  decayStartTime: numeric
   endTime: numeric!
   feeTreasury: String
   globalDepositCapFormatted: String!
   globalDepositCapRaw: numeric!
   id: String!
+  initialMultiplier: numeric
   lastUpdatedAt: numeric!
   lendingFacility: String
   market_id: String
   maxLeverage: numeric!
+  merkleRoot: String
 
   """An array relationship"""
   participations(
@@ -3068,15 +3093,19 @@ input PreSaleContract_bool_exp {
   commissionBps: String_array_comparison_exp
   createdAt: numeric_comparison_exp
   currentState: Int_comparison_exp
+  decayDuration: numeric_comparison_exp
+  decayStartTime: numeric_comparison_exp
   endTime: numeric_comparison_exp
   feeTreasury: String_comparison_exp
   globalDepositCapFormatted: String_comparison_exp
   globalDepositCapRaw: numeric_comparison_exp
   id: String_comparison_exp
+  initialMultiplier: numeric_comparison_exp
   lastUpdatedAt: numeric_comparison_exp
   lendingFacility: String_comparison_exp
   market_id: String_comparison_exp
   maxLeverage: numeric_comparison_exp
+  merkleRoot: String_comparison_exp
   participations: PresaleParticipation_bool_exp
   perAddressDepositCapFormatted: String_comparison_exp
   perAddressDepositCapRaw: numeric_comparison_exp
@@ -3102,15 +3131,19 @@ input PreSaleContract_order_by {
   commissionBps: order_by
   createdAt: order_by
   currentState: order_by
+  decayDuration: order_by
+  decayStartTime: order_by
   endTime: order_by
   feeTreasury: order_by
   globalDepositCapFormatted: order_by
   globalDepositCapRaw: order_by
   id: order_by
+  initialMultiplier: order_by
   lastUpdatedAt: order_by
   lendingFacility: order_by
   market_id: order_by
   maxLeverage: order_by
+  merkleRoot: order_by
   participations_aggregate: PresaleParticipation_aggregate_order_by
   perAddressDepositCapFormatted: order_by
   perAddressDepositCapRaw: order_by
@@ -3146,6 +3179,12 @@ enum PreSaleContract_select_column {
   currentState
 
   """column name"""
+  decayDuration
+
+  """column name"""
+  decayStartTime
+
+  """column name"""
   endTime
 
   """column name"""
@@ -3161,6 +3200,9 @@ enum PreSaleContract_select_column {
   id
 
   """column name"""
+  initialMultiplier
+
+  """column name"""
   lastUpdatedAt
 
   """column name"""
@@ -3171,6 +3213,9 @@ enum PreSaleContract_select_column {
 
   """column name"""
   maxLeverage
+
+  """column name"""
+  merkleRoot
 
   """column name"""
   perAddressDepositCapFormatted
@@ -3229,15 +3274,19 @@ input PreSaleContract_stream_cursor_value_input {
   commissionBps: [String!]
   createdAt: numeric
   currentState: Int
+  decayDuration: numeric
+  decayStartTime: numeric
   endTime: numeric
   feeTreasury: String
   globalDepositCapFormatted: String
   globalDepositCapRaw: numeric
   id: String
+  initialMultiplier: numeric
   lastUpdatedAt: numeric
   lendingFacility: String
   market_id: String
   maxLeverage: numeric
+  merkleRoot: String
   perAddressDepositCapFormatted: String
   perAddressDepositCapRaw: numeric
   priceBreakpointOffsets: [Int!]
@@ -4532,131 +4581,226 @@ input Role_variance_order_by {
 }
 
 """
-columns and relationships of "Stake"
+columns and relationships of "StakePosition"
 """
-type Stake {
-  amountFormatted: String!
-  amountRaw: numeric!
-  contract_id: String!
+type StakePosition {
+  """An array relationship"""
+  activities(
+    """distinct select on columns"""
+    distinct_on: [StakingActivity_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [StakingActivity_order_by!]
+
+    """filter the rows returned"""
+    where: StakingActivity_bool_exp
+  ): [StakingActivity!]!
+  collateralDeployedFormatted: String!
+  collateralDeployedRaw: numeric!
+  createdAt: numeric!
+  floorPriceAtStakeFormatted: String!
+  floorPriceAtStakeRaw: numeric!
   id: String!
-  lockDuration: numeric!
-  status: stakestatus!
-  timestamp: numeric!
+  issuanceTokenAmountFormatted: String!
+  issuanceTokenAmountRaw: numeric!
+  lastUpdatedAt: numeric!
+  stakingManager_id: String!
+  status: stakepositionstatus!
+  strategy_id: String!
+  totalFeePaidFormatted: String!
+  totalFeePaidRaw: numeric!
+  totalYieldHarvestedFormatted: String!
+  totalYieldHarvestedRaw: numeric!
   transactionHash: String!
   user_id: String!
 }
 
 """
-order by aggregate values of table "Stake"
+order by aggregate values of table "StakePosition"
 """
-input Stake_aggregate_order_by {
-  avg: Stake_avg_order_by
+input StakePosition_aggregate_order_by {
+  avg: StakePosition_avg_order_by
   count: order_by
-  max: Stake_max_order_by
-  min: Stake_min_order_by
-  stddev: Stake_stddev_order_by
-  stddev_pop: Stake_stddev_pop_order_by
-  stddev_samp: Stake_stddev_samp_order_by
-  sum: Stake_sum_order_by
-  var_pop: Stake_var_pop_order_by
-  var_samp: Stake_var_samp_order_by
-  variance: Stake_variance_order_by
+  max: StakePosition_max_order_by
+  min: StakePosition_min_order_by
+  stddev: StakePosition_stddev_order_by
+  stddev_pop: StakePosition_stddev_pop_order_by
+  stddev_samp: StakePosition_stddev_samp_order_by
+  sum: StakePosition_sum_order_by
+  var_pop: StakePosition_var_pop_order_by
+  var_samp: StakePosition_var_samp_order_by
+  variance: StakePosition_variance_order_by
 }
 
 """
-order by avg() on columns of table "Stake"
+order by avg() on columns of table "StakePosition"
 """
-input Stake_avg_order_by {
-  amountRaw: order_by
-  lockDuration: order_by
-  timestamp: order_by
+input StakePosition_avg_order_by {
+  collateralDeployedRaw: order_by
+  createdAt: order_by
+  floorPriceAtStakeRaw: order_by
+  issuanceTokenAmountRaw: order_by
+  lastUpdatedAt: order_by
+  totalFeePaidRaw: order_by
+  totalYieldHarvestedRaw: order_by
 }
 
 """
-Boolean expression to filter rows from the table "Stake". All fields are combined with a logical 'AND'.
+Boolean expression to filter rows from the table "StakePosition". All fields are combined with a logical 'AND'.
 """
-input Stake_bool_exp {
-  _and: [Stake_bool_exp!]
-  _not: Stake_bool_exp
-  _or: [Stake_bool_exp!]
-  amountFormatted: String_comparison_exp
-  amountRaw: numeric_comparison_exp
-  contract_id: String_comparison_exp
+input StakePosition_bool_exp {
+  _and: [StakePosition_bool_exp!]
+  _not: StakePosition_bool_exp
+  _or: [StakePosition_bool_exp!]
+  activities: StakingActivity_bool_exp
+  collateralDeployedFormatted: String_comparison_exp
+  collateralDeployedRaw: numeric_comparison_exp
+  createdAt: numeric_comparison_exp
+  floorPriceAtStakeFormatted: String_comparison_exp
+  floorPriceAtStakeRaw: numeric_comparison_exp
   id: String_comparison_exp
-  lockDuration: numeric_comparison_exp
-  status: stakestatus_comparison_exp
-  timestamp: numeric_comparison_exp
+  issuanceTokenAmountFormatted: String_comparison_exp
+  issuanceTokenAmountRaw: numeric_comparison_exp
+  lastUpdatedAt: numeric_comparison_exp
+  stakingManager_id: String_comparison_exp
+  status: stakepositionstatus_comparison_exp
+  strategy_id: String_comparison_exp
+  totalFeePaidFormatted: String_comparison_exp
+  totalFeePaidRaw: numeric_comparison_exp
+  totalYieldHarvestedFormatted: String_comparison_exp
+  totalYieldHarvestedRaw: numeric_comparison_exp
   transactionHash: String_comparison_exp
   user_id: String_comparison_exp
 }
 
 """
-order by max() on columns of table "Stake"
+order by max() on columns of table "StakePosition"
 """
-input Stake_max_order_by {
-  amountFormatted: order_by
-  amountRaw: order_by
-  contract_id: order_by
+input StakePosition_max_order_by {
+  collateralDeployedFormatted: order_by
+  collateralDeployedRaw: order_by
+  createdAt: order_by
+  floorPriceAtStakeFormatted: order_by
+  floorPriceAtStakeRaw: order_by
   id: order_by
-  lockDuration: order_by
+  issuanceTokenAmountFormatted: order_by
+  issuanceTokenAmountRaw: order_by
+  lastUpdatedAt: order_by
+  stakingManager_id: order_by
   status: order_by
-  timestamp: order_by
+  strategy_id: order_by
+  totalFeePaidFormatted: order_by
+  totalFeePaidRaw: order_by
+  totalYieldHarvestedFormatted: order_by
+  totalYieldHarvestedRaw: order_by
   transactionHash: order_by
   user_id: order_by
 }
 
 """
-order by min() on columns of table "Stake"
+order by min() on columns of table "StakePosition"
 """
-input Stake_min_order_by {
-  amountFormatted: order_by
-  amountRaw: order_by
-  contract_id: order_by
+input StakePosition_min_order_by {
+  collateralDeployedFormatted: order_by
+  collateralDeployedRaw: order_by
+  createdAt: order_by
+  floorPriceAtStakeFormatted: order_by
+  floorPriceAtStakeRaw: order_by
   id: order_by
-  lockDuration: order_by
+  issuanceTokenAmountFormatted: order_by
+  issuanceTokenAmountRaw: order_by
+  lastUpdatedAt: order_by
+  stakingManager_id: order_by
   status: order_by
-  timestamp: order_by
+  strategy_id: order_by
+  totalFeePaidFormatted: order_by
+  totalFeePaidRaw: order_by
+  totalYieldHarvestedFormatted: order_by
+  totalYieldHarvestedRaw: order_by
   transactionHash: order_by
   user_id: order_by
 }
 
-"""Ordering options when selecting data from "Stake"."""
-input Stake_order_by {
-  amountFormatted: order_by
-  amountRaw: order_by
-  contract_id: order_by
+"""Ordering options when selecting data from "StakePosition"."""
+input StakePosition_order_by {
+  activities_aggregate: StakingActivity_aggregate_order_by
+  collateralDeployedFormatted: order_by
+  collateralDeployedRaw: order_by
+  createdAt: order_by
+  floorPriceAtStakeFormatted: order_by
+  floorPriceAtStakeRaw: order_by
   id: order_by
-  lockDuration: order_by
+  issuanceTokenAmountFormatted: order_by
+  issuanceTokenAmountRaw: order_by
+  lastUpdatedAt: order_by
+  stakingManager_id: order_by
   status: order_by
-  timestamp: order_by
+  strategy_id: order_by
+  totalFeePaidFormatted: order_by
+  totalFeePaidRaw: order_by
+  totalYieldHarvestedFormatted: order_by
+  totalYieldHarvestedRaw: order_by
   transactionHash: order_by
   user_id: order_by
 }
 
 """
-select columns of table "Stake"
+select columns of table "StakePosition"
 """
-enum Stake_select_column {
+enum StakePosition_select_column {
   """column name"""
-  amountFormatted
+  collateralDeployedFormatted
 
   """column name"""
-  amountRaw
+  collateralDeployedRaw
 
   """column name"""
-  contract_id
+  createdAt
+
+  """column name"""
+  floorPriceAtStakeFormatted
+
+  """column name"""
+  floorPriceAtStakeRaw
 
   """column name"""
   id
 
   """column name"""
-  lockDuration
+  issuanceTokenAmountFormatted
+
+  """column name"""
+  issuanceTokenAmountRaw
+
+  """column name"""
+  lastUpdatedAt
+
+  """column name"""
+  stakingManager_id
 
   """column name"""
   status
 
   """column name"""
-  timestamp
+  strategy_id
+
+  """column name"""
+  totalFeePaidFormatted
+
+  """column name"""
+  totalFeePaidRaw
+
+  """column name"""
+  totalYieldHarvestedFormatted
+
+  """column name"""
+  totalYieldHarvestedRaw
 
   """column name"""
   transactionHash
@@ -4666,104 +4810,434 @@ enum Stake_select_column {
 }
 
 """
-order by stddev() on columns of table "Stake"
+order by stddev() on columns of table "StakePosition"
 """
-input Stake_stddev_order_by {
-  amountRaw: order_by
-  lockDuration: order_by
-  timestamp: order_by
+input StakePosition_stddev_order_by {
+  collateralDeployedRaw: order_by
+  createdAt: order_by
+  floorPriceAtStakeRaw: order_by
+  issuanceTokenAmountRaw: order_by
+  lastUpdatedAt: order_by
+  totalFeePaidRaw: order_by
+  totalYieldHarvestedRaw: order_by
 }
 
 """
-order by stddev_pop() on columns of table "Stake"
+order by stddev_pop() on columns of table "StakePosition"
 """
-input Stake_stddev_pop_order_by {
-  amountRaw: order_by
-  lockDuration: order_by
-  timestamp: order_by
+input StakePosition_stddev_pop_order_by {
+  collateralDeployedRaw: order_by
+  createdAt: order_by
+  floorPriceAtStakeRaw: order_by
+  issuanceTokenAmountRaw: order_by
+  lastUpdatedAt: order_by
+  totalFeePaidRaw: order_by
+  totalYieldHarvestedRaw: order_by
 }
 
 """
-order by stddev_samp() on columns of table "Stake"
+order by stddev_samp() on columns of table "StakePosition"
 """
-input Stake_stddev_samp_order_by {
-  amountRaw: order_by
-  lockDuration: order_by
-  timestamp: order_by
+input StakePosition_stddev_samp_order_by {
+  collateralDeployedRaw: order_by
+  createdAt: order_by
+  floorPriceAtStakeRaw: order_by
+  issuanceTokenAmountRaw: order_by
+  lastUpdatedAt: order_by
+  totalFeePaidRaw: order_by
+  totalYieldHarvestedRaw: order_by
 }
 
 """
-Streaming cursor of the table "Stake"
+Streaming cursor of the table "StakePosition"
 """
-input Stake_stream_cursor_input {
+input StakePosition_stream_cursor_input {
   """Stream column input with initial value"""
-  initial_value: Stake_stream_cursor_value_input!
+  initial_value: StakePosition_stream_cursor_value_input!
 
   """cursor ordering"""
   ordering: cursor_ordering
 }
 
 """Initial value of the column from where the streaming should start"""
-input Stake_stream_cursor_value_input {
-  amountFormatted: String
-  amountRaw: numeric
-  contract_id: String
+input StakePosition_stream_cursor_value_input {
+  collateralDeployedFormatted: String
+  collateralDeployedRaw: numeric
+  createdAt: numeric
+  floorPriceAtStakeFormatted: String
+  floorPriceAtStakeRaw: numeric
   id: String
-  lockDuration: numeric
-  status: stakestatus
-  timestamp: numeric
+  issuanceTokenAmountFormatted: String
+  issuanceTokenAmountRaw: numeric
+  lastUpdatedAt: numeric
+  stakingManager_id: String
+  status: stakepositionstatus
+  strategy_id: String
+  totalFeePaidFormatted: String
+  totalFeePaidRaw: numeric
+  totalYieldHarvestedFormatted: String
+  totalYieldHarvestedRaw: numeric
   transactionHash: String
   user_id: String
 }
 
 """
-order by sum() on columns of table "Stake"
+order by sum() on columns of table "StakePosition"
 """
-input Stake_sum_order_by {
-  amountRaw: order_by
-  lockDuration: order_by
-  timestamp: order_by
+input StakePosition_sum_order_by {
+  collateralDeployedRaw: order_by
+  createdAt: order_by
+  floorPriceAtStakeRaw: order_by
+  issuanceTokenAmountRaw: order_by
+  lastUpdatedAt: order_by
+  totalFeePaidRaw: order_by
+  totalYieldHarvestedRaw: order_by
 }
 
 """
-order by var_pop() on columns of table "Stake"
+order by var_pop() on columns of table "StakePosition"
 """
-input Stake_var_pop_order_by {
-  amountRaw: order_by
-  lockDuration: order_by
-  timestamp: order_by
+input StakePosition_var_pop_order_by {
+  collateralDeployedRaw: order_by
+  createdAt: order_by
+  floorPriceAtStakeRaw: order_by
+  issuanceTokenAmountRaw: order_by
+  lastUpdatedAt: order_by
+  totalFeePaidRaw: order_by
+  totalYieldHarvestedRaw: order_by
 }
 
 """
-order by var_samp() on columns of table "Stake"
+order by var_samp() on columns of table "StakePosition"
 """
-input Stake_var_samp_order_by {
-  amountRaw: order_by
-  lockDuration: order_by
-  timestamp: order_by
+input StakePosition_var_samp_order_by {
+  collateralDeployedRaw: order_by
+  createdAt: order_by
+  floorPriceAtStakeRaw: order_by
+  issuanceTokenAmountRaw: order_by
+  lastUpdatedAt: order_by
+  totalFeePaidRaw: order_by
+  totalYieldHarvestedRaw: order_by
 }
 
 """
-order by variance() on columns of table "Stake"
+order by variance() on columns of table "StakePosition"
 """
-input Stake_variance_order_by {
-  amountRaw: order_by
-  lockDuration: order_by
-  timestamp: order_by
+input StakePosition_variance_order_by {
+  collateralDeployedRaw: order_by
+  createdAt: order_by
+  floorPriceAtStakeRaw: order_by
+  issuanceTokenAmountRaw: order_by
+  lastUpdatedAt: order_by
+  totalFeePaidRaw: order_by
+  totalYieldHarvestedRaw: order_by
 }
 
 """
-columns and relationships of "StakingContract"
+columns and relationships of "StakingActivity"
 """
-type StakingContract {
+type StakingActivity {
+  activityType: stakingactivitytype!
+  collateralAmountFormatted: String
+  collateralAmountRaw: numeric
+  feeAmountFormatted: String
+  feeAmountRaw: numeric
+  id: String!
+  issuanceTokenAmountFormatted: String
+  issuanceTokenAmountRaw: numeric
+  position_id: String!
+  stakingManager_id: String!
+  timestamp: numeric!
+  transactionHash: String!
+  user_id: String!
+  yieldAmountFormatted: String
+  yieldAmountRaw: numeric
+}
+
+"""
+order by aggregate values of table "StakingActivity"
+"""
+input StakingActivity_aggregate_order_by {
+  avg: StakingActivity_avg_order_by
+  count: order_by
+  max: StakingActivity_max_order_by
+  min: StakingActivity_min_order_by
+  stddev: StakingActivity_stddev_order_by
+  stddev_pop: StakingActivity_stddev_pop_order_by
+  stddev_samp: StakingActivity_stddev_samp_order_by
+  sum: StakingActivity_sum_order_by
+  var_pop: StakingActivity_var_pop_order_by
+  var_samp: StakingActivity_var_samp_order_by
+  variance: StakingActivity_variance_order_by
+}
+
+"""
+order by avg() on columns of table "StakingActivity"
+"""
+input StakingActivity_avg_order_by {
+  collateralAmountRaw: order_by
+  feeAmountRaw: order_by
+  issuanceTokenAmountRaw: order_by
+  timestamp: order_by
+  yieldAmountRaw: order_by
+}
+
+"""
+Boolean expression to filter rows from the table "StakingActivity". All fields are combined with a logical 'AND'.
+"""
+input StakingActivity_bool_exp {
+  _and: [StakingActivity_bool_exp!]
+  _not: StakingActivity_bool_exp
+  _or: [StakingActivity_bool_exp!]
+  activityType: stakingactivitytype_comparison_exp
+  collateralAmountFormatted: String_comparison_exp
+  collateralAmountRaw: numeric_comparison_exp
+  feeAmountFormatted: String_comparison_exp
+  feeAmountRaw: numeric_comparison_exp
+  id: String_comparison_exp
+  issuanceTokenAmountFormatted: String_comparison_exp
+  issuanceTokenAmountRaw: numeric_comparison_exp
+  position_id: String_comparison_exp
+  stakingManager_id: String_comparison_exp
+  timestamp: numeric_comparison_exp
+  transactionHash: String_comparison_exp
+  user_id: String_comparison_exp
+  yieldAmountFormatted: String_comparison_exp
+  yieldAmountRaw: numeric_comparison_exp
+}
+
+"""
+order by max() on columns of table "StakingActivity"
+"""
+input StakingActivity_max_order_by {
+  activityType: order_by
+  collateralAmountFormatted: order_by
+  collateralAmountRaw: order_by
+  feeAmountFormatted: order_by
+  feeAmountRaw: order_by
+  id: order_by
+  issuanceTokenAmountFormatted: order_by
+  issuanceTokenAmountRaw: order_by
+  position_id: order_by
+  stakingManager_id: order_by
+  timestamp: order_by
+  transactionHash: order_by
+  user_id: order_by
+  yieldAmountFormatted: order_by
+  yieldAmountRaw: order_by
+}
+
+"""
+order by min() on columns of table "StakingActivity"
+"""
+input StakingActivity_min_order_by {
+  activityType: order_by
+  collateralAmountFormatted: order_by
+  collateralAmountRaw: order_by
+  feeAmountFormatted: order_by
+  feeAmountRaw: order_by
+  id: order_by
+  issuanceTokenAmountFormatted: order_by
+  issuanceTokenAmountRaw: order_by
+  position_id: order_by
+  stakingManager_id: order_by
+  timestamp: order_by
+  transactionHash: order_by
+  user_id: order_by
+  yieldAmountFormatted: order_by
+  yieldAmountRaw: order_by
+}
+
+"""Ordering options when selecting data from "StakingActivity"."""
+input StakingActivity_order_by {
+  activityType: order_by
+  collateralAmountFormatted: order_by
+  collateralAmountRaw: order_by
+  feeAmountFormatted: order_by
+  feeAmountRaw: order_by
+  id: order_by
+  issuanceTokenAmountFormatted: order_by
+  issuanceTokenAmountRaw: order_by
+  position_id: order_by
+  stakingManager_id: order_by
+  timestamp: order_by
+  transactionHash: order_by
+  user_id: order_by
+  yieldAmountFormatted: order_by
+  yieldAmountRaw: order_by
+}
+
+"""
+select columns of table "StakingActivity"
+"""
+enum StakingActivity_select_column {
+  """column name"""
+  activityType
+
+  """column name"""
+  collateralAmountFormatted
+
+  """column name"""
+  collateralAmountRaw
+
+  """column name"""
+  feeAmountFormatted
+
+  """column name"""
+  feeAmountRaw
+
+  """column name"""
+  id
+
+  """column name"""
+  issuanceTokenAmountFormatted
+
+  """column name"""
+  issuanceTokenAmountRaw
+
+  """column name"""
+  position_id
+
+  """column name"""
+  stakingManager_id
+
+  """column name"""
+  timestamp
+
+  """column name"""
+  transactionHash
+
+  """column name"""
+  user_id
+
+  """column name"""
+  yieldAmountFormatted
+
+  """column name"""
+  yieldAmountRaw
+}
+
+"""
+order by stddev() on columns of table "StakingActivity"
+"""
+input StakingActivity_stddev_order_by {
+  collateralAmountRaw: order_by
+  feeAmountRaw: order_by
+  issuanceTokenAmountRaw: order_by
+  timestamp: order_by
+  yieldAmountRaw: order_by
+}
+
+"""
+order by stddev_pop() on columns of table "StakingActivity"
+"""
+input StakingActivity_stddev_pop_order_by {
+  collateralAmountRaw: order_by
+  feeAmountRaw: order_by
+  issuanceTokenAmountRaw: order_by
+  timestamp: order_by
+  yieldAmountRaw: order_by
+}
+
+"""
+order by stddev_samp() on columns of table "StakingActivity"
+"""
+input StakingActivity_stddev_samp_order_by {
+  collateralAmountRaw: order_by
+  feeAmountRaw: order_by
+  issuanceTokenAmountRaw: order_by
+  timestamp: order_by
+  yieldAmountRaw: order_by
+}
+
+"""
+Streaming cursor of the table "StakingActivity"
+"""
+input StakingActivity_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: StakingActivity_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input StakingActivity_stream_cursor_value_input {
+  activityType: stakingactivitytype
+  collateralAmountFormatted: String
+  collateralAmountRaw: numeric
+  feeAmountFormatted: String
+  feeAmountRaw: numeric
+  id: String
+  issuanceTokenAmountFormatted: String
+  issuanceTokenAmountRaw: numeric
+  position_id: String
+  stakingManager_id: String
+  timestamp: numeric
+  transactionHash: String
+  user_id: String
+  yieldAmountFormatted: String
+  yieldAmountRaw: numeric
+}
+
+"""
+order by sum() on columns of table "StakingActivity"
+"""
+input StakingActivity_sum_order_by {
+  collateralAmountRaw: order_by
+  feeAmountRaw: order_by
+  issuanceTokenAmountRaw: order_by
+  timestamp: order_by
+  yieldAmountRaw: order_by
+}
+
+"""
+order by var_pop() on columns of table "StakingActivity"
+"""
+input StakingActivity_var_pop_order_by {
+  collateralAmountRaw: order_by
+  feeAmountRaw: order_by
+  issuanceTokenAmountRaw: order_by
+  timestamp: order_by
+  yieldAmountRaw: order_by
+}
+
+"""
+order by var_samp() on columns of table "StakingActivity"
+"""
+input StakingActivity_var_samp_order_by {
+  collateralAmountRaw: order_by
+  feeAmountRaw: order_by
+  issuanceTokenAmountRaw: order_by
+  timestamp: order_by
+  yieldAmountRaw: order_by
+}
+
+"""
+order by variance() on columns of table "StakingActivity"
+"""
+input StakingActivity_variance_order_by {
+  collateralAmountRaw: order_by
+  feeAmountRaw: order_by
+  issuanceTokenAmountRaw: order_by
+  timestamp: order_by
+  yieldAmountRaw: order_by
+}
+
+"""
+columns and relationships of "StakingManager"
+"""
+type StakingManager {
   createdAt: numeric!
   id: String!
-  rewardToken_id: String!
+  lastUpdatedAt: numeric!
+  market_id: String!
+  performanceFeeBps: numeric!
 
   """An array relationship"""
-  stakes(
+  positions(
     """distinct select on columns"""
-    distinct_on: [Stake_select_column!]
+    distinct_on: [StakePosition_select_column!]
 
     """limit the number of rows returned"""
     limit: Int
@@ -4772,53 +5246,86 @@ type StakingContract {
     offset: Int
 
     """sort the rows by one or more columns"""
-    order_by: [Stake_order_by!]
+    order_by: [StakePosition_order_by!]
 
     """filter the rows returned"""
-    where: Stake_bool_exp
-  ): [Stake!]!
-  stakingToken_id: String!
-  totalRewardsFormatted: String!
-  totalRewardsRaw: numeric!
-  totalStakedFormatted: String!
-  totalStakedRaw: numeric!
+    where: StakePosition_bool_exp
+  ): [StakePosition!]!
+
+  """An array relationship"""
+  strategies(
+    """distinct select on columns"""
+    distinct_on: [Strategy_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [Strategy_order_by!]
+
+    """filter the rows returned"""
+    where: Strategy_bool_exp
+  ): [Strategy!]!
+  totalCollateralDeployedFormatted: String!
+  totalCollateralDeployedRaw: numeric!
+  totalFeesCapturedFormatted: String!
+  totalFeesCapturedRaw: numeric!
+  totalStakedIssuanceFormatted: String!
+  totalStakedIssuanceRaw: numeric!
+  totalYieldHarvestedFormatted: String!
+  totalYieldHarvestedRaw: numeric!
 }
 
 """
-Boolean expression to filter rows from the table "StakingContract". All fields are combined with a logical 'AND'.
+Boolean expression to filter rows from the table "StakingManager". All fields are combined with a logical 'AND'.
 """
-input StakingContract_bool_exp {
-  _and: [StakingContract_bool_exp!]
-  _not: StakingContract_bool_exp
-  _or: [StakingContract_bool_exp!]
+input StakingManager_bool_exp {
+  _and: [StakingManager_bool_exp!]
+  _not: StakingManager_bool_exp
+  _or: [StakingManager_bool_exp!]
   createdAt: numeric_comparison_exp
   id: String_comparison_exp
-  rewardToken_id: String_comparison_exp
-  stakes: Stake_bool_exp
-  stakingToken_id: String_comparison_exp
-  totalRewardsFormatted: String_comparison_exp
-  totalRewardsRaw: numeric_comparison_exp
-  totalStakedFormatted: String_comparison_exp
-  totalStakedRaw: numeric_comparison_exp
+  lastUpdatedAt: numeric_comparison_exp
+  market_id: String_comparison_exp
+  performanceFeeBps: numeric_comparison_exp
+  positions: StakePosition_bool_exp
+  strategies: Strategy_bool_exp
+  totalCollateralDeployedFormatted: String_comparison_exp
+  totalCollateralDeployedRaw: numeric_comparison_exp
+  totalFeesCapturedFormatted: String_comparison_exp
+  totalFeesCapturedRaw: numeric_comparison_exp
+  totalStakedIssuanceFormatted: String_comparison_exp
+  totalStakedIssuanceRaw: numeric_comparison_exp
+  totalYieldHarvestedFormatted: String_comparison_exp
+  totalYieldHarvestedRaw: numeric_comparison_exp
 }
 
-"""Ordering options when selecting data from "StakingContract"."""
-input StakingContract_order_by {
+"""Ordering options when selecting data from "StakingManager"."""
+input StakingManager_order_by {
   createdAt: order_by
   id: order_by
-  rewardToken_id: order_by
-  stakes_aggregate: Stake_aggregate_order_by
-  stakingToken_id: order_by
-  totalRewardsFormatted: order_by
-  totalRewardsRaw: order_by
-  totalStakedFormatted: order_by
-  totalStakedRaw: order_by
+  lastUpdatedAt: order_by
+  market_id: order_by
+  performanceFeeBps: order_by
+  positions_aggregate: StakePosition_aggregate_order_by
+  strategies_aggregate: Strategy_aggregate_order_by
+  totalCollateralDeployedFormatted: order_by
+  totalCollateralDeployedRaw: order_by
+  totalFeesCapturedFormatted: order_by
+  totalFeesCapturedRaw: order_by
+  totalStakedIssuanceFormatted: order_by
+  totalStakedIssuanceRaw: order_by
+  totalYieldHarvestedFormatted: order_by
+  totalYieldHarvestedRaw: order_by
 }
 
 """
-select columns of table "StakingContract"
+select columns of table "StakingManager"
 """
-enum StakingContract_select_column {
+enum StakingManager_select_column {
   """column name"""
   createdAt
 
@@ -4826,45 +5333,269 @@ enum StakingContract_select_column {
   id
 
   """column name"""
-  rewardToken_id
+  lastUpdatedAt
 
   """column name"""
-  stakingToken_id
+  market_id
 
   """column name"""
-  totalRewardsFormatted
+  performanceFeeBps
 
   """column name"""
-  totalRewardsRaw
+  totalCollateralDeployedFormatted
 
   """column name"""
-  totalStakedFormatted
+  totalCollateralDeployedRaw
 
   """column name"""
-  totalStakedRaw
+  totalFeesCapturedFormatted
+
+  """column name"""
+  totalFeesCapturedRaw
+
+  """column name"""
+  totalStakedIssuanceFormatted
+
+  """column name"""
+  totalStakedIssuanceRaw
+
+  """column name"""
+  totalYieldHarvestedFormatted
+
+  """column name"""
+  totalYieldHarvestedRaw
 }
 
 """
-Streaming cursor of the table "StakingContract"
+Streaming cursor of the table "StakingManager"
 """
-input StakingContract_stream_cursor_input {
+input StakingManager_stream_cursor_input {
   """Stream column input with initial value"""
-  initial_value: StakingContract_stream_cursor_value_input!
+  initial_value: StakingManager_stream_cursor_value_input!
 
   """cursor ordering"""
   ordering: cursor_ordering
 }
 
 """Initial value of the column from where the streaming should start"""
-input StakingContract_stream_cursor_value_input {
+input StakingManager_stream_cursor_value_input {
   createdAt: numeric
   id: String
-  rewardToken_id: String
-  stakingToken_id: String
-  totalRewardsFormatted: String
-  totalRewardsRaw: numeric
-  totalStakedFormatted: String
-  totalStakedRaw: numeric
+  lastUpdatedAt: numeric
+  market_id: String
+  performanceFeeBps: numeric
+  totalCollateralDeployedFormatted: String
+  totalCollateralDeployedRaw: numeric
+  totalFeesCapturedFormatted: String
+  totalFeesCapturedRaw: numeric
+  totalStakedIssuanceFormatted: String
+  totalStakedIssuanceRaw: numeric
+  totalYieldHarvestedFormatted: String
+  totalYieldHarvestedRaw: numeric
+}
+
+"""
+columns and relationships of "Strategy"
+"""
+type Strategy {
+  addedAt: numeric!
+  id: String!
+  isActive: Boolean!
+
+  """An array relationship"""
+  positions(
+    """distinct select on columns"""
+    distinct_on: [StakePosition_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [StakePosition_order_by!]
+
+    """filter the rows returned"""
+    where: StakePosition_bool_exp
+  ): [StakePosition!]!
+  removedAt: numeric
+  stakingManager_id: String!
+  transactionHash: String!
+}
+
+"""
+order by aggregate values of table "Strategy"
+"""
+input Strategy_aggregate_order_by {
+  avg: Strategy_avg_order_by
+  count: order_by
+  max: Strategy_max_order_by
+  min: Strategy_min_order_by
+  stddev: Strategy_stddev_order_by
+  stddev_pop: Strategy_stddev_pop_order_by
+  stddev_samp: Strategy_stddev_samp_order_by
+  sum: Strategy_sum_order_by
+  var_pop: Strategy_var_pop_order_by
+  var_samp: Strategy_var_samp_order_by
+  variance: Strategy_variance_order_by
+}
+
+"""
+order by avg() on columns of table "Strategy"
+"""
+input Strategy_avg_order_by {
+  addedAt: order_by
+  removedAt: order_by
+}
+
+"""
+Boolean expression to filter rows from the table "Strategy". All fields are combined with a logical 'AND'.
+"""
+input Strategy_bool_exp {
+  _and: [Strategy_bool_exp!]
+  _not: Strategy_bool_exp
+  _or: [Strategy_bool_exp!]
+  addedAt: numeric_comparison_exp
+  id: String_comparison_exp
+  isActive: Boolean_comparison_exp
+  positions: StakePosition_bool_exp
+  removedAt: numeric_comparison_exp
+  stakingManager_id: String_comparison_exp
+  transactionHash: String_comparison_exp
+}
+
+"""
+order by max() on columns of table "Strategy"
+"""
+input Strategy_max_order_by {
+  addedAt: order_by
+  id: order_by
+  removedAt: order_by
+  stakingManager_id: order_by
+  transactionHash: order_by
+}
+
+"""
+order by min() on columns of table "Strategy"
+"""
+input Strategy_min_order_by {
+  addedAt: order_by
+  id: order_by
+  removedAt: order_by
+  stakingManager_id: order_by
+  transactionHash: order_by
+}
+
+"""Ordering options when selecting data from "Strategy"."""
+input Strategy_order_by {
+  addedAt: order_by
+  id: order_by
+  isActive: order_by
+  positions_aggregate: StakePosition_aggregate_order_by
+  removedAt: order_by
+  stakingManager_id: order_by
+  transactionHash: order_by
+}
+
+"""
+select columns of table "Strategy"
+"""
+enum Strategy_select_column {
+  """column name"""
+  addedAt
+
+  """column name"""
+  id
+
+  """column name"""
+  isActive
+
+  """column name"""
+  removedAt
+
+  """column name"""
+  stakingManager_id
+
+  """column name"""
+  transactionHash
+}
+
+"""
+order by stddev() on columns of table "Strategy"
+"""
+input Strategy_stddev_order_by {
+  addedAt: order_by
+  removedAt: order_by
+}
+
+"""
+order by stddev_pop() on columns of table "Strategy"
+"""
+input Strategy_stddev_pop_order_by {
+  addedAt: order_by
+  removedAt: order_by
+}
+
+"""
+order by stddev_samp() on columns of table "Strategy"
+"""
+input Strategy_stddev_samp_order_by {
+  addedAt: order_by
+  removedAt: order_by
+}
+
+"""
+Streaming cursor of the table "Strategy"
+"""
+input Strategy_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: Strategy_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input Strategy_stream_cursor_value_input {
+  addedAt: numeric
+  id: String
+  isActive: Boolean
+  removedAt: numeric
+  stakingManager_id: String
+  transactionHash: String
+}
+
+"""
+order by sum() on columns of table "Strategy"
+"""
+input Strategy_sum_order_by {
+  addedAt: order_by
+  removedAt: order_by
+}
+
+"""
+order by var_pop() on columns of table "Strategy"
+"""
+input Strategy_var_pop_order_by {
+  addedAt: order_by
+  removedAt: order_by
+}
+
+"""
+order by var_samp() on columns of table "Strategy"
+"""
+input Strategy_var_samp_order_by {
+  addedAt: order_by
+  removedAt: order_by
+}
+
+"""
+order by variance() on columns of table "Strategy"
+"""
+input Strategy_variance_order_by {
+  addedAt: order_by
+  removedAt: order_by
 }
 
 """
@@ -6702,11 +7433,11 @@ type query_root {
   Role_by_pk(id: String!): Role
 
   """
-  fetch data from the table: "Stake"
+  fetch data from the table: "StakePosition"
   """
-  Stake(
+  StakePosition(
     """distinct select on columns"""
-    distinct_on: [Stake_select_column!]
+    distinct_on: [StakePosition_select_column!]
 
     """limit the number of rows returned"""
     limit: Int
@@ -6715,21 +7446,21 @@ type query_root {
     offset: Int
 
     """sort the rows by one or more columns"""
-    order_by: [Stake_order_by!]
+    order_by: [StakePosition_order_by!]
 
     """filter the rows returned"""
-    where: Stake_bool_exp
-  ): [Stake!]!
+    where: StakePosition_bool_exp
+  ): [StakePosition!]!
 
-  """fetch data from the table: "Stake" using primary key columns"""
-  Stake_by_pk(id: String!): Stake
+  """fetch data from the table: "StakePosition" using primary key columns"""
+  StakePosition_by_pk(id: String!): StakePosition
 
   """
-  fetch data from the table: "StakingContract"
+  fetch data from the table: "StakingActivity"
   """
-  StakingContract(
+  StakingActivity(
     """distinct select on columns"""
-    distinct_on: [StakingContract_select_column!]
+    distinct_on: [StakingActivity_select_column!]
 
     """limit the number of rows returned"""
     limit: Int
@@ -6738,14 +7469,60 @@ type query_root {
     offset: Int
 
     """sort the rows by one or more columns"""
-    order_by: [StakingContract_order_by!]
+    order_by: [StakingActivity_order_by!]
 
     """filter the rows returned"""
-    where: StakingContract_bool_exp
-  ): [StakingContract!]!
+    where: StakingActivity_bool_exp
+  ): [StakingActivity!]!
 
-  """fetch data from the table: "StakingContract" using primary key columns"""
-  StakingContract_by_pk(id: String!): StakingContract
+  """fetch data from the table: "StakingActivity" using primary key columns"""
+  StakingActivity_by_pk(id: String!): StakingActivity
+
+  """
+  fetch data from the table: "StakingManager"
+  """
+  StakingManager(
+    """distinct select on columns"""
+    distinct_on: [StakingManager_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [StakingManager_order_by!]
+
+    """filter the rows returned"""
+    where: StakingManager_bool_exp
+  ): [StakingManager!]!
+
+  """fetch data from the table: "StakingManager" using primary key columns"""
+  StakingManager_by_pk(id: String!): StakingManager
+
+  """
+  fetch data from the table: "Strategy"
+  """
+  Strategy(
+    """distinct select on columns"""
+    distinct_on: [Strategy_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [Strategy_order_by!]
+
+    """filter the rows returned"""
+    where: Strategy_bool_exp
+  ): [Strategy!]!
+
+  """fetch data from the table: "Strategy" using primary key columns"""
+  Strategy_by_pk(id: String!): Strategy
 
   """
   fetch data from the table: "Token"
@@ -7061,21 +7838,38 @@ input snapshotperiod_comparison_exp {
   _nin: [snapshotperiod!]
 }
 
-scalar stakestatus
+scalar stakepositionstatus
 
 """
-Boolean expression to compare columns of type "stakestatus". All fields are combined with logical 'AND'.
+Boolean expression to compare columns of type "stakepositionstatus". All fields are combined with logical 'AND'.
 """
-input stakestatus_comparison_exp {
-  _eq: stakestatus
-  _gt: stakestatus
-  _gte: stakestatus
-  _in: [stakestatus!]
+input stakepositionstatus_comparison_exp {
+  _eq: stakepositionstatus
+  _gt: stakepositionstatus
+  _gte: stakepositionstatus
+  _in: [stakepositionstatus!]
   _is_null: Boolean
-  _lt: stakestatus
-  _lte: stakestatus
-  _neq: stakestatus
-  _nin: [stakestatus!]
+  _lt: stakepositionstatus
+  _lte: stakepositionstatus
+  _neq: stakepositionstatus
+  _nin: [stakepositionstatus!]
+}
+
+scalar stakingactivitytype
+
+"""
+Boolean expression to compare columns of type "stakingactivitytype". All fields are combined with logical 'AND'.
+"""
+input stakingactivitytype_comparison_exp {
+  _eq: stakingactivitytype
+  _gt: stakingactivitytype
+  _gte: stakingactivitytype
+  _in: [stakingactivitytype!]
+  _is_null: Boolean
+  _lt: stakingactivitytype
+  _lte: stakingactivitytype
+  _neq: stakingactivitytype
+  _nin: [stakingactivitytype!]
 }
 
 type subscription_root {
@@ -7947,11 +8741,11 @@ type subscription_root {
   ): [Role!]!
 
   """
-  fetch data from the table: "Stake"
+  fetch data from the table: "StakePosition"
   """
-  Stake(
+  StakePosition(
     """distinct select on columns"""
-    distinct_on: [Stake_select_column!]
+    distinct_on: [StakePosition_select_column!]
 
     """limit the number of rows returned"""
     limit: Int
@@ -7960,35 +8754,35 @@ type subscription_root {
     offset: Int
 
     """sort the rows by one or more columns"""
-    order_by: [Stake_order_by!]
+    order_by: [StakePosition_order_by!]
 
     """filter the rows returned"""
-    where: Stake_bool_exp
-  ): [Stake!]!
+    where: StakePosition_bool_exp
+  ): [StakePosition!]!
 
-  """fetch data from the table: "Stake" using primary key columns"""
-  Stake_by_pk(id: String!): Stake
+  """fetch data from the table: "StakePosition" using primary key columns"""
+  StakePosition_by_pk(id: String!): StakePosition
 
   """
-  fetch data from the table in a streaming manner: "Stake"
+  fetch data from the table in a streaming manner: "StakePosition"
   """
-  Stake_stream(
+  StakePosition_stream(
     """maximum number of rows returned in a single batch"""
     batch_size: Int!
 
     """cursor to stream the results returned by the query"""
-    cursor: [Stake_stream_cursor_input]!
+    cursor: [StakePosition_stream_cursor_input]!
 
     """filter the rows returned"""
-    where: Stake_bool_exp
-  ): [Stake!]!
+    where: StakePosition_bool_exp
+  ): [StakePosition!]!
 
   """
-  fetch data from the table: "StakingContract"
+  fetch data from the table: "StakingActivity"
   """
-  StakingContract(
+  StakingActivity(
     """distinct select on columns"""
-    distinct_on: [StakingContract_select_column!]
+    distinct_on: [StakingActivity_select_column!]
 
     """limit the number of rows returned"""
     limit: Int
@@ -7997,28 +8791,102 @@ type subscription_root {
     offset: Int
 
     """sort the rows by one or more columns"""
-    order_by: [StakingContract_order_by!]
+    order_by: [StakingActivity_order_by!]
 
     """filter the rows returned"""
-    where: StakingContract_bool_exp
-  ): [StakingContract!]!
+    where: StakingActivity_bool_exp
+  ): [StakingActivity!]!
 
-  """fetch data from the table: "StakingContract" using primary key columns"""
-  StakingContract_by_pk(id: String!): StakingContract
+  """fetch data from the table: "StakingActivity" using primary key columns"""
+  StakingActivity_by_pk(id: String!): StakingActivity
 
   """
-  fetch data from the table in a streaming manner: "StakingContract"
+  fetch data from the table in a streaming manner: "StakingActivity"
   """
-  StakingContract_stream(
+  StakingActivity_stream(
     """maximum number of rows returned in a single batch"""
     batch_size: Int!
 
     """cursor to stream the results returned by the query"""
-    cursor: [StakingContract_stream_cursor_input]!
+    cursor: [StakingActivity_stream_cursor_input]!
 
     """filter the rows returned"""
-    where: StakingContract_bool_exp
-  ): [StakingContract!]!
+    where: StakingActivity_bool_exp
+  ): [StakingActivity!]!
+
+  """
+  fetch data from the table: "StakingManager"
+  """
+  StakingManager(
+    """distinct select on columns"""
+    distinct_on: [StakingManager_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [StakingManager_order_by!]
+
+    """filter the rows returned"""
+    where: StakingManager_bool_exp
+  ): [StakingManager!]!
+
+  """fetch data from the table: "StakingManager" using primary key columns"""
+  StakingManager_by_pk(id: String!): StakingManager
+
+  """
+  fetch data from the table in a streaming manner: "StakingManager"
+  """
+  StakingManager_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [StakingManager_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: StakingManager_bool_exp
+  ): [StakingManager!]!
+
+  """
+  fetch data from the table: "Strategy"
+  """
+  Strategy(
+    """distinct select on columns"""
+    distinct_on: [Strategy_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [Strategy_order_by!]
+
+    """filter the rows returned"""
+    where: Strategy_bool_exp
+  ): [Strategy!]!
+
+  """fetch data from the table: "Strategy" using primary key columns"""
+  Strategy_by_pk(id: String!): Strategy
+
+  """
+  fetch data from the table in a streaming manner: "Strategy"
+  """
+  Strategy_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [Strategy_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: Strategy_bool_exp
+  ): [Strategy!]!
 
   """
   fetch data from the table: "Token"

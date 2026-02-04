@@ -1,9 +1,12 @@
 /**
  * @description Contract deployment utilities for testing
  * Runs the deploy-devnet.sh script and extracts deployed addresses
+ *
+ * NOTE: These utilities assume the local dev environment is already running.
+ * Start it with `bun dev:local` before running tests.
  */
 
-import { execSync, spawn } from 'child_process'
+import { execSync } from 'child_process'
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
 import type { Address } from 'viem'
@@ -15,7 +18,6 @@ import type { Address } from 'viem'
 const CONTRACTS_DIR = resolve(__dirname, '../../../../contracts')
 const DEPLOY_SCRIPT = resolve(CONTRACTS_DIR, 'script/deploy-devnet.sh')
 const ENV_FILE = resolve(CONTRACTS_DIR, '.env')
-const LOCAL_RPC_URL = 'http://localhost:8545'
 
 // =============================================================================
 // Environment File Helpers
@@ -54,56 +56,6 @@ export function getCollateralTokenFromEnv(): Address | null {
 }
 
 // =============================================================================
-// Anvil Management
-// =============================================================================
-
-let anvilProcess: ReturnType<typeof spawn> | null = null
-
-/**
- * Starts a local Anvil instance
- */
-export function startAnvil(): void {
-  if (anvilProcess) {
-    console.log('  Anvil already running')
-    return
-  }
-
-  console.log('  Starting Anvil...')
-  anvilProcess = spawn('anvil', ['--host', '0.0.0.0', '--port', '8545'], {
-    stdio: 'ignore',
-    detached: true,
-  })
-
-  // Wait for Anvil to be ready
-  const maxAttempts = 20
-  for (let i = 0; i < maxAttempts; i++) {
-    try {
-      execSync(
-        `curl -s -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' ${LOCAL_RPC_URL}`,
-        { stdio: 'ignore' }
-      )
-      console.log('  Anvil started successfully')
-      return
-    } catch {
-      execSync('sleep 0.5')
-    }
-  }
-
-  throw new Error('Failed to start Anvil')
-}
-
-/**
- * Stops the local Anvil instance
- */
-export function stopAnvil(): void {
-  if (anvilProcess) {
-    console.log('  Stopping Anvil...')
-    anvilProcess.kill()
-    anvilProcess = null
-  }
-}
-
-// =============================================================================
 // Deployment Script Execution
 // =============================================================================
 
@@ -112,8 +64,7 @@ export interface DeploymentOptions {
   local?: boolean
   /**
    * Skip infrastructure deployment if FLOOR_FACTORY exists.
-   * Note: When running locally, this should typically be false since local Anvil starts fresh.
-   * Default: false for local, auto-detect for remote
+   * Default: auto-detect based on existing FLOOR_FACTORY
    */
   skipInfra?: boolean
   /**
@@ -122,12 +73,15 @@ export interface DeploymentOptions {
    * Default: true for local, false for remote
    */
   infraOnly?: boolean
-  /** Timeout in milliseconds (default: 300000 for local, 120000 for remote) */
+  /** Timeout in milliseconds (default: 120000) */
   timeout?: number
 }
 
 /**
- * Runs the deploy-devnet.sh script to deploy contracts
+ * Runs the deploy-devnet.sh script to deploy contracts.
+ *
+ * NOTE: Assumes local Anvil is already running via `bun dev:local`.
+ * Use `requireLocalDevEnvironment()` in beforeAll() to verify this.
  *
  * @param options - Deployment options
  * @returns The FLOOR_FACTORY address from the deployment
@@ -135,23 +89,15 @@ export interface DeploymentOptions {
  */
 export function runDeploymentScript(options?: DeploymentOptions): Address {
   const { local = true } = options ?? {}
-  const timeout = options?.timeout ?? (local ? 300_000 : 120_000)
+  const timeout = options?.timeout ?? 120_000
 
   console.log('\n=== Running deploy-devnet.sh ===')
 
   // Determine if we should skip infrastructure deployment
-  // For local Anvil, default to full deployment since it starts fresh
-  // For remote, auto-detect based on existing FLOOR_FACTORY
-  const shouldSkipInfra = options?.skipInfra ?? (!local && getFloorFactoryFromEnv() !== null)
+  const shouldSkipInfra = options?.skipInfra ?? getFloorFactoryFromEnv() !== null
 
   // For local deployment, default to infrastructure-only (SDK deploys tokens separately)
   const shouldInfraOnly = options?.infraOnly ?? local
-
-  // For local deployment, start Anvil first
-  if (local && !shouldSkipInfra) {
-    console.log('  Setting up local Anvil environment...')
-    startAnvil()
-  }
 
   const flags: string[] = []
   if (local) {
@@ -199,4 +145,4 @@ export function runDeploymentScript(options?: DeploymentOptions): Address {
 // Exported Constants
 // =============================================================================
 
-export { CONTRACTS_DIR, DEPLOY_SCRIPT, ENV_FILE, LOCAL_RPC_URL }
+export { CONTRACTS_DIR, DEPLOY_SCRIPT, ENV_FILE }
