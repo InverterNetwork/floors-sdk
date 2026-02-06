@@ -414,7 +414,7 @@ export class Market {
         address: creditFacility,
         abi: CreditFacility_v1,
         functionName: 'buyAndBorrow',
-        args: [amount, loops, consolidate],
+        args: [amount, loops, consolidate, BigInt(0)],
         account: this.getWalletAddress(walletClient),
       })
 

@@ -95,6 +95,11 @@ export default [
         type: 'bool',
         internalType: 'bool',
       },
+      {
+        name: 'minAmountOut_',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
     ],
     outputs: [
       {
@@ -133,6 +138,11 @@ export default [
         name: 'consolidate_',
         type: 'bool',
         internalType: 'bool',
+      },
+      {
+        name: 'minAmountOut_',
+        type: 'uint256',
+        internalType: 'uint256',
       },
     ],
     outputs: [
@@ -350,6 +360,35 @@ export default [
             internalType: 'bool',
           },
         ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getUserTotalDebt',
+    inputs: [
+      {
+        name: 'user_',
+        type: 'address',
+        internalType: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: 'totalDebt_',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+      {
+        name: 'totalLockedTokens_',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+      {
+        name: 'loanCount_',
+        type: 'uint256',
+        internalType: 'uint256',
       },
     ],
     stateMutability: 'view',
@@ -830,7 +869,18 @@ export default [
   {
     type: 'error',
     name: 'Module__CreditFacility_BorrowAmountTooSmall',
-    inputs: [],
+    inputs: [
+      {
+        name: 'requested_',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+      {
+        name: 'minimumRequired_',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
   },
   {
     type: 'error',
@@ -911,7 +961,18 @@ export default [
   {
     type: 'error',
     name: 'Module__CreditFacility_LoanToValueRatioTooHigh',
-    inputs: [],
+    inputs: [
+      {
+        name: 'attempted_',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+      {
+        name: 'maximum_',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
   },
   {
     type: 'error',
@@ -940,6 +1001,22 @@ export default [
   },
   {
     type: 'error',
+    name: 'Module__CreditFacility_SlippageExceeded',
+    inputs: [
+      {
+        name: 'received_',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+      {
+        name: 'minimum_',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
+  },
+  {
+    type: 'error',
     name: 'Module__InvalidAddress',
     inputs: [],
   },
@@ -956,6 +1033,11 @@ export default [
   {
     type: 'error',
     name: 'NotInitializing',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'ReentrancyGuardReentrantCall',
     inputs: [],
   },
   {

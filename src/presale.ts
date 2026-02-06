@@ -869,7 +869,7 @@ export class Presale {
         address: this.address,
         abi: Presale_v1,
         functionName: 'buyPresale',
-        args: [depositAmount],
+        args: [depositAmount, BigInt(0)],
         account: accountAddress,
       })
 
@@ -938,7 +938,7 @@ export class Presale {
         address: this.address,
         abi: Presale_v1,
         functionName: 'buyPresaleWithLeverage',
-        args: [depositAmount, BigInt(leverageIndex)],
+        args: [depositAmount, BigInt(leverageIndex), BigInt(0)],
         account: accountAddress,
       })
 

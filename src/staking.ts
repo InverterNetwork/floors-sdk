@@ -1,6 +1,6 @@
 import type { Address, TransactionReceipt } from 'viem'
 
-import { ERC20Issuance_v1, StakingManager_v1 } from './abis'
+import { ERC20Issuance_v1, StakingManager_v1, TestnetStrategy_v1 } from './abis'
 import type { TransactionLifecycleCallbacks } from './presale'
 import type { PopPublicClient, PopWalletClient } from './types'
 
@@ -53,6 +53,28 @@ export interface TStakingRemoveStrategyParams {
 
 export interface TStakingSetPerformanceFeeParams {
   feeBps: number
+  /** Optional lifecycle callbacks for multi-stage feedback */
+  lifecycle?: TransactionLifecycleCallbacks
+}
+
+// TestnetStrategy params
+export interface TStakingInjectYieldParams {
+  strategyAddress: Address
+  amount: bigint
+  /** Optional lifecycle callbacks for multi-stage feedback */
+  lifecycle?: TransactionLifecycleCallbacks
+}
+
+export interface TStakingSimulateLossParams {
+  strategyAddress: Address
+  amount: bigint
+  /** Optional lifecycle callbacks for multi-stage feedback */
+  lifecycle?: TransactionLifecycleCallbacks
+}
+
+export interface TStakingApproveCollateralForStrategyParams {
+  strategyAddress: Address
+  amount: bigint
   /** Optional lifecycle callbacks for multi-stage feedback */
   lifecycle?: TransactionLifecycleCallbacks
 }
@@ -549,6 +571,164 @@ export class Staking {
         lifecycle?.onConfirmed?.(receipt)
       } else {
         lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  // ===========================================================================
+  // TestnetStrategy Methods
+  // ===========================================================================
+
+  /**
+   * @description Inject yield into a TestnetStrategy (testnet only)
+   * @param strategyAddress Address of the TestnetStrategy
+   * @param amount Amount of collateral tokens to inject as yield
+   * @param lifecycle Optional lifecycle callbacks
+   * @returns Transaction receipt
+   */
+  public async injectYield({
+    strategyAddress,
+    amount,
+    lifecycle,
+  }: TStakingInjectYieldParams): Promise<TStakingMutationResult> {
+    const walletClient = this.requireWalletClient()
+    this.assertPositiveAmount(amount)
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: strategyAddress,
+        abi: TestnetStrategy_v1,
+        functionName: 'injectYield',
+        args: [amount],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Inject yield transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Simulate a loss in a TestnetStrategy (testnet only)
+   * @param strategyAddress Address of the TestnetStrategy
+   * @param amount Amount of loss to simulate
+   * @param lifecycle Optional lifecycle callbacks
+   * @returns Transaction receipt
+   */
+  public async simulateLoss({
+    strategyAddress,
+    amount,
+    lifecycle,
+  }: TStakingSimulateLossParams): Promise<TStakingMutationResult> {
+    const walletClient = this.requireWalletClient()
+    this.assertPositiveAmount(amount)
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: strategyAddress,
+        abi: TestnetStrategy_v1,
+        functionName: 'simulateLoss',
+        args: [amount],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Simulate loss transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Get total reserve from a TestnetStrategy
+   * @param strategyAddress Address of the TestnetStrategy
+   * @returns Total reserve amount
+   */
+  public async getTotalReserve(strategyAddress: Address): Promise<bigint> {
+    return (await this.publicClient.readContract({
+      address: strategyAddress,
+      abi: TestnetStrategy_v1,
+      functionName: 'getTotalReserve',
+      args: [],
+    })) as bigint
+  }
+
+  /**
+   * @description Approve collateral tokens for a TestnetStrategy (needed for injectYield)
+   * @param strategyAddress Address of the TestnetStrategy
+   * @param amount Amount to approve
+   * @param lifecycle Optional lifecycle callbacks
+   * @returns Transaction receipt
+   */
+  public async approveCollateralForStrategy({
+    strategyAddress,
+    amount,
+    lifecycle,
+  }: TStakingApproveCollateralForStrategyParams): Promise<TStakingMutationResult> {
+    const walletClient = this.requireWalletClient()
+    this.assertPositiveAmount(amount)
+
+    // Read the collateral token address from the strategy
+    const collateralToken = (await this.publicClient.readContract({
+      address: strategyAddress,
+      abi: TestnetStrategy_v1,
+      functionName: 'asset',
+      args: [],
+    })) as Address
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: collateralToken,
+        abi: ERC20Issuance_v1,
+        functionName: 'approve',
+        args: [strategyAddress, amount],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Approve collateral transaction reverted'))
       }
 
       return receipt

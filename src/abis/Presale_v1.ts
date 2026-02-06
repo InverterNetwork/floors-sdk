@@ -71,6 +71,11 @@ export default [
         type: 'uint256',
         internalType: 'uint256',
       },
+      {
+        name: 'minAmountOut_',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
     ],
     outputs: [
       {
@@ -102,6 +107,11 @@ export default [
       },
       {
         name: 'leverageIndex_',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+      {
+        name: 'minAmountOut_',
         type: 'uint256',
         internalType: 'uint256',
       },
@@ -460,6 +470,35 @@ export default [
         name: 'startTime_',
         type: 'uint64',
         internalType: 'uint64',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getUserTotalTokens',
+    inputs: [
+      {
+        name: 'user_',
+        type: 'address',
+        internalType: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: 'totalClaimable_',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+      {
+        name: 'totalLocked_',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+      {
+        name: 'totalClaimed_',
+        type: 'uint256',
+        internalType: 'uint256',
       },
     ],
     stateMutability: 'view',
@@ -1147,7 +1186,23 @@ export default [
   {
     type: 'error',
     name: 'Presale__GlobalCapExceeded',
-    inputs: [],
+    inputs: [
+      {
+        name: 'currentIssuance_',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+      {
+        name: 'cap_',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+      {
+        name: 'attemptedMint_',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
   },
   {
     type: 'error',
@@ -1242,7 +1297,44 @@ export default [
   {
     type: 'error',
     name: 'Presale__PerAddressCapExceeded',
-    inputs: [],
+    inputs: [
+      {
+        name: 'user_',
+        type: 'address',
+        internalType: 'address',
+      },
+      {
+        name: 'currentIssuance_',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+      {
+        name: 'cap_',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+      {
+        name: 'attemptedMint_',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'Presale__SlippageExceeded',
+    inputs: [
+      {
+        name: 'received_',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+      {
+        name: 'minRequired_',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
   },
   {
     type: 'error',

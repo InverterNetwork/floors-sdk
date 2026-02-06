@@ -6,12 +6,15 @@ import { usePublicClient, useWalletClient } from 'wagmi'
 import {
   Staking,
   type TStakingAddStrategyParams,
+  type TStakingApproveCollateralForStrategyParams,
   type TStakingApproveParams,
   type TStakingHarvestYieldParams,
+  type TStakingInjectYieldParams,
   type TStakingMutationResult,
   type TStakingRebalanceParams,
   type TStakingRemoveStrategyParams,
   type TStakingSetPerformanceFeeParams,
+  type TStakingSimulateLossParams,
   type TStakingStakeParams,
   type TStakingWithdrawParams,
 } from '../../staking'
@@ -48,6 +51,15 @@ type UseStakingMutationsReturnType = {
     TStakingMutationResult,
     Error,
     TStakingSetPerformanceFeeParams
+  >
+  // TestnetStrategy mutations
+  injectYield: UseMutationResult<TStakingMutationResult, Error, TStakingInjectYieldParams>
+  simulateLoss: UseMutationResult<TStakingMutationResult, Error, TStakingSimulateLossParams>
+  getTotalReserve: UseMutationResult<bigint, Error, Address>
+  approveCollateralForStrategy: UseMutationResult<
+    TStakingMutationResult,
+    Error,
+    TStakingApproveCollateralForStrategyParams
   >
 }
 
@@ -220,6 +232,34 @@ export const useStakingMutations = (
     },
   })
 
+  // TestnetStrategy mutations
+  const injectYield = useMutation({
+    mutationFn: (params: TStakingInjectYieldParams) => ensureStaking().injectYield(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+    },
+  })
+
+  const simulateLoss = useMutation({
+    mutationFn: (params: TStakingSimulateLossParams) => ensureStaking().simulateLoss(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+    },
+  })
+
+  const getTotalReserve = useMutation({
+    mutationFn: async (strategyAddress: Address) =>
+      ensureStaking().getTotalReserve(strategyAddress),
+  })
+
+  const approveCollateralForStrategy = useMutation({
+    mutationFn: (params: TStakingApproveCollateralForStrategyParams) =>
+      ensureStaking().approveCollateralForStrategy(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+    },
+  })
+
   return {
     stake,
     harvestYield,
@@ -236,5 +276,10 @@ export const useStakingMutations = (
     addStrategy,
     removeStrategy,
     setPerformanceFeeBps,
+    // TestnetStrategy
+    injectYield,
+    simulateLoss,
+    getTotalReserve,
+    approveCollateralForStrategy,
   }
 }

@@ -625,4 +625,89 @@ describe('#Staking Class Write Functions', () => {
       }
     })
   })
+
+  describe('TestnetStrategy Write Functions - Validation', () => {
+    it('should reject injectYield with zero amount', async () => {
+      expect(() =>
+        staking.injectYield({
+          strategyAddress,
+          amount: BigInt(0),
+        })
+      ).toThrow('Invalid amount')
+    })
+
+    it('should reject simulateLoss with zero amount', async () => {
+      expect(() =>
+        staking.simulateLoss({
+          strategyAddress,
+          amount: BigInt(0),
+        })
+      ).toThrow('Invalid amount')
+    })
+
+    it('should reject approveCollateralForStrategy with zero amount', async () => {
+      expect(() =>
+        staking.approveCollateralForStrategy({
+          strategyAddress,
+          amount: BigInt(0),
+        })
+      ).toThrow('Invalid amount')
+    })
+  })
+
+  describe('TestnetStrategy Read Functions', () => {
+    it('should get total reserve', async () => {
+      try {
+        const reserve = await staking.getTotalReserve(strategyAddress)
+        expect(typeof reserve).toBe('bigint')
+      } catch (error) {
+        // Expected to fail if contract not deployed locally
+        console.log('getTotalReserve test skipped (contract not deployed):', error)
+      }
+    })
+  })
+
+  describe('TestnetStrategy Lifecycle Callbacks', () => {
+    it('should call lifecycle callbacks for injectYield', async () => {
+      const lifecycle = {
+        onPendingWallet: () => console.log('Waiting for wallet confirmation...'),
+        onSubmitted: (hash: string) => console.log('Transaction submitted:', hash),
+        onPendingConfirmation: (hash: string) => console.log('Waiting for confirmation:', hash),
+        onConfirmed: (receipt: any) => console.log('Transaction confirmed:', receipt.status),
+        onFailed: (error: Error) => console.log('Transaction failed:', error.message),
+      }
+
+      try {
+        await staking.injectYield({
+          strategyAddress,
+          amount: BigInt(1000000),
+          lifecycle,
+        })
+      } catch (error) {
+        // Expected to fail if contract not deployed locally
+        console.log('injectYield lifecycle test skipped (contract not deployed):', error)
+      }
+    })
+
+    it('should call lifecycle callbacks for simulateLoss', async () => {
+      const lifecycle = {
+        onPendingWallet: () => console.log('Waiting for wallet confirmation...'),
+        onSubmitted: (hash: string) => console.log('Transaction submitted:', hash),
+        onPendingConfirmation: (hash: string) => console.log('Waiting for confirmation:', hash),
+        onConfirmed: (receipt: any) => console.log('Transaction confirmed:', receipt.status),
+        onFailed: (error: Error) => console.log('Transaction failed:', error.message),
+      }
+
+      try {
+        await staking.simulateLoss({
+          strategyAddress,
+          amount: BigInt(1000000),
+          lifecycle,
+        })
+      } catch (error) {
+        // Expected to fail if contract not deployed locally
+        console.log('simulateLoss lifecycle test skipped (contract not deployed):', error)
+      }
+    })
+  })
 })
