@@ -16,6 +16,7 @@ import {
   type LaunchConfig,
   type LaunchResult,
   type PresaleConfig,
+  type StakingConfig,
   type TreasuryConfig,
 } from '../../launch'
 import { useFloors } from '../floors-context'
@@ -91,6 +92,15 @@ export type CreditFacilityFormData = {
 }
 
 /**
+ * @description Form-friendly staking configuration
+ */
+export type StakingFormData = {
+  enabled: boolean
+  /** Performance fee on harvested yield in basis points (e.g., 1000 = 10%) */
+  performanceFeeBps: number
+}
+
+/**
  * @description Form-friendly configuration options for post-deployment setup
  */
 export type ConfigurationFormData = {
@@ -141,7 +151,10 @@ export type LaunchFormData = {
   // Step 5: Credit Facility (Optional)
   creditFacility: CreditFacilityFormData
 
-  // Step 6: Presale (Optional)
+  // Step 6: Staking (Optional)
+  staking: StakingFormData
+
+  // Step 7: Presale (Optional)
   presale: PresaleFormData
 
   // Step 7: Configuration (post-deployment)
@@ -282,12 +295,21 @@ export function useLaunch(options?: UseLaunchOptions) {
         }
       }
 
+      // Staking configuration (optional)
+      let stakingConfig: StakingConfig | undefined
+      if (formData.staking?.enabled) {
+        stakingConfig = {
+          performanceFeeBps: formData.staking.performanceFeeBps,
+        }
+      }
+
       return {
         floor: floorConfig,
         initialAdmin: creatorAddress,
         treasury: treasuryConfig,
         creditFacility: creditFacilityConfig,
         presale: presaleConfig,
+        staking: stakingConfig,
       }
     },
     []

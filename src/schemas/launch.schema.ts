@@ -149,6 +149,25 @@ export const PresaleConfigSchema = Schema.Struct({
 export type PresaleConfig = typeof PresaleConfigSchema.Type
 
 // =============================================================================
+// Staking Configuration
+// =============================================================================
+
+/**
+ * @description StakingManager module configuration
+ * Encoding order matches stakingManagerSetup.s.sol:
+ * abi.encode(performanceFeeBps)
+ */
+export const StakingConfigSchema = Schema.Struct({
+  /** Performance fee on harvested yield in basis points (e.g., 1000 = 10%) */
+  performanceFeeBps: Schema.Number.pipe(Schema.int(), Schema.between(0, 10_000)),
+}).annotations({
+  title: 'StakingConfig',
+  description: 'StakingManager module configuration for yield staking',
+})
+
+export type StakingConfig = typeof StakingConfigSchema.Type
+
+// =============================================================================
 // Combined Launch Configuration
 // =============================================================================
 
@@ -166,6 +185,8 @@ export const LaunchConfigSchema = Schema.Struct({
   creditFacility: Schema.optional(CreditFacilityConfigSchema),
   /** Presale configuration (optional) */
   presale: Schema.optional(PresaleConfigSchema),
+  /** Staking configuration (optional) */
+  staking: Schema.optional(StakingConfigSchema),
 }).annotations({
   title: 'LaunchConfig',
   description: 'Complete market launch configuration',

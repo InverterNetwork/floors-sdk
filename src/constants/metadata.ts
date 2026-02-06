@@ -62,6 +62,17 @@ export const PRESALE_METADATA = {
 } as const
 
 /**
+ * @description Metadata for StakingManager_v1 - Staking manager for yield strategies
+ */
+export const STAKING_MANAGER_METADATA = {
+  majorVersion: BigInt(1),
+  minorVersion: BigInt(0),
+  patchVersion: BigInt(0),
+  url: METADATA_URL,
+  title: 'StakingManager_v1',
+} as const
+
+/**
  * @description Type for module metadata
  */
 export type ModuleMetadata = {

@@ -40,6 +40,7 @@ export function mapMarketToFloorAssetData(
     authorizer: string | null
     presale: string | null
     feeTreasury: string | null
+    staking: string | null
   } | null
 ): TFloorAssetData {
   const floorPrice = toNumber(market.floorPriceFormatted || market.floorPriceRaw)
@@ -212,6 +213,7 @@ export function mapMarketToFloorAssetData(
   const authorizerAddress = moduleRegistry?.authorizer ?? null
   const presaleAddress = moduleRegistry?.presale ?? null
   const treasuryAddress = moduleRegistry?.feeTreasury ?? null
+  const stakingManagerAddress = moduleRegistry?.staking ?? null
 
   return {
     ...market,
@@ -238,6 +240,7 @@ export function mapMarketToFloorAssetData(
     authorizer: authorizerAddress,
     presale: presaleAddress,
     treasury: treasuryAddress,
+    stakingManagerAddress,
   }
 }
 

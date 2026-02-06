@@ -28,6 +28,7 @@ import {
   FLOOR_METADATA,
   type ModuleMetadata,
   PRESALE_METADATA,
+  STAKING_MANAGER_METADATA,
   TREASURY_METADATA,
 } from './constants/metadata'
 import {
@@ -40,6 +41,7 @@ import {
   type LaunchResult,
   type PresaleConfig,
   PresaleConfigSchema,
+  type StakingConfig,
   type TreasuryConfig,
   TreasuryConfigSchema,
 } from './schemas/launch.schema'
@@ -59,6 +61,7 @@ export type {
   LaunchConfig,
   LaunchResult,
   PresaleConfig,
+  StakingConfig,
   TreasuryConfig,
 } from './schemas/launch.schema'
 
@@ -207,6 +210,15 @@ export class Launch {
     if (validated.presale) {
       optionalModules.push(
         this.buildModuleConfig(PRESALE_METADATA, this.encodePresaleConfig(validated.presale))
+      )
+    }
+
+    if (validated.staking) {
+      optionalModules.push(
+        this.buildModuleConfig(
+          STAKING_MANAGER_METADATA,
+          this.encodeStakingConfig(validated.staking)
+        )
       )
     }
 
@@ -781,6 +793,17 @@ export class Launch {
         config.decayDuration,
       ]
     )
+  }
+
+  /**
+   * @description Encode StakingManager module configData
+   * Format matches stakingManagerSetup.s.sol:
+   * abi.encode(performanceFeeBps)
+   */
+  public encodeStakingConfig(config: StakingConfig): `0x${string}` {
+    return encodeAbiParameters(parseAbiParameters('uint256 performanceFeeBps'), [
+      BigInt(config.performanceFeeBps),
+    ])
   }
 
   // ===========================================================================
