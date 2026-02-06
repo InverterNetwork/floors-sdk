@@ -38,6 +38,25 @@ export interface TStakingApproveParams {
   lifecycle?: TransactionLifecycleCallbacks
 }
 
+// Admin params
+export interface TStakingAddStrategyParams {
+  strategyAddress: Address
+  /** Optional lifecycle callbacks for multi-stage feedback */
+  lifecycle?: TransactionLifecycleCallbacks
+}
+
+export interface TStakingRemoveStrategyParams {
+  strategyAddress: Address
+  /** Optional lifecycle callbacks for multi-stage feedback */
+  lifecycle?: TransactionLifecycleCallbacks
+}
+
+export interface TStakingSetPerformanceFeeParams {
+  feeBps: number
+  /** Optional lifecycle callbacks for multi-stage feedback */
+  lifecycle?: TransactionLifecycleCallbacks
+}
+
 export type TStakingMutationResult = TransactionReceipt
 
 interface StakingConstructorArgs {
@@ -407,6 +426,141 @@ export class Staking {
       throw error
     }
   }
+
+  // ===========================================================================
+  // Admin Methods
+  // ===========================================================================
+
+  /**
+   * @description Add a yield strategy to the approved list (admin only)
+   * @param strategyAddress Address of the ERC4626 strategy to add
+   * @param lifecycle Optional lifecycle callbacks
+   * @returns Transaction receipt
+   */
+  public async addStrategy({
+    strategyAddress,
+    lifecycle,
+  }: TStakingAddStrategyParams): Promise<TStakingMutationResult> {
+    const walletClient = this.requireWalletClient()
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.stakingManagerAddress,
+        abi: StakingManager_v1,
+        functionName: 'addStrategy',
+        args: [strategyAddress],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Remove a yield strategy from the approved list (admin only)
+   * @param strategyAddress Address of the strategy to remove (must have 0 assets)
+   * @param lifecycle Optional lifecycle callbacks
+   * @returns Transaction receipt
+   */
+  public async removeStrategy({
+    strategyAddress,
+    lifecycle,
+  }: TStakingRemoveStrategyParams): Promise<TStakingMutationResult> {
+    const walletClient = this.requireWalletClient()
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.stakingManagerAddress,
+        abi: StakingManager_v1,
+        functionName: 'removeStrategy',
+        args: [strategyAddress],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Update the performance fee percentage (admin only)
+   * @param feeBps Fee in basis points (e.g., 1000 = 10%). Max 10000.
+   * @param lifecycle Optional lifecycle callbacks
+   * @returns Transaction receipt
+   */
+  public async setPerformanceFeeBps({
+    feeBps,
+    lifecycle,
+  }: TStakingSetPerformanceFeeParams): Promise<TStakingMutationResult> {
+    const walletClient = this.requireWalletClient()
+
+    if (feeBps < 0 || feeBps > 10_000) {
+      throw new Error('Performance fee must be between 0 and 10000 basis points')
+    }
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.stakingManagerAddress,
+        abi: StakingManager_v1,
+        functionName: 'setPerformanceFeeBps',
+        args: [BigInt(feeBps)],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  // ===========================================================================
+  // Private Helpers
+  // ===========================================================================
 
   private assertPositiveAmount(amount: bigint): void {
     if (amount <= ZERO_AMOUNT) {

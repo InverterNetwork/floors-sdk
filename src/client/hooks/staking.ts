@@ -5,10 +5,13 @@ import { usePublicClient, useWalletClient } from 'wagmi'
 
 import {
   Staking,
+  type TStakingAddStrategyParams,
   type TStakingApproveParams,
   type TStakingHarvestYieldParams,
   type TStakingMutationResult,
   type TStakingRebalanceParams,
+  type TStakingRemoveStrategyParams,
+  type TStakingSetPerformanceFeeParams,
   type TStakingStakeParams,
   type TStakingWithdrawParams,
 } from '../../staking'
@@ -38,6 +41,14 @@ type UseStakingMutationsReturnType = {
   getPerformanceFeeBps: UseMutationResult<number, Error, void>
   isStrategyApproved: UseMutationResult<boolean, Error, Address>
   getIssuanceTokenAllowance: UseMutationResult<bigint, Error, Address | undefined>
+  // Admin mutations
+  addStrategy: UseMutationResult<TStakingMutationResult, Error, TStakingAddStrategyParams>
+  removeStrategy: UseMutationResult<TStakingMutationResult, Error, TStakingRemoveStrategyParams>
+  setPerformanceFeeBps: UseMutationResult<
+    TStakingMutationResult,
+    Error,
+    TStakingSetPerformanceFeeParams
+  >
 }
 
 interface UseStakingMutationsOptions {
@@ -186,6 +197,29 @@ export const useStakingMutations = (
       ensureStaking().getIssuanceTokenAllowance(ensureWalletAddress(owner)),
   })
 
+  // Admin mutations
+  const addStrategy = useMutation({
+    mutationFn: (params: TStakingAddStrategyParams) => ensureStaking().addStrategy(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+    },
+  })
+
+  const removeStrategy = useMutation({
+    mutationFn: (params: TStakingRemoveStrategyParams) => ensureStaking().removeStrategy(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+    },
+  })
+
+  const setPerformanceFeeBps = useMutation({
+    mutationFn: (params: TStakingSetPerformanceFeeParams) =>
+      ensureStaking().setPerformanceFeeBps(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+    },
+  })
+
   return {
     stake,
     harvestYield,
@@ -198,5 +232,9 @@ export const useStakingMutations = (
     getPerformanceFeeBps,
     isStrategyApproved,
     getIssuanceTokenAllowance,
+    // Admin
+    addStrategy,
+    removeStrategy,
+    setPerformanceFeeBps,
   }
 }
