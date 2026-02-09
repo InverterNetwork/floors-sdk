@@ -131,6 +131,24 @@ export async function fetchMarketById(id: string): Promise<TFloorAssetData | nul
 
   const moduleRegistry = registryResponse.ModuleRegistry_by_pk
 
+  // Fetch first active strategy for this market's StakingManager (if any)
+  let firstStrategyAddress: string | null = null
+  if (moduleRegistry?.staking) {
+    const strategyResponse = await query({
+      Strategy: {
+        __args: {
+          where: { stakingManager_id: { _eq: moduleRegistry.staking }, isActive: { _eq: true } },
+          limit: 1,
+        },
+        id: true,
+      },
+    })
+    const strategies = strategyResponse.Strategy ?? []
+    if (strategies.length > 0) {
+      firstStrategyAddress = strategies[0].id
+    }
+  }
+
   // Fetch all candle periods in parallel for different timeframes
   // ONE_HOUR: for 1D timeframe (24 data points per day)
   // FOUR_HOURS: for 1W timeframe (42 data points per week)
@@ -177,10 +195,11 @@ export async function fetchMarketById(id: string): Promise<TFloorAssetData | nul
 
   const mappedMarket = mapMarketToFloorAssetData(market, moduleRegistry)
 
-  // Add priceCandles organized by period to the mapped market data
+  // Add priceCandles and strategy data to the mapped market data
   return {
     ...mappedMarket,
     priceCandles,
+    firstStrategyAddress,
   } as TFloorAssetData
 }
 
