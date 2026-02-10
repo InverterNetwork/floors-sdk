@@ -5,7 +5,13 @@ import { useCallback } from 'react'
 import type { Address, TransactionReceipt } from 'viem'
 import { usePublicClient, useWalletClient } from 'wagmi'
 
-import { CreditFacilityAdmin, type TCreditFacilityAdminState } from '../../credit-facility-admin'
+import {
+  CreditFacilityAdmin,
+  type TCreditFacilityAdminState,
+  type TSetBorrowingFeeParams,
+  type TSetLTVParams,
+  type TSetMaxLeverageParams,
+} from '../../credit-facility-admin'
 
 // =============================================================================
 // Types
@@ -19,11 +25,17 @@ export type UseCreditFacilityAdminOptions = {
   /** Whether to auto-fetch state on mount */
   autoFetch?: boolean
   /** Mutation options for setLTV */
-  setLTVOptions?: Omit<UseMutationOptions<TransactionReceipt, Error, number>, 'mutationFn'>
+  setLTVOptions?: Omit<UseMutationOptions<TransactionReceipt, Error, TSetLTVParams>, 'mutationFn'>
   /** Mutation options for setBorrowingFeeRate */
-  setBorrowingFeeOptions?: Omit<UseMutationOptions<TransactionReceipt, Error, number>, 'mutationFn'>
+  setBorrowingFeeOptions?: Omit<
+    UseMutationOptions<TransactionReceipt, Error, TSetBorrowingFeeParams>,
+    'mutationFn'
+  >
   /** Mutation options for setMaxLeverage */
-  setMaxLeverageOptions?: Omit<UseMutationOptions<TransactionReceipt, Error, number>, 'mutationFn'>
+  setMaxLeverageOptions?: Omit<
+    UseMutationOptions<TransactionReceipt, Error, TSetMaxLeverageParams>,
+    'mutationFn'
+  >
 }
 
 // =============================================================================
@@ -106,25 +118,25 @@ export function useCreditFacilityAdmin(options: UseCreditFacilityAdminOptions) {
   // ===========================================================================
 
   const setLTVMutation = useMutation({
-    mutationFn: async (ltvBps: number): Promise<TransactionReceipt> => {
+    mutationFn: async (params: TSetLTVParams): Promise<TransactionReceipt> => {
       const admin = getCreditFacilityAdminInstance()
-      return admin.setLoanToValueRatio({ ltvBps })
+      return admin.setLoanToValueRatio(params)
     },
     ...options.setLTVOptions,
   })
 
   const setBorrowingFeeMutation = useMutation({
-    mutationFn: async (feeBps: number): Promise<TransactionReceipt> => {
+    mutationFn: async (params: TSetBorrowingFeeParams): Promise<TransactionReceipt> => {
       const admin = getCreditFacilityAdminInstance()
-      return admin.setBorrowingFeeRate({ feeBps })
+      return admin.setBorrowingFeeRate(params)
     },
     ...options.setBorrowingFeeOptions,
   })
 
   const setMaxLeverageMutation = useMutation({
-    mutationFn: async (maxLeverage: number): Promise<TransactionReceipt> => {
+    mutationFn: async (params: TSetMaxLeverageParams): Promise<TransactionReceipt> => {
       const admin = getCreditFacilityAdminInstance()
-      return admin.setMaxLeverage({ maxLeverage })
+      return admin.setMaxLeverage(params)
     },
     ...options.setMaxLeverageOptions,
   })

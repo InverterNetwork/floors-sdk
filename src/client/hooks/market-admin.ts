@@ -9,6 +9,7 @@ import {
   MarketAdmin,
   type TMarketAdminParams,
   type TMarketAdminState,
+  type TRaiseFloorParams,
   type TSetFeeParams,
 } from '../../market-admin'
 
@@ -24,19 +25,40 @@ export type UseMarketAdminOptions = {
   /** Whether to auto-fetch market state on mount */
   autoFetch?: boolean
   /** Mutation options for openBuy */
-  openBuyOptions?: Omit<UseMutationOptions<TransactionReceipt, Error, void>, 'mutationFn'>
+  openBuyOptions?: Omit<
+    UseMutationOptions<TransactionReceipt, Error, TMarketAdminParams | undefined>,
+    'mutationFn'
+  >
   /** Mutation options for closeBuy */
-  closeBuyOptions?: Omit<UseMutationOptions<TransactionReceipt, Error, void>, 'mutationFn'>
+  closeBuyOptions?: Omit<
+    UseMutationOptions<TransactionReceipt, Error, TMarketAdminParams | undefined>,
+    'mutationFn'
+  >
   /** Mutation options for openSell */
-  openSellOptions?: Omit<UseMutationOptions<TransactionReceipt, Error, void>, 'mutationFn'>
+  openSellOptions?: Omit<
+    UseMutationOptions<TransactionReceipt, Error, TMarketAdminParams | undefined>,
+    'mutationFn'
+  >
   /** Mutation options for closeSell */
-  closeSellOptions?: Omit<UseMutationOptions<TransactionReceipt, Error, void>, 'mutationFn'>
+  closeSellOptions?: Omit<
+    UseMutationOptions<TransactionReceipt, Error, TMarketAdminParams | undefined>,
+    'mutationFn'
+  >
   /** Mutation options for setBuyFee */
-  setBuyFeeOptions?: Omit<UseMutationOptions<TransactionReceipt, Error, number>, 'mutationFn'>
+  setBuyFeeOptions?: Omit<
+    UseMutationOptions<TransactionReceipt, Error, TSetFeeParams>,
+    'mutationFn'
+  >
   /** Mutation options for setSellFee */
-  setSellFeeOptions?: Omit<UseMutationOptions<TransactionReceipt, Error, number>, 'mutationFn'>
+  setSellFeeOptions?: Omit<
+    UseMutationOptions<TransactionReceipt, Error, TSetFeeParams>,
+    'mutationFn'
+  >
   /** Mutation options for raiseFloor */
-  raiseFloorOptions?: Omit<UseMutationOptions<TransactionReceipt, Error, void>, 'mutationFn'>
+  raiseFloorOptions?: Omit<
+    UseMutationOptions<TransactionReceipt, Error, TRaiseFloorParams | undefined>,
+    'mutationFn'
+  >
 }
 
 // =============================================================================
@@ -130,33 +152,33 @@ export function useMarketAdmin(options: UseMarketAdminOptions) {
   // ===========================================================================
 
   const openBuyMutation = useMutation({
-    mutationFn: async (): Promise<TransactionReceipt> => {
+    mutationFn: async (params?: TMarketAdminParams): Promise<TransactionReceipt> => {
       const admin = getMarketAdminInstance()
-      return admin.openBuy()
+      return admin.openBuy(params)
     },
     ...options.openBuyOptions,
   })
 
   const closeBuyMutation = useMutation({
-    mutationFn: async (): Promise<TransactionReceipt> => {
+    mutationFn: async (params?: TMarketAdminParams): Promise<TransactionReceipt> => {
       const admin = getMarketAdminInstance()
-      return admin.closeBuy()
+      return admin.closeBuy(params)
     },
     ...options.closeBuyOptions,
   })
 
   const openSellMutation = useMutation({
-    mutationFn: async (): Promise<TransactionReceipt> => {
+    mutationFn: async (params?: TMarketAdminParams): Promise<TransactionReceipt> => {
       const admin = getMarketAdminInstance()
-      return admin.openSell()
+      return admin.openSell(params)
     },
     ...options.openSellOptions,
   })
 
   const closeSellMutation = useMutation({
-    mutationFn: async (): Promise<TransactionReceipt> => {
+    mutationFn: async (params?: TMarketAdminParams): Promise<TransactionReceipt> => {
       const admin = getMarketAdminInstance()
-      return admin.closeSell()
+      return admin.closeSell(params)
     },
     ...options.closeSellOptions,
   })
@@ -166,17 +188,17 @@ export function useMarketAdmin(options: UseMarketAdminOptions) {
   // ===========================================================================
 
   const setBuyFeeMutation = useMutation({
-    mutationFn: async (feeBps: number): Promise<TransactionReceipt> => {
+    mutationFn: async (params: TSetFeeParams): Promise<TransactionReceipt> => {
       const admin = getMarketAdminInstance()
-      return admin.setBuyFee({ feeBps })
+      return admin.setBuyFee(params)
     },
     ...options.setBuyFeeOptions,
   })
 
   const setSellFeeMutation = useMutation({
-    mutationFn: async (feeBps: number): Promise<TransactionReceipt> => {
+    mutationFn: async (params: TSetFeeParams): Promise<TransactionReceipt> => {
       const admin = getMarketAdminInstance()
-      return admin.setSellFee({ feeBps })
+      return admin.setSellFee(params)
     },
     ...options.setSellFeeOptions,
   })
@@ -186,9 +208,9 @@ export function useMarketAdmin(options: UseMarketAdminOptions) {
   // ===========================================================================
 
   const raiseFloorMutation = useMutation({
-    mutationFn: async (): Promise<TransactionReceipt> => {
+    mutationFn: async (params?: TRaiseFloorParams): Promise<TransactionReceipt> => {
       const admin = getMarketAdminInstance()
-      return admin.raiseFloor()
+      return admin.raiseFloor(params)
     },
     ...options.raiseFloorOptions,
   })

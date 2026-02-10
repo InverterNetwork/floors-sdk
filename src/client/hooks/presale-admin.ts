@@ -5,11 +5,15 @@ import { useCallback } from 'react'
 import type { Address, TransactionReceipt } from 'viem'
 import { usePublicClient, useWalletClient } from 'wagmi'
 
-import type { PresaleState } from '../../presale'
+// PresaleState is re-exported via TPresaleAdminSetStateParams
 import {
   PresaleAdmin,
+  type TPresaleAdminParams,
   type TPresaleAdminSetCapsParams,
   type TPresaleAdminSetCommissionParams,
+  type TPresaleAdminSetEndTimestampParams,
+  type TPresaleAdminSetMerkleRootParams,
+  type TPresaleAdminSetStateParams,
   type TPresaleAdminState,
 } from '../../presale-admin'
 
@@ -25,17 +29,23 @@ export type UsePresaleAdminConfigOptions = {
   /** Whether to auto-fetch presale state on mount */
   autoFetch?: boolean
   /** Mutation options for setPresaleState */
-  setStateOptions?: Omit<UseMutationOptions<TransactionReceipt, Error, PresaleState>, 'mutationFn'>
+  setStateOptions?: Omit<
+    UseMutationOptions<TransactionReceipt, Error, TPresaleAdminSetStateParams>,
+    'mutationFn'
+  >
   /** Mutation options for setCaps */
   setCapsOptions?: Omit<
-    UseMutationOptions<TransactionReceipt, Error, Omit<TPresaleAdminSetCapsParams, 'lifecycle'>>,
+    UseMutationOptions<TransactionReceipt, Error, TPresaleAdminSetCapsParams>,
     'mutationFn'
   >
   /** Mutation options for setEndTimestamp */
-  setEndTimestampOptions?: Omit<UseMutationOptions<TransactionReceipt, Error, bigint>, 'mutationFn'>
+  setEndTimestampOptions?: Omit<
+    UseMutationOptions<TransactionReceipt, Error, TPresaleAdminSetEndTimestampParams>,
+    'mutationFn'
+  >
   /** Mutation options for setMerkleRoot */
   setMerkleRootOptions?: Omit<
-    UseMutationOptions<TransactionReceipt, Error, `0x${string}`>,
+    UseMutationOptions<TransactionReceipt, Error, TPresaleAdminSetMerkleRootParams>,
     'mutationFn'
   >
 }
@@ -124,31 +134,31 @@ export function usePresaleAdminConfig(options: UsePresaleAdminConfigOptions) {
   // ===========================================================================
 
   const setPresaleStateMutation = useMutation({
-    mutationFn: async (state: PresaleState): Promise<TransactionReceipt> => {
+    mutationFn: async (params: TPresaleAdminSetStateParams): Promise<TransactionReceipt> => {
       const admin = getPresaleAdminInstance()
-      return admin.setPresaleState({ state })
+      return admin.setPresaleState(params)
     },
     ...options.setStateOptions,
   })
 
   const goLiveMutation = useMutation({
-    mutationFn: async (): Promise<TransactionReceipt> => {
+    mutationFn: async (params?: TPresaleAdminParams): Promise<TransactionReceipt> => {
       const admin = getPresaleAdminInstance()
-      return admin.goLive()
+      return admin.goLive(params)
     },
   })
 
   const closePresaleMutation = useMutation({
-    mutationFn: async (): Promise<TransactionReceipt> => {
+    mutationFn: async (params?: TPresaleAdminParams): Promise<TransactionReceipt> => {
       const admin = getPresaleAdminInstance()
-      return admin.closePresale()
+      return admin.closePresale(params)
     },
   })
 
   const setWhitelistPhaseMutation = useMutation({
-    mutationFn: async (): Promise<TransactionReceipt> => {
+    mutationFn: async (params?: TPresaleAdminParams): Promise<TransactionReceipt> => {
       const admin = getPresaleAdminInstance()
-      return admin.setWhitelistPhase()
+      return admin.setWhitelistPhase(params)
     },
   })
 
@@ -157,9 +167,7 @@ export function usePresaleAdminConfig(options: UsePresaleAdminConfigOptions) {
   // ===========================================================================
 
   const setCapsMutation = useMutation({
-    mutationFn: async (
-      params: Omit<TPresaleAdminSetCapsParams, 'lifecycle'>
-    ): Promise<TransactionReceipt> => {
+    mutationFn: async (params: TPresaleAdminSetCapsParams): Promise<TransactionReceipt> => {
       const admin = getPresaleAdminInstance()
       return admin.setCaps(params)
     },
@@ -171,9 +179,9 @@ export function usePresaleAdminConfig(options: UsePresaleAdminConfigOptions) {
   // ===========================================================================
 
   const setEndTimestampMutation = useMutation({
-    mutationFn: async (timestamp: bigint): Promise<TransactionReceipt> => {
+    mutationFn: async (params: TPresaleAdminSetEndTimestampParams): Promise<TransactionReceipt> => {
       const admin = getPresaleAdminInstance()
-      return admin.setEndTimestamp({ timestamp })
+      return admin.setEndTimestamp(params)
     },
     ...options.setEndTimestampOptions,
   })
@@ -183,9 +191,9 @@ export function usePresaleAdminConfig(options: UsePresaleAdminConfigOptions) {
   // ===========================================================================
 
   const setMerkleRootMutation = useMutation({
-    mutationFn: async (merkleRoot: `0x${string}`): Promise<TransactionReceipt> => {
+    mutationFn: async (params: TPresaleAdminSetMerkleRootParams): Promise<TransactionReceipt> => {
       const admin = getPresaleAdminInstance()
-      return admin.setMerkleRoot({ merkleRoot })
+      return admin.setMerkleRoot(params)
     },
     ...options.setMerkleRootOptions,
   })
@@ -195,9 +203,7 @@ export function usePresaleAdminConfig(options: UsePresaleAdminConfigOptions) {
   // ===========================================================================
 
   const setCommissionMutation = useMutation({
-    mutationFn: async (
-      params: Omit<TPresaleAdminSetCommissionParams, 'lifecycle'>
-    ): Promise<TransactionReceipt> => {
+    mutationFn: async (params: TPresaleAdminSetCommissionParams): Promise<TransactionReceipt> => {
       const admin = getPresaleAdminInstance()
       return admin.setBaseCommissionAndPriceBreakpoints(params)
     },
