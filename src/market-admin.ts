@@ -28,6 +28,30 @@ export interface TSetFeeParams extends TMarketAdminParams {
   feeBps: number
 }
 
+export interface TReconfigureSegmentsParams extends TMarketAdminParams {
+  /** Array of segment identifiers (bytes32[]) */
+  segments: `0x${string}`[]
+  /** Supplied collateral amount */
+  suppliedCollateral: bigint
+  /** Whether the collateral is self-supplied */
+  selfSupplied: boolean
+}
+
+export interface TSetVirtualCollateralSupplyParams extends TMarketAdminParams {
+  /** Virtual collateral supply amount */
+  virtualSupply: bigint
+}
+
+export interface TWithdrawCollateralParams extends TMarketAdminParams {
+  /** Amount to withdraw */
+  amount: bigint
+}
+
+export interface TDepositCollateralParams extends TMarketAdminParams {
+  /** Amount to deposit */
+  amount: bigint
+}
+
 export interface TMarketAdminState {
   /** Whether buying is enabled */
   isBuyOpen: boolean
@@ -467,6 +491,164 @@ export class MarketAdmin {
       return receipt
     } catch (error) {
       params?.lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  // ===========================================================================
+  // Write Methods - Segment & Collateral Management
+  // ===========================================================================
+
+  /**
+   * @description Reconfigure bonding curve segments
+   */
+  public async reconfigureSegments({
+    segments,
+    suppliedCollateral,
+    selfSupplied,
+    lifecycle,
+  }: TReconfigureSegmentsParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Floor_v1,
+        functionName: 'reconfigureSegments',
+        args: [segments, suppliedCollateral, selfSupplied],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Set the virtual collateral supply
+   */
+  public async setVirtualCollateralSupply({
+    virtualSupply,
+    lifecycle,
+  }: TSetVirtualCollateralSupplyParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Floor_v1,
+        functionName: 'setVirtualCollateralSupply',
+        args: [virtualSupply],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Withdraw collateral from the market
+   */
+  public async withdrawCollateralTo({
+    amount,
+    lifecycle,
+  }: TWithdrawCollateralParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Floor_v1,
+        functionName: 'withdrawCollateralTo',
+        args: [amount],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Deposit collateral into the market
+   */
+  public async depositCollateralFrom({
+    amount,
+    lifecycle,
+  }: TDepositCollateralParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Floor_v1,
+        functionName: 'depositCollateralFrom',
+        args: [amount],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
       throw error
     }
   }

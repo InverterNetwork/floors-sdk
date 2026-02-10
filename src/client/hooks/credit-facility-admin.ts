@@ -7,10 +7,15 @@ import { usePublicClient, useWalletClient } from 'wagmi'
 
 import {
   CreditFacilityAdmin,
+  type TBorrowForParams,
+  type TBuyAndBorrowForParams,
+  type TConsolidateLoansParams,
   type TCreditFacilityAdminState,
+  type TRebalanceLoanParams,
   type TSetBorrowingFeeParams,
   type TSetLTVParams,
   type TSetMaxLeverageParams,
+  type TTransferLoanParams,
 } from '../../credit-facility-admin'
 
 // =============================================================================
@@ -34,6 +39,31 @@ export type UseCreditFacilityAdminOptions = {
   /** Mutation options for setMaxLeverage */
   setMaxLeverageOptions?: Omit<
     UseMutationOptions<TransactionReceipt, Error, TSetMaxLeverageParams>,
+    'mutationFn'
+  >
+  /** Mutation options for transferLoan */
+  transferLoanOptions?: Omit<
+    UseMutationOptions<TransactionReceipt, Error, TTransferLoanParams>,
+    'mutationFn'
+  >
+  /** Mutation options for rebalanceLoan */
+  rebalanceLoanOptions?: Omit<
+    UseMutationOptions<TransactionReceipt, Error, TRebalanceLoanParams>,
+    'mutationFn'
+  >
+  /** Mutation options for consolidateLoans */
+  consolidateLoansOptions?: Omit<
+    UseMutationOptions<TransactionReceipt, Error, TConsolidateLoansParams>,
+    'mutationFn'
+  >
+  /** Mutation options for borrowFor */
+  borrowForOptions?: Omit<
+    UseMutationOptions<TransactionReceipt, Error, TBorrowForParams>,
+    'mutationFn'
+  >
+  /** Mutation options for buyAndBorrowFor */
+  buyAndBorrowForOptions?: Omit<
+    UseMutationOptions<TransactionReceipt, Error, TBuyAndBorrowForParams>,
     'mutationFn'
   >
 }
@@ -142,13 +172,77 @@ export function useCreditFacilityAdmin(options: UseCreditFacilityAdminOptions) {
   })
 
   // ===========================================================================
+  // Mutations - Loan Management
+  // ===========================================================================
+
+  const transferLoanMutation = useMutation({
+    mutationFn: async (params: TTransferLoanParams): Promise<TransactionReceipt> => {
+      const admin = getCreditFacilityAdminInstance()
+      return admin.transferLoan(params)
+    },
+    onSuccess: async () => {
+      await creditFacilityStateQuery.refetch()
+    },
+    ...options.transferLoanOptions,
+  })
+
+  const rebalanceLoanMutation = useMutation({
+    mutationFn: async (params: TRebalanceLoanParams): Promise<TransactionReceipt> => {
+      const admin = getCreditFacilityAdminInstance()
+      return admin.rebalanceLoan(params)
+    },
+    onSuccess: async () => {
+      await creditFacilityStateQuery.refetch()
+    },
+    ...options.rebalanceLoanOptions,
+  })
+
+  const consolidateLoansMutation = useMutation({
+    mutationFn: async (params: TConsolidateLoansParams): Promise<TransactionReceipt> => {
+      const admin = getCreditFacilityAdminInstance()
+      return admin.consolidateLoans(params)
+    },
+    onSuccess: async () => {
+      await creditFacilityStateQuery.refetch()
+    },
+    ...options.consolidateLoansOptions,
+  })
+
+  const borrowForMutation = useMutation({
+    mutationFn: async (params: TBorrowForParams): Promise<TransactionReceipt> => {
+      const admin = getCreditFacilityAdminInstance()
+      return admin.borrowFor(params)
+    },
+    onSuccess: async () => {
+      await creditFacilityStateQuery.refetch()
+    },
+    ...options.borrowForOptions,
+  })
+
+  const buyAndBorrowForMutation = useMutation({
+    mutationFn: async (params: TBuyAndBorrowForParams): Promise<TransactionReceipt> => {
+      const admin = getCreditFacilityAdminInstance()
+      return admin.buyAndBorrowFor(params)
+    },
+    onSuccess: async () => {
+      await creditFacilityStateQuery.refetch()
+    },
+    ...options.buyAndBorrowForOptions,
+  })
+
+  // ===========================================================================
   // Loading State
   // ===========================================================================
 
   const isLoading =
     setLTVMutation.isPending ||
     setBorrowingFeeMutation.isPending ||
-    setMaxLeverageMutation.isPending
+    setMaxLeverageMutation.isPending ||
+    transferLoanMutation.isPending ||
+    rebalanceLoanMutation.isPending ||
+    consolidateLoansMutation.isPending ||
+    borrowForMutation.isPending ||
+    buyAndBorrowForMutation.isPending
 
   return {
     // Credit facility state query
@@ -161,6 +255,11 @@ export function useCreditFacilityAdmin(options: UseCreditFacilityAdminOptions) {
     setLTV: setLTVMutation,
     setBorrowingFee: setBorrowingFeeMutation,
     setMaxLeverage: setMaxLeverageMutation,
+    transferLoan: transferLoanMutation,
+    rebalanceLoan: rebalanceLoanMutation,
+    consolidateLoans: consolidateLoansMutation,
+    borrowFor: borrowForMutation,
+    buyAndBorrowFor: buyAndBorrowForMutation,
 
     // Combined loading state
     isLoading,
@@ -169,5 +268,10 @@ export function useCreditFacilityAdmin(options: UseCreditFacilityAdminOptions) {
     isSettingLTV: setLTVMutation.isPending,
     isSettingBorrowingFee: setBorrowingFeeMutation.isPending,
     isSettingMaxLeverage: setMaxLeverageMutation.isPending,
+    isTransferringLoan: transferLoanMutation.isPending,
+    isRebalancingLoan: rebalanceLoanMutation.isPending,
+    isConsolidatingLoans: consolidateLoansMutation.isPending,
+    isBorrowingFor: borrowForMutation.isPending,
+    isBuyingAndBorrowingFor: buyAndBorrowForMutation.isPending,
   }
 }

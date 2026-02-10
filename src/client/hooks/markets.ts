@@ -15,6 +15,7 @@ import {
   type TMarketApproveParams,
   type TMarketBorrowParams,
   type TMarketBuyAndBorrowParams,
+  type TMarketBuyForParams,
   type TMarketBuyParams,
   type TMarketMutationResult,
   type TMarketRepayParams,
@@ -52,6 +53,9 @@ type UseMarketMutationsReturnType = {
   getBorrowingFeeRate: UseMutationResult<number, Error, void>
   getMaxLeverage: UseMutationResult<number, Error, void>
   approveReserveForCredit: UseMutationResult<TMarketMutationResult, Error, TMarketApproveParams>
+  buyFor: UseMutationResult<TMarketMutationResult, Error, TMarketBuyForParams>
+  getFloorSection: UseMutationResult<`0x${string}`, Error, void>
+  getPremiumSections: UseMutationResult<`0x${string}`[], Error, void>
 }
 
 /**
@@ -250,6 +254,21 @@ export const useMarketMutations = (): UseMarketMutationsReturnType => {
     mutationFn: async () => ensureMarket().getMaxLeverage(),
   })
 
+  const buyFor = useMutation({
+    mutationFn: (params: TMarketBuyForParams) => ensureMarket().buyFor(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+    },
+  })
+
+  const getFloorSection = useMutation({
+    mutationFn: async () => ensureMarket().getFloorSection(),
+  })
+
+  const getPremiumSections = useMutation({
+    mutationFn: async () => ensureMarket().getPremiumSections(),
+  })
+
   return {
     buy,
     sell,
@@ -269,5 +288,8 @@ export const useMarketMutations = (): UseMarketMutationsReturnType => {
     getLoanToValueRatio,
     getBorrowingFeeRate,
     getMaxLeverage,
+    buyFor,
+    getFloorSection,
+    getPremiumSections,
   }
 }

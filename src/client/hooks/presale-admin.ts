@@ -11,8 +11,12 @@ import {
   type TPresaleAdminParams,
   type TPresaleAdminSetCapsParams,
   type TPresaleAdminSetCommissionParams,
+  type TPresaleAdminSetCreditFacilityParams,
+  type TPresaleAdminSetDecayDurationParams,
   type TPresaleAdminSetEndTimestampParams,
+  type TPresaleAdminSetInitialMultiplierParams,
   type TPresaleAdminSetMerkleRootParams,
+  type TPresaleAdminSetStartTimeParams,
   type TPresaleAdminSetStateParams,
   type TPresaleAdminState,
 } from '../../presale-admin'
@@ -210,6 +214,44 @@ export function usePresaleAdminConfig(options: UsePresaleAdminConfigOptions) {
   })
 
   // ===========================================================================
+  // Mutations - Multiplier & Decay Configuration
+  // ===========================================================================
+
+  const setCreditFacilityMutation = useMutation({
+    mutationFn: async (
+      params: TPresaleAdminSetCreditFacilityParams
+    ): Promise<TransactionReceipt> => {
+      const admin = getPresaleAdminInstance()
+      return admin.setCreditFacility(params)
+    },
+  })
+
+  const setInitialMultiplierMutation = useMutation({
+    mutationFn: async (
+      params: TPresaleAdminSetInitialMultiplierParams
+    ): Promise<TransactionReceipt> => {
+      const admin = getPresaleAdminInstance()
+      return admin.setInitialMultiplier(params)
+    },
+  })
+
+  const setDecayDurationMutation = useMutation({
+    mutationFn: async (
+      params: TPresaleAdminSetDecayDurationParams
+    ): Promise<TransactionReceipt> => {
+      const admin = getPresaleAdminInstance()
+      return admin.setDecayDuration(params)
+    },
+  })
+
+  const setStartTimeMutation = useMutation({
+    mutationFn: async (params: TPresaleAdminSetStartTimeParams): Promise<TransactionReceipt> => {
+      const admin = getPresaleAdminInstance()
+      return admin.setStartTime(params)
+    },
+  })
+
+  // ===========================================================================
   // Query - Check Whitelist Status
   // ===========================================================================
 
@@ -235,7 +277,11 @@ export function usePresaleAdminConfig(options: UsePresaleAdminConfigOptions) {
     setCapsMutation.isPending ||
     setEndTimestampMutation.isPending ||
     setMerkleRootMutation.isPending ||
-    setCommissionMutation.isPending
+    setCommissionMutation.isPending ||
+    setCreditFacilityMutation.isPending ||
+    setInitialMultiplierMutation.isPending ||
+    setDecayDurationMutation.isPending ||
+    setStartTimeMutation.isPending
 
   return {
     // Presale state query
@@ -263,6 +309,12 @@ export function usePresaleAdminConfig(options: UsePresaleAdminConfigOptions) {
     // Commission configuration
     setCommission: setCommissionMutation,
 
+    // Multiplier & decay configuration
+    setCreditFacility: setCreditFacilityMutation,
+    setInitialMultiplier: setInitialMultiplierMutation,
+    setDecayDuration: setDecayDurationMutation,
+    setStartTime: setStartTimeMutation,
+
     // Combined loading state
     isLoading,
 
@@ -275,5 +327,9 @@ export function usePresaleAdminConfig(options: UsePresaleAdminConfigOptions) {
     isSettingEndTimestamp: setEndTimestampMutation.isPending,
     isSettingMerkleRoot: setMerkleRootMutation.isPending,
     isSettingCommission: setCommissionMutation.isPending,
+    isSettingCreditFacility: setCreditFacilityMutation.isPending,
+    isSettingInitialMultiplier: setInitialMultiplierMutation.isPending,
+    isSettingDecayDuration: setDecayDurationMutation.isPending,
+    isSettingStartTime: setStartTimeMutation.isPending,
   }
 }

@@ -33,10 +33,14 @@ import {
   type TPresalePositionWithState,
   type TPresaleTransitionStatus,
   type TSetCapsParams,
+  type TSetCreditFacilityParams,
+  type TSetDecayDurationParams,
   type TSetEndTimestampParams,
+  type TSetInitialMultiplierParams,
   type TSetLiveFeesParams,
   type TSetMerkleRootParams,
   type TSetPresaleStateParams,
+  type TSetStartTimeParams,
 } from '../../presale'
 import { useFloors } from '../floors-context'
 import {
@@ -192,6 +196,11 @@ export type UsePresaleMutationsReturnType = {
   isDecayActive: UseMutationResult<boolean, Error, void>
   isDecayEnded: UseMutationResult<boolean, Error, void>
   getMultiplierState: UseMutationResult<TMultiplierState, Error, void>
+  getUserTotalTokens: UseMutationResult<
+    { totalTokens: bigint; claimedTokens: bigint; lockedTokens: bigint },
+    Error,
+    Address | undefined
+  >
 }
 
 /**
@@ -349,6 +358,11 @@ export const usePresaleMutations = (): UsePresaleMutationsReturnType => {
     mutationFn: async () => ensurePresale().getMultiplierState(),
   })
 
+  const getUserTotalTokens = useMutation({
+    mutationFn: async (userAddress?: Address) =>
+      ensurePresale().getUserTotalTokens(ensureWalletAddress(userAddress)),
+  })
+
   return {
     buyPresale,
     buyPresaleWithLeverage,
@@ -373,6 +387,7 @@ export const usePresaleMutations = (): UsePresaleMutationsReturnType => {
     isDecayActive,
     isDecayEnded,
     getMultiplierState,
+    getUserTotalTokens,
   }
 }
 
@@ -571,6 +586,18 @@ export type UsePresaleAdminReturnType = {
     Error,
     TAddToWhitelistWithProofParams
   >
+  /** Set credit facility address */
+  setCreditFacility: UseMutationResult<TPresaleMutationResult, Error, TSetCreditFacilityParams>
+  /** Set initial fee multiplier */
+  setInitialMultiplier: UseMutationResult<
+    TPresaleMutationResult,
+    Error,
+    TSetInitialMultiplierParams
+  >
+  /** Set decay duration */
+  setDecayDuration: UseMutationResult<TPresaleMutationResult, Error, TSetDecayDurationParams>
+  /** Set decay start time */
+  setStartTime: UseMutationResult<TPresaleMutationResult, Error, TSetStartTimeParams>
   /** Whether any admin operation is pending */
   isPending: boolean
 }
@@ -656,12 +683,45 @@ export const usePresaleAdmin = (): UsePresaleAdminReturnType => {
     },
   })
 
+  const setCreditFacility = useMutation({
+    mutationFn: (params: TSetCreditFacilityParams) => ensurePresale().setCreditFacility(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+    },
+  })
+
+  const setInitialMultiplier = useMutation({
+    mutationFn: (params: TSetInitialMultiplierParams) =>
+      ensurePresale().setInitialMultiplier(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+    },
+  })
+
+  const setDecayDuration = useMutation({
+    mutationFn: (params: TSetDecayDurationParams) => ensurePresale().setDecayDuration(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+    },
+  })
+
+  const setStartTime = useMutation({
+    mutationFn: (params: TSetStartTimeParams) => ensurePresale().setStartTime(params),
+    onSuccess: async () => {
+      await refetchAfterMutation()
+    },
+  })
+
   const isPending =
     setPresaleState.isPending ||
     setCaps.isPending ||
     setEndTimestamp.isPending ||
     setMerkleRoot.isPending ||
-    addToWhitelistWithProof.isPending
+    addToWhitelistWithProof.isPending ||
+    setCreditFacility.isPending ||
+    setInitialMultiplier.isPending ||
+    setDecayDuration.isPending ||
+    setStartTime.isPending
 
   return {
     setPresaleState,
@@ -669,6 +729,10 @@ export const usePresaleAdmin = (): UsePresaleAdminReturnType => {
     setEndTimestamp,
     setMerkleRoot,
     addToWhitelistWithProof,
+    setCreditFacility,
+    setInitialMultiplier,
+    setDecayDuration,
+    setStartTime,
     isPending,
   }
 }

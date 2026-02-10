@@ -33,6 +33,43 @@ export interface TSetMaxLeverageParams extends TCreditFacilityAdminParams {
   maxLeverage: number
 }
 
+export interface TTransferLoanParams extends TCreditFacilityAdminParams {
+  /** Loan ID to transfer */
+  loanId: bigint
+  /** New borrower address */
+  newBorrower: Address
+}
+
+export interface TRebalanceLoanParams extends TCreditFacilityAdminParams {
+  /** Loan ID to rebalance */
+  loanId: bigint
+}
+
+export interface TConsolidateLoansParams extends TCreditFacilityAdminParams {
+  /** Array of loan IDs to consolidate (must be >= 2) */
+  loanIds: bigint[]
+}
+
+export interface TBorrowForParams extends TCreditFacilityAdminParams {
+  /** Receiver address for the borrowed funds */
+  receiver: Address
+  /** Amount to borrow */
+  requestedLoanAmount: bigint
+}
+
+export interface TBuyAndBorrowForParams extends TCreditFacilityAdminParams {
+  /** Receiver address */
+  receiver: Address
+  /** Amount of reserve tokens */
+  amount: bigint
+  /** Leverage multiplier (>= 1) */
+  leverage: number
+  /** Whether to consolidate with existing loans */
+  consolidate?: boolean
+  /** Minimum amount out (slippage protection) */
+  minAmountOut?: bigint
+}
+
 export interface TCreditFacilityAdminState {
   /** Current LTV ratio in basis points */
   ltvBps: number
@@ -270,6 +307,213 @@ export class CreditFacilityAdmin {
         abi: CreditFacility_v1,
         functionName: 'setMaxLeverage',
         args: [BigInt(maxLeverage)],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Transfer a loan to a new borrower
+   */
+  public async transferLoan({
+    loanId,
+    newBorrower,
+    lifecycle,
+  }: TTransferLoanParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: CreditFacility_v1,
+        functionName: 'transferLoan',
+        args: [loanId, newBorrower],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Rebalance a loan
+   */
+  public async rebalanceLoan({
+    loanId,
+    lifecycle,
+  }: TRebalanceLoanParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: CreditFacility_v1,
+        functionName: 'rebalanceLoan',
+        args: [loanId],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Consolidate multiple loans into one
+   * @param params Loan IDs (must be >= 2) and optional lifecycle callbacks
+   */
+  public async consolidateLoans({
+    loanIds,
+    lifecycle,
+  }: TConsolidateLoansParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    if (loanIds.length < 2) {
+      throw new Error('At least 2 loan IDs are required for consolidation')
+    }
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: CreditFacility_v1,
+        functionName: 'consolidateLoans',
+        args: [loanIds],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Borrow on behalf of a receiver
+   */
+  public async borrowFor({
+    receiver,
+    requestedLoanAmount,
+    lifecycle,
+  }: TBorrowForParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: CreditFacility_v1,
+        functionName: 'borrowFor',
+        args: [receiver, requestedLoanAmount],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Buy and borrow on behalf of a receiver with leverage
+   */
+  public async buyAndBorrowFor({
+    receiver,
+    amount,
+    leverage,
+    consolidate = false,
+    minAmountOut = BigInt(0),
+    lifecycle,
+  }: TBuyAndBorrowForParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    if (leverage < 1) {
+      throw new Error('Leverage must be at least 1')
+    }
+
+    const loops = BigInt(Math.floor(leverage))
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: CreditFacility_v1,
+        functionName: 'buyAndBorrowFor',
+        args: [receiver, amount, loops, consolidate, minAmountOut],
         account: this.getWalletAddress(walletClient),
       })
 

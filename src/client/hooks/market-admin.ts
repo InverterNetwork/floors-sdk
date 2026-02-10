@@ -7,10 +7,14 @@ import { usePublicClient, useWalletClient } from 'wagmi'
 
 import {
   MarketAdmin,
+  type TDepositCollateralParams,
   type TMarketAdminParams,
   type TMarketAdminState,
   type TRaiseFloorParams,
+  type TReconfigureSegmentsParams,
   type TSetFeeParams,
+  type TSetVirtualCollateralSupplyParams,
+  type TWithdrawCollateralParams,
 } from '../../market-admin'
 
 // =============================================================================
@@ -57,6 +61,26 @@ export type UseMarketAdminOptions = {
   /** Mutation options for raiseFloor */
   raiseFloorOptions?: Omit<
     UseMutationOptions<TransactionReceipt, Error, TRaiseFloorParams | undefined>,
+    'mutationFn'
+  >
+  /** Mutation options for reconfigureSegments */
+  reconfigureSegmentsOptions?: Omit<
+    UseMutationOptions<TransactionReceipt, Error, TReconfigureSegmentsParams>,
+    'mutationFn'
+  >
+  /** Mutation options for setVirtualCollateralSupply */
+  setVirtualCollateralSupplyOptions?: Omit<
+    UseMutationOptions<TransactionReceipt, Error, TSetVirtualCollateralSupplyParams>,
+    'mutationFn'
+  >
+  /** Mutation options for withdrawCollateralTo */
+  withdrawCollateralToOptions?: Omit<
+    UseMutationOptions<TransactionReceipt, Error, TWithdrawCollateralParams>,
+    'mutationFn'
+  >
+  /** Mutation options for depositCollateralFrom */
+  depositCollateralFromOptions?: Omit<
+    UseMutationOptions<TransactionReceipt, Error, TDepositCollateralParams>,
     'mutationFn'
   >
 }
@@ -216,6 +240,54 @@ export function useMarketAdmin(options: UseMarketAdminOptions) {
   })
 
   // ===========================================================================
+  // Mutations - Segment & Collateral Management
+  // ===========================================================================
+
+  const reconfigureSegmentsMutation = useMutation({
+    mutationFn: async (params: TReconfigureSegmentsParams): Promise<TransactionReceipt> => {
+      const admin = getMarketAdminInstance()
+      return admin.reconfigureSegments(params)
+    },
+    onSuccess: async () => {
+      await marketStateQuery.refetch()
+    },
+    ...options.reconfigureSegmentsOptions,
+  })
+
+  const setVirtualCollateralSupplyMutation = useMutation({
+    mutationFn: async (params: TSetVirtualCollateralSupplyParams): Promise<TransactionReceipt> => {
+      const admin = getMarketAdminInstance()
+      return admin.setVirtualCollateralSupply(params)
+    },
+    onSuccess: async () => {
+      await marketStateQuery.refetch()
+    },
+    ...options.setVirtualCollateralSupplyOptions,
+  })
+
+  const withdrawCollateralToMutation = useMutation({
+    mutationFn: async (params: TWithdrawCollateralParams): Promise<TransactionReceipt> => {
+      const admin = getMarketAdminInstance()
+      return admin.withdrawCollateralTo(params)
+    },
+    onSuccess: async () => {
+      await marketStateQuery.refetch()
+    },
+    ...options.withdrawCollateralToOptions,
+  })
+
+  const depositCollateralFromMutation = useMutation({
+    mutationFn: async (params: TDepositCollateralParams): Promise<TransactionReceipt> => {
+      const admin = getMarketAdminInstance()
+      return admin.depositCollateralFrom(params)
+    },
+    onSuccess: async () => {
+      await marketStateQuery.refetch()
+    },
+    ...options.depositCollateralFromOptions,
+  })
+
+  // ===========================================================================
   // Loading State
   // ===========================================================================
 
@@ -226,7 +298,11 @@ export function useMarketAdmin(options: UseMarketAdminOptions) {
     closeSellMutation.isPending ||
     setBuyFeeMutation.isPending ||
     setSellFeeMutation.isPending ||
-    raiseFloorMutation.isPending
+    raiseFloorMutation.isPending ||
+    reconfigureSegmentsMutation.isPending ||
+    setVirtualCollateralSupplyMutation.isPending ||
+    withdrawCollateralToMutation.isPending ||
+    depositCollateralFromMutation.isPending
 
   return {
     // Market state query
@@ -248,6 +324,12 @@ export function useMarketAdmin(options: UseMarketAdminOptions) {
     // Floor elevation
     raiseFloor: raiseFloorMutation,
 
+    // Segment & collateral management
+    reconfigureSegments: reconfigureSegmentsMutation,
+    setVirtualCollateralSupply: setVirtualCollateralSupplyMutation,
+    withdrawCollateralTo: withdrawCollateralToMutation,
+    depositCollateralFrom: depositCollateralFromMutation,
+
     // Combined loading state
     isLoading,
 
@@ -259,5 +341,9 @@ export function useMarketAdmin(options: UseMarketAdminOptions) {
     isSettingBuyFee: setBuyFeeMutation.isPending,
     isSettingSellFee: setSellFeeMutation.isPending,
     isRaisingFloor: raiseFloorMutation.isPending,
+    isReconfiguringSegments: reconfigureSegmentsMutation.isPending,
+    isSettingVirtualCollateralSupply: setVirtualCollateralSupplyMutation.isPending,
+    isWithdrawingCollateral: withdrawCollateralToMutation.isPending,
+    isDepositingCollateral: depositCollateralFromMutation.isPending,
   }
 }

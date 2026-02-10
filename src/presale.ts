@@ -280,6 +280,29 @@ export interface TAddToWhitelistWithProofParams {
   lifecycle?: TransactionLifecycleCallbacks
 }
 
+export interface TSetCreditFacilityParams {
+  creditFacility: Address
+  lifecycle?: TransactionLifecycleCallbacks
+}
+
+export interface TSetInitialMultiplierParams {
+  /** Multiplier value (uint32) */
+  multiplier: number
+  lifecycle?: TransactionLifecycleCallbacks
+}
+
+export interface TSetDecayDurationParams {
+  /** Duration in seconds (uint64) */
+  duration: bigint
+  lifecycle?: TransactionLifecycleCallbacks
+}
+
+export interface TSetStartTimeParams {
+  /** Start time as Unix timestamp (uint64) */
+  startTime: bigint
+  lifecycle?: TransactionLifecycleCallbacks
+}
+
 // ============================================================================
 // Internal Types
 // ============================================================================
@@ -615,6 +638,28 @@ export class Presale {
       abi: Presale_v1,
       functionName: 'isEnded',
     })) as boolean
+  }
+
+  /**
+   * @description Get user's total tokens breakdown (total, claimed, locked)
+   * @param user User address
+   * @returns Object with totalTokens, claimedTokens, lockedTokens
+   */
+  public async getUserTotalTokens(
+    user: Address
+  ): Promise<{ totalTokens: bigint; claimedTokens: bigint; lockedTokens: bigint }> {
+    const result = (await this.publicClient.readContract({
+      address: this.address,
+      abi: Presale_v1,
+      functionName: 'getUserTotalTokens',
+      args: [user],
+    })) as [bigint, bigint, bigint]
+
+    return {
+      totalTokens: result[0],
+      claimedTokens: result[1],
+      lockedTokens: result[2],
+    }
   }
 
   /**
@@ -1246,6 +1291,158 @@ export class Presale {
         lifecycle?.onConfirmed?.(receipt)
       } else {
         lifecycle?.onFailed?.(new Error('addToWhitelistWithProof transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Set the credit facility address (Admin only)
+   */
+  public async setCreditFacility({
+    creditFacility,
+    lifecycle,
+  }: TSetCreditFacilityParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'setCreditFacility',
+        args: [creditFacility],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('setCreditFacility transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Set the initial fee multiplier (Admin only)
+   */
+  public async setInitialMultiplier({
+    multiplier,
+    lifecycle,
+  }: TSetInitialMultiplierParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'setInitialMultiplier',
+        args: [multiplier],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('setInitialMultiplier transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Set the decay duration (Admin only)
+   */
+  public async setDecayDuration({
+    duration,
+    lifecycle,
+  }: TSetDecayDurationParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'setDecayDuration',
+        args: [duration],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('setDecayDuration transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Set the decay start time (Admin only)
+   */
+  public async setStartTime({
+    startTime,
+    lifecycle,
+  }: TSetStartTimeParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'setStartTime',
+        args: [startTime],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('setStartTime transaction reverted'))
       }
 
       return receipt

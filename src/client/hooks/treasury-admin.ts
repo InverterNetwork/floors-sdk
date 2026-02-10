@@ -6,6 +6,7 @@ import type { Address, TransactionReceipt } from 'viem'
 import { usePublicClient, useWalletClient } from 'wagmi'
 
 import {
+  type TFetchFundsParams,
   TreasuryAdmin,
   type TTreasuryAdminState,
   type TTreasuryRecipient,
@@ -146,13 +147,48 @@ export function useTreasuryAdmin(options: UseTreasuryAdminOptions) {
   })
 
   // ===========================================================================
+  // Mutations - Read & Fetch
+  // ===========================================================================
+
+  const getTotalSharesMutation = useMutation({
+    mutationFn: async (): Promise<bigint> => {
+      const instance = getReadOnlyInstance()
+      if (!instance) {
+        throw new Error('Public client not available')
+      }
+      return instance.getTotalShares()
+    },
+  })
+
+  const getFundsMutation = useMutation({
+    mutationFn: async (token: Address): Promise<bigint> => {
+      const instance = getReadOnlyInstance()
+      if (!instance) {
+        throw new Error('Public client not available')
+      }
+      return instance.getFunds(token)
+    },
+  })
+
+  const fetchFundsMutation = useMutation({
+    mutationFn: async (params: TFetchFundsParams): Promise<TransactionReceipt> => {
+      const admin = getTreasuryAdminInstance()
+      return admin.fetchFunds(params)
+    },
+    onSuccess: async () => {
+      await treasuryStateQuery.refetch()
+    },
+  })
+
+  // ===========================================================================
   // Loading State
   // ===========================================================================
 
   const isLoading =
     setRecipientsMutation.isPending ||
     setFloorFeePercentageMutation.isPending ||
-    setFloorFeeTreasuryMutation.isPending
+    setFloorFeeTreasuryMutation.isPending ||
+    fetchFundsMutation.isPending
 
   return {
     // Treasury state query
@@ -165,6 +201,9 @@ export function useTreasuryAdmin(options: UseTreasuryAdminOptions) {
     setRecipients: setRecipientsMutation,
     setFloorFeePercentage: setFloorFeePercentageMutation,
     setFloorFeeTreasury: setFloorFeeTreasuryMutation,
+    getTotalShares: getTotalSharesMutation,
+    getFunds: getFundsMutation,
+    fetchFunds: fetchFundsMutation,
 
     // Combined loading state
     isLoading,
@@ -173,5 +212,6 @@ export function useTreasuryAdmin(options: UseTreasuryAdminOptions) {
     isSettingRecipients: setRecipientsMutation.isPending,
     isSettingFloorFeePercentage: setFloorFeePercentageMutation.isPending,
     isSettingFloorFeeTreasury: setFloorFeeTreasuryMutation.isPending,
+    isFetchingFunds: fetchFundsMutation.isPending,
   }
 }

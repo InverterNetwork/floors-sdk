@@ -40,6 +40,18 @@ export interface TSetFloorFeeTreasuryParams extends TTreasuryAdminParams {
   treasuryAddress: Address
 }
 
+export interface TGetFundsParams {
+  /** Token address to query funds for */
+  token: Address
+}
+
+export interface TFetchFundsParams extends TTreasuryAdminParams {
+  /** Token address to fetch funds for */
+  token: Address
+  /** Amount to fetch */
+  amount: bigint
+}
+
 export interface TTreasuryAdminState {
   /** Current floor fee percentage in basis points */
   floorFeePercentage: number
@@ -47,6 +59,8 @@ export interface TTreasuryAdminState {
   floorFeeTreasury: Address
   /** Current recipients (would need indexer data for full list) */
   recipientCount: number
+  /** Total shares across all recipients */
+  totalShares: bigint
 }
 
 interface TreasuryAdminConstructorArgs {
@@ -108,7 +122,7 @@ export class TreasuryAdmin {
    * @description Get the current treasury configuration state
    */
   public async getTreasuryState(): Promise<TTreasuryAdminState> {
-    const [floorFeePercentage, floorFeeTreasury] = await Promise.all([
+    const [floorFeePercentage, floorFeeTreasury, totalShares] = await Promise.all([
       this.publicClient.readContract({
         address: this.address,
         abi: SplitterTreasury_v1,
@@ -119,12 +133,18 @@ export class TreasuryAdmin {
         abi: SplitterTreasury_v1,
         functionName: 'getFloorFeeTreasury',
       }) as Promise<Address>,
+      this.publicClient.readContract({
+        address: this.address,
+        abi: SplitterTreasury_v1,
+        functionName: 'getTotalShares',
+      }) as Promise<bigint>,
     ])
 
     return {
       floorFeePercentage: Number(floorFeePercentage),
       floorFeeTreasury,
       recipientCount: 0, // Would need indexer data
+      totalShares,
     }
   }
 
@@ -151,9 +171,71 @@ export class TreasuryAdmin {
     })) as Address
   }
 
+  /**
+   * @description Get the total shares across all recipients
+   */
+  public async getTotalShares(): Promise<bigint> {
+    return (await this.publicClient.readContract({
+      address: this.address,
+      abi: SplitterTreasury_v1,
+      functionName: 'getTotalShares',
+    })) as bigint
+  }
+
+  /**
+   * @description Get the funds balance for a specific token
+   */
+  public async getFunds(token: Address): Promise<bigint> {
+    return (await this.publicClient.readContract({
+      address: this.address,
+      abi: SplitterTreasury_v1,
+      functionName: 'getFunds',
+      args: [token],
+    })) as bigint
+  }
+
   // ===========================================================================
   // Write Methods
   // ===========================================================================
+
+  /**
+   * @description Fetch funds for a specific token from the strategy
+   */
+  public async fetchFunds({
+    token,
+    amount,
+    lifecycle,
+  }: TFetchFundsParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: SplitterTreasury_v1,
+        functionName: 'fetchFunds',
+        args: [token, amount],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
 
   /**
    * @description Set the fee recipients and their shares

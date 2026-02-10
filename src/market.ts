@@ -31,6 +31,14 @@ export interface TMarketBorrowParams {
   lifecycle?: TransactionLifecycleCallbacks
 }
 
+export interface TMarketBuyForParams {
+  receiver: Address
+  depositAmount: bigint
+  slippageBps?: number
+  /** Optional lifecycle callbacks for multi-stage feedback */
+  lifecycle?: TransactionLifecycleCallbacks
+}
+
 export interface TMarketBuyAndBorrowParams {
   amount: bigint
   leverage: number
@@ -200,6 +208,70 @@ export class Market {
       lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
       throw error
     }
+  }
+
+  public async buyFor({
+    receiver,
+    depositAmount,
+    slippageBps = 50,
+    lifecycle,
+  }: TMarketBuyForParams): Promise<TMarketMutationResult> {
+    const walletClient = this.requireWalletClient()
+    this.assertPositiveAmount(depositAmount)
+    const normalizedSlippage = this.normalizeSlippage(slippageBps)
+
+    const expectedOut = await this.previewBuy(depositAmount)
+    const minAmountOut = this.applySlippage(expectedOut, normalizedSlippage)
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Floor_v1,
+        functionName: 'buyFor',
+        args: [receiver, depositAmount, minAmountOut],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Get the floor section identifier (bytes32)
+   */
+  public async getFloorSection(): Promise<`0x${string}`> {
+    return (await this.publicClient.readContract({
+      address: this.address,
+      abi: Floor_v1,
+      functionName: 'getFloorSection',
+    })) as `0x${string}`
+  }
+
+  /**
+   * @description Get the premium section identifiers (bytes32[])
+   */
+  public async getPremiumSections(): Promise<`0x${string}`[]> {
+    return (await this.publicClient.readContract({
+      address: this.address,
+      abi: Floor_v1,
+      functionName: 'getPremiumSections',
+    })) as `0x${string}`[]
   }
 
   public async sell({

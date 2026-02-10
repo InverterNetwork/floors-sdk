@@ -50,6 +50,26 @@ export interface TPresaleAdminSetCommissionParams extends TPresaleAdminParams {
   priceBreakpoints: bigint[][]
 }
 
+export interface TPresaleAdminSetCreditFacilityParams extends TPresaleAdminParams {
+  /** Credit facility contract address */
+  creditFacility: Address
+}
+
+export interface TPresaleAdminSetInitialMultiplierParams extends TPresaleAdminParams {
+  /** Initial multiplier value (uint32) */
+  multiplier: number
+}
+
+export interface TPresaleAdminSetDecayDurationParams extends TPresaleAdminParams {
+  /** Decay duration in seconds (uint64) */
+  duration: bigint
+}
+
+export interface TPresaleAdminSetStartTimeParams extends TPresaleAdminParams {
+  /** Start time as Unix timestamp (uint64) */
+  startTime: bigint
+}
+
 export interface TPresaleAdminState {
   /** Current presale state (0=Closed, 1=Whitelist, 2=Live) */
   currentState: PresaleState
@@ -452,6 +472,162 @@ export class PresaleAdmin {
         abi: Presale_v1,
         functionName: 'setBaseCommissionBpsAndPriceBreakpoints',
         args: [baseCommissionBps.map((b) => Number(b)), priceBreakpoints],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  // ===========================================================================
+  // Write Methods - Multiplier & Decay Configuration
+  // ===========================================================================
+
+  /**
+   * @description Set the credit facility address
+   */
+  public async setCreditFacility({
+    creditFacility,
+    lifecycle,
+  }: TPresaleAdminSetCreditFacilityParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'setCreditFacility',
+        args: [creditFacility],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Set the initial fee multiplier
+   */
+  public async setInitialMultiplier({
+    multiplier,
+    lifecycle,
+  }: TPresaleAdminSetInitialMultiplierParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'setInitialMultiplier',
+        args: [multiplier],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Set the decay duration
+   */
+  public async setDecayDuration({
+    duration,
+    lifecycle,
+  }: TPresaleAdminSetDecayDurationParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'setDecayDuration',
+        args: [duration],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  /**
+   * @description Set the decay start time
+   */
+  public async setStartTime({
+    startTime,
+    lifecycle,
+  }: TPresaleAdminSetStartTimeParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Presale_v1,
+        functionName: 'setStartTime',
+        args: [startTime],
         account: this.getWalletAddress(walletClient),
       })
 
