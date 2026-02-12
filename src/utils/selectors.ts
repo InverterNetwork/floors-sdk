@@ -74,10 +74,10 @@ export const FLOOR_SELECTORS = {
   buyFor: getSelector(Floor_v1, 'buyFor'),
   sell: getSelector(Floor_v1, 'sell'),
   sellTo: getSelector(Floor_v1, 'sellTo'),
-  openBuy: getSelector(Floor_v1, 'openBuy'),
-  closeBuy: getSelector(Floor_v1, 'closeBuy'),
-  openSell: getSelector(Floor_v1, 'openSell'),
-  closeSell: getSelector(Floor_v1, 'closeSell'),
+  enableBuy: getSelector(Floor_v1, 'enableBuy'),
+  disableBuy: getSelector(Floor_v1, 'disableBuy'),
+  enableSell: getSelector(Floor_v1, 'enableSell'),
+  disableSell: getSelector(Floor_v1, 'disableSell'),
   setBuyFee: getSelector(Floor_v1, 'setBuyFee'),
   setSellFee: getSelector(Floor_v1, 'setSellFee'),
   raiseFloor: getSelector(Floor_v1, 'raiseFloor'),
@@ -104,7 +104,7 @@ export const CREDIT_FACILITY_SELECTORS = {
   consolidateLoans: getSelector(CreditFacility_v1, 'consolidateLoans'),
   setLoanToValueRatio: getSelector(CreditFacility_v1, 'setLoanToValueRatio'),
   setBorrowingFeeRate: getSelector(CreditFacility_v1, 'setBorrowingFeeRate'),
-  setMaxLeverage: getSelector(CreditFacility_v1, 'setMaxLeverage'),
+  setMaxLoops: getSelector(CreditFacility_v1, 'setMaxLoops'),
 } as const
 
 // =============================================================================
@@ -163,26 +163,26 @@ export const SELECTOR_REGISTRY: RegisteredSelector[] = [
     description: 'Sell tokens to another address',
   },
   {
-    name: 'openBuy',
-    selector: FLOOR_SELECTORS.openBuy,
+    name: 'enableBuy',
+    selector: FLOOR_SELECTORS.enableBuy,
     module: 'floor',
     description: 'Enable buying',
   },
   {
-    name: 'closeBuy',
-    selector: FLOOR_SELECTORS.closeBuy,
+    name: 'disableBuy',
+    selector: FLOOR_SELECTORS.disableBuy,
     module: 'floor',
     description: 'Disable buying',
   },
   {
-    name: 'openSell',
-    selector: FLOOR_SELECTORS.openSell,
+    name: 'enableSell',
+    selector: FLOOR_SELECTORS.enableSell,
     module: 'floor',
     description: 'Enable selling',
   },
   {
-    name: 'closeSell',
-    selector: FLOOR_SELECTORS.closeSell,
+    name: 'disableSell',
+    selector: FLOOR_SELECTORS.disableSell,
     module: 'floor',
     description: 'Disable selling',
   },
@@ -279,10 +279,10 @@ export const SELECTOR_REGISTRY: RegisteredSelector[] = [
     description: 'Set borrowing fee rate',
   },
   {
-    name: 'setMaxLeverage',
-    selector: CREDIT_FACILITY_SELECTORS.setMaxLeverage,
+    name: 'setMaxLoops',
+    selector: CREDIT_FACILITY_SELECTORS.setMaxLoops,
     module: 'creditFacility',
-    description: 'Set maximum leverage',
+    description: 'Set maximum loops',
   },
 
   // Presale functions

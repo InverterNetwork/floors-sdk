@@ -323,7 +323,7 @@ export class Launch {
         allowFailure: false,
         callData: encodeFunctionData({
           abi: Floor_v1,
-          functionName: 'openBuy',
+          functionName: 'enableBuy',
         }),
       })
 
@@ -346,7 +346,7 @@ export class Launch {
         allowFailure: false,
         callData: encodeFunctionData({
           abi: Floor_v1,
-          functionName: 'openSell',
+          functionName: 'enableSell',
         }),
       })
 

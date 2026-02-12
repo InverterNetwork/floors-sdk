@@ -153,7 +153,7 @@ export class CreditFacilityAdmin {
       this.publicClient.readContract({
         address: this.address,
         abi: CreditFacility_v1,
-        functionName: 'getMaxLeverage',
+        functionName: 'getMaxLoops',
       }) as Promise<bigint>,
     ])
 
@@ -199,7 +199,7 @@ export class CreditFacilityAdmin {
     const leverage = (await this.publicClient.readContract({
       address: this.address,
       abi: CreditFacility_v1,
-      functionName: 'getMaxLeverage',
+      functionName: 'getMaxLoops',
     })) as bigint
     return Number(leverage)
   }
@@ -305,7 +305,7 @@ export class CreditFacilityAdmin {
       const hash = await walletClient.writeContract({
         address: this.address,
         abi: CreditFacility_v1,
-        functionName: 'setMaxLeverage',
+        functionName: 'setMaxLoops',
         args: [BigInt(maxLeverage)],
         account: this.getWalletAddress(walletClient),
       })

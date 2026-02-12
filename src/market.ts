@@ -601,7 +601,7 @@ export class Market {
     const maxLeverage = (await this.publicClient.readContract({
       address: creditFacility,
       abi: CreditFacility_v1,
-      functionName: 'getMaxLeverage',
+      functionName: 'getMaxLoops',
       args: [],
     })) as bigint
 

@@ -430,6 +430,31 @@ export default [
   },
   {
     type: 'event',
+    name: 'LastFloorPriceUpdated',
+    inputs: [
+      {
+        name: 'user_',
+        type: 'address',
+        indexed: true,
+        internalType: 'address',
+      },
+      {
+        name: 'strategy_',
+        type: 'address',
+        indexed: true,
+        internalType: 'address',
+      },
+      {
+        name: 'newFloorPrice_',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
     name: 'ModuleInitialized',
     inputs: [
       {
@@ -670,12 +695,22 @@ export default [
   },
   {
     type: 'error',
+    name: 'Module__StakingManager__StrategyAssetMismatch',
+    inputs: [],
+  },
+  {
+    type: 'error',
     name: 'Module__StakingManager__StrategyHasValue',
     inputs: [],
   },
   {
     type: 'error',
     name: 'Module__StakingManager__StrategyNotApproved',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'Module__StakingManager__StrategySharesTransferable',
     inputs: [],
   },
   {

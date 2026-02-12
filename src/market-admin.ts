@@ -242,7 +242,7 @@ export class MarketAdmin {
       const hash = await walletClient.writeContract({
         address: this.address,
         abi: Floor_v1,
-        functionName: 'openBuy',
+        functionName: 'enableBuy',
         account: this.getWalletAddress(walletClient),
       })
 
@@ -278,7 +278,7 @@ export class MarketAdmin {
       const hash = await walletClient.writeContract({
         address: this.address,
         abi: Floor_v1,
-        functionName: 'closeBuy',
+        functionName: 'disableBuy',
         account: this.getWalletAddress(walletClient),
       })
 
@@ -314,7 +314,7 @@ export class MarketAdmin {
       const hash = await walletClient.writeContract({
         address: this.address,
         abi: Floor_v1,
-        functionName: 'openSell',
+        functionName: 'enableSell',
         account: this.getWalletAddress(walletClient),
       })
 
@@ -350,7 +350,7 @@ export class MarketAdmin {
       const hash = await walletClient.writeContract({
         address: this.address,
         abi: Floor_v1,
-        functionName: 'closeSell',
+        functionName: 'disableSell',
         account: this.getWalletAddress(walletClient),
       })
 

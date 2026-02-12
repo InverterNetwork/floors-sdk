@@ -86,7 +86,7 @@ export default [
         internalType: 'uint256',
       },
       {
-        name: 'leverage_',
+        name: 'loops_',
         type: 'uint256',
         internalType: 'uint256',
       },
@@ -130,7 +130,7 @@ export default [
         internalType: 'uint256',
       },
       {
-        name: 'leverage_',
+        name: 'loops_',
         type: 'uint256',
         internalType: 'uint256',
       },
@@ -283,11 +283,11 @@ export default [
   },
   {
     type: 'function',
-    name: 'getMaxLeverage',
+    name: 'getMaxLoops',
     inputs: [],
     outputs: [
       {
-        name: 'maxLeverage_',
+        name: 'maxLoops_',
         type: 'uint256',
         internalType: 'uint256',
       },
@@ -505,10 +505,10 @@ export default [
   },
   {
     type: 'function',
-    name: 'setMaxLeverage',
+    name: 'setMaxLoops',
     inputs: [
       {
-        name: 'newMaxLeverage_',
+        name: 'newMaxLoops_',
         type: 'uint256',
         internalType: 'uint256',
       },
@@ -659,12 +659,6 @@ export default [
         indexed: true,
         internalType: 'address',
       },
-      {
-        name: 'issuanceTokensUnlocked_',
-        type: 'uint256',
-        indexed: false,
-        internalType: 'uint256',
-      },
     ],
     anonymous: false,
   },
@@ -730,6 +724,31 @@ export default [
       },
       {
         name: 'repaymentAmount_',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+      {
+        name: 'issuanceTokensUnlocked_',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'LoanToValueRatioLowered',
+    inputs: [
+      {
+        name: 'previousRatio_',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+      {
+        name: 'newRatio_',
         type: 'uint256',
         indexed: false,
         internalType: 'uint256',
@@ -814,10 +833,10 @@ export default [
   },
   {
     type: 'event',
-    name: 'MaxLeverageUpdated',
+    name: 'MaxLoopsUpdated',
     inputs: [
       {
-        name: 'newMaxLeverage_',
+        name: 'newMaxLoops_',
         type: 'uint256',
         indexed: false,
         internalType: 'uint256',
@@ -900,7 +919,7 @@ export default [
   },
   {
     type: 'error',
-    name: 'Module__CreditFacility_InsufficientCollateralForLeverage',
+    name: 'Module__CreditFacility_InsufficientCollateralForLoops',
     inputs: [],
   },
   {
@@ -930,17 +949,17 @@ export default [
   },
   {
     type: 'error',
-    name: 'Module__CreditFacility_InvalidLeverage',
-    inputs: [],
-  },
-  {
-    type: 'error',
     name: 'Module__CreditFacility_InvalidLoanId',
     inputs: [],
   },
   {
     type: 'error',
     name: 'Module__CreditFacility_InvalidLoansForConsolidation',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'Module__CreditFacility_InvalidLoopCount',
     inputs: [],
   },
   {
@@ -956,6 +975,11 @@ export default [
   {
     type: 'error',
     name: 'Module__CreditFacility_InvalidTransferRecipient',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'Module__CreditFacility_LoanNotFoundInUserLoans',
     inputs: [],
   },
   {

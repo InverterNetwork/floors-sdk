@@ -78,36 +78,36 @@ export const PERMISSION_MAP: Record<`0x${string}`, PermissionMapEntry> = {
     contract: 'Floor_v1',
   },
 
-  // openBuy()
+  // enableBuy()
   '0xc6b0bdc5': {
-    functionName: 'openBuy',
+    functionName: 'enableBuy',
     description: 'Enable buying on the market',
     requiredRole: 'ADMIN_ROLE',
     roleDescription: 'Only administrators can enable buying',
     contract: 'Floor_v1',
   },
 
-  // closeBuy()
+  // disableBuy()
   '0xa42dbf1d': {
-    functionName: 'closeBuy',
+    functionName: 'disableBuy',
     description: 'Disable buying on the market',
     requiredRole: 'ADMIN_ROLE',
     roleDescription: 'Only administrators can disable buying',
     contract: 'Floor_v1',
   },
 
-  // openSell()
+  // enableSell()
   '0x8a0e7f33': {
-    functionName: 'openSell',
+    functionName: 'enableSell',
     description: 'Enable selling on the market',
     requiredRole: 'ADMIN_ROLE',
     roleDescription: 'Only administrators can enable selling',
     contract: 'Floor_v1',
   },
 
-  // closeSell()
+  // disableSell()
   '0x5bf35a98': {
-    functionName: 'closeSell',
+    functionName: 'disableSell',
     description: 'Disable selling on the market',
     requiredRole: 'ADMIN_ROLE',
     roleDescription: 'Only administrators can disable selling',
@@ -235,12 +235,12 @@ export const PERMISSION_MAP: Record<`0x${string}`, PermissionMapEntry> = {
     contract: 'CreditFacility_v1',
   },
 
-  // setMaxLeverage(uint256)
+  // setMaxLoops(uint256)
   '0x7e837aa1': {
-    functionName: 'setMaxLeverage',
-    description: 'Set maximum leverage',
+    functionName: 'setMaxLoops',
+    description: 'Set maximum loops',
     requiredRole: 'ADMIN_ROLE',
-    roleDescription: 'Only administrators can change max leverage',
+    roleDescription: 'Only administrators can change max loops',
     contract: 'CreditFacility_v1',
   },
 
@@ -257,10 +257,10 @@ export const PERMISSION_MAP: Record<`0x${string}`, PermissionMapEntry> = {
     contract: 'Presale_v1',
   },
 
-  // buyPresaleWithLeverage(uint256,uint256)
+  // buyPresaleWithLoops(uint256,uint256)
   '0x9f0d04e7': {
-    functionName: 'buyPresaleWithLeverage',
-    description: 'Participate in presale with leverage',
+    functionName: 'buyPresaleWithLoops',
+    description: 'Participate in presale with loops',
     requiredRole: 'WHITELIST_ROLE (if whitelist phase) or PUBLIC_ROLE',
     roleDescription: 'You may need to be whitelisted',
     contract: 'Presale_v1',

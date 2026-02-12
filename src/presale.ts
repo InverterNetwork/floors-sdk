@@ -73,9 +73,9 @@ export type TPresaleMutationResult = TransactionReceipt
 
 export interface TPresalePosition {
   owner: Address
-  totalDeposit: bigint
+  netAllocation: bigint
   totalMinted: bigint
-  leverage: bigint
+  loopCount: bigint
   loanIds: bigint[]
   directTokens: bigint
 }
@@ -982,7 +982,7 @@ export class Presale {
       const hash = await walletClient.writeContract({
         address: this.address,
         abi: Presale_v1,
-        functionName: 'buyPresaleWithLeverage',
+        functionName: 'buyPresaleWithLoops',
         args: [depositAmount, BigInt(leverageIndex), BigInt(0)],
         account: accountAddress,
       })
@@ -1533,7 +1533,7 @@ export class Presale {
     }
 
     if (!floorSellOpen) {
-      missingSteps.push('Open Floor sell (openSell)')
+      missingSteps.push('Open Floor sell (enableSell)')
     }
 
     if (!permissions.floorBuyPublic) {
@@ -1778,7 +1778,7 @@ export class Presale {
       allowFailure: false,
       callData: encodeFunctionData({
         abi: Floor_v1,
-        functionName: 'openSell',
+        functionName: 'enableSell',
       }),
     })
 
@@ -1952,7 +1952,7 @@ export class Presale {
       allowFailure: false,
       callData: encodeFunctionData({
         abi: Floor_v1,
-        functionName: 'openSell',
+        functionName: 'enableSell',
       }),
     })
 
