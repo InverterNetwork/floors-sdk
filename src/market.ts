@@ -25,6 +25,14 @@ export interface TMarketApproveParams {
   lifecycle?: TransactionLifecycleCallbacks
 }
 
+export interface TMarketSellToParams {
+  receiver: Address
+  depositAmount: bigint
+  slippageBps?: number
+  /** Optional lifecycle callbacks for multi-stage feedback */
+  lifecycle?: TransactionLifecycleCallbacks
+}
+
 export interface TMarketBorrowParams {
   borrowAmount: bigint
   /** Optional lifecycle callbacks for multi-stage feedback */
@@ -327,6 +335,80 @@ export class Market {
         abi: Floor_v1,
         functionName: 'sell',
         args: [depositAmount, minAmountOut],
+        account: accountAddress,
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
+  }
+
+  public async sellTo({
+    receiver,
+    depositAmount,
+    slippageBps = 50,
+    lifecycle,
+  }: TMarketSellToParams): Promise<TMarketMutationResult> {
+    const walletClient = this.requireWalletClient()
+    this.assertPositiveAmount(depositAmount)
+    const normalizedSlippage = this.normalizeSlippage(slippageBps)
+
+    const accountAddress = this.getWalletAddress(walletClient)
+
+    const [balance, allowance] = await this.publicClient.multicall({
+      contracts: [
+        {
+          address: this.issuanceTokenAddress,
+          abi: ERC20Issuance_v1,
+          functionName: 'balanceOf',
+          args: [accountAddress],
+        },
+        {
+          address: this.issuanceTokenAddress,
+          abi: ERC20Issuance_v1,
+          functionName: 'allowance',
+          args: [accountAddress, this.address],
+        },
+      ],
+      allowFailure: false,
+    })
+
+    if ((balance as bigint) < depositAmount) {
+      throw new Error(
+        `Insufficient fToken balance. You have ${(balance as bigint).toString()} but tried to sell ${depositAmount.toString()}`
+      )
+    }
+
+    if ((allowance as bigint) < depositAmount) {
+      throw new Error(
+        `Insufficient fToken allowance. Please approve the Floor contract to spend your fTokens first.\n\nRequired: ${depositAmount.toString()}\nCurrent: ${(allowance as bigint).toString()}`
+      )
+    }
+
+    const expectedOut = await this.previewSell(depositAmount)
+    const minAmountOut = this.applySlippage(expectedOut, normalizedSlippage)
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: this.address,
+        abi: Floor_v1,
+        functionName: 'sellTo',
+        args: [receiver, depositAmount, minAmountOut],
         account: accountAddress,
       })
 
