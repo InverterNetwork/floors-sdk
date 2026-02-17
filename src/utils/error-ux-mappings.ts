@@ -129,6 +129,15 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
     recoveryActions: [ACTIONS.contactSupport],
   },
 
+  '0x247434a8': {
+    // Module__Authorizer__CannotRenounceLastAdmin
+    prettyMessage: 'Cannot remove last admin',
+    suggestion: 'At least one admin must remain. Assign another admin first.',
+    category: 'authorizer',
+    severity: 'error',
+    recoveryActions: [ACTIONS.contactSupport],
+  },
+
   '0x5b784de5': {
     // Module__Authorizer__InvalidInitialAdmin
     prettyMessage: 'Invalid admin address',
@@ -397,6 +406,36 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
   // FLOOR SPECIFIC ERRORS
   // ==========================================================================
 
+  '0x07982e52': {
+    // Module__BC_Discrete_Redeeming_VirtualSupply__InsufficientCollateralBalance
+    prettyMessage: 'Insufficient collateral balance',
+    suggestion: 'The contract does not have enough collateral to complete this operation.',
+    category: 'system',
+    severity: 'error',
+    recoveryActions: [ACTIONS.decreaseAmount, ACTIONS.contactSupport],
+    dynamicMessage: (args) =>
+      `Collateral balance ${args.actualBalance_} is less than required ${args.requiredBalance_}`,
+  },
+
+  '0x1bb5195f': {
+    // Module__BC_Discrete_Redeeming_VirtualSupply__InvarianceCheckFailed
+    prettyMessage: 'Invariance check failed',
+    suggestion: 'Internal consistency check failed. Please try again.',
+    category: 'system',
+    severity: 'error',
+    recoveryActions: [ACTIONS.retry, ACTIONS.contactSupport],
+  },
+
+  '0x6c8712d9': {
+    // Module__Floor__CollateralTooSmall
+    prettyMessage: 'Collateral too small',
+    suggestion: 'Increase the collateral amount to meet the minimum requirement.',
+    category: 'trading',
+    severity: 'warning',
+    recoveryActions: [ACTIONS.increaseAmount],
+    dynamicMessage: (args) => `Provided ${args.provided_}, minimum required is ${args.minimum_}`,
+  },
+
   '0x54fe6890': {
     // Module__Floor__InsufficientPremiumSteps
     prettyMessage: 'Insufficient premium steps',
@@ -433,35 +472,37 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
     recoveryActions: [ACTIONS.increaseAmount],
   },
 
-  '0x1bb5195f': {
-    // Module__BC_Discrete_Redeeming_VirtualSupply__InvarianceCheckFailed
-    prettyMessage: 'Invariance check failed',
-    suggestion: 'Internal consistency check failed. Please try again.',
-    category: 'system',
-    severity: 'error',
-    recoveryActions: [ACTIONS.retry, ACTIONS.contactSupport],
-  },
-
   // ==========================================================================
   // CREDIT FACILITY ERRORS
   // ==========================================================================
 
-  '0xb5d3d39c': {
+  '0xf31ff149': {
     // Module__CreditFacility_BorrowAmountTooSmall
     prettyMessage: 'Borrow amount too small',
     suggestion: 'Increase your borrow amount to meet the minimum',
     category: 'credit',
     severity: 'warning',
     recoveryActions: [ACTIONS.increaseAmount],
+    dynamicMessage: (args) => `Requested ${args.requested_}, minimum is ${args.minimumRequired_}`,
   },
 
-  '0x9860564d': {
-    // Module__CreditFacility_InsufficientCollateralForLeverage
-    prettyMessage: 'Insufficient collateral for leverage',
-    suggestion: 'Reduce leverage or add more initial amount',
+  '0xe0a00cb8': {
+    // Module__CreditFacility_FeeTooHigh
+    prettyMessage: 'Fee too high',
+    suggestion: 'The fee exceeds the maximum allowed.',
+    category: 'credit',
+    severity: 'error',
+    recoveryActions: [ACTIONS.contactSupport],
+    dynamicMessage: (args) => `Fee ${args.provided_} exceeds maximum ${args.maximum_}`,
+  },
+
+  '0x0d0fa8e8': {
+    // Module__CreditFacility_InsufficientCollateralForLoops
+    prettyMessage: 'Insufficient collateral for loops',
+    suggestion: 'Reduce the number of loops or add more collateral.',
     category: 'credit',
     severity: 'warning',
-    recoveryActions: [ACTIONS.reduceLeverage, ACTIONS.increaseAmount],
+    recoveryActions: [ACTIONS.addCollateral, ACTIONS.decreaseAmount],
   },
 
   '0xb8d4508f': {
@@ -509,15 +550,6 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
     recoveryActions: [ACTIONS.contactSupport],
   },
 
-  '0x882a2be3': {
-    // Module__CreditFacility_InvalidLeverage
-    prettyMessage: 'Invalid leverage',
-    suggestion: 'Leverage must be between 1x and the maximum allowed',
-    category: 'credit',
-    severity: 'warning',
-    recoveryActions: [ACTIONS.reduceLeverage],
-  },
-
   '0xecbc7909': {
     // Module__CreditFacility_InvalidLoanId
     prettyMessage: 'Loan not found',
@@ -531,6 +563,15 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
     // Module__CreditFacility_InvalidLoansForConsolidation
     prettyMessage: 'Cannot consolidate these loans',
     suggestion: 'The selected loans cannot be consolidated',
+    category: 'credit',
+    severity: 'error',
+    recoveryActions: [ACTIONS.retry],
+  },
+
+  '0xd644eb85': {
+    // Module__CreditFacility_InvalidLoopCount
+    prettyMessage: 'Invalid loop count',
+    suggestion: 'The number of loops must be within the allowed range.',
     category: 'credit',
     severity: 'error',
     recoveryActions: [ACTIONS.retry],
@@ -563,13 +604,23 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
     recoveryActions: [ACTIONS.retry],
   },
 
-  '0x26831539': {
+  '0xf9beff8d': {
+    // Module__CreditFacility_LoanNotFoundInUserLoans
+    prettyMessage: 'Loan not found',
+    suggestion: 'This loan does not exist in your active loans.',
+    category: 'credit',
+    severity: 'error',
+    recoveryActions: [ACTIONS.refresh],
+  },
+
+  '0x24b7757c': {
     // Module__CreditFacility_LoanToValueRatioTooHigh
     prettyMessage: 'Borrow amount exceeds limit',
     suggestion: 'Reduce borrow amount or add more collateral',
     category: 'credit',
     severity: 'warning',
     recoveryActions: [ACTIONS.decreaseAmount, ACTIONS.addCollateral],
+    dynamicMessage: (args) => `LTV ratio ${args.attempted_} exceeds maximum ${args.maximum_}`,
   },
 
   '0xff17a9c5': {
@@ -617,6 +668,87 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
     recoveryActions: [],
   },
 
+  '0xa454b13c': {
+    // Module__CreditFacility_SlippageExceeded
+    prettyMessage: 'Slippage exceeded',
+    suggestion: 'Price moved during the transaction. Try increasing slippage tolerance.',
+    category: 'credit',
+    severity: 'warning',
+    recoveryActions: [ACTIONS.adjustSlippage, ACTIONS.retry],
+    dynamicMessage: (args) => `Received ${args.received_}, minimum required was ${args.minimum_}`,
+  },
+
+  // ==========================================================================
+  // DECAYING FEE MULTIPLIER ERRORS
+  // ==========================================================================
+
+  '0x7f16213e': {
+    // Module__DecayingFeeMultiplierBase__AlreadyStarted
+    prettyMessage: 'Fee decay already started',
+    suggestion: 'The fee decay period has already begun and cannot be restarted.',
+    category: 'system',
+    severity: 'warning',
+    recoveryActions: [ACTIONS.refresh],
+  },
+
+  '0x35a92e14': {
+    // Module__DecayingFeeMultiplierBase__InvalidDecayDuration
+    prettyMessage: 'Invalid decay duration',
+    suggestion: 'The decay duration is out of the allowed range.',
+    category: 'validation',
+    severity: 'error',
+    recoveryActions: [ACTIONS.contactSupport],
+  },
+
+  '0x54f744ae': {
+    // Module__DecayingFeeMultiplierBase__InvalidInitialMultiplier
+    prettyMessage: 'Invalid initial multiplier',
+    suggestion: 'The initial fee multiplier is out of the allowed range.',
+    category: 'validation',
+    severity: 'error',
+    recoveryActions: [ACTIONS.contactSupport],
+  },
+
+  '0x9adec4d0': {
+    // Module__DecayingFeeMultiplierBase__NotStarted
+    prettyMessage: 'Fee decay not started',
+    suggestion: 'The fee decay period has not begun yet.',
+    category: 'system',
+    severity: 'warning',
+    recoveryActions: [ACTIONS.wait],
+  },
+
+  // ==========================================================================
+  // MERKLE WHITELIST ERRORS
+  // ==========================================================================
+
+  '0xd48f547a': {
+    // Module__MerkleWhitelistBase__AlreadyWhitelisted
+    prettyMessage: 'Already whitelisted',
+    suggestion: 'This address is already on the whitelist.',
+    category: 'presale',
+    severity: 'info',
+    recoveryActions: [],
+  },
+
+  '0x2c3dd9fb': {
+    // Module__MerkleWhitelistBase__MerkleRootNotSettable
+    prettyMessage: 'Whitelist not configurable',
+    suggestion: 'The whitelist configuration is locked and cannot be changed.',
+    category: 'system',
+    severity: 'error',
+    recoveryActions: [ACTIONS.contactSupport],
+  },
+
+  '0xbd034118': {
+    // Module__MerkleWhitelistBase__NotWhitelisted
+    prettyMessage: 'Not on whitelist',
+    suggestion: 'Your address is not on the whitelist. Contact the project team.',
+    category: 'presale',
+    severity: 'warning',
+    recoveryActions: [ACTIONS.checkWhitelist, ACTIONS.contactSupport],
+  },
+
   // ==========================================================================
   // PRESALE ERRORS
   // ==========================================================================
@@ -639,6 +771,25 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
     recoveryActions: [ACTIONS.refresh],
   },
 
+  '0x147f6a01': {
+    // Presale__CannotModifyAfterStart
+    prettyMessage: 'Cannot modify after start',
+    suggestion: 'Presale parameters cannot be changed after it has started.',
+    category: 'presale',
+    severity: 'error',
+    recoveryActions: [ACTIONS.contactSupport],
+  },
+
+  '0xfcb808d9': {
+    // Presale__FeeExceedsDeposit
+    prettyMessage: 'Fee exceeds deposit',
+    suggestion: 'The fee amount is larger than the deposit. Try a larger amount.',
+    category: 'presale',
+    severity: 'warning',
+    recoveryActions: [ACTIONS.increaseAmount],
+    dynamicMessage: (args) => `Fee ${args.fee_} exceeds deposit ${args.deposit_}`,
+  },
+
   '0x63a69154': {
     // Presale__NotWhitelisted
     prettyMessage: 'Not on whitelist',
@@ -648,22 +799,26 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
     recoveryActions: [ACTIONS.checkWhitelist, ACTIONS.contactSupport],
   },
 
-  '0xdb351373': {
+  '0xafbfe5b0': {
     // Presale__GlobalCapExceeded
     prettyMessage: 'Presale cap reached',
     suggestion: 'The total presale allocation has been sold',
     category: 'presale',
     severity: 'warning',
     recoveryActions: [ACTIONS.decreaseAmount],
+    dynamicMessage: (args) =>
+      `Attempted to mint ${args.attemptedMint_} but cap is ${args.cap_} (current: ${args.currentIssuance_})`,
   },
 
-  '0xc19cf6bb': {
+  '0x24bf5106': {
     // Presale__PerAddressCapExceeded
     prettyMessage: 'Personal cap reached',
     suggestion: "You've reached your maximum allocation",
     category: 'presale',
     severity: 'warning',
     recoveryActions: [ACTIONS.decreaseAmount],
+    dynamicMessage: (args) =>
+      `Attempted to mint ${args.attemptedMint_} but your cap is ${args.cap_} (current: ${args.currentIssuance_})`,
   },
 
   '0xd6ec36a7': {
@@ -702,13 +857,13 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
     recoveryActions: [ACTIONS.retry],
   },
 
-  '0x29168c21': {
-    // Presale__InvalidLeverageIndex
-    prettyMessage: 'Invalid leverage option',
-    suggestion: 'Select a valid leverage tier',
+  '0xbb2a7b92': {
+    // Presale__InvalidLoopCount
+    prettyMessage: 'Invalid loop count',
+    suggestion: 'The number of loops is out of the allowed range.',
     category: 'presale',
     severity: 'error',
-    recoveryActions: [ACTIONS.reduceLeverage],
+    recoveryActions: [ACTIONS.retry],
   },
 
   '0xfab2a8f9': {
@@ -729,6 +884,26 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
     recoveryActions: [ACTIONS.refresh],
   },
 
+  '0x55600ec7': {
+    // Presale__InvalidTransition
+    prettyMessage: 'Invalid state transition',
+    suggestion: 'This presale state change is not allowed.',
+    category: 'presale',
+    severity: 'error',
+    recoveryActions: [ACTIONS.contactSupport],
+  },
+
+  '0x65d6e237': {
+    // Presale__SlippageExceeded
+    prettyMessage: 'Price moved too much',
+    suggestion: 'The price changed during your transaction. Try increasing slippage.',
+    category: 'presale',
+    severity: 'warning',
+    recoveryActions: [ACTIONS.adjustSlippage, ACTIONS.retry],
+    dynamicMessage: (args) =>
+      `Received ${args.received_}, minimum required was ${args.minRequired_}`,
+  },
+
   '0x62df6dff': {
     // Presale__TrancheNotClaimable
     prettyMessage: 'Tranche not claimable yet',
@@ -736,6 +911,15 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
     category: 'presale',
     severity: 'warning',
     recoveryActions: [ACTIONS.wait],
+  },
+
+  '0x20a49fd4': {
+    // Presale__Unsorted
+    prettyMessage: 'Input data not sorted',
+    suggestion: 'The input data must be in sorted order.',
+    category: 'validation',
+    severity: 'error',
+    recoveryActions: [ACTIONS.retry],
   },
 
   // ==========================================================================
@@ -826,8 +1010,57 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
   },
 
   // ==========================================================================
+  // ERC4626 VAULT ERRORS
+  // ==========================================================================
+
+  '0x79012fb2': {
+    // ERC4626ExceededMaxDeposit
+    prettyMessage: 'Deposit exceeds maximum',
+    suggestion: 'Reduce your deposit amount to stay within the vault limit.',
+    category: 'token',
+    severity: 'warning',
+    recoveryActions: [ACTIONS.decreaseAmount],
+  },
+
+  '0x284ff667': {
+    // ERC4626ExceededMaxMint
+    prettyMessage: 'Mint exceeds maximum',
+    suggestion: 'Reduce the shares amount to stay within the vault limit.',
+    category: 'token',
+    severity: 'warning',
+    recoveryActions: [ACTIONS.decreaseAmount],
+  },
+
+  '0xb94abeec': {
+    // ERC4626ExceededMaxRedeem
+    prettyMessage: 'Redeem exceeds maximum',
+    suggestion: 'Reduce the shares amount to stay within the redeemable limit.',
+    category: 'token',
+    severity: 'warning',
+    recoveryActions: [ACTIONS.decreaseAmount],
+  },
+
+  '0xfe9cceec': {
+    // ERC4626ExceededMaxWithdraw
+    prettyMessage: 'Withdrawal exceeds maximum',
+    suggestion: 'Reduce the withdrawal amount to stay within the limit.',
+    category: 'token',
+    severity: 'warning',
+    recoveryActions: [ACTIONS.decreaseAmount],
+  },
+
+  // ==========================================================================
   // TREASURY ERRORS
   // ==========================================================================
+
+  '0x5bdd6941': {
+    // Module__SplitterTreasury__EmptyRecipients
+    prettyMessage: 'No recipients configured',
+    suggestion: 'At least one recipient must be specified.',
+    category: 'treasury',
+    severity: 'error',
+    recoveryActions: [ACTIONS.contactSupport],
+  },
 
   '0x00f94c58': {
     // Module__SplitterTreasury__FloorFeeTreasuryIsZeroAddress
@@ -881,6 +1114,149 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
     category: 'treasury',
     severity: 'error',
     recoveryActions: [ACTIONS.retry],
+  },
+
+  // ==========================================================================
+  // STAKING MANAGER ERRORS
+  // ==========================================================================
+
+  '0x37fa37f8': {
+    // Module__StakingManager__IncompleteWithdrawal
+    prettyMessage: 'Withdrawal incomplete',
+    suggestion: 'The withdrawal could not be fully completed. Try again.',
+    category: 'system',
+    severity: 'error',
+    recoveryActions: [ACTIONS.retry, ACTIONS.contactSupport],
+  },
+
+  '0x64b7c9de': {
+    // Module__StakingManager__InsufficientPosition
+    prettyMessage: 'Insufficient position',
+    suggestion: 'Your staked position is not large enough for this operation.',
+    category: 'system',
+    severity: 'warning',
+    recoveryActions: [ACTIONS.decreaseAmount],
+  },
+
+  '0xfff8effb': {
+    // Module__StakingManager__InvalidFeePercentage
+    prettyMessage: 'Invalid fee percentage',
+    suggestion: 'Fee percentage is out of the allowed range.',
+    category: 'validation',
+    severity: 'error',
+    recoveryActions: [ACTIONS.contactSupport],
+  },
+
+  '0x63706032': {
+    // Module__StakingManager__InvalidStrategyInterface
+    prettyMessage: 'Invalid strategy interface',
+    suggestion: 'The strategy contract does not implement the required interface.',
+    category: 'system',
+    severity: 'error',
+    recoveryActions: [ACTIONS.contactSupport],
+  },
+
+  '0x284cab5c': {
+    // Module__StakingManager__NoPosition
+    prettyMessage: 'No position found',
+    suggestion: 'You do not have a staked position.',
+    category: 'system',
+    severity: 'warning',
+    recoveryActions: [ACTIONS.refresh],
+  },
+
+  '0x080b0033': {
+    // Module__StakingManager__NothingToRebalance
+    prettyMessage: 'Nothing to rebalance',
+    suggestion: 'The position is already optimally balanced.',
+    category: 'system',
+    severity: 'info',
+    recoveryActions: [],
+  },
+
+  '0x2f89c79d': {
+    // Module__StakingManager__NoYieldToHarvest
+    prettyMessage: 'No yield to harvest',
+    suggestion: 'There is no yield available to harvest at this time.',
+    category: 'system',
+    severity: 'info',
+    recoveryActions: [ACTIONS.wait],
+  },
+
+  '0xd40edeb7': {
+    // Module__StakingManager__StrategyAlreadyApproved
+    prettyMessage: 'Strategy already approved',
+    suggestion: 'This strategy is already in the approved list.',
+    category: 'system',
+    severity: 'warning',
+    recoveryActions: [ACTIONS.refresh],
+  },
+
+  '0x2e022d12': {
+    // Module__StakingManager__StrategyAssetMismatch
+    prettyMessage: 'Strategy asset mismatch',
+    suggestion: 'The strategy asset does not match the expected asset.',
+    category: 'system',
+    severity: 'error',
+    recoveryActions: [ACTIONS.contactSupport],
+  },
+
+  '0x79ab1802': {
+    // Module__StakingManager__StrategyHasValue
+    prettyMessage: 'Cannot remove strategy with value',
+    suggestion: 'Withdraw all funds from the strategy before removing it.',
+    category: 'system',
+    severity: 'error',
+    recoveryActions: [ACTIONS.contactSupport],
+  },
+
+  '0x212c3718': {
+    // Module__StakingManager__StrategyNotApproved
+    prettyMessage: 'Strategy not approved',
+    suggestion: 'This strategy has not been approved for use.',
+    category: 'system',
+    severity: 'error',
+    recoveryActions: [ACTIONS.contactSupport],
+  },
+
+  '0x9a8b7fa3': {
+    // Module__StakingManager__StrategySharesTransferable
+    prettyMessage: 'Strategy shares are transferable',
+    suggestion: 'This strategy does not support non-transferable shares.',
+    category: 'system',
+    severity: 'error',
+    recoveryActions: [ACTIONS.contactSupport],
+  },
+
+  // ==========================================================================
+  // STRATEGY ERRORS
+  // ==========================================================================
+
+  '0xa8a77814': {
+    // Module__StrategyBase__NotImplemented
+    prettyMessage: 'Not implemented',
+    suggestion: 'This function is not available for this strategy.',
+    category: 'system',
+    severity: 'error',
+    recoveryActions: [ACTIONS.contactSupport],
+  },
+
+  '0x11edc645': {
+    // Module__StrategyBase__TransfersDisabled
+    prettyMessage: 'Transfers disabled',
+    suggestion: 'Token transfers are disabled for this strategy.',
+    category: 'system',
+    severity: 'error',
+    recoveryActions: [ACTIONS.contactSupport],
+  },
+
+  '0x6293d2d5': {
+    // Module__TestnetStrategy__InsufficientReserve
+    prettyMessage: 'Insufficient reserve',
+    suggestion: 'The strategy does not have enough reserves for this operation.',
+    category: 'system',
+    severity: 'error',
+    recoveryActions: [ACTIONS.decreaseAmount],
   },
 
   // ==========================================================================

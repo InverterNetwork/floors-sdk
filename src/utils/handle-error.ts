@@ -30,7 +30,7 @@
  */
 
 import type { Abi, AbiItem, Hex } from 'viem'
-import { decodeErrorResult } from 'viem'
+import { decodeErrorResult, keccak256, toHex } from 'viem'
 
 import * as abis from '../abis'
 import {
@@ -381,6 +381,29 @@ function extractErrors(abiList: Abi[]): AbiItem[] {
 }
 
 /**
+ * Manually matches a 4-byte selector against ABI error definitions by computing
+ * keccak256 of each error signature. This is the same approach as cast 4byte-decode
+ * but using local ABIs instead of an external database.
+ */
+function matchSelectorToAbiErrorName(errors: AbiItem[], selector: Hex): string | null {
+  for (const item of errors) {
+    if (item.type !== 'error' || !('name' in item) || typeof item.name !== 'string') continue
+
+    const inputs = 'inputs' in item && Array.isArray(item.inputs) ? item.inputs : []
+    const types = inputs.map((i: { type: string }) => i.type).join(',')
+    const sig = `${item.name}(${types})`
+    const hash = keccak256(toHex(sig))
+    const computed = hash.slice(0, 10) as Hex
+
+    if (computed === selector) {
+      return item.name
+    }
+  }
+
+  return null
+}
+
+/**
  * Decodes error arguments from signature and data.
  */
 function decodeErrorArgs(
@@ -613,12 +636,42 @@ function parseError(params: HandleErrorParams): EnhancedParsedError {
     }
   }
 
-  // Signature not in registry - try to decode with provided ABI
-  if (abi) {
-    try {
-      const allAbis = [...getAllAbis(), abi as Abi]
-      const errors = extractErrors(allAbis)
+  // Signature not in registry - try to decode with all known ABIs (+ provided ABI if any)
+  {
+    const abiList = abi ? [...getAllAbis(), abi as Abi] : getAllAbis()
+    const errors = extractErrors(abiList)
+    const fullData = extractFullErrorData(error)
 
+    // Try with full error data first (selector + encoded args)
+    if (fullData && fullData.length > 10) {
+      try {
+        const decoded = decodeErrorResult({
+          abi: errors,
+          data: fullData,
+        })
+
+        if (decoded.errorName) {
+          return {
+            message: extractContractCallDetails(errorMessage, decoded.errorName),
+            prettyMessage: parseErrorNameToPrettyMessage(decoded.errorName),
+            errorName: decoded.errorName,
+            isUserRejection: false,
+            category: 'unknown',
+            severity: 'error',
+            suggestion: 'This error is not yet documented. Please report it.',
+            recoveryActions: [{ label: 'Report issue', type: 'contact_support' }],
+            originalError: error,
+            signature,
+            context,
+          }
+        }
+      } catch {
+        // Full data decoding failed, try selector-only below
+      }
+    }
+
+    // Try with just the 4-byte selector (works for errors with no inputs)
+    try {
       const decoded = decodeErrorResult({
         abi: errors,
         data: signature,
@@ -640,7 +693,27 @@ function parseError(params: HandleErrorParams): EnhancedParsedError {
         }
       }
     } catch {
-      // Decoding failed
+      // Selector-only decoding failed (happens for errors with inputs)
+    }
+
+    // Last resort: manually match the selector against ABI error definitions.
+    // This handles cases where decodeErrorResult fails (e.g., errors with inputs
+    // but only a selector is available), similar to how cast 4byte-decode works.
+    const matchedName = matchSelectorToAbiErrorName(errors, signature)
+    if (matchedName) {
+      return {
+        message: extractContractCallDetails(errorMessage, matchedName),
+        prettyMessage: parseErrorNameToPrettyMessage(matchedName),
+        errorName: matchedName,
+        isUserRejection: false,
+        category: 'unknown',
+        severity: 'error',
+        suggestion: 'This error is not yet documented. Please report it.',
+        recoveryActions: [{ label: 'Report issue', type: 'contact_support' }],
+        originalError: error,
+        signature,
+        context,
+      }
     }
   }
 
@@ -841,6 +914,102 @@ export function isErrorType(error: unknown, errorName: string): boolean {
 export function isPermissionError(error: unknown): boolean {
   const parsed = parseError({ error })
   return parsed.category === 'permission'
+}
+
+// ============================================================================
+// 4byte / OpenChain Signature Lookup
+// ============================================================================
+
+/**
+ * Result from the OpenChain/4byte signature lookup.
+ */
+export type FourByteLookupResult = {
+  /** The error name (e.g., "ERC20InsufficientBalance") */
+  name: string
+  /** The full text signature (e.g., "ERC20InsufficientBalance(address,uint256,uint256)") */
+  textSignature: string
+}
+
+/**
+ * Looks up an unknown 4-byte error selector via the OpenChain Signatures API.
+ * This is the same database that `cast 4byte-decode` uses under the hood.
+ *
+ * @description Queries https://api.openchain.xyz/signature-database/v1/lookup
+ * for error selectors not found in the local ABI registry.
+ *
+ * @param selector - The 4-byte hex selector (e.g., "0xfb8f41b2")
+ * @returns Array of matching error signatures, or empty array if none found
+ *
+ * @example
+ * ```ts
+ * const results = await lookup4ByteSelector('0xfb8f41b2')
+ * // [{ name: 'ERC20InsufficientAllowance', textSignature: 'ERC20InsufficientAllowance(address,uint256,uint256)' }]
+ * ```
+ */
+export async function lookup4ByteSelector(selector: Hex): Promise<FourByteLookupResult[]> {
+  try {
+    const url = `https://api.openchain.xyz/signature-database/v1/lookup?filter=true&event=false&function=false&error=true&hash=${selector}`
+    const response = await fetch(url)
+
+    if (!response.ok) return []
+
+    const data = (await response.json()) as {
+      ok: boolean
+      result: {
+        error: Record<string, Array<{ name: string; filtered: boolean }> | null>
+      }
+    }
+
+    if (!data.ok) return []
+
+    const entries = data.result.error[selector]
+    if (!entries || entries.length === 0) return []
+
+    return entries.map((entry) => {
+      const textSignature = entry.name
+      // Extract just the error name (before the parenthesis)
+      const name = textSignature.split('(')[0]
+      return { name, textSignature }
+    })
+  } catch {
+    return []
+  }
+}
+
+/**
+ * Enhanced error parsing that includes async 4byte lookup for unknown selectors.
+ * Falls back to the synchronous parser for known errors.
+ *
+ * @description Like getParsedError, but additionally queries the OpenChain
+ * signature database for selectors not found in the local registry.
+ * This mimics what `cast 4byte-decode` does.
+ *
+ * @example
+ * ```ts
+ * const parsed = await getParsedErrorAsync({ error })
+ * // Even for unknown contract errors, parsed.errorName may be populated
+ * // if the selector was found in the 4byte directory
+ * ```
+ */
+export async function getParsedErrorAsync(params: HandleErrorParams): Promise<EnhancedParsedError> {
+  const result = parseError(params)
+
+  // If we got a generic "Contract error" with a signature, try 4byte lookup
+  if (result.prettyMessage === 'Contract error' && result.signature) {
+    const lookupResults = await lookup4ByteSelector(result.signature)
+
+    if (lookupResults.length > 0) {
+      const best = lookupResults[0]
+      return {
+        ...result,
+        errorName: best.name,
+        prettyMessage: parseErrorNameToPrettyMessage(best.name),
+        suggestion: `Error: ${best.textSignature}. This error is not in the local registry.`,
+      }
+    }
+  }
+
+  return result
 }
 
 // ============================================================================
