@@ -6,6 +6,11 @@ import type { TransactionReceipt } from 'viem'
 import type { TransactionLifecycleCallbacks, TransactionStage } from '../../presale'
 import { type EnhancedParsedError, getParsedError } from '../../utils'
 
+/** Structured transaction telemetry — searchable in browser console & Vercel log drain */
+function logTx(event: string, data: Record<string, unknown>) {
+  console.info(JSON.stringify({ ts: new Date().toISOString(), event, ...data }))
+}
+
 export interface UseTransactionToastOptions {
   /** Messages for each stage */
   messages?: {
@@ -107,6 +112,7 @@ export const useTransactionToast = ({
       (hash: `0x${string}`) => {
         setStage('submitted')
         setTxHash(hash)
+        logTx('tx_submitted', { hash })
         // Update the loading toast
         if (toastIdRef.current !== null) {
           toast.loading(submitted, { id: toastIdRef.current as string })
@@ -128,10 +134,16 @@ export const useTransactionToast = ({
     ),
 
     onConfirmed: useCallback(
-      (_receipt: TransactionReceipt) => {
+      (receipt: TransactionReceipt) => {
         setStage('confirmed')
         dismissCurrentToast()
         toast.success(confirmed)
+        logTx('tx_confirmed', {
+          hash: receipt.transactionHash,
+          block: Number(receipt.blockNumber),
+          gasUsed: Number(receipt.gasUsed),
+          status: receipt.status,
+        })
       },
       [dismissCurrentToast, toast, confirmed]
     ),
@@ -147,6 +159,14 @@ export const useTransactionToast = ({
 
         // Call custom handler if provided
         onParsedError?.(parsed)
+
+        logTx('tx_failed', {
+          isUserRejection: parsed.isUserRejection,
+          errorName: parsed.errorName,
+          category: parsed.category,
+          severity: parsed.severity,
+          message: parsed.prettyMessage,
+        })
 
         if (parsed.isUserRejection) {
           // User cancelled - show mild message

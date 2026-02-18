@@ -6,6 +6,7 @@ import ERC20Issuance_v1 from './abis/ERC20Issuance_v1'
 import Presale_v1 from './abis/Presale_v1'
 import type { TPresale } from './graphql/api'
 import type { PopPublicClient, PopWalletClient } from './types'
+import { getParsedError } from './utils/handle-error'
 import {
   CREDIT_FACILITY_SELECTORS,
   DEFAULT_LIVE_BORROW_FEE_BPS,
@@ -909,24 +910,25 @@ export class Presale {
     try {
       // Stage 1: Pending wallet signature
       lifecycle?.onPendingWallet?.()
+      let hash
+      try {
+        hash = await walletClient.writeContract({
+          address: this.address,
+          abi: Presale_v1,
+          functionName: 'buyPresale',
+          args: [depositAmount, BigInt(0)],
+          account: accountAddress,
+        })
+      } catch (error) {
+        console.log('error happends')
 
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Presale_v1,
-        functionName: 'buyPresale',
-        args: [depositAmount, BigInt(0)],
-        account: accountAddress,
-      })
-
-      // Stage 2: Transaction submitted
+        throw error
+      }
       lifecycle?.onSubmitted?.(hash)
 
-      // Stage 3: Pending confirmation
       lifecycle?.onPendingConfirmation?.(hash)
-
       const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
 
-      // Stage 4: Confirmed or Failed based on status
       if (receipt.status === 'success') {
         lifecycle?.onConfirmed?.(receipt)
       } else {
@@ -935,7 +937,8 @@ export class Presale {
 
       return receipt
     } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      const parsed = getParsedError({ error })
+      lifecycle?.onFailed?.(new Error(parsed.prettyMessage))
       throw error
     }
   }

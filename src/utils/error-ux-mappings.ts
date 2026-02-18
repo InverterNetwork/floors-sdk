@@ -6,10 +6,9 @@
  * have a mapping here. When contracts are updated and new errors are added,
  * you'll get TypeScript errors until you add UX mappings for them.
  *
- * To add a new error mapping:
- * 1. Run `bun run generate:errors` after updating contract ABIs
- * 2. TypeScript will show errors for missing mappings
- * 3. Add the missing entries to ERROR_UX_MAPPINGS below
+ * To sync after contract updates:
+ * 1. Run `bun run sync:errors`
+ * 2. Search for "TODO:" to find entries that need manual review
  */
 
 import type { KnownErrorSignature } from './error-signatures.generated'
@@ -111,15 +110,6 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
   // MODULE PERMISSION ERRORS
   // ==========================================================================
 
-  '0x7ea9d542': {
-    // Module__CallerNotPermissioned
-    prettyMessage: 'Not authorized for this action',
-    suggestion: 'This function requires special permissions. Public access may not be enabled yet.',
-    category: 'permission',
-    severity: 'error',
-    recoveryActions: [ACTIONS.checkWhitelist, ACTIONS.contactSupport],
-  },
-
   '0x7e5cf732': {
     // Module__Authorizer__CannotModifyAdminRoleAccess
     prettyMessage: 'Cannot modify admin role',
@@ -165,6 +155,15 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
     recoveryActions: [ACTIONS.retry],
   },
 
+  '0x7ea9d542': {
+    // Module__CallerNotPermissioned
+    prettyMessage: 'Not authorized for this action',
+    suggestion: 'This function requires special permissions. Public access may not be enabled yet.',
+    category: 'permission',
+    severity: 'error',
+    recoveryActions: [ACTIONS.checkWhitelist, ACTIONS.contactSupport],
+  },
+
   // ==========================================================================
   // TRADING ERRORS (BUY/SELL)
   // ==========================================================================
@@ -173,15 +172,6 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
     // Module__IssuanceBase__BuyingFunctionaltiesClosed
     prettyMessage: 'Buying is currently disabled',
     suggestion: 'Trading may not be open yet. Check if the presale has ended.',
-    category: 'trading',
-    severity: 'warning',
-    recoveryActions: [ACTIONS.wait, ACTIONS.refresh],
-  },
-
-  '0x9a71ec39': {
-    // Module__RedeemingIssuanceBase__SellingFunctionaltiesClosed
-    prettyMessage: 'Selling is currently disabled',
-    suggestion: 'Selling may not be enabled for this market yet',
     category: 'trading',
     severity: 'warning',
     recoveryActions: [ACTIONS.wait, ACTIONS.refresh],
@@ -248,6 +238,15 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
     category: 'trading',
     severity: 'error',
     recoveryActions: [ACTIONS.decreaseAmount, ACTIONS.contactSupport],
+  },
+
+  '0x9a71ec39': {
+    // Module__RedeemingIssuanceBase__SellingFunctionaltiesClosed
+    prettyMessage: 'Selling is currently disabled',
+    suggestion: 'Selling may not be enabled for this market yet',
+    category: 'trading',
+    severity: 'warning',
+    recoveryActions: [ACTIONS.wait, ACTIONS.refresh],
   },
 
   // ==========================================================================
@@ -679,88 +678,8 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
   },
 
   // ==========================================================================
-  // DECAYING FEE MULTIPLIER ERRORS
-  // ==========================================================================
-
-  '0x7f16213e': {
-    // Module__DecayingFeeMultiplierBase__AlreadyStarted
-    prettyMessage: 'Fee decay already started',
-    suggestion: 'The fee decay period has already begun and cannot be restarted.',
-    category: 'system',
-    severity: 'warning',
-    recoveryActions: [ACTIONS.refresh],
-  },
-
-  '0x35a92e14': {
-    // Module__DecayingFeeMultiplierBase__InvalidDecayDuration
-    prettyMessage: 'Invalid decay duration',
-    suggestion: 'The decay duration is out of the allowed range.',
-    category: 'validation',
-    severity: 'error',
-    recoveryActions: [ACTIONS.contactSupport],
-  },
-
-  '0x54f744ae': {
-    // Module__DecayingFeeMultiplierBase__InvalidInitialMultiplier
-    prettyMessage: 'Invalid initial multiplier',
-    suggestion: 'The initial fee multiplier is out of the allowed range.',
-    category: 'validation',
-    severity: 'error',
-    recoveryActions: [ACTIONS.contactSupport],
-  },
-
-  '0x9adec4d0': {
-    // Module__DecayingFeeMultiplierBase__NotStarted
-    prettyMessage: 'Fee decay not started',
-    suggestion: 'The fee decay period has not begun yet.',
-    category: 'system',
-    severity: 'warning',
-    recoveryActions: [ACTIONS.wait],
-  },
-
-  // ==========================================================================
-  // MERKLE WHITELIST ERRORS
-  // ==========================================================================
-
-  '0xd48f547a': {
-    // Module__MerkleWhitelistBase__AlreadyWhitelisted
-    prettyMessage: 'Already whitelisted',
-    suggestion: 'This address is already on the whitelist.',
-    category: 'presale',
-    severity: 'info',
-    recoveryActions: [],
-  },
-
-  '0x2c3dd9fb': {
-    // Module__MerkleWhitelistBase__MerkleRootNotSettable
-    prettyMessage: 'Whitelist not configurable',
-    suggestion: 'The whitelist configuration is locked and cannot be changed.',
-    category: 'system',
-    severity: 'error',
-    recoveryActions: [ACTIONS.contactSupport],
-  },
-
-  '0xbd034118': {
-    // Module__MerkleWhitelistBase__NotWhitelisted
-    prettyMessage: 'Not on whitelist',
-    suggestion: 'Your address is not on the whitelist. Contact the project team.',
-    category: 'presale',
-    severity: 'warning',
-    recoveryActions: [ACTIONS.checkWhitelist, ACTIONS.contactSupport],
-  },
-
-  // ==========================================================================
   // PRESALE ERRORS
   // ==========================================================================
-
-  '0x8c66b6e0': {
-    // Presale__NotOpen
-    prettyMessage: 'Presale not open',
-    suggestion: 'The presale has not started yet',
-    category: 'presale',
-    severity: 'warning',
-    recoveryActions: [ACTIONS.wait],
-  },
 
   '0x842b8bd1': {
     // Presale__AfterEndTimestamp
@@ -790,15 +709,6 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
     dynamicMessage: (args) => `Fee ${args.fee_} exceeds deposit ${args.deposit_}`,
   },
 
-  '0x63a69154': {
-    // Presale__NotWhitelisted
-    prettyMessage: 'Not on whitelist',
-    suggestion: 'Contact the project team for whitelist access',
-    category: 'presale',
-    severity: 'warning',
-    recoveryActions: [ACTIONS.checkWhitelist, ACTIONS.contactSupport],
-  },
-
   '0xafbfe5b0': {
     // Presale__GlobalCapExceeded
     prettyMessage: 'Presale cap reached',
@@ -810,17 +720,6 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
       `Attempted to mint ${args.attemptedMint_} but cap is ${args.cap_} (current: ${args.currentIssuance_})`,
   },
 
-  '0x24bf5106': {
-    // Presale__PerAddressCapExceeded
-    prettyMessage: 'Personal cap reached',
-    suggestion: "You've reached your maximum allocation",
-    category: 'presale',
-    severity: 'warning',
-    recoveryActions: [ACTIONS.decreaseAmount],
-    dynamicMessage: (args) =>
-      `Attempted to mint ${args.attemptedMint_} but your cap is ${args.cap_} (current: ${args.currentIssuance_})`,
-  },
-
   '0xd6ec36a7': {
     // Presale__InvalidBps
     prettyMessage: 'Invalid percentage',
@@ -828,24 +727,6 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
     category: 'validation',
     severity: 'error',
     recoveryActions: [ACTIONS.contactSupport],
-  },
-
-  '0x189bb1f2': {
-    // Presale__NotEnded
-    prettyMessage: 'Presale still active',
-    suggestion: 'This action is only available after presale ends',
-    category: 'presale',
-    severity: 'warning',
-    recoveryActions: [ACTIONS.wait],
-  },
-
-  '0x654a5dde': {
-    // Presale__NotStarted
-    prettyMessage: 'Presale not started',
-    suggestion: 'Wait for the presale to begin',
-    category: 'presale',
-    severity: 'warning',
-    recoveryActions: [ACTIONS.wait],
   },
 
   '0x5cd7b824': {
@@ -893,6 +774,53 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
     recoveryActions: [ACTIONS.contactSupport],
   },
 
+  '0x189bb1f2': {
+    // Presale__NotEnded
+    prettyMessage: 'Not ended', // TODO: review
+    suggestion: null, // TODO: add suggestion
+    category: 'presale',
+    severity: 'error',
+    recoveryActions: [ACTIONS.retry],
+  },
+
+  '0x8c66b6e0': {
+    // Presale__NotOpen
+    prettyMessage: 'Not open', // TODO: review
+    suggestion: null, // TODO: add suggestion
+    category: 'presale',
+    severity: 'error',
+    recoveryActions: [ACTIONS.retry],
+  },
+
+  '0x654a5dde': {
+    // Presale__NotStarted
+    prettyMessage: 'Not started', // TODO: review
+    suggestion: null, // TODO: add suggestion
+    category: 'presale',
+    severity: 'error',
+    recoveryActions: [ACTIONS.retry],
+  },
+
+  '0x63a69154': {
+    // Presale__NotWhitelisted
+    prettyMessage: 'Not on whitelist',
+    suggestion: 'Contact the project team for whitelist access',
+    category: 'presale',
+    severity: 'error',
+    recoveryActions: [ACTIONS.retry],
+  },
+
+  '0x24bf5106': {
+    // Presale__PerAddressCapExceeded
+    prettyMessage: 'Personal cap reached',
+    suggestion: "You've reached your maximum allocation",
+    category: 'presale',
+    severity: 'warning',
+    recoveryActions: [ACTIONS.decreaseAmount],
+    dynamicMessage: (args) =>
+      `Attempted to mint ${args.attemptedMint_} but your cap is ${args.cap_} (current: ${args.currentIssuance_})`,
+  },
+
   '0x65d6e237': {
     // Presale__SlippageExceeded
     prettyMessage: 'Price moved too much',
@@ -923,8 +851,88 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
   },
 
   // ==========================================================================
+  // MERKLE WHITELIST ERRORS
+  // ==========================================================================
+
+  '0xd48f547a': {
+    // Module__MerkleWhitelistBase__AlreadyWhitelisted
+    prettyMessage: 'Already whitelisted',
+    suggestion: 'This address is already on the whitelist.',
+    category: 'presale',
+    severity: 'info',
+    recoveryActions: [],
+  },
+
+  '0x2c3dd9fb': {
+    // Module__MerkleWhitelistBase__MerkleRootNotSettable
+    prettyMessage: 'Whitelist not configurable',
+    suggestion: 'The whitelist configuration is locked and cannot be changed.',
+    category: 'system',
+    severity: 'error',
+    recoveryActions: [ACTIONS.contactSupport],
+  },
+
+  '0xbd034118': {
+    // Module__MerkleWhitelistBase__NotWhitelisted
+    prettyMessage: 'Not on whitelist',
+    suggestion: 'Your address is not on the whitelist. Contact the project team.',
+    category: 'presale',
+    severity: 'warning',
+    recoveryActions: [ACTIONS.checkWhitelist, ACTIONS.contactSupport],
+  },
+
+  // ==========================================================================
+  // DECAYING FEE MULTIPLIER ERRORS
+  // ==========================================================================
+
+  '0x7f16213e': {
+    // Module__DecayingFeeMultiplierBase__AlreadyStarted
+    prettyMessage: 'Fee decay already started',
+    suggestion: 'The fee decay period has already begun and cannot be restarted.',
+    category: 'system',
+    severity: 'warning',
+    recoveryActions: [ACTIONS.refresh],
+  },
+
+  '0x35a92e14': {
+    // Module__DecayingFeeMultiplierBase__InvalidDecayDuration
+    prettyMessage: 'Invalid decay duration',
+    suggestion: 'The decay duration is out of the allowed range.',
+    category: 'validation',
+    severity: 'error',
+    recoveryActions: [ACTIONS.contactSupport],
+  },
+
+  '0x54f744ae': {
+    // Module__DecayingFeeMultiplierBase__InvalidInitialMultiplier
+    prettyMessage: 'Invalid initial multiplier',
+    suggestion: 'The initial fee multiplier is out of the allowed range.',
+    category: 'validation',
+    severity: 'error',
+    recoveryActions: [ACTIONS.contactSupport],
+  },
+
+  '0x9adec4d0': {
+    // Module__DecayingFeeMultiplierBase__NotStarted
+    prettyMessage: 'Fee decay not started',
+    suggestion: 'The fee decay period has not begun yet.',
+    category: 'system',
+    severity: 'warning',
+    recoveryActions: [ACTIONS.wait],
+  },
+
+  // ==========================================================================
   // ERC20 TOKEN ERRORS
   // ==========================================================================
+
+  '0x9e79f854': {
+    // ERC20ExceededCap
+    prettyMessage: 'Token cap exceeded',
+    suggestion: 'Cannot mint more tokens than the maximum supply',
+    category: 'token',
+    severity: 'error',
+    recoveryActions: [ACTIONS.decreaseAmount],
+  },
 
   '0xfb8f41b2': {
     // ERC20InsufficientAllowance
@@ -944,15 +952,6 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
     severity: 'warning',
     recoveryActions: [ACTIONS.decreaseAmount],
     dynamicMessage: (args) => `Balance: ${args.balance}, Needed: ${args.needed}`,
-  },
-
-  '0x9e79f854': {
-    // ERC20ExceededCap
-    prettyMessage: 'Token cap exceeded',
-    suggestion: 'Cannot mint more tokens than the maximum supply',
-    category: 'token',
-    severity: 'error',
-    recoveryActions: [ACTIONS.decreaseAmount],
   },
 
   '0xe602df05': {
@@ -1343,15 +1342,6 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
     recoveryActions: [ACTIONS.refresh],
   },
 
-  '0xadc1baa1': {
-    // ModuleFactory__InvalidMetadata
-    prettyMessage: 'Invalid module metadata',
-    suggestion: 'Module configuration is invalid',
-    category: 'factory',
-    severity: 'error',
-    recoveryActions: [ACTIONS.contactSupport],
-  },
-
   '0xb8ac5f88': {
     // ModuleFactory__InvalidInitialRegistrationData
     prettyMessage: 'Invalid registration data',
@@ -1365,6 +1355,15 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
     // ModuleFactory__InvalidInverterBeacon
     prettyMessage: 'Invalid beacon',
     suggestion: 'Module beacon address is invalid',
+    category: 'factory',
+    severity: 'error',
+    recoveryActions: [ACTIONS.contactSupport],
+  },
+
+  '0xadc1baa1': {
+    // ModuleFactory__InvalidMetadata
+    prettyMessage: 'Invalid module metadata',
+    suggestion: 'Module configuration is invalid',
     category: 'factory',
     severity: 'error',
     recoveryActions: [ACTIONS.contactSupport],
