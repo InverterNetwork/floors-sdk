@@ -1,4 +1,4 @@
-import type { GraphQLQueryArgs, GraphQLQueryResult } from '../..'
+import type { GraphQLQueryArgs, GraphQLQueryResult, GraphQLSubscriptionArgs } from '../..'
 
 // ============================================================================
 // Base Field Definitions
@@ -97,6 +97,44 @@ export const buildMarketActivityQuery = (marketId: string, limit: number = 100) 
       ...floorElevationActivityFields,
     },
   }) satisfies GraphQLQueryArgs
+
+// ============================================================================
+// Subscription Definition
+// ============================================================================
+
+/**
+ * @description Builds a combined subscription for market activity (trades + loans + floor elevations)
+ * Uses WebSocket for real-time updates via Hasura subscriptions
+ */
+export const buildMarketActivitySubscription = (marketId: string, limit: number = 100) =>
+  ({
+    Trade: {
+      __args: {
+        where: { market_id: { _eq: marketId } },
+        order_by: [{ timestamp: 'desc' as const }],
+        limit,
+      },
+      ...tradeActivityFields,
+    },
+    Loan: {
+      __args: {
+        where: { market_id: { _eq: marketId } },
+        order_by: [{ openedAt: 'desc' as const }],
+        limit,
+      },
+      ...loanActivityFields,
+    },
+    FloorElevation: {
+      __args: {
+        where: { market_id: { _eq: marketId } },
+        order_by: [{ timestamp: 'desc' as const }],
+        limit,
+      },
+      ...floorElevationActivityFields,
+    },
+  }) satisfies GraphQLSubscriptionArgs
+
+export type MarketActivitySubscriptionFields = ReturnType<typeof buildMarketActivitySubscription>
 
 export type MarketActivityQueryType = ReturnType<typeof buildMarketActivityQuery>
 export type MarketActivityQueryResultType = GraphQLQueryResult<MarketActivityQueryType>

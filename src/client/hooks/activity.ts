@@ -1,7 +1,17 @@
 import { useQuery, type UseQueryOptions, type UseQueryResult } from '@tanstack/react-query'
+import { useMemo } from 'react'
 
-import { fetchMarketActivity, type TMarketActivityData } from '../../graphql/api'
-import { marketActivityQueryKey } from '../query-keys'
+import {
+  buildMarketActivitySubscription,
+  combineMarketActivity,
+  fetchMarketActivity,
+  type TGraphQLFloorElevationActivity,
+  type TGraphQLLoanActivity,
+  type TGraphQLTradeActivity,
+  type TMarketActivityData,
+} from '../../graphql/api'
+import { marketActivityQueryKey, marketActivitySubKey } from '../query-keys'
+import { useSubscription } from './subscriptions'
 
 export type UseMarketActivityQueryOptions<TData = TMarketActivityData[]> = Omit<
   UseQueryOptions<TMarketActivityData[], Error, TData, ReturnType<typeof marketActivityQueryKey>>,
@@ -40,6 +50,79 @@ export const useMarketActivityQuery = <TData = TMarketActivityData[]>(
     ...options,
     enabled,
   })
+}
+
+// ============================================================================
+// Unified Activity Data Hook (Query for initial data + Subscription for live updates)
+// ============================================================================
+
+export type UseMarketActivityDataParams = {
+  marketId: string | null | undefined
+  enabled?: boolean
+  limit?: number
+}
+
+export type UseMarketActivityDataResult = {
+  key: ReturnType<typeof marketActivitySubKey>
+  activity: TMarketActivityData[]
+  error: string | null
+  isLoading: boolean
+}
+
+/**
+ * @description Unified hook for market activity — uses query for instant cached data,
+ * then overlays live subscription data when it arrives.
+ *
+ * @example
+ * ```tsx
+ * const { activity, isLoading } = useMarketActivityData({ marketId })
+ * ```
+ */
+export const useMarketActivityData = ({
+  marketId,
+  enabled = true,
+  limit = 100,
+}: UseMarketActivityDataParams): UseMarketActivityDataResult => {
+  const isEnabled = enabled && Boolean(marketId)
+  const key = marketActivitySubKey(marketId)
+
+  // Query for instant cached data (stale-while-revalidate)
+  const queryResult = useMarketActivityQuery(marketId, {
+    enabled: isEnabled,
+  })
+
+  // Subscription for live updates
+  const fields = useMemo(
+    () => (isEnabled && marketId ? buildMarketActivitySubscription(marketId, limit) : null),
+    [isEnabled, marketId, limit]
+  )
+
+  const subResult = useSubscription({
+    fields: fields ?? ({} as NonNullable<typeof fields>),
+    enabled: isEnabled && fields !== null,
+  })
+
+  // Transform subscription data into unified activity format
+  const subscriptionActivity = useMemo(() => {
+    if (!subResult.data) return null
+
+    const trades = (subResult.data.Trade ?? []) as TGraphQLTradeActivity[]
+    const loans = (subResult.data.Loan ?? []) as TGraphQLLoanActivity[]
+    const floorElevations = (subResult.data.FloorElevation ??
+      []) as TGraphQLFloorElevationActivity[]
+
+    return combineMarketActivity(trades, loans, floorElevations)
+  }, [subResult.data])
+
+  // Prefer subscription data when available, fall back to query data
+  const activity = subscriptionActivity ?? queryResult.data ?? []
+
+  return {
+    key,
+    activity,
+    error: subResult.error ?? queryResult.error?.message ?? null,
+    isLoading: queryResult.isLoading && !subscriptionActivity,
+  }
 }
 
 // Re-export types for convenience
