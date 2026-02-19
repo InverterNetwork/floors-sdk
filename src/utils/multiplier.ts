@@ -6,6 +6,9 @@
 /** Basis points constant (10000 = 100%) */
 export const BPS = BigInt(10000)
 
+/** Maximum commission rate (50%) — mirrors Presale_v1.MAX_COMMISSION_BPS */
+export const MAX_COMMISSION_BPS = BigInt(5000)
+
 /** Maximum multiplier (100x) */
 export const MAX_MULTIPLIER = BigInt(1_000_000)
 
@@ -225,7 +228,8 @@ export function getDerivedMultiplierState(
  * @returns Adjusted fee in basis points
  */
 export function calculateAdjustedFee(baseBps: bigint, multiplier: bigint): bigint {
-  return (baseBps * multiplier) / BPS
+  const adjustedBps = (baseBps * multiplier) / BPS
+  return adjustedBps > MAX_COMMISSION_BPS ? MAX_COMMISSION_BPS : adjustedBps
 }
 
 /**

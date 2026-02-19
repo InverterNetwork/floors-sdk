@@ -11,6 +11,7 @@ import { usePublicClient, useWalletClient } from 'wagmi'
 
 import {
   buildPresaleClaimSubscription,
+  buildPresaleContractSubscription,
   buildPresaleParticipationSubscription,
   fetchPresaleById,
   fetchPresales,
@@ -394,6 +395,69 @@ export const usePresaleMutations = (): UsePresaleMutationsReturnType => {
 // ============================================================================
 // Presale Data Hooks (Unified Query + Subscription)
 // ============================================================================
+
+// ============================================================================
+// Presale Contract Subscription (live presale entity data)
+// ============================================================================
+
+export type TPresaleContractLiveData = {
+  id: string
+  totalRaisedRaw: string
+  totalRaisedFormatted: string
+  totalParticipants: number
+  currentState: number
+  globalDepositCapRaw: string
+  globalDepositCapFormatted: string
+}
+
+export type UsePresaleContractSubscriptionParams = {
+  presaleId: string | null | undefined
+  enabled?: boolean
+}
+
+export type UsePresaleContractSubscriptionResult = {
+  data: TPresaleContractLiveData | null
+  error: string | null
+  isLoading: boolean
+}
+
+/**
+ * @description Subscribes to live presale contract data (totalRaised, currentState, etc.)
+ * Use this to get real-time updates when on-chain presale state changes.
+ * @example
+ * ```tsx
+ * const { data: liveData } = usePresaleContractSubscription({ presaleId })
+ * const totalRaised = liveData?.totalRaisedRaw ?? presaleData?.totalRaisedRaw
+ * ```
+ */
+export const usePresaleContractSubscription = ({
+  presaleId,
+  enabled = true,
+}: UsePresaleContractSubscriptionParams): UsePresaleContractSubscriptionResult => {
+  const isEnabled = enabled && Boolean(presaleId)
+
+  const fields = useMemo(
+    () => (isEnabled && presaleId ? buildPresaleContractSubscription(presaleId) : null),
+    [isEnabled, presaleId]
+  )
+
+  const subResult = useSubscription({
+    fields: fields ?? ({} as NonNullable<typeof fields>),
+    enabled: isEnabled && fields !== null,
+  })
+
+  const data = useMemo(() => {
+    const raw = subResult.data?.PreSaleContract
+    if (!raw || raw.length === 0) return null
+    return raw[0] as TPresaleContractLiveData
+  }, [subResult.data])
+
+  return {
+    data,
+    error: subResult.error,
+    isLoading: subResult.isLoading,
+  }
+}
 
 /**
  * @description Data type for presale participation
