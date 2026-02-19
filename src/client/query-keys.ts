@@ -92,6 +92,12 @@ export const marketActivitySubKey = (marketId: string | null | undefined) =>
 // ============================================================================
 
 /**
+ * @description Parameterized subscription key for presale contract live data.
+ */
+export const presaleContractSubKey = (presaleId: string | null | undefined) =>
+  ['subscription', 'presale-contract', presaleId ?? ''] as const
+
+/**
  * @description Parameterized subscription key for presale participations.
  */
 export const presaleParticipationsSubKey = (presaleId: string | null | undefined) =>

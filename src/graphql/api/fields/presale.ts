@@ -116,6 +116,27 @@ export const presaleQuery = {
 // ============================================================================
 
 /**
+ * @description Builds subscription fields for a presale contract entity (live data: totalRaised, state, etc.)
+ */
+export const buildPresaleContractSubscription = (presaleId: string) =>
+  ({
+    PreSaleContract: {
+      __args: {
+        where: { id: { _eq: presaleId } },
+      },
+      id: true,
+      totalRaisedRaw: true,
+      totalRaisedFormatted: true,
+      totalParticipants: true,
+      currentState: true,
+      globalDepositCapRaw: true,
+      globalDepositCapFormatted: true,
+    },
+  }) satisfies GraphQLSubscriptionArgs
+
+export type PresaleContractSubscriptionFields = ReturnType<typeof buildPresaleContractSubscription>
+
+/**
  * @description Builds subscription fields for presale participations
  */
 export const buildPresaleParticipationSubscription = (presaleId: string, limit: number = 100) =>
