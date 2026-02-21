@@ -14,6 +14,12 @@ import { Authorizer, type TAuthorizerMutationResult } from '../../authorizer'
 import { fetchAuthorizerRolesById, type TAuthorizerRole } from '../../graphql/api'
 import { authorizerRolesQueryKey } from '../query-keys'
 
+export interface PermissionCheck {
+  target: Address
+  selector: Hex
+  key: string
+}
+
 // Re-export param types for consumers
 export interface CreateRoleParams {
   roleName: string
@@ -222,4 +228,68 @@ export const useAuthorizerMutations = (
     revokeRole,
     renounceRole,
   }
+}
+
+/**
+ * @description Check if the connected user has permission to call a specific function.
+ * Uses cached indexed roles data (no RPC call).
+ */
+export const useHasPermission = (
+  authorizerId: string | null | undefined,
+  target: Address | undefined,
+  selector: Hex | undefined
+): boolean => {
+  const { address } = useAccount()
+  const publicClient = usePublicClient()
+
+  const { data: roles } = useAuthorizerRolesQuery(authorizerId, address)
+
+  return useMemo(() => {
+    if (!authorizerId || !publicClient || !address || !target || !selector || !roles) return false
+
+    const authorizer = new Authorizer({
+      authorizerAddress: authorizerId as Address,
+      publicClient,
+      roles,
+    })
+
+    return authorizer.hasPermission(address, target, selector)
+  }, [authorizerId, publicClient, address, target, selector, roles])
+}
+
+/**
+ * @description Batch-check multiple permissions for the connected user.
+ * Returns a record keyed by each check's `key` field.
+ */
+export const usePermissions = (
+  authorizerId: string | null | undefined,
+  checks: PermissionCheck[]
+): Record<string, boolean> => {
+  const { address } = useAccount()
+  const publicClient = usePublicClient()
+
+  const { data: roles } = useAuthorizerRolesQuery(authorizerId, address)
+
+  return useMemo(() => {
+    const result: Record<string, boolean> = {}
+
+    if (!authorizerId || !publicClient || !address || !roles) {
+      for (const check of checks) {
+        result[check.key] = false
+      }
+      return result
+    }
+
+    const authorizer = new Authorizer({
+      authorizerAddress: authorizerId as Address,
+      publicClient,
+      roles,
+    })
+
+    for (const check of checks) {
+      result[check.key] = authorizer.hasPermission(address, check.target, check.selector)
+    }
+
+    return result
+  }, [authorizerId, publicClient, address, roles, checks])
 }

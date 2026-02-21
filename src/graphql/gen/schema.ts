@@ -152,6 +152,7 @@ export type FloorElevation_select_column = 'deployedAmountFormatted' | 'deployed
 export interface GlobalRegistry {
     createdAt: Scalars['numeric']
     floorFactoryAddress: Scalars['String']
+    governorAddress: Scalars['String']
     id: Scalars['String']
     lastUpdatedAt: Scalars['numeric']
     moduleFactoryAddress: Scalars['String']
@@ -161,7 +162,7 @@ export interface GlobalRegistry {
 
 
 /** select columns of table "GlobalRegistry" */
-export type GlobalRegistry_select_column = 'createdAt' | 'floorFactoryAddress' | 'id' | 'lastUpdatedAt' | 'moduleFactoryAddress' | 'trustedForwarderAddress'
+export type GlobalRegistry_select_column = 'createdAt' | 'floorFactoryAddress' | 'governorAddress' | 'id' | 'lastUpdatedAt' | 'moduleFactoryAddress' | 'trustedForwarderAddress'
 
 
 /** columns and relationships of "GlobalStats" */
@@ -1603,6 +1604,7 @@ export interface FloorElevation_variance_order_by {deployedAmountRaw?: (order_by
 export interface GlobalRegistryGenqlSelection{
     createdAt?: boolean | number
     floorFactoryAddress?: boolean | number
+    governorAddress?: boolean | number
     id?: boolean | number
     lastUpdatedAt?: boolean | number
     moduleFactoryAddress?: boolean | number
@@ -1613,11 +1615,11 @@ export interface GlobalRegistryGenqlSelection{
 
 
 /** Boolean expression to filter rows from the table "GlobalRegistry". All fields are combined with a logical 'AND'. */
-export interface GlobalRegistry_bool_exp {_and?: (GlobalRegistry_bool_exp[] | null),_not?: (GlobalRegistry_bool_exp | null),_or?: (GlobalRegistry_bool_exp[] | null),createdAt?: (numeric_comparison_exp | null),floorFactoryAddress?: (String_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),moduleFactoryAddress?: (String_comparison_exp | null),trustedForwarderAddress?: (String_comparison_exp | null)}
+export interface GlobalRegistry_bool_exp {_and?: (GlobalRegistry_bool_exp[] | null),_not?: (GlobalRegistry_bool_exp | null),_or?: (GlobalRegistry_bool_exp[] | null),createdAt?: (numeric_comparison_exp | null),floorFactoryAddress?: (String_comparison_exp | null),governorAddress?: (String_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),moduleFactoryAddress?: (String_comparison_exp | null),trustedForwarderAddress?: (String_comparison_exp | null)}
 
 
 /** Ordering options when selecting data from "GlobalRegistry". */
-export interface GlobalRegistry_order_by {createdAt?: (order_by | null),floorFactoryAddress?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),moduleFactoryAddress?: (order_by | null),trustedForwarderAddress?: (order_by | null)}
+export interface GlobalRegistry_order_by {createdAt?: (order_by | null),floorFactoryAddress?: (order_by | null),governorAddress?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),moduleFactoryAddress?: (order_by | null),trustedForwarderAddress?: (order_by | null)}
 
 
 /** Streaming cursor of the table "GlobalRegistry" */
@@ -1629,7 +1631,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface GlobalRegistry_stream_cursor_value_input {createdAt?: (Scalars['numeric'] | null),floorFactoryAddress?: (Scalars['String'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),moduleFactoryAddress?: (Scalars['String'] | null),trustedForwarderAddress?: (Scalars['String'] | null)}
+export interface GlobalRegistry_stream_cursor_value_input {createdAt?: (Scalars['numeric'] | null),floorFactoryAddress?: (Scalars['String'] | null),governorAddress?: (Scalars['String'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),moduleFactoryAddress?: (Scalars['String'] | null),trustedForwarderAddress?: (Scalars['String'] | null)}
 
 
 /** columns and relationships of "GlobalStats" */
@@ -5126,6 +5128,7 @@ export const enumFloorElevationSelectColumn = {
 export const enumGlobalRegistrySelectColumn = {
    createdAt: 'createdAt' as const,
    floorFactoryAddress: 'floorFactoryAddress' as const,
+   governorAddress: 'governorAddress' as const,
    id: 'id' as const,
    lastUpdatedAt: 'lastUpdatedAt' as const,
    moduleFactoryAddress: 'moduleFactoryAddress' as const,

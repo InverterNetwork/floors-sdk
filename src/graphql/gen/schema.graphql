@@ -1135,6 +1135,7 @@ columns and relationships of "GlobalRegistry"
 type GlobalRegistry {
   createdAt: numeric!
   floorFactoryAddress: String!
+  governorAddress: String!
   id: String!
   lastUpdatedAt: numeric!
   moduleFactoryAddress: String!
@@ -1150,6 +1151,7 @@ input GlobalRegistry_bool_exp {
   _or: [GlobalRegistry_bool_exp!]
   createdAt: numeric_comparison_exp
   floorFactoryAddress: String_comparison_exp
+  governorAddress: String_comparison_exp
   id: String_comparison_exp
   lastUpdatedAt: numeric_comparison_exp
   moduleFactoryAddress: String_comparison_exp
@@ -1160,6 +1162,7 @@ input GlobalRegistry_bool_exp {
 input GlobalRegistry_order_by {
   createdAt: order_by
   floorFactoryAddress: order_by
+  governorAddress: order_by
   id: order_by
   lastUpdatedAt: order_by
   moduleFactoryAddress: order_by
@@ -1175,6 +1178,9 @@ enum GlobalRegistry_select_column {
 
   """column name"""
   floorFactoryAddress
+
+  """column name"""
+  governorAddress
 
   """column name"""
   id
@@ -1204,6 +1210,7 @@ input GlobalRegistry_stream_cursor_input {
 input GlobalRegistry_stream_cursor_value_input {
   createdAt: numeric
   floorFactoryAddress: String
+  governorAddress: String
   id: String
   lastUpdatedAt: numeric
   moduleFactoryAddress: String

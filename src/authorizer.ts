@@ -4,6 +4,7 @@ import { getAddress } from 'viem'
 import { AUT_Roles_v2 } from './abis'
 import type { TAuthorizerRole } from './graphql/api'
 import type { PopPublicClient, PopWalletClient } from './types'
+import { DEFAULT_ADMIN_ROLE, PUBLIC_ROLE } from './utils/selectors'
 
 export type TAuthorizerMutationResult = TransactionReceipt
 
@@ -227,6 +228,48 @@ export class Authorizer {
     })
 
     return this.publicClient.waitForTransactionReceipt({ hash })
+  }
+
+  /**
+   * @description Check if a caller has permission to call a specific function on a target.
+   * Pure function using cached roles data (no RPC call).
+   * Replicates the on-chain AUT_Roles_v2.hasPermission logic.
+   */
+  public hasPermission(caller: Address, target: Address, selector: Hex): boolean {
+    const roles = this.roles
+    if (!roles) return false
+
+    const normalizedCaller = caller.toLowerCase()
+    const normalizedTarget = target.toLowerCase()
+    const normalizedSelector = selector.toLowerCase()
+
+    // 1. Is caller a DEFAULT_ADMIN_ROLE member?
+    const adminRole = roles.find((r) => r.roleId === DEFAULT_ADMIN_ROLE)
+    if (adminRole?.members.some((m) => m.address.toLowerCase() === normalizedCaller)) {
+      return true
+    }
+
+    // 2. For each role that has a permission matching target+selector:
+    for (const role of roles) {
+      const hasMatchingPermission = role.permissions.some(
+        (p) =>
+          p.target.toLowerCase() === normalizedTarget &&
+          p.selector.toLowerCase() === normalizedSelector
+      )
+
+      if (!hasMatchingPermission) continue
+
+      // Is it PUBLIC_ROLE?
+      if (role.roleId === PUBLIC_ROLE) return true
+
+      // Does caller have this role?
+      if (role.members.some((m) => m.address.toLowerCase() === normalizedCaller)) {
+        return true
+      }
+    }
+
+    // 3. No permission found
+    return false
   }
 
   public async renounceRole({

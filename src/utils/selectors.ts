@@ -27,6 +27,10 @@ export type SingleCall = {
 // Constants
 // =============================================================================
 
+/** DEFAULT_ADMIN_ROLE constant: bytes32(0) - full admin access */
+export const DEFAULT_ADMIN_ROLE =
+  '0x0000000000000000000000000000000000000000000000000000000000000000' as const
+
 /** PUBLIC_ROLE constant: bytes32(1) - grants access to anyone */
 export const PUBLIC_ROLE =
   '0x0000000000000000000000000000000000000000000000000000000000000001' as const
