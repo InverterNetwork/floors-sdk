@@ -510,9 +510,10 @@ export function mapRolesToAuthorizerRoles(
  * @description Maps GraphQL Loan to UI-friendly loan data
  */
 export function mapLoanToUserLoanData(loan: TGraphQLLoan): TUserLoanData {
-  // Extract numeric loan ID from the composite ID (format: facilityAddress-loanIndex)
+  // Extract numeric loan ID — indexer stores id as stringified loanId (e.g. "42")
+  // but handle composite format "facilityAddress-loanIndex" as fallback
   const loanIdParts = loan.id.split('-')
-  const loanIndex = loanIdParts.length > 1 ? BigInt(loanIdParts[1]) : BigInt(0)
+  const loanIndex = loanIdParts.length > 1 ? BigInt(loanIdParts[1]) : BigInt(loan.id)
 
   return {
     id: loan.id,
