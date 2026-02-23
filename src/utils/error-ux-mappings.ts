@@ -776,29 +776,29 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
 
   '0x189bb1f2': {
     // Presale__NotEnded
-    prettyMessage: 'Not ended', // TODO: review
-    suggestion: null, // TODO: add suggestion
+    prettyMessage: 'Presale has not ended yet',
+    suggestion: 'Wait for the presale period to end before claiming',
     category: 'presale',
-    severity: 'error',
-    recoveryActions: [ACTIONS.retry],
+    severity: 'warning',
+    recoveryActions: [ACTIONS.wait],
   },
 
   '0x8c66b6e0': {
     // Presale__NotOpen
-    prettyMessage: 'Not open', // TODO: review
-    suggestion: null, // TODO: add suggestion
+    prettyMessage: 'Presale is not open',
+    suggestion: "The presale hasn't started accepting deposits yet",
     category: 'presale',
-    severity: 'error',
-    recoveryActions: [ACTIONS.retry],
+    severity: 'warning',
+    recoveryActions: [ACTIONS.wait],
   },
 
   '0x654a5dde': {
     // Presale__NotStarted
-    prettyMessage: 'Not started', // TODO: review
-    suggestion: null, // TODO: add suggestion
+    prettyMessage: 'Presale has not started',
+    suggestion: 'Check back when the presale begins',
     category: 'presale',
-    severity: 'error',
-    recoveryActions: [ACTIONS.retry],
+    severity: 'warning',
+    recoveryActions: [ACTIONS.wait],
   },
 
   '0x63a69154': {

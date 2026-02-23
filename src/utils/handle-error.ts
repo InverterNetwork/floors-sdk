@@ -161,6 +161,58 @@ const WALLET_ERROR_PATTERNS: WalletErrorPattern[] = [
 // ============================================================================
 
 /**
+ * Formats an error name with its module source preserved.
+ * Splits on `__` to separate source from error, then converts PascalCase to spaced words.
+ *
+ * @example
+ * formatErrorNameWithSource('Module__CreditFacility_InvalidLoanId')
+ * // → { source: 'Credit Facility', error: 'Invalid Loan Id', formatted: 'Credit Facility: Invalid Loan Id' }
+ *
+ * formatErrorNameWithSource('ERC20InsufficientBalance')
+ * // → { source: null, error: 'ERC20 Insufficient Balance', formatted: 'ERC20 Insufficient Balance' }
+ */
+export function formatErrorNameWithSource(errorName: string): {
+  source: string | null
+  error: string
+  formatted: string
+} {
+  const pascalToWords = (s: string): string =>
+    s
+      // Split underscores into spaces first (handles CreditFacility_InvalidLoanId)
+      .replace(/_/g, ' ')
+      .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .replace(/(\d)([A-Za-z])/g, '$1 $2')
+      .replace(/([A-Za-z])(\d)/g, '$1 $2')
+      .split(/\s+/)
+      .map((word) => {
+        if (word.length <= 4 && word === word.toUpperCase() && /^[A-Z]+$/.test(word)) return word
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+      })
+      .join(' ')
+
+  const parts = errorName.split('__')
+
+  if (parts.length >= 2) {
+    // Has module prefix(es) — last part is the error name, everything before is source
+    const errorPart = parts[parts.length - 1]
+    const sourceParts = parts.slice(1, -1) // skip "Module" prefix if present
+    const sourceStr = sourceParts.length > 0 ? sourceParts.map(pascalToWords).join(' > ') : null
+    const errorStr = pascalToWords(errorPart)
+
+    return {
+      source: sourceStr,
+      error: errorStr,
+      formatted: sourceStr ? `${sourceStr}: ${errorStr}` : errorStr,
+    }
+  }
+
+  // No module prefix — just format the error name
+  const errorStr = pascalToWords(errorName)
+  return { source: null, error: errorStr, formatted: errorStr }
+}
+
+/**
  * Parses error name to human-readable format.
  * Handles conventions like "Module__Floor__InvalidFloorSegment" -> "Invalid floor segment"
  */
@@ -633,6 +685,7 @@ function parseError(params: HandleErrorParams): EnhancedParsedError {
       signature,
       decodedArgs: decodedArgs ?? undefined,
       context,
+      formattedErrorName: formatErrorNameWithSource(metadata.name).formatted,
     }
   }
 
@@ -663,6 +716,7 @@ function parseError(params: HandleErrorParams): EnhancedParsedError {
             originalError: error,
             signature,
             context,
+            formattedErrorName: formatErrorNameWithSource(decoded.errorName).formatted,
           }
         }
       } catch {
@@ -690,6 +744,7 @@ function parseError(params: HandleErrorParams): EnhancedParsedError {
           originalError: error,
           signature,
           context,
+          formattedErrorName: formatErrorNameWithSource(decoded.errorName).formatted,
         }
       }
     } catch {
@@ -713,6 +768,7 @@ function parseError(params: HandleErrorParams): EnhancedParsedError {
         originalError: error,
         signature,
         context,
+        formattedErrorName: formatErrorNameWithSource(matchedName).formatted,
       }
     }
   }
@@ -1005,6 +1061,7 @@ export async function getParsedErrorAsync(params: HandleErrorParams): Promise<En
         errorName: best.name,
         prettyMessage: parseErrorNameToPrettyMessage(best.name),
         suggestion: `Error: ${best.textSignature}. This error is not in the local registry.`,
+        formattedErrorName: formatErrorNameWithSource(best.name).formatted,
       }
     }
   }

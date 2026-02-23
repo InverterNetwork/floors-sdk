@@ -208,6 +208,9 @@ export type EnhancedParsedError = {
 
   /** Decoded error arguments if available */
   decodedArgs?: Record<string, unknown>
+
+  /** Formatted error name with source (e.g., "Credit Facility: Invalid Loan Id") */
+  formattedErrorName?: string
 }
 
 // ============================================================================
