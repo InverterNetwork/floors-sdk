@@ -67,6 +67,10 @@ export interface TMarketAdminState {
   currentPrice: bigint
   /** Virtual collateral supply */
   virtualCollateralSupply: bigint
+  /** Collateral (reserve) token address */
+  collateralTokenAddress: Address
+  /** Reserve token balance held by market contract (available for floor raise) */
+  reserveBalance: bigint
 }
 
 interface MarketAdminConstructorArgs {
@@ -128,44 +132,76 @@ export class MarketAdmin {
    * @returns Market state including trading status, fees, and prices
    */
   public async getMarketState(): Promise<TMarketAdminState> {
-    const [isBuyOpen, isSellOpen, buyFeeBps, sellFeeBps, floorPrice, currentPrice, virtualSupply] =
-      await Promise.all([
-        this.publicClient.readContract({
-          address: this.address,
-          abi: Floor_v1,
-          functionName: 'isBuyOpen',
-        }) as Promise<boolean>,
-        this.publicClient.readContract({
-          address: this.address,
-          abi: Floor_v1,
-          functionName: 'isSellOpen',
-        }) as Promise<boolean>,
-        this.publicClient.readContract({
-          address: this.address,
-          abi: Floor_v1,
-          functionName: 'getBuyFee',
-        }) as Promise<bigint>,
-        this.publicClient.readContract({
-          address: this.address,
-          abi: Floor_v1,
-          functionName: 'getSellFee',
-        }) as Promise<bigint>,
-        this.publicClient.readContract({
-          address: this.address,
-          abi: Floor_v1,
-          functionName: 'getFloorPrice',
-        }) as Promise<bigint>,
-        this.publicClient.readContract({
-          address: this.address,
-          abi: Floor_v1,
-          functionName: 'getStaticPriceForBuying',
-        }) as Promise<bigint>,
-        this.publicClient.readContract({
-          address: this.address,
-          abi: Floor_v1,
-          functionName: 'getVirtualCollateralSupply',
-        }) as Promise<bigint>,
-      ])
+    const erc20BalanceOfAbi = [
+      {
+        type: 'function',
+        name: 'balanceOf',
+        inputs: [{ name: 'account', type: 'address', internalType: 'address' }],
+        outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
+        stateMutability: 'view',
+      },
+    ] as const
+
+    // First batch: read market state + collateral token address
+    const [
+      isBuyOpen,
+      isSellOpen,
+      buyFeeBps,
+      sellFeeBps,
+      floorPrice,
+      currentPrice,
+      virtualSupply,
+      collateralTokenAddress,
+    ] = await Promise.all([
+      this.publicClient.readContract({
+        address: this.address,
+        abi: Floor_v1,
+        functionName: 'isBuyOpen',
+      }) as Promise<boolean>,
+      this.publicClient.readContract({
+        address: this.address,
+        abi: Floor_v1,
+        functionName: 'isSellOpen',
+      }) as Promise<boolean>,
+      this.publicClient.readContract({
+        address: this.address,
+        abi: Floor_v1,
+        functionName: 'getBuyFee',
+      }) as Promise<bigint>,
+      this.publicClient.readContract({
+        address: this.address,
+        abi: Floor_v1,
+        functionName: 'getSellFee',
+      }) as Promise<bigint>,
+      this.publicClient.readContract({
+        address: this.address,
+        abi: Floor_v1,
+        functionName: 'getFloorPrice',
+      }) as Promise<bigint>,
+      this.publicClient.readContract({
+        address: this.address,
+        abi: Floor_v1,
+        functionName: 'getStaticPriceForBuying',
+      }) as Promise<bigint>,
+      this.publicClient.readContract({
+        address: this.address,
+        abi: Floor_v1,
+        functionName: 'getVirtualCollateralSupply',
+      }) as Promise<bigint>,
+      this.publicClient.readContract({
+        address: this.address,
+        abi: Floor_v1,
+        functionName: 'getCollateralToken',
+      }) as Promise<Address>,
+    ])
+
+    // Second read: reserve token balance held by market contract
+    const reserveBalance = (await this.publicClient.readContract({
+      address: collateralTokenAddress,
+      abi: erc20BalanceOfAbi,
+      functionName: 'balanceOf',
+      args: [this.address],
+    })) as bigint
 
     return {
       isBuyOpen,
@@ -175,6 +211,8 @@ export class MarketAdmin {
       floorPrice,
       currentPrice,
       virtualCollateralSupply: virtualSupply,
+      collateralTokenAddress,
+      reserveBalance,
     }
   }
 
