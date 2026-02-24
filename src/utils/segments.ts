@@ -112,48 +112,81 @@ export type SegmentConfig = {
 }
 
 /**
- * @description Default floor segment configuration (100k supply @ 1.0 price, flat)
+ * @description Default floor segment configuration (400k supply @ 1.0 price, flat)
  */
 export const DEFAULT_FLOOR_SEGMENT: SegmentConfig = {
   initialPrice: BigInt(1e18), // 1.0
   priceIncrease: BigInt(0),
-  supplyPerStep: BigInt(100_000e18), // 100k tokens
+  supplyPerStep: BigInt(400_000e18), // 400k tokens
   numberOfSteps: 1,
 }
 
 /**
- * @description Default S-curve premium segments from 1Settings.md
+ * @description Default premium segments (9-segment curve from fAVAX standard config)
  */
 export const DEFAULT_PREMIUM_SEGMENTS: SegmentConfig[] = [
   {
     initialPrice: BigInt(1e18), // 1.00 AVAX
-    priceIncrease: BigInt(0.013e18), // 0.013 AVAX increase
-    supplyPerStep: BigInt(250_000e18), // 250k per step
+    priceIncrease: BigInt(0.0045e18), // 0.0045 AVAX per step
+    supplyPerStep: BigInt(1_000e18), // 1k per step
+    numberOfSteps: 97,
+    // approxEndPrice: 1.4365 AVAX
+  },
+  {
+    initialPrice: BigInt(1.4365e18), // 1.4365 AVAX
+    priceIncrease: BigInt(0.0055e18), // 0.0055 AVAX per step
+    supplyPerStep: BigInt(1_000e18), // 1k per step
+    numberOfSteps: 95,
+    // approxEndPrice: 1.959 AVAX
+  },
+  {
+    initialPrice: BigInt(1.959e18), // 1.959 AVAX
+    priceIncrease: BigInt(0.0065e18), // 0.0065 AVAX per step
+    supplyPerStep: BigInt(1_000e18), // 1k per step
+    numberOfSteps: 93,
+    // approxEndPrice: 2.5635 AVAX
+  },
+  {
+    initialPrice: BigInt(2.5635e18), // 2.5635 AVAX
+    priceIncrease: BigInt(0.0075e18), // 0.0075 AVAX per step
+    supplyPerStep: BigInt(1_000e18), // 1k per step
+    numberOfSteps: 91,
+    // approxEndPrice: 3.246 AVAX
+  },
+  {
+    initialPrice: BigInt(3.246e18), // 3.246 AVAX
+    priceIncrease: BigInt(0.0085e18), // 0.0085 AVAX per step
+    supplyPerStep: BigInt(1_000e18), // 1k per step
+    numberOfSteps: 89,
+    // approxEndPrice: 4.0025 AVAX
+  },
+  {
+    initialPrice: BigInt(4.0025e18), // 4.0025 AVAX
+    priceIncrease: BigInt(0.0095e18), // 0.0095 AVAX per step
+    supplyPerStep: BigInt(1_000e18), // 1k per step
+    numberOfSteps: 88,
+    // approxEndPrice: 4.8385 AVAX
+  },
+  {
+    initialPrice: BigInt(4.8385e18), // 4.8385 AVAX
+    priceIncrease: BigInt(0.01e18), // 0.01 AVAX per step
+    supplyPerStep: BigInt(1_000e18), // 1k per step
+    numberOfSteps: 86,
+    // approxEndPrice: 5.6985 AVAX
+  },
+  {
+    initialPrice: BigInt(5.6985e18), // 5.6985 AVAX
+    priceIncrease: BigInt(0.013e18), // 0.013 AVAX per step
+    supplyPerStep: BigInt(1_000e18), // 1k per step
+    numberOfSteps: 84,
+    // approxEndPrice: 6.7905 AVAX
+  },
+  {
+    initialPrice: BigInt(6.7905e18), // 6.7905 AVAX
+    priceIncrease: BigInt(0.015e18), // 0.015 AVAX per step
+    supplyPerStep: BigInt(1_000e18), // 1k per step
     numberOfSteps: 77,
-  },
-  {
-    initialPrice: BigInt(2.014e18), // 2.014 AVAX
-    priceIncrease: BigInt(0.026182e18), // 0.026182 AVAX increase
-    supplyPerStep: BigInt(280_000e18), // 280k per step
-    numberOfSteps: 69,
-  },
-  {
-    initialPrice: BigInt(3.84674e18), // 3.84674 AVAX
-    priceIncrease: BigInt(0.05000762e18), // 0.05000762 AVAX increase
-    supplyPerStep: BigInt(400_000e18), // 400k per step
-    numberOfSteps: 49,
-  },
-  {
-    initialPrice: BigInt(6.347121e18), // 6.347121 AVAX
-    priceIncrease: BigInt(0.07667056e18), // 0.07667056 AVAX increase
-    supplyPerStep: BigInt(740_000e18), // 740k per step
-    numberOfSteps: 27,
-  },
-  {
-    initialPrice: BigInt(8.49389668e18), // 8.49389668 AVAX
-    priceIncrease: BigInt(0.08697255e18), // 0.08697255 AVAX increase
-    supplyPerStep: BigInt(1_530_000e18), // 1.53M per step
-    numberOfSteps: 13,
+    // approxEndPrice: 7.9455 AVAX
   },
 ]
 
@@ -349,9 +382,9 @@ export function generateDefaultCurve(
 }
 
 /**
- * @description Generate commission schedule for presale (based on 1Settings.md formula)
- * Formula: 2% + (n-1) * 2.5% for leveraged positions
- * Non-leveraged (index 0): 1%
+ * @description Generate commission schedule for presale
+ * Formula: 3.5% + n * 4.5% (350 + n * 450 bps)
+ * Index 0 = direct buy fee, subsequent indices = loop fees
  */
 export function generateCommissionSchedule(maxLeverage: number): bigint[] {
   if (maxLeverage < 1) {
@@ -363,15 +396,9 @@ export function generateCommissionSchedule(maxLeverage: number): bigint[] {
 
   const schedule: bigint[] = []
 
-  // Index 0: Non-leveraged fee (1%)
-  schedule.push(BigInt(100)) // 100 bps = 1%
-
-  // Index 1 to maxLeverage: Leveraged fees
-  // Formula: 2% + (n-1) * 2.5%
-  for (let i = 1; i <= maxLeverage; i++) {
-    // 200 + (i-1) * 250 bps
-    const fee = BigInt(200) + BigInt(i - 1) * BigInt(250)
-    schedule.push(fee)
+  // Formula: 350 + n * 450 bps (3.5% base, +4.5% per loop level)
+  for (let i = 0; i <= maxLeverage; i++) {
+    schedule.push(BigInt(350) + BigInt(i) * BigInt(450))
   }
 
   return schedule
