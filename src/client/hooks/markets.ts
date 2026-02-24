@@ -2,6 +2,7 @@ import {
   useMutation,
   type UseMutationResult,
   useQuery,
+  useQueryClient,
   type UseQueryOptions,
   type UseQueryResult,
 } from '@tanstack/react-query'
@@ -100,6 +101,7 @@ export const useMarketQuery = <TData = TFloorAssetData | null>(
  * @description Provides buy/sell/approve mutations backed by the pure Market class.
  */
 export const useMarketMutations = (): UseMarketMutationsReturnType => {
+  const queryClient = useQueryClient()
   const floorsContext = useFloors()
   const resolvedMarket = floorsContext.market.data ?? null
   const {
@@ -204,6 +206,8 @@ export const useMarketMutations = (): UseMarketMutationsReturnType => {
     onSuccess: async () => {
       await refetchAfterMutation()
       await floorsContext.refetch.userPosition()
+      // Invalidate user loans queries to update both Borrow and Repay forms
+      await queryClient.invalidateQueries({ queryKey: ['user-loans'] })
     },
   })
 
@@ -212,6 +216,8 @@ export const useMarketMutations = (): UseMarketMutationsReturnType => {
     onSuccess: async () => {
       await refetchAfterMutation()
       await floorsContext.refetch.userPosition()
+      // Invalidate user loans queries to update both Borrow and Repay forms
+      await queryClient.invalidateQueries({ queryKey: ['user-loans'] })
     },
   })
 
@@ -220,6 +226,8 @@ export const useMarketMutations = (): UseMarketMutationsReturnType => {
     onSuccess: async () => {
       await refetchAfterMutation()
       await floorsContext.refetch.userPosition()
+      // Invalidate user loans queries to update both Borrow and Repay forms
+      await queryClient.invalidateQueries({ queryKey: ['user-loans'] })
     },
   })
 

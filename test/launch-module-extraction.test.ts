@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { type Address,encodeAbiParameters, encodeEventTopics, parseAbiParameters } from 'viem'
+import { type Address, encodeAbiParameters, encodeEventTopics, parseAbiParameters } from 'viem'
 
 import { ModuleFactory_v1 } from '../src/abis'
 import { extractModuleAddressesFromLogs } from '../src/client/hooks/launch'
@@ -33,7 +33,7 @@ function moduleCreatedLog({
         floor_: floor,
         module_: module,
       },
-    }),
+    }) as readonly `0x${string}`[],
     data: encodeAbiParameters(METADATA_PARAM, [metadata]),
   }
 }
