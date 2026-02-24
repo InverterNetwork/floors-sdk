@@ -43,6 +43,7 @@ describe('#extractModuleAddressesFromLogs', () => {
   const credit = '0x2222222222222222222222222222222222222222' as Address
   const presale = '0x3333333333333333333333333333333333333333' as Address
   const staking = '0x4444444444444444444444444444444444444444' as Address
+  const strategy = '0x5555555555555555555555555555555555555555' as Address
 
   it('extracts requested module addresses by metadata title', () => {
     const logs = [
@@ -72,5 +73,15 @@ describe('#extractModuleAddressesFromLogs', () => {
     expect(extracted.stakingManagerAddress).toBeUndefined()
     expect(extracted.creditFacilityAddress).toBeUndefined()
     expect(extracted.presaleAddress).toBeUndefined()
+  })
+
+  it('extracts strategy addresses when requested', () => {
+    const logs = [moduleCreatedLog({ floor, module: strategy, title: 'TestnetStrategy_v1' })]
+
+    const extracted = extractModuleAddressesFromLogs(logs, {
+      needsStrategy: true,
+    })
+
+    expect(extracted.strategyAddress).toBe(strategy)
   })
 })

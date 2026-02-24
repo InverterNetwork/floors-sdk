@@ -6,7 +6,8 @@ import type { Address } from 'viem'
 import { decodeEventLog, isAddress } from 'viem'
 import { useAccount, usePublicClient, useWalletClient } from 'wagmi'
 
-import { Floor_v1, ModuleFactory_v1 } from '../../abis'
+import { Floor_v1, ModuleFactory_v1, StakingManager_v1 } from '../../abis'
+import { TESTNET_STRATEGY_METADATA } from '../../constants/metadata'
 import {
   type ConfigureParams,
   type ConfigureResult,
@@ -39,12 +40,14 @@ type ModuleAddressExtractionOptions = {
   needsCreditFacility?: boolean
   needsPresale?: boolean
   needsStaking?: boolean
+  needsStrategy?: boolean
 }
 
 type ModuleAddressExtractionResult = {
   creditFacilityAddress?: Address
   presaleAddress?: Address
   stakingManagerAddress?: Address
+  strategyAddress?: Address
 }
 
 type ReceiptLogLike = {
@@ -78,13 +81,16 @@ export function extractModuleAddressesFromLogs(
         result.presaleAddress = decoded.args.module_ as Address
       } else if (title.includes('stakingmanager') && !result.stakingManagerAddress) {
         result.stakingManagerAddress = decoded.args.module_ as Address
+      } else if (title.includes('strategy') && !result.strategyAddress) {
+        result.strategyAddress = decoded.args.module_ as Address
       }
 
       const hasCreditFacility =
         !options.needsCreditFacility || Boolean(result.creditFacilityAddress)
       const hasPresale = !options.needsPresale || Boolean(result.presaleAddress)
       const hasStaking = !options.needsStaking || Boolean(result.stakingManagerAddress)
-      if (hasCreditFacility && hasPresale && hasStaking) {
+      const hasStrategy = !options.needsStrategy || Boolean(result.strategyAddress)
+      if (hasCreditFacility && hasPresale && hasStaking && hasStrategy) {
         break
       }
     } catch {
@@ -420,6 +426,9 @@ export function useLaunch(options?: UseLaunchOptions) {
       if (!publicClient) {
         throw new Error('Public client not available')
       }
+      if (!walletClient) {
+        throw new Error('Please connect your wallet')
+      }
 
       const launch = getLaunchInstance(params.floorFactoryAddress)
       const launchConfig = transformFormData(params.formData, creatorAddress)
@@ -487,16 +496,62 @@ export function useLaunch(options?: UseLaunchOptions) {
         stakingManagerAddress = extracted.stakingManagerAddress
       }
 
-      let strategyAddresses: Address[] | undefined
+      let userProvidedStrategyAddress: Address | undefined
+      let autoDeployedStrategyAddress: Address | undefined
       if (params.formData.staking?.enabled) {
         const strategyAddress = params.formData.staking.strategyAddress?.trim()
         if (strategyAddress) {
           if (!isAddress(strategyAddress)) {
             throw new Error('Invalid staking strategy address')
           }
-          strategyAddresses = [strategyAddress as Address]
+          userProvidedStrategyAddress = strategyAddress as Address
+        } else if (stakingManagerAddress) {
+          const moduleFactoryAddress = await launch.getModuleFactory()
+          const feeTreasuryAddress = (await publicClient.readContract({
+            address: floorAddress,
+            abi: Floor_v1,
+            functionName: 'feeTreasury',
+          })) as Address
+
+          const deployStrategyHash = await walletClient.writeContract({
+            address: moduleFactoryAddress,
+            abi: ModuleFactory_v1,
+            functionName: 'createAndInitModule',
+            args: [
+              TESTNET_STRATEGY_METADATA,
+              floorAddress,
+              authorizerAddress,
+              feeTreasuryAddress,
+              '0x',
+            ],
+            account: creatorAddress,
+          })
+
+          const deployStrategyReceipt = await publicClient.waitForTransactionReceipt({
+            hash: deployStrategyHash,
+          })
+          if (deployStrategyReceipt.status === 'reverted') {
+            throw new Error(
+              `TestnetStrategy deployment reverted. Hash: ${deployStrategyHash}. Check the transaction for details.`
+            )
+          }
+
+          autoDeployedStrategyAddress = extractModuleAddressesFromLogs(deployStrategyReceipt.logs, {
+            needsStrategy: true,
+          }).strategyAddress
+
+          if (!autoDeployedStrategyAddress) {
+            throw new Error(
+              `TestnetStrategy deployment succeeded but strategy address was not found in logs. Hash: ${deployStrategyHash}`
+            )
+          }
         }
       }
+      const strategyAddresses = userProvidedStrategyAddress
+        ? [userProvidedStrategyAddress]
+        : autoDeployedStrategyAddress
+          ? [autoDeployedStrategyAddress]
+          : undefined
 
       // Step 3: Configure the market
       const configureResult = await launch.configure({
@@ -514,6 +569,34 @@ export function useLaunch(options?: UseLaunchOptions) {
         openStaking: params.formData.staking?.enabled ?? false,
         strategyAddresses,
       })
+
+      // Auto-register strategy when create flow deployed it implicitly.
+      if (autoDeployedStrategyAddress && stakingManagerAddress) {
+        const isApproved = (await publicClient.readContract({
+          address: stakingManagerAddress,
+          abi: StakingManager_v1,
+          functionName: 'isStrategyApproved',
+          args: [autoDeployedStrategyAddress],
+        })) as boolean
+
+        if (!isApproved) {
+          const addStrategyHash = await walletClient.writeContract({
+            address: stakingManagerAddress,
+            abi: StakingManager_v1,
+            functionName: 'addStrategy',
+            args: [autoDeployedStrategyAddress],
+            account: creatorAddress,
+          })
+          const addStrategyReceipt = await publicClient.waitForTransactionReceipt({
+            hash: addStrategyHash,
+          })
+          if (addStrategyReceipt.status === 'reverted') {
+            throw new Error(
+              `Staking strategy registration reverted. Hash: ${addStrategyHash}. Check the transaction for details.`
+            )
+          }
+        }
+      }
 
       return { launch: launchResult, configure: configureResult }
     },
