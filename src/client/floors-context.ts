@@ -32,6 +32,8 @@ export type TFloorsConfig = {
   moduleFactoryAddress?: Address
   /** TransactionForwarder address for batching configuration calls */
   transactionForwarderAddress?: Address
+  /** Governor contract address */
+  governorAddress?: Address
 }
 
 export type TFloorsContextValue = {
