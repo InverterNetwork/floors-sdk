@@ -101,8 +101,8 @@ export type TreasuryConfig = typeof TreasuryConfigSchema.Type
  * abi.encode(loanToValueRatio, maxLeverage, borrowingFeeRate)
  */
 export const CreditFacilityConfigSchema = Schema.Struct({
-  /** Loan-to-value ratio in basis points (e.g., 9900 = 99%) */
-  loanToValueRatio: Schema.Number.pipe(Schema.int(), Schema.between(1, 9_900)),
+  /** Loan-to-value ratio in basis points (e.g., 10000 = 100%) */
+  loanToValueRatio: Schema.Number.pipe(Schema.int(), Schema.between(1, 10_000)),
   /** Maximum leverage multiplier (e.g., 25) */
   maxLeverage: Schema.Number.pipe(Schema.int(), Schema.between(1, 255)),
   /** Borrowing fee rate in basis points (e.g., 600 = 6%) */

@@ -121,8 +121,8 @@ describe('#Launch', () => {
       expect(validated.loanToValueRatio).toBe(9900)
     })
 
-    it('should reject credit facility config with LTV > 9900', () => {
-      const config = { loanToValueRatio: 10000, maxLeverage: 25, borrowingFeeRate: 0 }
+    it('should reject credit facility config with LTV > 10000', () => {
+      const config = { loanToValueRatio: 10001, maxLeverage: 25, borrowingFeeRate: 0 }
       expect(() => launch.validateCreditFacilityConfig(config)).toThrow()
     })
 
