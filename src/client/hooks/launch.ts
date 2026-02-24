@@ -3,7 +3,7 @@
 import { useMutation, type UseMutationOptions } from '@tanstack/react-query'
 import { useCallback } from 'react'
 import type { Address } from 'viem'
-import { decodeEventLog } from 'viem'
+import { decodeEventLog, isAddress } from 'viem'
 import { useAccount, usePublicClient, useWalletClient } from 'wagmi'
 
 import { Floor_v1, ModuleFactory_v1 } from '../../abis'
@@ -80,7 +80,8 @@ export function extractModuleAddressesFromLogs(
         result.stakingManagerAddress = decoded.args.module_ as Address
       }
 
-      const hasCreditFacility = !options.needsCreditFacility || Boolean(result.creditFacilityAddress)
+      const hasCreditFacility =
+        !options.needsCreditFacility || Boolean(result.creditFacilityAddress)
       const hasPresale = !options.needsPresale || Boolean(result.presaleAddress)
       const hasStaking = !options.needsStaking || Boolean(result.stakingManagerAddress)
       if (hasCreditFacility && hasPresale && hasStaking) {
@@ -157,6 +158,8 @@ export type StakingFormData = {
   enabled: boolean
   /** Performance fee on harvested yield in basis points (e.g., 1000 = 10%) */
   performanceFeeBps: number
+  /** Optional ERC-4626 strategy address to configure during setup */
+  strategyAddress?: string
 }
 
 /**
@@ -436,6 +439,13 @@ export function useLaunch(options?: UseLaunchOptions) {
         return { launch: launchResult, configure: null }
       }
 
+      // If a forwarder is unavailable, keep the successful deployment and skip batch configure.
+      // The UI can then direct admins to complete setup via manual transactions.
+      const transactionForwarderAddress = config.transactionForwarderAddress
+      if (!transactionForwarderAddress) {
+        return { launch: launchResult, configure: null }
+      }
+
       // Step 2: Read module addresses from deployed Floor contract
       const floorAddress = launchResult.floorAddress as Address
       const [authorizerAddress, issuanceTokenAddress] = await Promise.all([
@@ -450,12 +460,6 @@ export function useLaunch(options?: UseLaunchOptions) {
           functionName: 'getIssuanceToken',
         }) as Promise<Address>,
       ])
-
-      // Get transaction forwarder address from config
-      const transactionForwarderAddress = config.transactionForwarderAddress
-      if (!transactionForwarderAddress) {
-        throw new Error('Transaction forwarder address not configured')
-      }
 
       // Determine module addresses if enabled
       let creditFacilityAddress: Address | undefined
@@ -483,6 +487,17 @@ export function useLaunch(options?: UseLaunchOptions) {
         stakingManagerAddress = extracted.stakingManagerAddress
       }
 
+      let strategyAddresses: Address[] | undefined
+      if (params.formData.staking?.enabled) {
+        const strategyAddress = params.formData.staking.strategyAddress?.trim()
+        if (strategyAddress) {
+          if (!isAddress(strategyAddress)) {
+            throw new Error('Invalid staking strategy address')
+          }
+          strategyAddresses = [strategyAddress as Address]
+        }
+      }
+
       // Step 3: Configure the market
       const configureResult = await launch.configure({
         floorAddress,
@@ -497,6 +512,7 @@ export function useLaunch(options?: UseLaunchOptions) {
         openSell: configOptions?.openSell ?? false,
         openBorrow: configOptions?.openBorrow ?? false,
         openStaking: params.formData.staking?.enabled ?? false,
+        strategyAddresses,
       })
 
       return { launch: launchResult, configure: configureResult }
