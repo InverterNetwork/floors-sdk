@@ -35,6 +35,65 @@ export type CreateAndConfigureResult = {
   configure: ConfigureResult | null
 }
 
+type ModuleAddressExtractionOptions = {
+  needsCreditFacility?: boolean
+  needsPresale?: boolean
+  needsStaking?: boolean
+}
+
+type ModuleAddressExtractionResult = {
+  creditFacilityAddress?: Address
+  presaleAddress?: Address
+  stakingManagerAddress?: Address
+}
+
+type ReceiptLogLike = {
+  data: `0x${string}`
+  topics: readonly `0x${string}`[]
+}
+
+export function extractModuleAddressesFromLogs(
+  logs: readonly ReceiptLogLike[],
+  options: ModuleAddressExtractionOptions
+): ModuleAddressExtractionResult {
+  const result: ModuleAddressExtractionResult = {}
+
+  for (const log of logs) {
+    if (log.topics.length === 0) continue
+
+    try {
+      const decoded = decodeEventLog({
+        abi: ModuleFactory_v1,
+        eventName: 'ModuleCreated',
+        data: log.data,
+        topics: log.topics as [`0x${string}`, ...`0x${string}`[]],
+      })
+
+      const metadata = decoded.args.metadata_ as { title?: string }
+      const title = metadata?.title?.toLowerCase() || ''
+
+      if (title.includes('creditfacility') && !result.creditFacilityAddress) {
+        result.creditFacilityAddress = decoded.args.module_ as Address
+      } else if (title.includes('presale') && !result.presaleAddress) {
+        result.presaleAddress = decoded.args.module_ as Address
+      } else if (title.includes('stakingmanager') && !result.stakingManagerAddress) {
+        result.stakingManagerAddress = decoded.args.module_ as Address
+      }
+
+      const hasCreditFacility = !options.needsCreditFacility || Boolean(result.creditFacilityAddress)
+      const hasPresale = !options.needsPresale || Boolean(result.presaleAddress)
+      const hasStaking = !options.needsStaking || Boolean(result.stakingManagerAddress)
+      if (hasCreditFacility && hasPresale && hasStaking) {
+        break
+      }
+    } catch {
+      // Ignore non-ModuleCreated logs.
+    }
+  }
+
+  return result
+}
+
 // =============================================================================
 // Types
 // =============================================================================
@@ -398,46 +457,30 @@ export function useLaunch(options?: UseLaunchOptions) {
         throw new Error('Transaction forwarder address not configured')
       }
 
-      // Determine credit facility and presale addresses if enabled
+      // Determine module addresses if enabled
       let creditFacilityAddress: Address | undefined
       let presaleAddress: Address | undefined
+      let stakingManagerAddress: Address | undefined
 
       // Only fetch receipt if we need to find module addresses
-      if (params.formData.creditFacility?.enabled || params.formData.presale?.enabled) {
+      if (
+        params.formData.creditFacility?.enabled ||
+        params.formData.presale?.enabled ||
+        params.formData.staking?.enabled
+      ) {
         // Fetch the transaction receipt to find module addresses from ModuleCreated events
         const receipt = await publicClient.getTransactionReceipt({
           hash: launchResult.transactionHash as `0x${string}`,
         })
 
-        // Parse ModuleCreated events to find credit facility and presale
-        for (const log of receipt.logs) {
-          try {
-            // Try to decode as ModuleCreated event
-            const decoded = decodeEventLog({
-              abi: ModuleFactory_v1,
-              eventName: 'ModuleCreated',
-              data: log.data,
-              topics: log.topics,
-            })
-
-            // Check module type by looking at metadata title
-            const metadata = decoded.args.metadata_ as { title?: string }
-            const title = metadata?.title?.toLowerCase() || ''
-
-            if (title.includes('creditfacility') && !creditFacilityAddress) {
-              creditFacilityAddress = decoded.args.module_ as Address
-            } else if (title.includes('presale') && !presaleAddress) {
-              presaleAddress = decoded.args.module_ as Address
-            }
-
-            // Break early if we found both
-            if (creditFacilityAddress && presaleAddress) {
-              break
-            }
-          } catch {
-            // Not a ModuleCreated event, skip
-          }
-        }
+        const extracted = extractModuleAddressesFromLogs(receipt.logs, {
+          needsCreditFacility: params.formData.creditFacility?.enabled,
+          needsPresale: params.formData.presale?.enabled,
+          needsStaking: params.formData.staking?.enabled,
+        })
+        creditFacilityAddress = extracted.creditFacilityAddress
+        presaleAddress = extracted.presaleAddress
+        stakingManagerAddress = extracted.stakingManagerAddress
       }
 
       // Step 3: Configure the market
@@ -448,10 +491,12 @@ export function useLaunch(options?: UseLaunchOptions) {
         transactionForwarderAddress,
         creditFacilityAddress,
         presaleAddress,
+        stakingManagerAddress,
         grantMinterRole: configOptions?.grantMinterRole ?? true,
         openBuy: configOptions?.openBuy ?? true,
         openSell: configOptions?.openSell ?? false,
         openBorrow: configOptions?.openBorrow ?? false,
+        openStaking: params.formData.staking?.enabled ?? false,
       })
 
       return { launch: launchResult, configure: configureResult }

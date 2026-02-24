@@ -87,7 +87,7 @@ export const useStakingMutations = (
   const stakingManagerAddress = useMemo(() => {
     if (options?.stakingManagerAddress) return options.stakingManagerAddress
     // Get from market data (via ModuleRegistry in GraphQL)
-    return (resolvedMarket as any)?.stakingManager as Address | undefined
+    return (resolvedMarket as any)?.stakingManagerAddress as Address | undefined
   }, [options?.stakingManagerAddress, resolvedMarket])
 
   // Resolve issuance token address from options or market data

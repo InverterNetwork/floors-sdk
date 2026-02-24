@@ -256,6 +256,8 @@ export interface TFloorAssetData extends TGraphQLMarket, TComputedAssetData {
   treasury?: string | null
   /** StakingManager contract address (from ModuleRegistry.staking) */
   stakingManagerAddress?: string | null
+  /** Active strategy addresses for this market's StakingManager (from indexer) */
+  activeStrategyAddresses?: string[]
   /** First active strategy address for this market's StakingManager (from indexer) */
   firstStrategyAddress?: string | null
   // PriceCandles organized by period for different chart timeframes

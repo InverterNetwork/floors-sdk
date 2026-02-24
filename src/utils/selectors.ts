@@ -112,6 +112,31 @@ export const CREDIT_FACILITY_SELECTORS = {
 } as const
 
 // =============================================================================
+// Staking Selectors
+// =============================================================================
+
+/**
+ * @description StakingManager function selectors for permission granting
+ */
+export const STAKING_SELECTORS = {
+  stake: toFunctionSelector('stake(address,uint256)'),
+  harvestYield: toFunctionSelector('harvestYield(address,address)'),
+  withdrawFunds: toFunctionSelector('withdrawFunds(address,uint256,address)'),
+  rebalance: toFunctionSelector('rebalance(address)'),
+  addStrategy: toFunctionSelector('addStrategy(address)'),
+  removeStrategy: toFunctionSelector('removeStrategy(address)'),
+  setPerformanceFeeBps: toFunctionSelector('setPerformanceFeeBps(uint256)'),
+} as const
+
+/**
+ * @description Strategy base selectors for staking-manager strategy permissions
+ */
+export const STRATEGY_BASE_SELECTORS = {
+  deposit: toFunctionSelector('deposit(uint256,address)'),
+  withdraw: toFunctionSelector('withdraw(uint256,address,address)'),
+} as const
+
+// =============================================================================
 // Presale Selectors
 // =============================================================================
 

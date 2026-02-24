@@ -46,7 +46,13 @@ import {
   TreasuryConfigSchema,
 } from './schemas/launch.schema'
 import type { PopPublicClient, PopWalletClient } from './types'
-import { CREDIT_FACILITY_SELECTORS, FLOOR_SELECTORS, type SingleCall } from './utils/selectors'
+import {
+  CREDIT_FACILITY_SELECTORS,
+  FLOOR_SELECTORS,
+  STAKING_SELECTORS,
+  STRATEGY_BASE_SELECTORS,
+  type SingleCall,
+} from './utils/selectors'
 
 // Re-export selectors for backwards compatibility
 export { CREDIT_FACILITY_SELECTORS, FLOOR_SELECTORS }
@@ -89,6 +95,10 @@ export type ConfigureParams = {
   creditFacilityAddress?: Address
   /** Presale address (optional, if deployed) */
   presaleAddress?: Address
+  /** Staking manager address (optional, if deployed) */
+  stakingManagerAddress?: Address
+  /** Strategy addresses to permission for StakingManager (optional) */
+  strategyAddresses?: Address[]
   /** Whether to grant minter role to Floor on issuance token (default: true) */
   grantMinterRole?: boolean
   /** Whether to open buy after configuration (default: true) */
@@ -97,6 +107,10 @@ export type ConfigureParams = {
   openSell?: boolean
   /** Whether to enable public borrowing (default: false) */
   openBorrow?: boolean
+  /** Whether to open public staking user actions (default: true when stakingManagerAddress is set) */
+  openStaking?: boolean
+  /** Whether to grant admin role access to staking admin actions (default: true) */
+  enableStakingAdmin?: boolean
 }
 
 /**
@@ -405,6 +419,8 @@ export class Launch {
     let nextRoleIdNumber = Number(lastRoleId as bigint) + 1
     let creditFacilityRoleId: `0x${string}` | undefined
     let presaleRoleId: `0x${string}` | undefined
+    let stakingManagerRoleId: `0x${string}` | undefined
+    let stakingManagerStrategyRoleId: `0x${string}` | undefined
 
     // 4. Configure CreditFacility if deployed
     if (params.creditFacilityAddress) {
@@ -515,6 +531,166 @@ export class Launch {
             args: [params.creditFacilityAddress],
           }),
         })
+      }
+    }
+
+    // 6. Configure StakingManager if deployed
+    if (params.stakingManagerAddress) {
+      if (params.openStaking !== false) {
+        calls.push(
+          {
+            target: params.authorizerAddress,
+            allowFailure: false,
+            callData: encodeFunctionData({
+              abi: AUT_Roles_v2,
+              functionName: 'addAccessPermission',
+              args: [params.stakingManagerAddress, STAKING_SELECTORS.stake, PUBLIC_ROLE],
+            }),
+          },
+          {
+            target: params.authorizerAddress,
+            allowFailure: false,
+            callData: encodeFunctionData({
+              abi: AUT_Roles_v2,
+              functionName: 'addAccessPermission',
+              args: [params.stakingManagerAddress, STAKING_SELECTORS.harvestYield, PUBLIC_ROLE],
+            }),
+          },
+          {
+            target: params.authorizerAddress,
+            allowFailure: false,
+            callData: encodeFunctionData({
+              abi: AUT_Roles_v2,
+              functionName: 'addAccessPermission',
+              args: [params.stakingManagerAddress, STAKING_SELECTORS.withdrawFunds, PUBLIC_ROLE],
+            }),
+          },
+          {
+            target: params.authorizerAddress,
+            allowFailure: false,
+            callData: encodeFunctionData({
+              abi: AUT_Roles_v2,
+              functionName: 'addAccessPermission',
+              args: [params.stakingManagerAddress, STAKING_SELECTORS.rebalance, PUBLIC_ROLE],
+            }),
+          }
+        )
+      }
+
+      if (params.enableStakingAdmin !== false) {
+        calls.push(
+          {
+            target: params.authorizerAddress,
+            allowFailure: false,
+            callData: encodeFunctionData({
+              abi: AUT_Roles_v2,
+              functionName: 'addAccessPermission',
+              args: [params.stakingManagerAddress, STAKING_SELECTORS.addStrategy, adminRole as `0x${string}`],
+            }),
+          },
+          {
+            target: params.authorizerAddress,
+            allowFailure: false,
+            callData: encodeFunctionData({
+              abi: AUT_Roles_v2,
+              functionName: 'addAccessPermission',
+              args: [
+                params.stakingManagerAddress,
+                STAKING_SELECTORS.removeStrategy,
+                adminRole as `0x${string}`,
+              ],
+            }),
+          },
+          {
+            target: params.authorizerAddress,
+            allowFailure: false,
+            callData: encodeFunctionData({
+              abi: AUT_Roles_v2,
+              functionName: 'addAccessPermission',
+              args: [
+                params.stakingManagerAddress,
+                STAKING_SELECTORS.setPerformanceFeeBps,
+                adminRole as `0x${string}`,
+              ],
+            }),
+          }
+        )
+      }
+
+      // Role for StakingManager to access Floor collateral functions
+      stakingManagerRoleId = `0x${nextRoleIdNumber.toString(16).padStart(64, '0')}` as `0x${string}`
+      nextRoleIdNumber++
+      calls.push(
+        {
+          target: params.authorizerAddress,
+          allowFailure: false,
+          callData: encodeFunctionData({
+            abi: AUT_Roles_v2,
+            functionName: 'createRole',
+            args: ['StakingManager', adminRole as `0x${string}`, [params.stakingManagerAddress]],
+          }),
+        },
+        {
+          target: params.authorizerAddress,
+          allowFailure: false,
+          callData: encodeFunctionData({
+            abi: AUT_Roles_v2,
+            functionName: 'addAccessPermission',
+            args: [params.floorAddress, FLOOR_SELECTORS.withdrawCollateralTo, stakingManagerRoleId],
+          }),
+        },
+        {
+          target: params.authorizerAddress,
+          allowFailure: false,
+          callData: encodeFunctionData({
+            abi: AUT_Roles_v2,
+            functionName: 'addAccessPermission',
+            args: [params.floorAddress, FLOOR_SELECTORS.depositCollateralFrom, stakingManagerRoleId],
+          }),
+        }
+      )
+
+      if (params.strategyAddresses && params.strategyAddresses.length > 0) {
+        stakingManagerStrategyRoleId =
+          `0x${nextRoleIdNumber.toString(16).padStart(64, '0')}` as `0x${string}`
+        nextRoleIdNumber++
+
+        calls.push({
+          target: params.authorizerAddress,
+          allowFailure: false,
+          callData: encodeFunctionData({
+            abi: AUT_Roles_v2,
+            functionName: 'createRole',
+            args: [
+              'StakingManager_Strategy',
+              adminRole as `0x${string}`,
+              [params.stakingManagerAddress],
+            ],
+          }),
+        })
+
+        for (const strategyAddress of params.strategyAddresses) {
+          calls.push(
+            {
+              target: params.authorizerAddress,
+              allowFailure: false,
+              callData: encodeFunctionData({
+                abi: AUT_Roles_v2,
+                functionName: 'addAccessPermission',
+                args: [strategyAddress, STRATEGY_BASE_SELECTORS.deposit, stakingManagerStrategyRoleId],
+              }),
+            },
+            {
+              target: params.authorizerAddress,
+              allowFailure: false,
+              callData: encodeFunctionData({
+                abi: AUT_Roles_v2,
+                functionName: 'addAccessPermission',
+                args: [strategyAddress, STRATEGY_BASE_SELECTORS.withdraw, stakingManagerStrategyRoleId],
+              }),
+            }
+          )
+        }
       }
     }
 
