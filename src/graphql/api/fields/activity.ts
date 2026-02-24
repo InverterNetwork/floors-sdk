@@ -62,16 +62,40 @@ export const floorElevationActivityFields = {
   transactionHash: true,
 } as const
 
+/**
+ * @description Base fields for staking activity entity (activity view)
+ */
+export const stakingActivityFields = {
+  id: true,
+  stakingManager_id: true,
+  user_id: true,
+  activityType: true,
+  issuanceTokenAmountRaw: true,
+  issuanceTokenAmountFormatted: true,
+  collateralAmountRaw: true,
+  collateralAmountFormatted: true,
+  yieldAmountRaw: true,
+  yieldAmountFormatted: true,
+  feeAmountRaw: true,
+  feeAmountFormatted: true,
+  timestamp: true,
+  transactionHash: true,
+} as const
+
 // ============================================================================
 // Combined Query Definition
 // ============================================================================
 
 /**
- * @description Builds a combined query for market activity (trades + loans + floor elevations)
+ * @description Builds a combined query for market activity (trades + loans + floor elevations + staking)
  * This fetches all in a single GraphQL request for efficiency
  */
-export const buildMarketActivityQuery = (marketId: string, limit: number = 100) =>
-  ({
+export const buildMarketActivityQuery = (
+  marketId: string,
+  limit: number = 100,
+  stakingManagerId?: string
+) => {
+  const base = {
     Trade: {
       __args: {
         where: { market_id: { _eq: marketId } },
@@ -96,18 +120,37 @@ export const buildMarketActivityQuery = (marketId: string, limit: number = 100) 
       },
       ...floorElevationActivityFields,
     },
-  }) satisfies GraphQLQueryArgs
+  } satisfies GraphQLQueryArgs
+
+  if (!stakingManagerId) return base
+
+  return {
+    ...base,
+    StakingActivity: {
+      __args: {
+        where: { stakingManager_id: { _eq: stakingManagerId } },
+        order_by: [{ timestamp: 'desc' as const }],
+        limit,
+      },
+      ...stakingActivityFields,
+    },
+  } satisfies GraphQLQueryArgs
+}
 
 // ============================================================================
 // Subscription Definition
 // ============================================================================
 
 /**
- * @description Builds a combined subscription for market activity (trades + loans + floor elevations)
+ * @description Builds a combined subscription for market activity (trades + loans + floor elevations + staking)
  * Uses WebSocket for real-time updates via Hasura subscriptions
  */
-export const buildMarketActivitySubscription = (marketId: string, limit: number = 100) =>
-  ({
+export const buildMarketActivitySubscription = (
+  marketId: string,
+  limit: number = 100,
+  stakingManagerId?: string
+) => {
+  const base = {
     Trade: {
       __args: {
         where: { market_id: { _eq: marketId } },
@@ -132,7 +175,22 @@ export const buildMarketActivitySubscription = (marketId: string, limit: number 
       },
       ...floorElevationActivityFields,
     },
-  }) satisfies GraphQLSubscriptionArgs
+  } satisfies GraphQLSubscriptionArgs
+
+  if (!stakingManagerId) return base
+
+  return {
+    ...base,
+    StakingActivity: {
+      __args: {
+        where: { stakingManager_id: { _eq: stakingManagerId } },
+        order_by: [{ timestamp: 'desc' as const }],
+        limit,
+      },
+      ...stakingActivityFields,
+    },
+  } satisfies GraphQLSubscriptionArgs
+}
 
 export type MarketActivitySubscriptionFields = ReturnType<typeof buildMarketActivitySubscription>
 
@@ -144,6 +202,14 @@ export type TGraphQLTradeActivity = NonNullable<MarketActivityQueryResultType['T
 export type TGraphQLLoanActivity = NonNullable<MarketActivityQueryResultType['Loan']>[0]
 export type TGraphQLFloorElevationActivity = NonNullable<
   MarketActivityQueryResultType['FloorElevation']
+>[0]
+
+// Staking activity type — built from the staking fields shape
+type StakingActivityQueryResult = GraphQLQueryResult<{
+  StakingActivity: { __args: Record<string, unknown> } & typeof stakingActivityFields
+}>
+export type TGraphQLStakingActivityItem = NonNullable<
+  StakingActivityQueryResult['StakingActivity']
 >[0]
 
 // ============================================================================
@@ -210,7 +276,7 @@ export interface TMarketActivityData {
   status: 'pending' | 'confirmed' | 'failed'
 
   // Source indicator
-  source: 'trade' | 'loan' | 'floor_elevation'
+  source: 'trade' | 'loan' | 'floor_elevation' | 'staking'
 }
 
 // ============================================================================
@@ -497,6 +563,91 @@ export function floorElevationToActivity(
 }
 
 /**
+ * @description Transforms a GraphQL staking activity to unified activity format
+ * @param sa - The staking activity entity from GraphQL
+ */
+export function stakingActivityToActivity(sa: TGraphQLStakingActivityItem): TMarketActivityData {
+  const tokenAmount = Number.parseFloat(sa.issuanceTokenAmountFormatted ?? '0') || 0
+  const collateralAmount = Number.parseFloat(sa.collateralAmountFormatted ?? '0') || 0
+  const yieldAmount = Number.parseFloat(sa.yieldAmountFormatted ?? '0') || 0
+  const feeAmount = Number.parseFloat(sa.feeAmountFormatted ?? '0') || 0
+
+  const typeMap: Record<string, TActivityType> = {
+    STAKE: 'stake',
+    HARVEST: 'claim',
+    WITHDRAW: 'unstake',
+    REBALANCE: 'claim',
+  }
+
+  const type = typeMap[sa.activityType] ?? 'stake'
+
+  // Determine amounts based on activity type
+  let input = 0
+  let output = 0
+  let fee = 0
+  let tAmountRaw = '0'
+  let tAmountFormatted = '0'
+  let rAmountRaw = '0'
+  let rAmountFormatted = '0'
+  let feeRaw = '0'
+  let feeFormatted = '0'
+
+  switch (sa.activityType) {
+    case 'STAKE':
+      input = tokenAmount
+      output = collateralAmount
+      tAmountRaw = String(sa.issuanceTokenAmountRaw ?? '0')
+      tAmountFormatted = sa.issuanceTokenAmountFormatted ?? '0'
+      rAmountRaw = String(sa.collateralAmountRaw ?? '0')
+      rAmountFormatted = sa.collateralAmountFormatted ?? '0'
+      break
+    case 'HARVEST':
+      output = yieldAmount
+      fee = feeAmount
+      rAmountRaw = String(sa.yieldAmountRaw ?? '0')
+      rAmountFormatted = sa.yieldAmountFormatted ?? '0'
+      feeRaw = String(sa.feeAmountRaw ?? '0')
+      feeFormatted = sa.feeAmountFormatted ?? '0'
+      break
+    case 'WITHDRAW':
+      input = tokenAmount
+      output = collateralAmount
+      tAmountRaw = String(sa.issuanceTokenAmountRaw ?? '0')
+      tAmountFormatted = sa.issuanceTokenAmountFormatted ?? '0'
+      rAmountRaw = String(sa.collateralAmountRaw ?? '0')
+      rAmountFormatted = sa.collateralAmountFormatted ?? '0'
+      break
+    case 'REBALANCE':
+      output = collateralAmount
+      rAmountRaw = String(sa.collateralAmountRaw ?? '0')
+      rAmountFormatted = sa.collateralAmountFormatted ?? '0'
+      break
+  }
+
+  return {
+    id: sa.id,
+    market_id: sa.stakingManager_id, // StakingManager id serves as market link
+    user_id: sa.user_id,
+    type,
+    timestamp: String(sa.timestamp),
+    tokenAmountRaw: tAmountRaw,
+    tokenAmountFormatted: tAmountFormatted,
+    reserveAmountRaw: rAmountRaw,
+    reserveAmountFormatted: rAmountFormatted,
+    feeRaw,
+    feeFormatted,
+    newPriceRaw: null,
+    newPriceFormatted: null,
+    transactionHash: sa.transactionHash,
+    amounts: { input, output, fee },
+    prices: null,
+    timestampDate: new Date(Number.parseInt(String(sa.timestamp)) * 1000),
+    status: 'confirmed',
+    source: 'staking',
+  }
+}
+
+/**
  * @description Combines and sorts trades, loans, and floor elevations into unified activity list
  * Detects "loop" transactions by matching BUY trades with loans that share the same txHash
  * Price impact is calculated from each trade's own execution data (effective price vs post-trade price)
@@ -504,7 +655,8 @@ export function floorElevationToActivity(
 export function combineMarketActivity(
   trades: TGraphQLTradeActivity[],
   loans: TGraphQLLoanActivity[],
-  floorElevations: TGraphQLFloorElevationActivity[] = []
+  floorElevations: TGraphQLFloorElevationActivity[] = [],
+  stakingActivities: TGraphQLStakingActivityItem[] = []
 ): TMarketActivityData[] {
   // Create a set of loan transaction hashes for quick lookup
   // These are loans created in the same tx as a buy (indicating a loop/buyAndBorrow)
@@ -549,8 +701,11 @@ export function combineMarketActivity(
   // Transform floor elevations
   const floorElevationActivities = floorElevations.map(floorElevationToActivity)
 
+  // Transform staking activities
+  const stakingActs = stakingActivities.map(stakingActivityToActivity)
+
   // Combine and sort by timestamp (newest first)
-  return [...tradeActivities, ...loanActivities, ...floorElevationActivities].sort(
+  return [...tradeActivities, ...loanActivities, ...floorElevationActivities, ...stakingActs].sort(
     (a, b) => Number.parseInt(b.timestamp) - Number.parseInt(a.timestamp)
   )
 }

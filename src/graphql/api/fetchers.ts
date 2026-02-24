@@ -131,22 +131,22 @@ export async function fetchMarketById(id: string): Promise<TFloorAssetData | nul
 
   const moduleRegistry = registryResponse.ModuleRegistry_by_pk
 
-  // Fetch first active strategy for this market's StakingManager (if any)
+  // Fetch active strategies for this market's StakingManager (if any)
+  let activeStrategyAddresses: string[] = []
   let firstStrategyAddress: string | null = null
   if (moduleRegistry?.staking) {
     const strategyResponse = await query({
       Strategy: {
         __args: {
           where: { stakingManager_id: { _eq: moduleRegistry.staking }, isActive: { _eq: true } },
-          limit: 1,
+          order_by: [{ addedAt: 'asc' }],
         },
         id: true,
       },
     })
     const strategies = strategyResponse.Strategy ?? []
-    if (strategies.length > 0) {
-      firstStrategyAddress = strategies[0].id
-    }
+    activeStrategyAddresses = strategies.map((strategy) => strategy.id)
+    firstStrategyAddress = activeStrategyAddresses[0] ?? null
   }
 
   // Fetch all candle periods in parallel for different timeframes
@@ -199,6 +199,7 @@ export async function fetchMarketById(id: string): Promise<TFloorAssetData | nul
   return {
     ...mappedMarket,
     priceCandles,
+    activeStrategyAddresses,
     firstStrategyAddress,
   } as TFloorAssetData
 }
@@ -456,7 +457,7 @@ export async function fetchPremiumChange24h(
 }
 
 /**
- * Fetch all market activity (trades + loans + floor elevations) in a single query
+ * Fetch all market activity (trades + loans + floor elevations + staking) in a single query
  * @param marketId - The market ID
  * @param limit - Maximum number of items per entity type (default: 100)
  * @returns Combined and sorted array of market activity
@@ -470,15 +471,32 @@ export async function fetchMarketActivity(
   try {
     const normalizedMarketId = getAddress(marketId as `0x${string}`)
 
-    // Single GraphQL query fetching trades, loans, and floor elevations
-    const response = await query(buildMarketActivityQuery(normalizedMarketId, limit))
+    // Resolve stakingManagerId from ModuleRegistry
+    let stakingManagerId: string | undefined
+    try {
+      const registryResponse = await query({
+        ModuleRegistry_by_pk: {
+          __args: { id: normalizedMarketId },
+          staking: true,
+        },
+      })
+      stakingManagerId = registryResponse.ModuleRegistry_by_pk?.staking ?? undefined
+    } catch {
+      // No staking module — continue without staking activities
+    }
+
+    // Single GraphQL query fetching trades, loans, floor elevations, and staking activities
+    const response = await query(
+      buildMarketActivityQuery(normalizedMarketId, limit, stakingManagerId)
+    )
 
     const trades = response.Trade ?? []
     const loans = response.Loan ?? []
     const floorElevations = response.FloorElevation ?? []
+    const stakingActivities = (response as any).StakingActivity ?? []
 
     // Combine and sort by timestamp
-    return combineMarketActivity(trades, loans, floorElevations)
+    return combineMarketActivity(trades, loans, floorElevations, stakingActivities)
   } catch (error) {
     console.error('Error fetching market activity:', error)
     return []

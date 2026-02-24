@@ -7,6 +7,7 @@ import {
   fetchMarketActivity,
   type TGraphQLFloorElevationActivity,
   type TGraphQLLoanActivity,
+  type TGraphQLStakingActivityItem,
   type TGraphQLTradeActivity,
   type TMarketActivityData,
 } from '../../graphql/api'
@@ -58,6 +59,7 @@ export const useMarketActivityQuery = <TData = TMarketActivityData[]>(
 
 export type UseMarketActivityDataParams = {
   marketId: string | null | undefined
+  stakingManagerId?: string | null
   enabled?: boolean
   limit?: number
 }
@@ -80,11 +82,13 @@ export type UseMarketActivityDataResult = {
  */
 export const useMarketActivityData = ({
   marketId,
+  stakingManagerId,
   enabled = true,
   limit = 100,
 }: UseMarketActivityDataParams): UseMarketActivityDataResult => {
   const isEnabled = enabled && Boolean(marketId)
   const key = marketActivitySubKey(marketId)
+  const resolvedStakingId = stakingManagerId ?? undefined
 
   // Query for instant cached data (stale-while-revalidate)
   const queryResult = useMarketActivityQuery(marketId, {
@@ -93,8 +97,11 @@ export const useMarketActivityData = ({
 
   // Subscription for live updates
   const fields = useMemo(
-    () => (isEnabled && marketId ? buildMarketActivitySubscription(marketId, limit) : null),
-    [isEnabled, marketId, limit]
+    () =>
+      isEnabled && marketId
+        ? buildMarketActivitySubscription(marketId, limit, resolvedStakingId)
+        : null,
+    [isEnabled, marketId, limit, resolvedStakingId]
   )
 
   const subResult = useSubscription({
@@ -110,8 +117,10 @@ export const useMarketActivityData = ({
     const loans = (subResult.data.Loan ?? []) as TGraphQLLoanActivity[]
     const floorElevations = (subResult.data.FloorElevation ??
       []) as TGraphQLFloorElevationActivity[]
+    const stakingActivities = ((subResult.data as any).StakingActivity ??
+      []) as TGraphQLStakingActivityItem[]
 
-    return combineMarketActivity(trades, loans, floorElevations)
+    return combineMarketActivity(trades, loans, floorElevations, stakingActivities)
   }, [subResult.data])
 
   // Prefer subscription data when available, fall back to query data
