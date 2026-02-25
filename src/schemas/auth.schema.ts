@@ -31,6 +31,6 @@ export const authGroup = HttpApiGroup.make('auth')
   .add(
     HttpApiEndpoint.post('verify', '/verify').setPayload(VerifyPayload).addSuccess(VerifyResponse)
   )
-  .add(HttpApiEndpoint.get('session', '/session').addSuccess(SessionSchema.Session))
+  .add(HttpApiEndpoint.get('session', '/session').addSuccess(Schema.NullOr(SessionSchema.Session)))
   .add(HttpApiEndpoint.get('signout', '/signout').addSuccess(SignOutResponse))
   .prefix('/auth')

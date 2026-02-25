@@ -9,7 +9,8 @@ export const PaginationResponse = Schema.Struct({
   hasPrevPage: Schema.Boolean,
 })
 
-export const AddressSchema = Schema.Union(
-  Schema.TemplateLiteral('0x', Schema.String),
-  Schema.String
+export const AddressSchema = Schema.String.pipe(
+  Schema.filter((s): s is `0x${string}` => /^0x[0-9a-fA-F]{40}$/.test(s), {
+    description: 'Valid Ethereum address',
+  })
 )
