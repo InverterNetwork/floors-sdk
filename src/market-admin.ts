@@ -100,6 +100,8 @@ export interface TMarketAdminState {
   virtualCollateralSupply: bigint
   /** Collateral (reserve) token address */
   collateralTokenAddress: Address
+  /** Collateral (reserve) token decimals */
+  collateralTokenDecimals: number
   /** Reserve token balance held by market contract (backs the bonding curve) */
   reserveBalance: bigint
 }
@@ -227,13 +229,20 @@ export class MarketAdmin {
       }) as Promise<Address>,
     ])
 
-    // Second read: reserve token balance held by market contract
-    const reserveBalance = (await this.publicClient.readContract({
-      address: collateralTokenAddress,
-      abi: erc20BalanceOfAbi,
-      functionName: 'balanceOf',
-      args: [this.address],
-    })) as bigint
+    // Second batch: reserve balance + decimals from collateral token
+    const [reserveBalance, collateralTokenDecimals] = await Promise.all([
+      this.publicClient.readContract({
+        address: collateralTokenAddress,
+        abi: erc20BalanceOfAbi,
+        functionName: 'balanceOf',
+        args: [this.address],
+      }) as Promise<bigint>,
+      this.publicClient.readContract({
+        address: collateralTokenAddress,
+        abi: ERC20_ABI,
+        functionName: 'decimals',
+      }) as Promise<number>,
+    ])
 
     return {
       isBuyOpen,
@@ -244,6 +253,7 @@ export class MarketAdmin {
       currentPrice,
       virtualCollateralSupply: virtualSupply,
       collateralTokenAddress,
+      collateralTokenDecimals,
       reserveBalance,
     }
   }
@@ -1032,5 +1042,12 @@ const ERC20_ABI = [
     ],
     outputs: [{ name: '', type: 'bool' }],
     stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'decimals',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint8' }],
+    stateMutability: 'view',
   },
 ] as const
