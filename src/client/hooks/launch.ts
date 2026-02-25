@@ -32,8 +32,10 @@ import { useFloors } from '../floors-context'
 export type CreateAndConfigureResult = {
   /** Result of market creation */
   launch: LaunchResult
-  /** Result of market configuration (null if skipped) */
+  /** Result of market configuration (null if skipped or failed) */
   configure: ConfigureResult | null
+  /** Error that occurred during configuration (create succeeded but configure failed) */
+  configureError?: string
 }
 
 type ModuleAddressExtractionOptions = {
@@ -448,157 +450,172 @@ export function useLaunch(options?: UseLaunchOptions) {
         return { launch: launchResult, configure: null }
       }
 
-      // If a forwarder is unavailable, keep the successful deployment and skip batch configure.
-      // The UI can then direct admins to complete setup via manual transactions.
+      // Require forwarder — fail explicitly instead of silently skipping
       const transactionForwarderAddress = config.transactionForwarderAddress
       if (!transactionForwarderAddress) {
-        return { launch: launchResult, configure: null }
+        return {
+          launch: launchResult,
+          configure: null,
+          configureError:
+            'TransactionForwarder is not configured. Market was created but roles and permissions were not set up. Complete configuration from the admin panel.',
+        }
       }
 
-      // Step 2: Read module addresses from deployed Floor contract
-      const floorAddress = launchResult.floorAddress as Address
-      const [authorizerAddress, issuanceTokenAddress] = await Promise.all([
-        publicClient.readContract({
-          address: floorAddress,
-          abi: Floor_v1,
-          functionName: 'authorizer',
-        }) as Promise<Address>,
-        publicClient.readContract({
-          address: floorAddress,
-          abi: Floor_v1,
-          functionName: 'getIssuanceToken',
-        }) as Promise<Address>,
-      ])
-
-      // Determine module addresses if enabled
-      let creditFacilityAddress: Address | undefined
-      let presaleAddress: Address | undefined
-      let stakingManagerAddress: Address | undefined
-
-      // Only fetch receipt if we need to find module addresses
-      if (
-        params.formData.creditFacility?.enabled ||
-        params.formData.presale?.enabled ||
-        params.formData.staking?.enabled
-      ) {
-        // Fetch the transaction receipt to find module addresses from ModuleCreated events
-        const receipt = await publicClient.getTransactionReceipt({
-          hash: launchResult.transactionHash as `0x${string}`,
-        })
-
-        const extracted = extractModuleAddressesFromLogs(receipt.logs, {
-          needsCreditFacility: params.formData.creditFacility?.enabled,
-          needsPresale: params.formData.presale?.enabled,
-          needsStaking: params.formData.staking?.enabled,
-        })
-        creditFacilityAddress = extracted.creditFacilityAddress
-        presaleAddress = extracted.presaleAddress
-        stakingManagerAddress = extracted.stakingManagerAddress
-      }
-
-      let userProvidedStrategyAddress: Address | undefined
-      let autoDeployedStrategyAddress: Address | undefined
-      if (params.formData.staking?.enabled) {
-        const strategyAddress = params.formData.staking.strategyAddress?.trim()
-        if (strategyAddress) {
-          if (!isAddress(strategyAddress)) {
-            throw new Error('Invalid staking strategy address')
-          }
-          userProvidedStrategyAddress = strategyAddress as Address
-        } else if (stakingManagerAddress) {
-          const moduleFactoryAddress = await launch.getModuleFactory()
-          const feeTreasuryAddress = (await publicClient.readContract({
+      // Step 2+3: Configure the market — wrapped in try/catch to preserve create result
+      try {
+        const floorAddress = launchResult.floorAddress as Address
+        const [authorizerAddress, issuanceTokenAddress] = await Promise.all([
+          publicClient.readContract({
             address: floorAddress,
             abi: Floor_v1,
-            functionName: 'feeTreasury',
-          })) as Address
+            functionName: 'authorizer',
+          }) as Promise<Address>,
+          publicClient.readContract({
+            address: floorAddress,
+            abi: Floor_v1,
+            functionName: 'getIssuanceToken',
+          }) as Promise<Address>,
+        ])
 
-          const deployStrategyHash = await walletClient.writeContract({
-            address: moduleFactoryAddress,
-            abi: ModuleFactory_v1,
-            functionName: 'createAndInitModule',
-            args: [
-              TESTNET_STRATEGY_METADATA,
-              floorAddress,
-              authorizerAddress,
-              feeTreasuryAddress,
-              '0x',
-            ],
-            account: creatorAddress,
+        // Determine module addresses if enabled
+        let creditFacilityAddress: Address | undefined
+        let presaleAddress: Address | undefined
+        let stakingManagerAddress: Address | undefined
+
+        if (
+          params.formData.creditFacility?.enabled ||
+          params.formData.presale?.enabled ||
+          params.formData.staking?.enabled
+        ) {
+          const receipt = await publicClient.getTransactionReceipt({
+            hash: launchResult.transactionHash as `0x${string}`,
           })
 
-          const deployStrategyReceipt = await publicClient.waitForTransactionReceipt({
-            hash: deployStrategyHash,
+          const extracted = extractModuleAddressesFromLogs(receipt.logs, {
+            needsCreditFacility: params.formData.creditFacility?.enabled,
+            needsPresale: params.formData.presale?.enabled,
+            needsStaking: params.formData.staking?.enabled,
           })
-          if (deployStrategyReceipt.status === 'reverted') {
-            throw new Error(
-              `TestnetStrategy deployment reverted. Hash: ${deployStrategyHash}. Check the transaction for details.`
-            )
-          }
+          creditFacilityAddress = extracted.creditFacilityAddress
+          presaleAddress = extracted.presaleAddress
+          stakingManagerAddress = extracted.stakingManagerAddress
+        }
 
-          autoDeployedStrategyAddress = extractModuleAddressesFromLogs(deployStrategyReceipt.logs, {
-            needsStrategy: true,
-          }).strategyAddress
+        let userProvidedStrategyAddress: Address | undefined
+        let autoDeployedStrategyAddress: Address | undefined
+        if (params.formData.staking?.enabled) {
+          const strategyAddress = params.formData.staking.strategyAddress?.trim()
+          if (strategyAddress) {
+            if (!isAddress(strategyAddress)) {
+              throw new Error('Invalid staking strategy address')
+            }
+            userProvidedStrategyAddress = strategyAddress as Address
+          } else if (stakingManagerAddress) {
+            const moduleFactoryAddress = await launch.getModuleFactory()
+            const feeTreasuryAddress = (await publicClient.readContract({
+              address: floorAddress,
+              abi: Floor_v1,
+              functionName: 'feeTreasury',
+            })) as Address
 
-          if (!autoDeployedStrategyAddress) {
-            throw new Error(
-              `TestnetStrategy deployment succeeded but strategy address was not found in logs. Hash: ${deployStrategyHash}`
-            )
+            const deployStrategyHash = await walletClient.writeContract({
+              address: moduleFactoryAddress,
+              abi: ModuleFactory_v1,
+              functionName: 'createAndInitModule',
+              args: [
+                TESTNET_STRATEGY_METADATA,
+                floorAddress,
+                authorizerAddress,
+                feeTreasuryAddress,
+                '0x',
+              ],
+              account: creatorAddress,
+            })
+
+            const deployStrategyReceipt = await publicClient.waitForTransactionReceipt({
+              hash: deployStrategyHash,
+            })
+            if (deployStrategyReceipt.status === 'reverted') {
+              throw new Error(
+                `TestnetStrategy deployment reverted. Hash: ${deployStrategyHash}. Check the transaction for details.`
+              )
+            }
+
+            autoDeployedStrategyAddress = extractModuleAddressesFromLogs(
+              deployStrategyReceipt.logs,
+              { needsStrategy: true }
+            ).strategyAddress
+
+            if (!autoDeployedStrategyAddress) {
+              throw new Error(
+                `TestnetStrategy deployment succeeded but strategy address was not found in logs. Hash: ${deployStrategyHash}`
+              )
+            }
           }
         }
-      }
-      const strategyAddresses = userProvidedStrategyAddress
-        ? [userProvidedStrategyAddress]
-        : autoDeployedStrategyAddress
-          ? [autoDeployedStrategyAddress]
-          : undefined
+        const strategyAddresses = userProvidedStrategyAddress
+          ? [userProvidedStrategyAddress]
+          : autoDeployedStrategyAddress
+            ? [autoDeployedStrategyAddress]
+            : undefined
 
-      // Step 3: Configure the market
-      const configureResult = await launch.configure({
-        floorAddress,
-        authorizerAddress,
-        issuanceTokenAddress,
-        transactionForwarderAddress,
-        creditFacilityAddress,
-        presaleAddress,
-        stakingManagerAddress,
-        grantMinterRole: configOptions?.grantMinterRole ?? true,
-        openBuy: configOptions?.openBuy ?? true,
-        openSell: configOptions?.openSell ?? false,
-        openBorrow: configOptions?.openBorrow ?? false,
-        openStaking: params.formData.staking?.enabled ?? false,
-        strategyAddresses,
-      })
+        // Step 3: Configure the market
+        const configureResult = await launch.configure({
+          floorAddress,
+          authorizerAddress,
+          issuanceTokenAddress,
+          transactionForwarderAddress,
+          creditFacilityAddress,
+          presaleAddress,
+          stakingManagerAddress,
+          grantMinterRole: configOptions?.grantMinterRole ?? true,
+          openBuy: configOptions?.openBuy ?? true,
+          openSell: configOptions?.openSell ?? false,
+          openBorrow: configOptions?.openBorrow ?? false,
+          openStaking: params.formData.staking?.enabled ?? false,
+          strategyAddresses,
+        })
 
-      // Auto-register strategy when create flow deployed it implicitly.
-      if (autoDeployedStrategyAddress && stakingManagerAddress) {
-        const isApproved = (await publicClient.readContract({
-          address: stakingManagerAddress,
-          abi: StakingManager_v1,
-          functionName: 'isStrategyApproved',
-          args: [autoDeployedStrategyAddress],
-        })) as boolean
-
-        if (!isApproved) {
-          const addStrategyHash = await walletClient.writeContract({
+        // Auto-register strategy when create flow deployed it implicitly.
+        if (autoDeployedStrategyAddress && stakingManagerAddress) {
+          const isApproved = (await publicClient.readContract({
             address: stakingManagerAddress,
             abi: StakingManager_v1,
-            functionName: 'addStrategy',
+            functionName: 'isStrategyApproved',
             args: [autoDeployedStrategyAddress],
-            account: creatorAddress,
-          })
-          const addStrategyReceipt = await publicClient.waitForTransactionReceipt({
-            hash: addStrategyHash,
-          })
-          if (addStrategyReceipt.status === 'reverted') {
-            throw new Error(
-              `Staking strategy registration reverted. Hash: ${addStrategyHash}. Check the transaction for details.`
-            )
+          })) as boolean
+
+          if (!isApproved) {
+            const addStrategyHash = await walletClient.writeContract({
+              address: stakingManagerAddress,
+              abi: StakingManager_v1,
+              functionName: 'addStrategy',
+              args: [autoDeployedStrategyAddress],
+              account: creatorAddress,
+            })
+            const addStrategyReceipt = await publicClient.waitForTransactionReceipt({
+              hash: addStrategyHash,
+            })
+            if (addStrategyReceipt.status === 'reverted') {
+              throw new Error(
+                `Staking strategy registration reverted. Hash: ${addStrategyHash}. Check the transaction for details.`
+              )
+            }
           }
         }
-      }
 
-      return { launch: launchResult, configure: configureResult }
+        return { launch: launchResult, configure: configureResult }
+      } catch (configError) {
+        // Create succeeded but configure failed — return create result with error
+        return {
+          launch: launchResult,
+          configure: null,
+          configureError:
+            configError instanceof Error
+              ? configError.message
+              : 'Configuration failed. Complete setup from the admin panel.',
+        }
+      }
     },
     ...options?.createAndConfigureOptions,
   })
