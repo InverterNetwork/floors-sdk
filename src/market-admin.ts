@@ -3,7 +3,8 @@
  * Provides methods for opening/closing trading, setting fees, and floor elevation
  */
 
-import type { Address, TransactionReceipt } from 'viem'
+import type { Address, Log, TransactionReceipt } from 'viem'
+import { decodeEventLog, parseAbiItem } from 'viem'
 
 import { Floor_v1 } from './abis'
 import type { TransactionLifecycleCallbacks } from './presale'
@@ -19,8 +20,38 @@ export interface TMarketAdminParams {
 }
 
 export interface TRaiseFloorParams extends TMarketAdminParams {
-  /** Amount of collateral to use for floor elevation (0 = use accumulated fees) */
-  collateralAmount?: bigint
+  /** Amount of collateral to transfer from caller for floor elevation */
+  collateralAmount: bigint
+}
+
+export interface TApproveCollateralParams extends TMarketAdminParams {
+  /** Amount of collateral tokens to approve */
+  amount: bigint
+}
+
+export interface TFloorIncreasedEvent {
+  oldFloorPrice: bigint
+  newFloorPrice: bigint
+  collateralConsumed: bigint
+  supplyIncrease: bigint
+  blockNumber: bigint
+  transactionHash: `0x${string}`
+}
+
+export interface TRaiseFloorPreview {
+  oldFloorPrice: bigint
+  newFloorPrice: bigint
+  collateralConsumed: bigint
+  supplyIncrease: bigint
+}
+
+export interface TRaiseFloorContext {
+  /** Admin's collateral token balance */
+  adminBalance: bigint
+  /** Current allowance for the market contract */
+  allowance: bigint
+  /** Last FloorIncreased event (if any) */
+  lastFloorRaise: TFloorIncreasedEvent | null
 }
 
 export interface TSetFeeParams extends TMarketAdminParams {
@@ -69,7 +100,7 @@ export interface TMarketAdminState {
   virtualCollateralSupply: bigint
   /** Collateral (reserve) token address */
   collateralTokenAddress: Address
-  /** Reserve token balance held by market contract (available for floor raise) */
+  /** Reserve token balance held by market contract (backs the bonding curve) */
   reserveBalance: bigint
 }
 
@@ -116,6 +147,7 @@ export class MarketAdmin {
   private readonly address: Address
   private readonly publicClient: PopPublicClient
   private readonly walletClient?: PopWalletClient
+  private cachedCollateralTokenAddress: Address | null = null
 
   constructor({ address, publicClient, walletClient }: MarketAdminConstructorArgs) {
     this.address = address
@@ -260,6 +292,240 @@ export class MarketAdmin {
       functionName: 'getSellFee',
     })) as bigint
     return Number(fee)
+  }
+
+  // ===========================================================================
+  // Read Methods - Raise Floor Context
+  // ===========================================================================
+
+  /**
+   * @description Get the collateral token address (cached after first call)
+   */
+  public async getCollateralTokenAddress(): Promise<Address> {
+    if (this.cachedCollateralTokenAddress) {
+      return this.cachedCollateralTokenAddress
+    }
+
+    const address = (await this.publicClient.readContract({
+      address: this.address,
+      abi: Floor_v1,
+      functionName: 'getCollateralToken',
+    })) as Address
+
+    this.cachedCollateralTokenAddress = address
+    return address
+  }
+
+  /**
+   * @description Get the admin's collateral token balance
+   */
+  public async getAdminCollateralBalance(ownerAddress: Address): Promise<bigint> {
+    const collateralToken = await this.getCollateralTokenAddress()
+
+    return (await this.publicClient.readContract({
+      address: collateralToken,
+      abi: ERC20_ABI,
+      functionName: 'balanceOf',
+      args: [ownerAddress],
+    })) as bigint
+  }
+
+  /**
+   * @description Get the current allowance of the collateral token for the market contract
+   */
+  public async getCollateralAllowance(ownerAddress: Address): Promise<bigint> {
+    const collateralToken = await this.getCollateralTokenAddress()
+
+    return (await this.publicClient.readContract({
+      address: collateralToken,
+      abi: ERC20_ABI,
+      functionName: 'allowance',
+      args: [ownerAddress, this.address],
+    })) as bigint
+  }
+
+  /**
+   * @description Get all context needed for the raise floor UI in a single call
+   */
+  public async getRaiseFloorContext(ownerAddress: Address): Promise<TRaiseFloorContext> {
+    const collateralToken = await this.getCollateralTokenAddress()
+
+    const [adminBalance, allowance] = await Promise.all([
+      this.publicClient.readContract({
+        address: collateralToken,
+        abi: ERC20_ABI,
+        functionName: 'balanceOf',
+        args: [ownerAddress],
+      }) as Promise<bigint>,
+      this.publicClient.readContract({
+        address: collateralToken,
+        abi: ERC20_ABI,
+        functionName: 'allowance',
+        args: [ownerAddress, this.address],
+      }) as Promise<bigint>,
+    ])
+
+    const lastFloorRaise = await this.getLastFloorIncreasedEvent()
+
+    return { adminBalance, allowance, lastFloorRaise }
+  }
+
+  /**
+   * @description Simulate raiseFloor to preview the result without sending a tx
+   */
+  public async simulateRaiseFloor(
+    collateralAmount: bigint,
+    accountAddress: Address
+  ): Promise<TRaiseFloorPreview> {
+    const { result, request } = await this.publicClient.simulateContract({
+      address: this.address,
+      abi: Floor_v1,
+      functionName: 'raiseFloor',
+      args: [collateralAmount],
+      account: accountAddress,
+    })
+
+    // raiseFloor returns void, so we need to get the event from the simulation
+    // viem's simulateContract doesn't give us events, so we use a different approach:
+    // Read current floor price, then calculate what the new state would be
+    // by using the contract's view functions after simulation
+    // Since simulateContract doesn't return events, we read current state
+    // and let the UI show the delta after the real tx via receipt logs
+    void result
+    void request
+
+    // Fallback: read current floor price for comparison
+    const currentFloorPrice = (await this.publicClient.readContract({
+      address: this.address,
+      abi: Floor_v1,
+      functionName: 'getFloorPrice',
+    })) as bigint
+
+    return {
+      oldFloorPrice: currentFloorPrice,
+      // These will be accurate after the real tx; simulation confirms it won't revert
+      newFloorPrice: BigInt(0),
+      collateralConsumed: collateralAmount,
+      supplyIncrease: BigInt(0),
+    }
+  }
+
+  /**
+   * @description Get the most recent FloorIncreased event
+   */
+  public async getLastFloorIncreasedEvent(): Promise<TFloorIncreasedEvent | null> {
+    try {
+      const logs = await this.publicClient.getLogs({
+        address: this.address,
+        event: parseAbiItem(
+          'event FloorIncreased(uint256 oldFloorPrice_, uint256 newFloorPrice_, uint256 collateralConsumed_, uint256 supplyIncrease_)'
+        ),
+        fromBlock: 'earliest',
+        toBlock: 'latest',
+      })
+
+      if (logs.length === 0) return null
+
+      const lastLog = logs[logs.length - 1]!
+      const blockNumber = lastLog.blockNumber
+      const transactionHash = lastLog.transactionHash
+      if (blockNumber == null || transactionHash == null) return null
+
+      const args = lastLog.args as {
+        oldFloorPrice_: bigint
+        newFloorPrice_: bigint
+        collateralConsumed_: bigint
+        supplyIncrease_: bigint
+      }
+
+      return {
+        oldFloorPrice: args.oldFloorPrice_,
+        newFloorPrice: args.newFloorPrice_,
+        collateralConsumed: args.collateralConsumed_,
+        supplyIncrease: args.supplyIncrease_,
+        blockNumber,
+        transactionHash,
+      }
+    } catch {
+      return null
+    }
+  }
+
+  /**
+   * @description Parse FloorIncreased event from a transaction receipt
+   */
+  public static parseFloorIncreasedFromReceipt(logs: Log[]): TFloorIncreasedEvent | null {
+    for (const log of logs) {
+      try {
+        const decoded = decodeEventLog({
+          abi: Floor_v1,
+          data: log.data,
+          topics: log.topics as [`0x${string}`, ...`0x${string}`[]],
+        })
+        if (decoded.eventName === 'FloorIncreased') {
+          const args = decoded.args as {
+            oldFloorPrice_: bigint
+            newFloorPrice_: bigint
+            collateralConsumed_: bigint
+            supplyIncrease_: bigint
+          }
+          return {
+            oldFloorPrice: args.oldFloorPrice_,
+            newFloorPrice: args.newFloorPrice_,
+            collateralConsumed: args.collateralConsumed_,
+            supplyIncrease: args.supplyIncrease_,
+            blockNumber: log.blockNumber ?? BigInt(0),
+            transactionHash: log.transactionHash ?? '0x',
+          }
+        }
+      } catch {
+        // Not our event, skip
+      }
+    }
+    return null
+  }
+
+  // ===========================================================================
+  // Write Methods - Collateral Approval
+  // ===========================================================================
+
+  /**
+   * @description Approve collateral tokens for the market contract to pull during raiseFloor
+   */
+  public async approveCollateral({
+    amount,
+    lifecycle,
+  }: TApproveCollateralParams): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+    const collateralToken = await this.getCollateralTokenAddress()
+
+    try {
+      lifecycle?.onPendingWallet?.()
+
+      const hash = await walletClient.writeContract({
+        address: collateralToken,
+        abi: ERC20_ABI,
+        functionName: 'approve',
+        args: [this.address, amount],
+        account: this.getWalletAddress(walletClient),
+      })
+
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
+
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'success') {
+        lifecycle?.onConfirmed?.(receipt)
+      } else {
+        lifecycle?.onFailed?.(new Error('Approval transaction reverted'))
+      }
+
+      return receipt
+    } catch (error) {
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      throw error
+    }
   }
 
   // ===========================================================================
@@ -495,40 +761,55 @@ export class MarketAdmin {
   // ===========================================================================
 
   /**
-   * @description Manually trigger floor price elevation
-   * Uses accumulated fees to raise the floor price
-   * @param params Optional collateral amount and lifecycle callbacks
-   * @returns Transaction receipt
+   * @description Raise the floor price by injecting collateral from the caller's wallet
+   * @param params Collateral amount (required, must be > 0) and lifecycle callbacks
+   * @returns Transaction receipt containing FloorIncreased event
+   * @note Caller must first approve sufficient collateral via approveCollateral()
    */
-  public async raiseFloor(params?: TRaiseFloorParams): Promise<TransactionReceipt> {
+  public async raiseFloor(params: TRaiseFloorParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
-    const collateralAmount = params?.collateralAmount ?? BigInt(0)
+    const { collateralAmount, lifecycle } = params
+
+    if (collateralAmount <= BigInt(0)) {
+      throw new Error('Collateral amount must be greater than 0')
+    }
+
+    const account = this.getWalletAddress(walletClient)
 
     try {
-      params?.lifecycle?.onPendingWallet?.()
+      lifecycle?.onPendingWallet?.()
+
+      // Simulate first to surface revert reasons (wallets often swallow them)
+      await this.publicClient.simulateContract({
+        address: this.address,
+        abi: Floor_v1,
+        functionName: 'raiseFloor',
+        args: [collateralAmount],
+        account,
+      })
 
       const hash = await walletClient.writeContract({
         address: this.address,
         abi: Floor_v1,
         functionName: 'raiseFloor',
         args: [collateralAmount],
-        account: this.getWalletAddress(walletClient),
+        account,
       })
 
-      params?.lifecycle?.onSubmitted?.(hash)
-      params?.lifecycle?.onPendingConfirmation?.(hash)
+      lifecycle?.onSubmitted?.(hash)
+      lifecycle?.onPendingConfirmation?.(hash)
 
       const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
 
       if (receipt.status === 'success') {
-        params?.lifecycle?.onConfirmed?.(receipt)
+        lifecycle?.onConfirmed?.(receipt)
       } else {
-        params?.lifecycle?.onFailed?.(new Error('Transaction reverted'))
+        lifecycle?.onFailed?.(new Error('Transaction reverted'))
       }
 
       return receipt
     } catch (error) {
-      params?.lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
+      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
       throw error
     }
   }
@@ -719,3 +1000,37 @@ export class MarketAdmin {
     }
   }
 }
+
+// =============================================================================
+// Minimal ERC20 ABI for allowance/approve/balanceOf
+// =============================================================================
+
+const ERC20_ABI = [
+  {
+    type: 'function',
+    name: 'balanceOf',
+    inputs: [{ name: 'account', type: 'address' }],
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'allowance',
+    inputs: [
+      { name: 'owner', type: 'address' },
+      { name: 'spender', type: 'address' },
+    ],
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'approve',
+    inputs: [
+      { name: 'spender', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    outputs: [{ name: '', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+] as const

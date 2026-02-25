@@ -3,13 +3,16 @@
 import { useMutation, type UseMutationOptions, useQuery } from '@tanstack/react-query'
 import { useCallback } from 'react'
 import type { Address, TransactionReceipt } from 'viem'
-import { usePublicClient, useWalletClient } from 'wagmi'
+import { useAccount, usePublicClient, useWalletClient } from 'wagmi'
 
 import {
   MarketAdmin,
+  type TApproveCollateralParams,
   type TDepositCollateralParams,
+  type TFloorIncreasedEvent,
   type TMarketAdminParams,
   type TMarketAdminState,
+  type TRaiseFloorContext,
   type TRaiseFloorParams,
   type TReconfigureSegmentsParams,
   type TSetFeeParams,
@@ -21,7 +24,14 @@ import {
 // Types
 // =============================================================================
 
-export type { TMarketAdminParams, TMarketAdminState, TSetFeeParams }
+export { MarketAdmin }
+export type {
+  TFloorIncreasedEvent,
+  TMarketAdminParams,
+  TMarketAdminState,
+  TRaiseFloorContext,
+  TSetFeeParams,
+}
 
 export type UseMarketAdminOptions = {
   /** Market/Floor contract address */
@@ -58,9 +68,14 @@ export type UseMarketAdminOptions = {
     UseMutationOptions<TransactionReceipt, Error, TSetFeeParams>,
     'mutationFn'
   >
+  /** Mutation options for approveCollateral */
+  approveCollateralOptions?: Omit<
+    UseMutationOptions<TransactionReceipt, Error, TApproveCollateralParams>,
+    'mutationFn'
+  >
   /** Mutation options for raiseFloor */
   raiseFloorOptions?: Omit<
-    UseMutationOptions<TransactionReceipt, Error, TRaiseFloorParams | undefined>,
+    UseMutationOptions<TransactionReceipt, Error, TRaiseFloorParams>,
     'mutationFn'
   >
   /** Mutation options for reconfigureSegments */
@@ -121,6 +136,7 @@ export function useMarketAdmin(options: UseMarketAdminOptions) {
   const { marketAddress, autoFetch = true } = options
   const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()
+  const { address: walletAddress } = useAccount()
 
   /**
    * @description Get a configured MarketAdmin instance
@@ -169,6 +185,38 @@ export function useMarketAdmin(options: UseMarketAdminOptions) {
     },
     enabled: autoFetch && !!publicClient && !!marketAddress,
     staleTime: 30_000, // 30 seconds
+  })
+
+  // ===========================================================================
+  // Query - Raise Floor Context (balance, allowance, last event)
+  // ===========================================================================
+
+  const raiseFloorContextQuery = useQuery({
+    queryKey: ['marketAdmin', 'raiseFloorContext', marketAddress, walletAddress],
+    queryFn: async (): Promise<TRaiseFloorContext> => {
+      const instance = getReadOnlyInstance()
+      if (!instance || !walletAddress) {
+        throw new Error('Public client or wallet not available')
+      }
+      return instance.getRaiseFloorContext(walletAddress)
+    },
+    enabled: autoFetch && !!publicClient && !!marketAddress && !!walletAddress,
+    staleTime: 30_000,
+  })
+
+  // ===========================================================================
+  // Mutations - Collateral Approval
+  // ===========================================================================
+
+  const approveCollateralMutation = useMutation({
+    mutationFn: async (params: TApproveCollateralParams): Promise<TransactionReceipt> => {
+      const admin = getMarketAdminInstance()
+      return admin.approveCollateral(params)
+    },
+    onSuccess: async () => {
+      await raiseFloorContextQuery.refetch()
+    },
+    ...options.approveCollateralOptions,
   })
 
   // ===========================================================================
@@ -232,9 +280,12 @@ export function useMarketAdmin(options: UseMarketAdminOptions) {
   // ===========================================================================
 
   const raiseFloorMutation = useMutation({
-    mutationFn: async (params?: TRaiseFloorParams): Promise<TransactionReceipt> => {
+    mutationFn: async (params: TRaiseFloorParams): Promise<TransactionReceipt> => {
       const admin = getMarketAdminInstance()
       return admin.raiseFloor(params)
+    },
+    onSuccess: async () => {
+      await Promise.all([marketStateQuery.refetch(), raiseFloorContextQuery.refetch()])
     },
     ...options.raiseFloorOptions,
   })
@@ -298,6 +349,7 @@ export function useMarketAdmin(options: UseMarketAdminOptions) {
     closeSellMutation.isPending ||
     setBuyFeeMutation.isPending ||
     setSellFeeMutation.isPending ||
+    approveCollateralMutation.isPending ||
     raiseFloorMutation.isPending ||
     reconfigureSegmentsMutation.isPending ||
     setVirtualCollateralSupplyMutation.isPending ||
@@ -322,6 +374,10 @@ export function useMarketAdmin(options: UseMarketAdminOptions) {
     setSellFee: setSellFeeMutation,
 
     // Floor elevation
+    raiseFloorContext: raiseFloorContextQuery.data ?? null,
+    isLoadingRaiseFloorContext: raiseFloorContextQuery.isLoading,
+    refetchRaiseFloorContext: raiseFloorContextQuery.refetch,
+    approveCollateral: approveCollateralMutation,
     raiseFloor: raiseFloorMutation,
 
     // Segment & collateral management
@@ -340,6 +396,7 @@ export function useMarketAdmin(options: UseMarketAdminOptions) {
     isClosingSell: closeSellMutation.isPending,
     isSettingBuyFee: setBuyFeeMutation.isPending,
     isSettingSellFee: setSellFeeMutation.isPending,
+    isApprovingCollateral: approveCollateralMutation.isPending,
     isRaisingFloor: raiseFloorMutation.isPending,
     isReconfiguringSegments: reconfigureSegmentsMutation.isPending,
     isSettingVirtualCollateralSupply: setVirtualCollateralSupplyMutation.isPending,
