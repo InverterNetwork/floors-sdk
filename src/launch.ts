@@ -49,13 +49,23 @@ import type { PopPublicClient, PopWalletClient } from './types'
 import {
   CREDIT_FACILITY_SELECTORS,
   FLOOR_SELECTORS,
+  type SingleCall,
   STAKING_SELECTORS,
   STRATEGY_BASE_SELECTORS,
-  type SingleCall,
 } from './utils/selectors'
 
 // Re-export selectors for backwards compatibility
 export { CREDIT_FACILITY_SELECTORS, FLOOR_SELECTORS }
+
+const IS_TRUSTED_FORWARDER_ABI = [
+  {
+    type: 'function',
+    name: 'isTrustedForwarder',
+    stateMutability: 'view',
+    inputs: [{ name: 'forwarder', type: 'address' }],
+    outputs: [{ name: '', type: 'bool' }],
+  },
+] as const
 
 // =============================================================================
 // Types
@@ -585,7 +595,11 @@ export class Launch {
             callData: encodeFunctionData({
               abi: AUT_Roles_v2,
               functionName: 'addAccessPermission',
-              args: [params.stakingManagerAddress, STAKING_SELECTORS.addStrategy, adminRole as `0x${string}`],
+              args: [
+                params.stakingManagerAddress,
+                STAKING_SELECTORS.addStrategy,
+                adminRole as `0x${string}`,
+              ],
             }),
           },
           {
@@ -645,7 +659,11 @@ export class Launch {
           callData: encodeFunctionData({
             abi: AUT_Roles_v2,
             functionName: 'addAccessPermission',
-            args: [params.floorAddress, FLOOR_SELECTORS.depositCollateralFrom, stakingManagerRoleId],
+            args: [
+              params.floorAddress,
+              FLOOR_SELECTORS.depositCollateralFrom,
+              stakingManagerRoleId,
+            ],
           }),
         }
       )
@@ -677,7 +695,11 @@ export class Launch {
               callData: encodeFunctionData({
                 abi: AUT_Roles_v2,
                 functionName: 'addAccessPermission',
-                args: [strategyAddress, STRATEGY_BASE_SELECTORS.deposit, stakingManagerStrategyRoleId],
+                args: [
+                  strategyAddress,
+                  STRATEGY_BASE_SELECTORS.deposit,
+                  stakingManagerStrategyRoleId,
+                ],
               }),
             },
             {
@@ -686,7 +708,11 @@ export class Launch {
               callData: encodeFunctionData({
                 abi: AUT_Roles_v2,
                 functionName: 'addAccessPermission',
-                args: [strategyAddress, STRATEGY_BASE_SELECTORS.withdraw, stakingManagerStrategyRoleId],
+                args: [
+                  strategyAddress,
+                  STRATEGY_BASE_SELECTORS.withdraw,
+                  stakingManagerStrategyRoleId,
+                ],
               }),
             }
           )
@@ -694,29 +720,42 @@ export class Launch {
       }
     }
 
-    // Execute multicall via TransactionForwarder
-    const hash = await walletClient.writeContract({
-      address: params.transactionForwarderAddress,
-      abi: TransactionForwarder_v1,
-      functionName: 'executeMulticall',
-      args: [calls],
-      account: this.getWalletAddress(walletClient),
-    })
+    const canUseForwarder = await this.canUseForwarderForCalls(
+      params.transactionForwarderAddress,
+      calls
+    )
 
-    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+    if (canUseForwarder) {
+      const hash = await walletClient.writeContract({
+        address: params.transactionForwarderAddress,
+        abi: TransactionForwarder_v1,
+        functionName: 'executeMulticall',
+        args: [calls],
+        account: this.getWalletAddress(walletClient),
+      })
 
-    // Check if transaction succeeded
-    if (receipt.status === 'reverted') {
-      throw new Error(
-        `configure transaction reverted. Hash: ${hash}. Check the transaction for details.`
-      )
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'reverted') {
+        throw new Error(
+          `configure transaction reverted. Hash: ${hash}. Check the transaction for details.`
+        )
+      }
+
+      return {
+        transactionHash: hash,
+        receipt,
+        success: receipt.status === 'success',
+        callResults: [],
+      }
     }
 
+    const directResult = await this.executeCallsDirectly(calls, walletClient, 'configure')
     return {
-      transactionHash: hash,
-      receipt,
-      success: receipt.status === 'success',
-      callResults: [], // Would need to decode logs to get individual results
+      transactionHash: directResult.lastHash,
+      receipt: directResult.lastReceipt,
+      success: directResult.success,
+      callResults: directResult.callResults,
     }
   }
 
@@ -745,27 +784,42 @@ export class Launch {
       }),
     }))
 
-    const hash = await walletClient.writeContract({
-      address: params.transactionForwarderAddress,
-      abi: TransactionForwarder_v1,
-      functionName: 'executeMulticall',
-      args: [calls],
-      account: this.getWalletAddress(walletClient),
-    })
+    const canUseForwarder = await this.canUseForwarderForCalls(
+      params.transactionForwarderAddress,
+      calls
+    )
 
-    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+    if (canUseForwarder) {
+      const hash = await walletClient.writeContract({
+        address: params.transactionForwarderAddress,
+        abi: TransactionForwarder_v1,
+        functionName: 'executeMulticall',
+        args: [calls],
+        account: this.getWalletAddress(walletClient),
+      })
 
-    if (receipt.status === 'reverted') {
-      throw new Error(
-        `addRolePermissions transaction reverted. Hash: ${hash}. Check the transaction for details.`
-      )
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      if (receipt.status === 'reverted') {
+        throw new Error(
+          `addRolePermissions transaction reverted. Hash: ${hash}. Check the transaction for details.`
+        )
+      }
+
+      return {
+        transactionHash: hash,
+        receipt,
+        success: receipt.status === 'success',
+        callResults: [],
+      }
     }
 
+    const directResult = await this.executeCallsDirectly(calls, walletClient, 'addRolePermissions')
     return {
-      transactionHash: hash,
-      receipt,
-      success: receipt.status === 'success',
-      callResults: [],
+      transactionHash: directResult.lastHash,
+      receipt: directResult.lastReceipt,
+      success: directResult.success,
+      callResults: directResult.callResults,
     }
   }
 
@@ -1042,6 +1096,84 @@ export class Launch {
       throw new Error('Wallet not connected. Please connect your wallet to continue.')
     }
     return account.address as Address
+  }
+
+  private async canUseForwarderForCalls(
+    forwarderAddress: Address,
+    calls: SingleCall[]
+  ): Promise<boolean> {
+    const uniqueTargets = [...new Set(calls.map((call) => call.target.toLowerCase()))] as string[]
+
+    for (const targetLower of uniqueTargets) {
+      try {
+        const trusted = (await this.publicClient.readContract({
+          address: targetLower as Address,
+          abi: IS_TRUSTED_FORWARDER_ABI,
+          functionName: 'isTrustedForwarder',
+          args: [forwarderAddress],
+        })) as boolean
+
+        if (!trusted) {
+          return false
+        }
+      } catch {
+        // If target cannot be checked, do not use the forwarder path.
+        return false
+      }
+    }
+
+    return true
+  }
+
+  private async executeCallsDirectly(
+    calls: SingleCall[],
+    walletClient: PopWalletClient,
+    operation: 'configure' | 'addRolePermissions'
+  ): Promise<{
+    lastHash: `0x${string}`
+    lastReceipt: TransactionReceipt
+    success: boolean
+    callResults: Array<{ success: boolean; returnData: `0x${string}` }>
+  }> {
+    const account = this.getWalletAddress(walletClient)
+    const callResults: Array<{ success: boolean; returnData: `0x${string}` }> = []
+    let lastHash: `0x${string}` | null = null
+    let lastReceipt: TransactionReceipt | null = null
+
+    for (let i = 0; i < calls.length; i++) {
+      const call = calls[i]
+      const hash = await walletClient.sendTransaction({
+        to: call.target,
+        data: call.callData,
+        account,
+      })
+      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
+
+      lastHash = hash
+      lastReceipt = receipt
+
+      if (receipt.status === 'reverted' && !call.allowFailure) {
+        throw new Error(
+          `${operation} direct call reverted at index ${i} (target: ${call.target}). Hash: ${hash}.`
+        )
+      }
+
+      callResults.push({
+        success: receipt.status === 'success',
+        returnData: '0x',
+      })
+    }
+
+    if (!lastHash || !lastReceipt) {
+      throw new Error(`${operation} had no calls to execute.`)
+    }
+
+    return {
+      lastHash,
+      lastReceipt,
+      success: callResults.every((result) => result.success),
+      callResults,
+    }
   }
 }
 
