@@ -45,7 +45,7 @@ export interface TPresaleAdminSetMerkleRootParams extends TPresaleAdminParams {
 
 export interface TPresaleAdminSetCommissionParams extends TPresaleAdminParams {
   /** Array of commission rates in basis points per leverage level */
-  baseCommissionBps: bigint[]
+  baseCommissionBps: number[]
   /** 2D array of price breakpoints per leverage level */
   priceBreakpoints: bigint[][]
 }
@@ -464,6 +464,17 @@ export class PresaleAdmin {
   }: TPresaleAdminSetCommissionParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
 
+    // Validate commission values are within uint16 range (0-65535)
+    // and also within valid basis points range (0-10000)
+    for (const bps of baseCommissionBps) {
+      if (bps < 0 || bps > 10_000) {
+        throw new Error(`Commission must be between 0 and 10000 bps (got ${bps})`)
+      }
+      if (!Number.isInteger(bps)) {
+        throw new Error(`Commission must be a whole number (got ${bps})`)
+      }
+    }
+
     try {
       lifecycle?.onPendingWallet?.()
 
@@ -471,7 +482,7 @@ export class PresaleAdmin {
         address: this.address,
         abi: Presale_v1,
         functionName: 'setBaseCommissionBpsAndPriceBreakpoints',
-        args: [baseCommissionBps.map((b) => Number(b)), priceBreakpoints],
+        args: [baseCommissionBps, priceBreakpoints],
         account: this.getWalletAddress(walletClient),
       })
 
