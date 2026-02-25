@@ -1810,6 +1810,9 @@ export default {
             "moduleFactoryAddress": [
                 321
             ],
+            "registeredStrategies": [
+                321
+            ],
             "trustedForwarderAddress": [
                 321
             ],
@@ -1845,6 +1848,9 @@ export default {
             "moduleFactoryAddress": [
                 323
             ],
+            "registeredStrategies": [
+                322
+            ],
             "trustedForwarderAddress": [
                 323
             ],
@@ -1869,6 +1875,9 @@ export default {
                 394
             ],
             "moduleFactoryAddress": [
+                394
+            ],
+            "registeredStrategies": [
                 394
             ],
             "trustedForwarderAddress": [
@@ -1907,6 +1916,9 @@ export default {
                 392
             ],
             "moduleFactoryAddress": [
+                321
+            ],
+            "registeredStrategies": [
                 321
             ],
             "trustedForwarderAddress": [
@@ -8234,6 +8246,9 @@ export default {
             "position_id": [
                 321
             ],
+            "receiver": [
+                321
+            ],
             "stakingManager_id": [
                 321
             ],
@@ -8351,6 +8366,9 @@ export default {
             "position_id": [
                 323
             ],
+            "receiver": [
+                323
+            ],
             "stakingManager_id": [
                 323
             ],
@@ -8399,6 +8417,9 @@ export default {
                 394
             ],
             "position_id": [
+                394
+            ],
+            "receiver": [
                 394
             ],
             "stakingManager_id": [
@@ -8451,6 +8472,9 @@ export default {
             "position_id": [
                 394
             ],
+            "receiver": [
+                394
+            ],
             "stakingManager_id": [
                 394
             ],
@@ -8499,6 +8523,9 @@ export default {
                 394
             ],
             "position_id": [
+                394
+            ],
+            "receiver": [
                 394
             ],
             "stakingManager_id": [
@@ -8621,6 +8648,9 @@ export default {
                 392
             ],
             "position_id": [
+                321
+            ],
+            "receiver": [
                 321
             ],
             "stakingManager_id": [
@@ -8988,6 +9018,9 @@ export default {
             "isActive": [
                 12
             ],
+            "name": [
+                321
+            ],
             "positions": [
                 264,
                 {
@@ -9014,6 +9047,9 @@ export default {
                 392
             ],
             "stakingManager_id": [
+                321
+            ],
+            "symbol": [
                 321
             ],
             "transactionHash": [
@@ -9091,6 +9127,9 @@ export default {
             "isActive": [
                 13
             ],
+            "name": [
+                323
+            ],
             "positions": [
                 267
             ],
@@ -9098,6 +9137,9 @@ export default {
                 393
             ],
             "stakingManager_id": [
+                323
+            ],
+            "symbol": [
                 323
             ],
             "transactionHash": [
@@ -9114,10 +9156,16 @@ export default {
             "id": [
                 394
             ],
+            "name": [
+                394
+            ],
             "removedAt": [
                 394
             ],
             "stakingManager_id": [
+                394
+            ],
+            "symbol": [
                 394
             ],
             "transactionHash": [
@@ -9134,10 +9182,16 @@ export default {
             "id": [
                 394
             ],
+            "name": [
+                394
+            ],
             "removedAt": [
                 394
             ],
             "stakingManager_id": [
+                394
+            ],
+            "symbol": [
                 394
             ],
             "transactionHash": [
@@ -9157,6 +9211,9 @@ export default {
             "isActive": [
                 394
             ],
+            "name": [
+                394
+            ],
             "positions_aggregate": [
                 265
             ],
@@ -9164,6 +9221,9 @@ export default {
                 394
             ],
             "stakingManager_id": [
+                394
+            ],
+            "symbol": [
                 394
             ],
             "transactionHash": [
@@ -9228,10 +9288,16 @@ export default {
             "isActive": [
                 12
             ],
+            "name": [
+                321
+            ],
             "removedAt": [
                 392
             ],
             "stakingManager_id": [
+                321
+            ],
+            "symbol": [
                 321
             ],
             "transactionHash": [

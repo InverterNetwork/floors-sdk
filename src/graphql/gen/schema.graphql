@@ -1139,6 +1139,7 @@ type GlobalRegistry {
   id: String!
   lastUpdatedAt: numeric!
   moduleFactoryAddress: String!
+  registeredStrategies: [String!]!
   trustedForwarderAddress: String!
 }
 
@@ -1155,6 +1156,7 @@ input GlobalRegistry_bool_exp {
   id: String_comparison_exp
   lastUpdatedAt: numeric_comparison_exp
   moduleFactoryAddress: String_comparison_exp
+  registeredStrategies: String_array_comparison_exp
   trustedForwarderAddress: String_comparison_exp
 }
 
@@ -1166,6 +1168,7 @@ input GlobalRegistry_order_by {
   id: order_by
   lastUpdatedAt: order_by
   moduleFactoryAddress: order_by
+  registeredStrategies: order_by
   trustedForwarderAddress: order_by
 }
 
@@ -1192,6 +1195,9 @@ enum GlobalRegistry_select_column {
   moduleFactoryAddress
 
   """column name"""
+  registeredStrategies
+
+  """column name"""
   trustedForwarderAddress
 }
 
@@ -1214,6 +1220,7 @@ input GlobalRegistry_stream_cursor_value_input {
   id: String
   lastUpdatedAt: numeric
   moduleFactoryAddress: String
+  registeredStrategies: [String!]
   trustedForwarderAddress: String
 }
 
@@ -4953,6 +4960,7 @@ type StakingActivity {
   issuanceTokenAmountFormatted: String
   issuanceTokenAmountRaw: numeric
   position_id: String!
+  receiver: String
   stakingManager_id: String!
   timestamp: numeric!
   transactionHash: String!
@@ -5005,6 +5013,7 @@ input StakingActivity_bool_exp {
   issuanceTokenAmountFormatted: String_comparison_exp
   issuanceTokenAmountRaw: numeric_comparison_exp
   position_id: String_comparison_exp
+  receiver: String_comparison_exp
   stakingManager_id: String_comparison_exp
   timestamp: numeric_comparison_exp
   transactionHash: String_comparison_exp
@@ -5026,6 +5035,7 @@ input StakingActivity_max_order_by {
   issuanceTokenAmountFormatted: order_by
   issuanceTokenAmountRaw: order_by
   position_id: order_by
+  receiver: order_by
   stakingManager_id: order_by
   timestamp: order_by
   transactionHash: order_by
@@ -5047,6 +5057,7 @@ input StakingActivity_min_order_by {
   issuanceTokenAmountFormatted: order_by
   issuanceTokenAmountRaw: order_by
   position_id: order_by
+  receiver: order_by
   stakingManager_id: order_by
   timestamp: order_by
   transactionHash: order_by
@@ -5066,6 +5077,7 @@ input StakingActivity_order_by {
   issuanceTokenAmountFormatted: order_by
   issuanceTokenAmountRaw: order_by
   position_id: order_by
+  receiver: order_by
   stakingManager_id: order_by
   timestamp: order_by
   transactionHash: order_by
@@ -5104,6 +5116,9 @@ enum StakingActivity_select_column {
 
   """column name"""
   position_id
+
+  """column name"""
+  receiver
 
   """column name"""
   stakingManager_id
@@ -5179,6 +5194,7 @@ input StakingActivity_stream_cursor_value_input {
   issuanceTokenAmountFormatted: String
   issuanceTokenAmountRaw: numeric
   position_id: String
+  receiver: String
   stakingManager_id: String
   timestamp: numeric
   transactionHash: String
@@ -5408,6 +5424,7 @@ type Strategy {
   addedAt: numeric!
   id: String!
   isActive: Boolean!
+  name: String
 
   """An array relationship"""
   positions(
@@ -5428,6 +5445,7 @@ type Strategy {
   ): [StakePosition!]!
   removedAt: numeric
   stakingManager_id: String!
+  symbol: String
   transactionHash: String!
 }
 
@@ -5466,9 +5484,11 @@ input Strategy_bool_exp {
   addedAt: numeric_comparison_exp
   id: String_comparison_exp
   isActive: Boolean_comparison_exp
+  name: String_comparison_exp
   positions: StakePosition_bool_exp
   removedAt: numeric_comparison_exp
   stakingManager_id: String_comparison_exp
+  symbol: String_comparison_exp
   transactionHash: String_comparison_exp
 }
 
@@ -5478,8 +5498,10 @@ order by max() on columns of table "Strategy"
 input Strategy_max_order_by {
   addedAt: order_by
   id: order_by
+  name: order_by
   removedAt: order_by
   stakingManager_id: order_by
+  symbol: order_by
   transactionHash: order_by
 }
 
@@ -5489,8 +5511,10 @@ order by min() on columns of table "Strategy"
 input Strategy_min_order_by {
   addedAt: order_by
   id: order_by
+  name: order_by
   removedAt: order_by
   stakingManager_id: order_by
+  symbol: order_by
   transactionHash: order_by
 }
 
@@ -5499,9 +5523,11 @@ input Strategy_order_by {
   addedAt: order_by
   id: order_by
   isActive: order_by
+  name: order_by
   positions_aggregate: StakePosition_aggregate_order_by
   removedAt: order_by
   stakingManager_id: order_by
+  symbol: order_by
   transactionHash: order_by
 }
 
@@ -5519,10 +5545,16 @@ enum Strategy_select_column {
   isActive
 
   """column name"""
+  name
+
+  """column name"""
   removedAt
 
   """column name"""
   stakingManager_id
+
+  """column name"""
+  symbol
 
   """column name"""
   transactionHash
@@ -5568,8 +5600,10 @@ input Strategy_stream_cursor_value_input {
   addedAt: numeric
   id: String
   isActive: Boolean
+  name: String
   removedAt: numeric
   stakingManager_id: String
+  symbol: String
   transactionHash: String
 }
 

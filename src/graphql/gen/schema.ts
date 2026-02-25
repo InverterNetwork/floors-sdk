@@ -156,13 +156,14 @@ export interface GlobalRegistry {
     id: Scalars['String']
     lastUpdatedAt: Scalars['numeric']
     moduleFactoryAddress: Scalars['String']
+    registeredStrategies: Scalars['String'][]
     trustedForwarderAddress: Scalars['String']
     __typename: 'GlobalRegistry'
 }
 
 
 /** select columns of table "GlobalRegistry" */
-export type GlobalRegistry_select_column = 'createdAt' | 'floorFactoryAddress' | 'governorAddress' | 'id' | 'lastUpdatedAt' | 'moduleFactoryAddress' | 'trustedForwarderAddress'
+export type GlobalRegistry_select_column = 'createdAt' | 'floorFactoryAddress' | 'governorAddress' | 'id' | 'lastUpdatedAt' | 'moduleFactoryAddress' | 'registeredStrategies' | 'trustedForwarderAddress'
 
 
 /** columns and relationships of "GlobalStats" */
@@ -591,6 +592,7 @@ export interface StakingActivity {
     issuanceTokenAmountFormatted: (Scalars['String'] | null)
     issuanceTokenAmountRaw: (Scalars['numeric'] | null)
     position_id: Scalars['String']
+    receiver: (Scalars['String'] | null)
     stakingManager_id: Scalars['String']
     timestamp: Scalars['numeric']
     transactionHash: Scalars['String']
@@ -602,7 +604,7 @@ export interface StakingActivity {
 
 
 /** select columns of table "StakingActivity" */
-export type StakingActivity_select_column = 'activityType' | 'collateralAmountFormatted' | 'collateralAmountRaw' | 'feeAmountFormatted' | 'feeAmountRaw' | 'id' | 'issuanceTokenAmountFormatted' | 'issuanceTokenAmountRaw' | 'position_id' | 'stakingManager_id' | 'timestamp' | 'transactionHash' | 'user_id' | 'yieldAmountFormatted' | 'yieldAmountRaw'
+export type StakingActivity_select_column = 'activityType' | 'collateralAmountFormatted' | 'collateralAmountRaw' | 'feeAmountFormatted' | 'feeAmountRaw' | 'id' | 'issuanceTokenAmountFormatted' | 'issuanceTokenAmountRaw' | 'position_id' | 'receiver' | 'stakingManager_id' | 'timestamp' | 'transactionHash' | 'user_id' | 'yieldAmountFormatted' | 'yieldAmountRaw'
 
 
 /** columns and relationships of "StakingManager" */
@@ -637,17 +639,19 @@ export interface Strategy {
     addedAt: Scalars['numeric']
     id: Scalars['String']
     isActive: Scalars['Boolean']
+    name: (Scalars['String'] | null)
     /** An array relationship */
     positions: StakePosition[]
     removedAt: (Scalars['numeric'] | null)
     stakingManager_id: Scalars['String']
+    symbol: (Scalars['String'] | null)
     transactionHash: Scalars['String']
     __typename: 'Strategy'
 }
 
 
 /** select columns of table "Strategy" */
-export type Strategy_select_column = 'addedAt' | 'id' | 'isActive' | 'removedAt' | 'stakingManager_id' | 'transactionHash'
+export type Strategy_select_column = 'addedAt' | 'id' | 'isActive' | 'name' | 'removedAt' | 'stakingManager_id' | 'symbol' | 'transactionHash'
 
 
 /** columns and relationships of "Token" */
@@ -1608,6 +1612,7 @@ export interface GlobalRegistryGenqlSelection{
     id?: boolean | number
     lastUpdatedAt?: boolean | number
     moduleFactoryAddress?: boolean | number
+    registeredStrategies?: boolean | number
     trustedForwarderAddress?: boolean | number
     __typename?: boolean | number
     __scalar?: boolean | number
@@ -1615,11 +1620,11 @@ export interface GlobalRegistryGenqlSelection{
 
 
 /** Boolean expression to filter rows from the table "GlobalRegistry". All fields are combined with a logical 'AND'. */
-export interface GlobalRegistry_bool_exp {_and?: (GlobalRegistry_bool_exp[] | null),_not?: (GlobalRegistry_bool_exp | null),_or?: (GlobalRegistry_bool_exp[] | null),createdAt?: (numeric_comparison_exp | null),floorFactoryAddress?: (String_comparison_exp | null),governorAddress?: (String_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),moduleFactoryAddress?: (String_comparison_exp | null),trustedForwarderAddress?: (String_comparison_exp | null)}
+export interface GlobalRegistry_bool_exp {_and?: (GlobalRegistry_bool_exp[] | null),_not?: (GlobalRegistry_bool_exp | null),_or?: (GlobalRegistry_bool_exp[] | null),createdAt?: (numeric_comparison_exp | null),floorFactoryAddress?: (String_comparison_exp | null),governorAddress?: (String_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),moduleFactoryAddress?: (String_comparison_exp | null),registeredStrategies?: (String_array_comparison_exp | null),trustedForwarderAddress?: (String_comparison_exp | null)}
 
 
 /** Ordering options when selecting data from "GlobalRegistry". */
-export interface GlobalRegistry_order_by {createdAt?: (order_by | null),floorFactoryAddress?: (order_by | null),governorAddress?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),moduleFactoryAddress?: (order_by | null),trustedForwarderAddress?: (order_by | null)}
+export interface GlobalRegistry_order_by {createdAt?: (order_by | null),floorFactoryAddress?: (order_by | null),governorAddress?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),moduleFactoryAddress?: (order_by | null),registeredStrategies?: (order_by | null),trustedForwarderAddress?: (order_by | null)}
 
 
 /** Streaming cursor of the table "GlobalRegistry" */
@@ -1631,7 +1636,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface GlobalRegistry_stream_cursor_value_input {createdAt?: (Scalars['numeric'] | null),floorFactoryAddress?: (Scalars['String'] | null),governorAddress?: (Scalars['String'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),moduleFactoryAddress?: (Scalars['String'] | null),trustedForwarderAddress?: (Scalars['String'] | null)}
+export interface GlobalRegistry_stream_cursor_value_input {createdAt?: (Scalars['numeric'] | null),floorFactoryAddress?: (Scalars['String'] | null),governorAddress?: (Scalars['String'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),moduleFactoryAddress?: (Scalars['String'] | null),registeredStrategies?: (Scalars['String'][] | null),trustedForwarderAddress?: (Scalars['String'] | null)}
 
 
 /** columns and relationships of "GlobalStats" */
@@ -2837,6 +2842,7 @@ export interface StakingActivityGenqlSelection{
     issuanceTokenAmountFormatted?: boolean | number
     issuanceTokenAmountRaw?: boolean | number
     position_id?: boolean | number
+    receiver?: boolean | number
     stakingManager_id?: boolean | number
     timestamp?: boolean | number
     transactionHash?: boolean | number
@@ -2857,19 +2863,19 @@ export interface StakingActivity_avg_order_by {collateralAmountRaw?: (order_by |
 
 
 /** Boolean expression to filter rows from the table "StakingActivity". All fields are combined with a logical 'AND'. */
-export interface StakingActivity_bool_exp {_and?: (StakingActivity_bool_exp[] | null),_not?: (StakingActivity_bool_exp | null),_or?: (StakingActivity_bool_exp[] | null),activityType?: (stakingactivitytype_comparison_exp | null),collateralAmountFormatted?: (String_comparison_exp | null),collateralAmountRaw?: (numeric_comparison_exp | null),feeAmountFormatted?: (String_comparison_exp | null),feeAmountRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),issuanceTokenAmountFormatted?: (String_comparison_exp | null),issuanceTokenAmountRaw?: (numeric_comparison_exp | null),position_id?: (String_comparison_exp | null),stakingManager_id?: (String_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),transactionHash?: (String_comparison_exp | null),user_id?: (String_comparison_exp | null),yieldAmountFormatted?: (String_comparison_exp | null),yieldAmountRaw?: (numeric_comparison_exp | null)}
+export interface StakingActivity_bool_exp {_and?: (StakingActivity_bool_exp[] | null),_not?: (StakingActivity_bool_exp | null),_or?: (StakingActivity_bool_exp[] | null),activityType?: (stakingactivitytype_comparison_exp | null),collateralAmountFormatted?: (String_comparison_exp | null),collateralAmountRaw?: (numeric_comparison_exp | null),feeAmountFormatted?: (String_comparison_exp | null),feeAmountRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),issuanceTokenAmountFormatted?: (String_comparison_exp | null),issuanceTokenAmountRaw?: (numeric_comparison_exp | null),position_id?: (String_comparison_exp | null),receiver?: (String_comparison_exp | null),stakingManager_id?: (String_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),transactionHash?: (String_comparison_exp | null),user_id?: (String_comparison_exp | null),yieldAmountFormatted?: (String_comparison_exp | null),yieldAmountRaw?: (numeric_comparison_exp | null)}
 
 
 /** order by max() on columns of table "StakingActivity" */
-export interface StakingActivity_max_order_by {activityType?: (order_by | null),collateralAmountFormatted?: (order_by | null),collateralAmountRaw?: (order_by | null),feeAmountFormatted?: (order_by | null),feeAmountRaw?: (order_by | null),id?: (order_by | null),issuanceTokenAmountFormatted?: (order_by | null),issuanceTokenAmountRaw?: (order_by | null),position_id?: (order_by | null),stakingManager_id?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null),yieldAmountFormatted?: (order_by | null),yieldAmountRaw?: (order_by | null)}
+export interface StakingActivity_max_order_by {activityType?: (order_by | null),collateralAmountFormatted?: (order_by | null),collateralAmountRaw?: (order_by | null),feeAmountFormatted?: (order_by | null),feeAmountRaw?: (order_by | null),id?: (order_by | null),issuanceTokenAmountFormatted?: (order_by | null),issuanceTokenAmountRaw?: (order_by | null),position_id?: (order_by | null),receiver?: (order_by | null),stakingManager_id?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null),yieldAmountFormatted?: (order_by | null),yieldAmountRaw?: (order_by | null)}
 
 
 /** order by min() on columns of table "StakingActivity" */
-export interface StakingActivity_min_order_by {activityType?: (order_by | null),collateralAmountFormatted?: (order_by | null),collateralAmountRaw?: (order_by | null),feeAmountFormatted?: (order_by | null),feeAmountRaw?: (order_by | null),id?: (order_by | null),issuanceTokenAmountFormatted?: (order_by | null),issuanceTokenAmountRaw?: (order_by | null),position_id?: (order_by | null),stakingManager_id?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null),yieldAmountFormatted?: (order_by | null),yieldAmountRaw?: (order_by | null)}
+export interface StakingActivity_min_order_by {activityType?: (order_by | null),collateralAmountFormatted?: (order_by | null),collateralAmountRaw?: (order_by | null),feeAmountFormatted?: (order_by | null),feeAmountRaw?: (order_by | null),id?: (order_by | null),issuanceTokenAmountFormatted?: (order_by | null),issuanceTokenAmountRaw?: (order_by | null),position_id?: (order_by | null),receiver?: (order_by | null),stakingManager_id?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null),yieldAmountFormatted?: (order_by | null),yieldAmountRaw?: (order_by | null)}
 
 
 /** Ordering options when selecting data from "StakingActivity". */
-export interface StakingActivity_order_by {activityType?: (order_by | null),collateralAmountFormatted?: (order_by | null),collateralAmountRaw?: (order_by | null),feeAmountFormatted?: (order_by | null),feeAmountRaw?: (order_by | null),id?: (order_by | null),issuanceTokenAmountFormatted?: (order_by | null),issuanceTokenAmountRaw?: (order_by | null),position_id?: (order_by | null),stakingManager_id?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null),yieldAmountFormatted?: (order_by | null),yieldAmountRaw?: (order_by | null)}
+export interface StakingActivity_order_by {activityType?: (order_by | null),collateralAmountFormatted?: (order_by | null),collateralAmountRaw?: (order_by | null),feeAmountFormatted?: (order_by | null),feeAmountRaw?: (order_by | null),id?: (order_by | null),issuanceTokenAmountFormatted?: (order_by | null),issuanceTokenAmountRaw?: (order_by | null),position_id?: (order_by | null),receiver?: (order_by | null),stakingManager_id?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),user_id?: (order_by | null),yieldAmountFormatted?: (order_by | null),yieldAmountRaw?: (order_by | null)}
 
 
 /** order by stddev() on columns of table "StakingActivity" */
@@ -2893,7 +2899,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface StakingActivity_stream_cursor_value_input {activityType?: (Scalars['stakingactivitytype'] | null),collateralAmountFormatted?: (Scalars['String'] | null),collateralAmountRaw?: (Scalars['numeric'] | null),feeAmountFormatted?: (Scalars['String'] | null),feeAmountRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),issuanceTokenAmountFormatted?: (Scalars['String'] | null),issuanceTokenAmountRaw?: (Scalars['numeric'] | null),position_id?: (Scalars['String'] | null),stakingManager_id?: (Scalars['String'] | null),timestamp?: (Scalars['numeric'] | null),transactionHash?: (Scalars['String'] | null),user_id?: (Scalars['String'] | null),yieldAmountFormatted?: (Scalars['String'] | null),yieldAmountRaw?: (Scalars['numeric'] | null)}
+export interface StakingActivity_stream_cursor_value_input {activityType?: (Scalars['stakingactivitytype'] | null),collateralAmountFormatted?: (Scalars['String'] | null),collateralAmountRaw?: (Scalars['numeric'] | null),feeAmountFormatted?: (Scalars['String'] | null),feeAmountRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),issuanceTokenAmountFormatted?: (Scalars['String'] | null),issuanceTokenAmountRaw?: (Scalars['numeric'] | null),position_id?: (Scalars['String'] | null),receiver?: (Scalars['String'] | null),stakingManager_id?: (Scalars['String'] | null),timestamp?: (Scalars['numeric'] | null),transactionHash?: (Scalars['String'] | null),user_id?: (Scalars['String'] | null),yieldAmountFormatted?: (Scalars['String'] | null),yieldAmountRaw?: (Scalars['numeric'] | null)}
 
 
 /** order by sum() on columns of table "StakingActivity" */
@@ -2981,6 +2987,7 @@ export interface StrategyGenqlSelection{
     addedAt?: boolean | number
     id?: boolean | number
     isActive?: boolean | number
+    name?: boolean | number
     /** An array relationship */
     positions?: (StakePositionGenqlSelection & { __args?: {
     /** distinct select on columns */
@@ -2995,6 +3002,7 @@ export interface StrategyGenqlSelection{
     where?: (StakePosition_bool_exp | null)} })
     removedAt?: boolean | number
     stakingManager_id?: boolean | number
+    symbol?: boolean | number
     transactionHash?: boolean | number
     __typename?: boolean | number
     __scalar?: boolean | number
@@ -3010,19 +3018,19 @@ export interface Strategy_avg_order_by {addedAt?: (order_by | null),removedAt?: 
 
 
 /** Boolean expression to filter rows from the table "Strategy". All fields are combined with a logical 'AND'. */
-export interface Strategy_bool_exp {_and?: (Strategy_bool_exp[] | null),_not?: (Strategy_bool_exp | null),_or?: (Strategy_bool_exp[] | null),addedAt?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),isActive?: (Boolean_comparison_exp | null),positions?: (StakePosition_bool_exp | null),removedAt?: (numeric_comparison_exp | null),stakingManager_id?: (String_comparison_exp | null),transactionHash?: (String_comparison_exp | null)}
+export interface Strategy_bool_exp {_and?: (Strategy_bool_exp[] | null),_not?: (Strategy_bool_exp | null),_or?: (Strategy_bool_exp[] | null),addedAt?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),isActive?: (Boolean_comparison_exp | null),name?: (String_comparison_exp | null),positions?: (StakePosition_bool_exp | null),removedAt?: (numeric_comparison_exp | null),stakingManager_id?: (String_comparison_exp | null),symbol?: (String_comparison_exp | null),transactionHash?: (String_comparison_exp | null)}
 
 
 /** order by max() on columns of table "Strategy" */
-export interface Strategy_max_order_by {addedAt?: (order_by | null),id?: (order_by | null),removedAt?: (order_by | null),stakingManager_id?: (order_by | null),transactionHash?: (order_by | null)}
+export interface Strategy_max_order_by {addedAt?: (order_by | null),id?: (order_by | null),name?: (order_by | null),removedAt?: (order_by | null),stakingManager_id?: (order_by | null),symbol?: (order_by | null),transactionHash?: (order_by | null)}
 
 
 /** order by min() on columns of table "Strategy" */
-export interface Strategy_min_order_by {addedAt?: (order_by | null),id?: (order_by | null),removedAt?: (order_by | null),stakingManager_id?: (order_by | null),transactionHash?: (order_by | null)}
+export interface Strategy_min_order_by {addedAt?: (order_by | null),id?: (order_by | null),name?: (order_by | null),removedAt?: (order_by | null),stakingManager_id?: (order_by | null),symbol?: (order_by | null),transactionHash?: (order_by | null)}
 
 
 /** Ordering options when selecting data from "Strategy". */
-export interface Strategy_order_by {addedAt?: (order_by | null),id?: (order_by | null),isActive?: (order_by | null),positions_aggregate?: (StakePosition_aggregate_order_by | null),removedAt?: (order_by | null),stakingManager_id?: (order_by | null),transactionHash?: (order_by | null)}
+export interface Strategy_order_by {addedAt?: (order_by | null),id?: (order_by | null),isActive?: (order_by | null),name?: (order_by | null),positions_aggregate?: (StakePosition_aggregate_order_by | null),removedAt?: (order_by | null),stakingManager_id?: (order_by | null),symbol?: (order_by | null),transactionHash?: (order_by | null)}
 
 
 /** order by stddev() on columns of table "Strategy" */
@@ -3046,7 +3054,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface Strategy_stream_cursor_value_input {addedAt?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),isActive?: (Scalars['Boolean'] | null),removedAt?: (Scalars['numeric'] | null),stakingManager_id?: (Scalars['String'] | null),transactionHash?: (Scalars['String'] | null)}
+export interface Strategy_stream_cursor_value_input {addedAt?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),isActive?: (Scalars['Boolean'] | null),name?: (Scalars['String'] | null),removedAt?: (Scalars['numeric'] | null),stakingManager_id?: (Scalars['String'] | null),symbol?: (Scalars['String'] | null),transactionHash?: (Scalars['String'] | null)}
 
 
 /** order by sum() on columns of table "Strategy" */
@@ -5132,6 +5140,7 @@ export const enumGlobalRegistrySelectColumn = {
    id: 'id' as const,
    lastUpdatedAt: 'lastUpdatedAt' as const,
    moduleFactoryAddress: 'moduleFactoryAddress' as const,
+   registeredStrategies: 'registeredStrategies' as const,
    trustedForwarderAddress: 'trustedForwarderAddress' as const
 }
 
@@ -5417,6 +5426,7 @@ export const enumStakingActivitySelectColumn = {
    issuanceTokenAmountFormatted: 'issuanceTokenAmountFormatted' as const,
    issuanceTokenAmountRaw: 'issuanceTokenAmountRaw' as const,
    position_id: 'position_id' as const,
+   receiver: 'receiver' as const,
    stakingManager_id: 'stakingManager_id' as const,
    timestamp: 'timestamp' as const,
    transactionHash: 'transactionHash' as const,
@@ -5445,8 +5455,10 @@ export const enumStrategySelectColumn = {
    addedAt: 'addedAt' as const,
    id: 'id' as const,
    isActive: 'isActive' as const,
+   name: 'name' as const,
    removedAt: 'removedAt' as const,
    stakingManager_id: 'stakingManager_id' as const,
+   symbol: 'symbol' as const,
    transactionHash: 'transactionHash' as const
 }
 
