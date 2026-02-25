@@ -1,4 +1,4 @@
-import { getAddress } from 'viem'
+import { type Address, getAddress } from 'viem'
 
 import { query } from '..'
 import {
@@ -483,6 +483,44 @@ export async function fetchAvailableStrategies(
   } catch (error) {
     console.error('Error fetching available strategies:', error)
     return []
+  }
+}
+
+/**
+ * Fetch GlobalRegistry addresses from the indexer
+ * @returns Object containing floorFactoryAddress, moduleFactoryAddress, trustedForwarderAddress, governorAddress
+ */
+export async function fetchGlobalRegistry(): Promise<{
+  floorFactoryAddress: Address
+  moduleFactoryAddress: Address
+  trustedForwarderAddress: Address
+  governorAddress: Address
+} | null> {
+  try {
+    const response = await query({
+      GlobalRegistry: {
+        __args: {
+          where: { id: { _eq: 'global-registry' } },
+        },
+        floorFactoryAddress: true,
+        moduleFactoryAddress: true,
+        trustedForwarderAddress: true,
+        governorAddress: true,
+      },
+    })
+
+    const registry = response.GlobalRegistry?.[0]
+    if (!registry) return null
+
+    return {
+      floorFactoryAddress: registry.floorFactoryAddress.toLowerCase() as Address,
+      moduleFactoryAddress: registry.moduleFactoryAddress.toLowerCase() as Address,
+      trustedForwarderAddress: registry.trustedForwarderAddress.toLowerCase() as Address,
+      governorAddress: registry.governorAddress.toLowerCase() as Address,
+    }
+  } catch (error) {
+    console.error('Error fetching GlobalRegistry:', error)
+    return null
   }
 }
 
