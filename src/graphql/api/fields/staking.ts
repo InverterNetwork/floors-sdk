@@ -1,4 +1,33 @@
 import type { GraphQLQueryArgs, GraphQLQueryResult } from '../..'
+import type { ExtendableQueryArgs } from '../utils'
+
+// Strategies query (for fetching available strategies)
+export const strategiesQuery = {
+  Strategy: {
+    __args: { order_by: [{ addedAt: 'desc' }] },
+    id: true,
+    stakingManager_id: true,
+    isActive: true,
+    name: true,
+    symbol: true,
+    addedAt: true,
+    removedAt: true,
+    transactionHash: true,
+    __typename: true,
+  },
+} satisfies GraphQLQueryArgs
+
+export type StrategiesQueryType = typeof strategiesQuery
+
+export const buildStrategiesQuery = (
+  args?: ExtendableQueryArgs<StrategiesQueryType['Strategy']['__args']>
+) => {
+  const selection = structuredClone(strategiesQuery) as typeof strategiesQuery
+  if (args) {
+    selection.Strategy.__args = { ...selection.Strategy.__args, ...args }
+  }
+  return selection
+}
 
 // StakingManager query
 export const stakingManagersQuery = {
@@ -76,6 +105,10 @@ export const stakingActivitiesQuery = {
 } satisfies GraphQLQueryArgs
 
 // Type exports
+export type TGraphQLStrategy = NonNullable<
+  GraphQLQueryResult<typeof strategiesQuery>['Strategy']
+>[0]
+
 export type TGraphQLStakingManager = NonNullable<
   GraphQLQueryResult<typeof stakingManagersQuery>['StakingManager']
 >[0]

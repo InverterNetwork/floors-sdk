@@ -1,8 +1,10 @@
-import { useMutation, type UseMutationResult } from '@tanstack/react-query'
+import { useMutation, type UseMutationResult, useQuery } from '@tanstack/react-query'
 import { useCallback, useMemo } from 'react'
 import type { Address } from 'viem'
 import { usePublicClient, useWalletClient } from 'wagmi'
 
+import { fetchAvailableStrategies } from '../../graphql/api/fetchers'
+import type { TGraphQLStrategy } from '../../graphql/api/fields/staking'
 import {
   Staking,
   type TStakingAddStrategyParams,
@@ -282,4 +284,23 @@ export const useStakingMutations = (
     getTotalReserve,
     approveCollateralForStrategy,
   }
+}
+
+// =============================================================================
+// Available Strategies Query Hook
+// =============================================================================
+
+/**
+ * @description Hook to fetch available staking strategies from the indexer
+ * @param activeOnly - Filter to only active strategies (default: true)
+ * @param limit - Maximum number of strategies to fetch (default: 100)
+ * @returns Query result with available strategies
+ */
+export const useAvailableStrategies = (activeOnly: boolean = true, limit: number = 100) => {
+  return useQuery<TGraphQLStrategy[]>({
+    queryKey: ['available-strategies', activeOnly, limit],
+    queryFn: () => fetchAvailableStrategies(activeOnly, limit),
+    staleTime: 60_000, // 1 minute
+    gcTime: 5 * 60_000, // 5 minutes
+  })
 }

@@ -7,6 +7,7 @@ import {
   buildAuthorizerRolesQuery,
   buildMarketActivityQuery,
   buildPresalesQuery,
+  buildStrategiesQuery,
   combineMarketActivity,
   computeGlobalMetricsWithHistory,
   computePlatformMetrics,
@@ -33,6 +34,7 @@ import {
   type TGlobalStats,
   type TGraphQLAccount,
   type TGraphQLLoan,
+  type TGraphQLStrategy,
   type TGraphQLUserMarketPosition,
   type TMarketActivityData,
   type TPlatformMetrics,
@@ -453,6 +455,34 @@ export async function fetchPremiumChange24h(
   } catch (error) {
     console.error('Error fetching premium change 24h:', error)
     return null
+  }
+}
+
+/**
+ * Fetch all available strategies from the indexer
+ * @param activeOnly - Filter to only active strategies (default: true)
+ * @param limit - Maximum number of strategies to fetch (default: 100)
+ * @returns Array of available strategies
+ */
+export async function fetchAvailableStrategies(
+  activeOnly: boolean = true,
+  limit: number = 100
+): Promise<TGraphQLStrategy[]> {
+  try {
+    const whereClause: Record<string, any> = activeOnly ? { isActive: { _eq: true } } : {}
+
+    const response = await query(
+      buildStrategiesQuery({
+        where: whereClause,
+        order_by: [{ addedAt: 'desc' }],
+        limit,
+      })
+    )
+
+    return response.Strategy ?? []
+  } catch (error) {
+    console.error('Error fetching available strategies:', error)
+    return []
   }
 }
 
