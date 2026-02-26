@@ -587,49 +587,9 @@ export class Launch {
         )
       }
 
-      if (params.enableStakingAdmin !== false) {
-        calls.push(
-          {
-            target: params.authorizerAddress,
-            allowFailure: false,
-            callData: encodeFunctionData({
-              abi: AUT_Roles_v2,
-              functionName: 'addAccessPermission',
-              args: [
-                params.stakingManagerAddress,
-                STAKING_SELECTORS.addStrategy,
-                adminRole as `0x${string}`,
-              ],
-            }),
-          },
-          {
-            target: params.authorizerAddress,
-            allowFailure: false,
-            callData: encodeFunctionData({
-              abi: AUT_Roles_v2,
-              functionName: 'addAccessPermission',
-              args: [
-                params.stakingManagerAddress,
-                STAKING_SELECTORS.removeStrategy,
-                adminRole as `0x${string}`,
-              ],
-            }),
-          },
-          {
-            target: params.authorizerAddress,
-            allowFailure: false,
-            callData: encodeFunctionData({
-              abi: AUT_Roles_v2,
-              functionName: 'addAccessPermission',
-              args: [
-                params.stakingManagerAddress,
-                STAKING_SELECTORS.setPerformanceFeeBps,
-                adminRole as `0x${string}`,
-              ],
-            }),
-          }
-        )
-      }
+      // Note: admin role (0x0) has implicit access to all functions in AUT_Roles_v2,
+      // so explicit addAccessPermission calls for addStrategy/removeStrategy/setPerformanceFeeBps
+      // are unnecessary and would revert with CannotModifyAdminRoleAccess.
 
       // Role for StakingManager to access Floor collateral functions
       stakingManagerRoleId = `0x${nextRoleIdNumber.toString(16).padStart(64, '0')}` as `0x${string}`

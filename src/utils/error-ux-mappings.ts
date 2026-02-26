@@ -1599,6 +1599,94 @@ export const ERROR_UX_MAPPINGS: Record<KnownErrorSignature, ErrorUXMapping> = {
     severity: 'error',
     recoveryActions: [ACTIONS.approveToken, ACTIONS.retry],
   },
+
+  // ==========================================================================
+  // GOVERNOR ERRORS
+  // ==========================================================================
+
+  '0x5024b181': {
+    // Governor__OnlyCommunityOrTeamMultisig
+    prettyMessage: 'Only community or team multisig can perform this action',
+    suggestion: 'This action requires a community or team multisig account.',
+    category: 'permission',
+    severity: 'error',
+    recoveryActions: [ACTIONS.contactSupport],
+  },
+
+  '0x616d5be5': {
+    // Governor__UpgradeProcessNotStarted
+    prettyMessage: 'Upgrade process has not been started',
+    suggestion: 'The upgrade process must be initiated before this action can be performed.',
+    category: 'system',
+    severity: 'error',
+    recoveryActions: [ACTIONS.contactSupport],
+  },
+
+  '0x75457600': {
+    // Governor__BeaconNotAccessible
+    prettyMessage: 'Beacon is not accessible',
+    suggestion: 'The target beacon contract is not accessible.',
+    category: 'system',
+    severity: 'error',
+    recoveryActions: [ACTIONS.contactSupport],
+    dynamicMessage: (args) => `Beacon at ${String(args.target_).slice(0, 10)}... is not accessible`,
+  },
+
+  '0x8754de10': {
+    // Governor__OnlyLinkedModuleFactory
+    prettyMessage: 'Only linked module factory can perform this action',
+    suggestion: 'This action is restricted to the linked module factory.',
+    category: 'permission',
+    severity: 'error',
+    recoveryActions: [ACTIONS.contactSupport],
+  },
+
+  '0xb3fcd825': {
+    // Governor__InvalidTimelockPeriod
+    prettyMessage: 'Invalid timelock period',
+    suggestion: 'The specified timelock period is not valid.',
+    category: 'validation',
+    severity: 'error',
+    recoveryActions: [ACTIONS.contactSupport],
+    dynamicMessage: (args) => `Invalid timelock period: ${String(args.amt_)}`,
+  },
+
+  '0xb56e8889': {
+    // Governor__InvalidAddress
+    prettyMessage: 'Invalid address provided',
+    suggestion: 'The provided address is not valid for this operation.',
+    category: 'validation',
+    severity: 'error',
+    recoveryActions: [ACTIONS.contactSupport],
+    dynamicMessage: (args) => `Invalid address: ${String(args.adr_).slice(0, 10)}...`,
+  },
+
+  '0xb62432b9': {
+    // Governor__LinkedBeaconsNotEmpty
+    prettyMessage: 'Linked beacons are not empty',
+    suggestion: 'All linked beacons must be removed before this action.',
+    category: 'system',
+    severity: 'error',
+    recoveryActions: [ACTIONS.contactSupport],
+  },
+
+  '0xc8c7ab9e': {
+    // Governor__CallToTargetContractFailed
+    prettyMessage: 'Call to target contract failed',
+    suggestion: 'The governance call to the target contract did not succeed.',
+    category: 'system',
+    severity: 'error',
+    recoveryActions: [ACTIONS.retry, ACTIONS.contactSupport],
+  },
+
+  '0xe169ce42': {
+    // Governor__TimelockPeriodNotExceeded
+    prettyMessage: 'Timelock period has not been exceeded',
+    suggestion: 'You must wait for the timelock period to pass before performing this action.',
+    category: 'system',
+    severity: 'error',
+    recoveryActions: [ACTIONS.wait],
+  },
 } as const satisfies Record<KnownErrorSignature, ErrorUXMapping>
 
 // ============================================================================
