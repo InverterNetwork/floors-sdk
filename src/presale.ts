@@ -47,6 +47,8 @@ export interface TransactionLifecycleCallbacks {
 
 export interface TPresaleBuyParams {
   depositAmount: bigint
+  /** Minimum tokens to receive — reverts with Presale__SlippageExceeded if not met. Defaults to 0 (no protection). */
+  minAmountOut?: bigint
   /** Optional lifecycle callbacks for multi-stage feedback */
   lifecycle?: TransactionLifecycleCallbacks
 }
@@ -54,6 +56,8 @@ export interface TPresaleBuyParams {
 export interface TPresaleBuyWithLeverageParams {
   depositAmount: bigint
   leverageIndex: number
+  /** Minimum tokens to receive — reverts with Presale__SlippageExceeded if not met. Defaults to 0 (no protection). */
+  minAmountOut?: bigint
   /** Optional lifecycle callbacks for multi-stage feedback */
   lifecycle?: TransactionLifecycleCallbacks
 }
@@ -884,6 +888,7 @@ export class Presale {
    */
   public async buyPresale({
     depositAmount,
+    minAmountOut = BigInt(0),
     lifecycle,
   }: TPresaleBuyParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
@@ -916,7 +921,7 @@ export class Presale {
           address: this.address,
           abi: Presale_v1,
           functionName: 'buyPresale',
-          args: [depositAmount, BigInt(0)],
+          args: [depositAmount, minAmountOut],
           account: accountAddress,
         })
       } catch (error) {
@@ -951,6 +956,7 @@ export class Presale {
   public async buyPresaleWithLeverage({
     depositAmount,
     leverageIndex,
+    minAmountOut = BigInt(0),
     lifecycle,
   }: TPresaleBuyWithLeverageParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
@@ -986,7 +992,7 @@ export class Presale {
         address: this.address,
         abi: Presale_v1,
         functionName: 'buyPresaleWithLoops',
-        args: [depositAmount, BigInt(leverageIndex), BigInt(0)],
+        args: [depositAmount, BigInt(leverageIndex), minAmountOut],
         account: accountAddress,
       })
 
