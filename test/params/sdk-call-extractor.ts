@@ -208,7 +208,8 @@ function parseArgWithType(argValue: string): ArgWithType {
 }
 
 /**
- * @description Find calls where slippage params are hardcoded to zero
+ * @description Find calls where ANY parameter is hardcoded to zero
+ * Generic detection - not based on hardcoded function names or positions
  */
 export function findHardcodedSlippageCalls(calls: SDKCall[]): Array<{
   call: SDKCall
@@ -221,34 +222,13 @@ export function findHardcodedSlippageCalls(calls: SDKCall[]): Array<{
     paramName?: string
   }> = []
 
-  // Common slippage parameter positions by function name
-  const slippageParamPositions: Record<string, number[]> = {
-    // IFloor_v1 / IBC_Discrete_Redeeming_VirtualSupply_v1
-    buy: [1], // buy(uint amount_, uint minAmountOut_)
-    buyFor: [2], // buyFor(address receiver_, uint amount_, uint minAmountOut_)
-    sell: [1], // sell(uint amount_, uint minAmountOut_)
-    sellTo: [2], // sellTo(address receiver_, uint amount_, uint minAmountOut_)
-
-    // ICreditFacility_v1
-    buyAndBorrow: [3], // buyAndBorrow(uint amount_, uint loops_, bool consolidate_, uint minAmountOut_)
-    buyAndBorrowFor: [4], // buyAndBorrowFor(address, uint, uint, bool, uint minAmountOut_)
-
-    // IPresale_v1
-    buyPresale: [1], // buyPresale(uint deposit_, uint minAmountOut_)
-    buyPresaleWithLoops: [2], // buyPresaleWithLoops(uint deposit_, uint loopCount_, uint minAmountOut_)
-  }
-
   for (const call of calls) {
-    const expectedPositions = slippageParamPositions[call.contractFunction]
-    if (!expectedPositions) {
-      continue
-    }
-
-    for (const pos of expectedPositions) {
-      if (call.argsWithTypes[pos]?.isHardcodedZero) {
+    for (let i = 0; i < call.argsWithTypes.length; i++) {
+      const arg = call.argsWithTypes[i]
+      if (arg.isHardcodedZero) {
         hardcodedCalls.push({
           call,
-          paramIndex: pos,
+          paramIndex: i,
         })
       }
     }
