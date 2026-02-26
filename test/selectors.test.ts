@@ -6,9 +6,7 @@ import { STAKING_SELECTORS, STRATEGY_BASE_SELECTORS } from '../src/utils/selecto
 describe('#selectors', () => {
   it('exposes correct staking manager selectors', () => {
     expect(STAKING_SELECTORS.stake).toBe(toFunctionSelector('stake(address,uint256)'))
-    expect(STAKING_SELECTORS.harvestYield).toBe(
-      toFunctionSelector('harvestYield(address,address)')
-    )
+    expect(STAKING_SELECTORS.harvestYield).toBe(toFunctionSelector('harvestYield(address,address)'))
     expect(STAKING_SELECTORS.withdrawFunds).toBe(
       toFunctionSelector('withdrawFunds(address,uint256,address)')
     )
@@ -21,9 +19,7 @@ describe('#selectors', () => {
   })
 
   it('exposes correct strategy base selectors', () => {
-    expect(STRATEGY_BASE_SELECTORS.deposit).toBe(
-      toFunctionSelector('deposit(uint256,address)')
-    )
+    expect(STRATEGY_BASE_SELECTORS.deposit).toBe(toFunctionSelector('deposit(uint256,address)'))
     expect(STRATEGY_BASE_SELECTORS.withdraw).toBe(
       toFunctionSelector('withdraw(uint256,address,address)')
     )
