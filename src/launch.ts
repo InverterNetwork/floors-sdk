@@ -20,6 +20,7 @@ import {
   Floor_v1,
   FloorFactory_v1,
   Presale_v1,
+  StakingManager_v1,
   TransactionForwarder_v1,
 } from './abis'
 import {
@@ -676,6 +677,21 @@ export class Launch {
               }),
             }
           )
+        }
+
+        // Add strategy registration calls if strategy addresses are provided
+        if (params.strategyAddresses && params.strategyAddresses.length > 0) {
+          for (const strategyAddress of params.strategyAddresses) {
+            calls.push({
+              target: params.stakingManagerAddress,
+              allowFailure: false,
+              callData: encodeFunctionData({
+                abi: StakingManager_v1,
+                functionName: 'addStrategy',
+                args: [strategyAddress],
+              }),
+            })
+          }
         }
       }
     }

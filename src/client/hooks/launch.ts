@@ -1,12 +1,12 @@
 'use client'
 
 import { useMutation, type UseMutationOptions } from '@tanstack/react-query'
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import type { Address } from 'viem'
 import { decodeEventLog, isAddress } from 'viem'
 import { useAccount, usePublicClient, useWalletClient } from 'wagmi'
 
-import { Floor_v1, ModuleFactory_v1, StakingManager_v1 } from '../../abis'
+import { Floor_v1, ModuleFactory_v1 } from '../../abis'
 import { TESTNET_STRATEGY_METADATA } from '../../constants/metadata'
 import {
   type ConfigureParams,
@@ -21,6 +21,35 @@ import {
   type TreasuryConfig,
 } from '../../launch'
 import { useFloors } from '../floors-context'
+
+// =============================================================================
+// Transaction Progress Types
+// =============================================================================
+
+export type TransactionProgressStatus =
+  | 'waiting'
+  | 'pending'
+  | 'confirming'
+  | 'confirmed'
+  | 'failed'
+
+export type TransactionStepId = 'create-floor' | 'deploy-strategy' | 'configure-market'
+
+export interface TransactionStep {
+  id: TransactionStepId
+  label: string
+  description?: string
+  status: TransactionProgressStatus
+  txHash?: string
+  error?: string
+}
+
+export interface TransactionProgress {
+  steps: TransactionStep[]
+  currentStepId?: TransactionStepId
+  isComplete: boolean
+  hasError: boolean
+}
 
 // =============================================================================
 // Combined Result Types
@@ -259,6 +288,8 @@ export type UseLaunchOptions = {
     UseMutationOptions<CreateAndConfigureResult, Error, CreateMarketFromFormParams>,
     'mutationFn'
   >
+  /** Callback for transaction progress updates */
+  onProgress?: (progress: TransactionProgress) => void
 }
 
 /**
@@ -418,6 +449,9 @@ export function useLaunch(options?: UseLaunchOptions) {
    * @description Create and configure a market in one flow
    * Reads module addresses from the deployed Floor contract
    */
+  // State for tracking transaction progress
+  const [transactionProgress, setTransactionProgress] = useState<TransactionProgress | null>(null)
+
   const createAndConfigureMutation = useMutation({
     mutationFn: async (params: CreateMarketFromFormParams): Promise<CreateAndConfigureResult> => {
       const creatorAddress = params.creatorAddress ?? address
@@ -432,37 +466,99 @@ export function useLaunch(options?: UseLaunchOptions) {
         throw new Error('Please connect your wallet')
       }
 
+      // Helper to report progress
+      const reportProgress = (steps: TransactionStep[], currentStepId?: TransactionStepId) => {
+        const progress: TransactionProgress = {
+          steps,
+          currentStepId,
+          isComplete: steps.every((s) => s.status === 'confirmed'),
+          hasError: steps.some((s) => s.status === 'failed'),
+        }
+        setTransactionProgress(progress)
+        options?.onProgress?.(progress)
+      }
+
+      // Initialize steps based on form data
+      const needsStaking = params.formData.staking?.enabled
+      const needsStrategy = needsStaking && !params.formData.staking.strategyAddress
+      const needsConfiguration =
+        params.formData.configuration?.grantMinterRole !== false ||
+        params.formData.configuration?.openBuy !== false ||
+        params.formData.configuration?.openSell === true ||
+        params.formData.configuration?.openBorrow === true
+
+      const steps: TransactionStep[] = [
+        {
+          id: 'create-floor',
+          label: 'Deploy Floor Contract',
+          description: 'Creating the base Floor contract with bonding curve',
+          status: 'pending' as const,
+        },
+      ]
+
+      if (needsStaking) {
+        steps.push({
+          id: 'deploy-strategy',
+          label: 'Deploy Yield Strategy',
+          description: 'Deploying TestnetStrategy vault for yield generation',
+          status: 'waiting' as const,
+        })
+      }
+
+      if (needsConfiguration) {
+        steps.push({
+          id: 'configure-market',
+          label: needsStrategy ? 'Configure Market & Register Strategy' : 'Configure Market',
+          description: needsStrategy
+            ? 'Setting up roles, permissions, and registering strategy'
+            : 'Setting up roles, permissions, and modules',
+          status: 'waiting' as const,
+        })
+      }
+
+      reportProgress(steps, 'create-floor')
+
       const launch = getLaunchInstance(params.floorFactoryAddress)
       const launchConfig = transformFormData(params.formData, creatorAddress)
 
-      // Step 1: Create the market
-      const launchResult = await launch.create(launchConfig)
+      let launchResult: LaunchResult | null = null
 
-      // Check if configuration is needed
-      const configOptions = params.formData.configuration
-      const needsConfiguration =
-        configOptions?.grantMinterRole !== false ||
-        configOptions?.openBuy !== false ||
-        configOptions?.openSell === true ||
-        configOptions?.openBorrow === true
-
-      if (!needsConfiguration) {
-        return { launch: launchResult, configure: null }
-      }
-
-      // Require forwarder — fail explicitly instead of silently skipping
-      const transactionForwarderAddress = config.transactionForwarderAddress
-      if (!transactionForwarderAddress) {
-        return {
-          launch: launchResult,
-          configure: null,
-          configureError:
-            'TransactionForwarder is not configured. Market was created but roles and permissions were not set up. Complete configuration from the admin panel.',
-        }
-      }
-
-      // Step 2+3: Configure the market — wrapped in try/catch to preserve create result
       try {
+        // Step 1: Create the market
+        launchResult = await launch.create(launchConfig)
+
+        // Update create-floor step to confirmed
+        const createFloorStep = steps.find((s) => s.id === 'create-floor')
+        if (createFloorStep) {
+          createFloorStep.status = 'confirmed'
+          createFloorStep.txHash = launchResult.transactionHash
+        }
+
+        // Check if configuration is needed
+        const configOptions = params.formData.configuration
+        if (!needsConfiguration) {
+          reportProgress(steps)
+          return { launch: launchResult, configure: null }
+        }
+
+        // Require forwarder — fail explicitly instead of silently skipping
+        const transactionForwarderAddress = config.transactionForwarderAddress
+        if (!transactionForwarderAddress) {
+          const configureStep = steps.find((s) => s.id === 'configure-market')
+          if (configureStep) {
+            configureStep.status = 'failed'
+            configureStep.error = 'TransactionForwarder not configured'
+          }
+          reportProgress(steps)
+          return {
+            launch: launchResult,
+            configure: null,
+            configureError:
+              'TransactionForwarder is not configured. Market was created but roles and permissions were not set up. Complete configuration from the admin panel.',
+          }
+        }
+
+        // Read contract data for configuration
         const floorAddress = launchResult.floorAddress as Address
         const [authorizerAddress, issuanceTokenAddress] = await Promise.all([
           publicClient.readContract({
@@ -503,14 +599,22 @@ export function useLaunch(options?: UseLaunchOptions) {
 
         let userProvidedStrategyAddress: Address | undefined
         let autoDeployedStrategyAddress: Address | undefined
-        if (params.formData.staking?.enabled) {
+
+        if (needsStaking) {
           const strategyAddress = params.formData.staking.strategyAddress?.trim()
           if (strategyAddress) {
             if (!isAddress(strategyAddress)) {
               throw new Error('Invalid staking strategy address')
             }
             userProvidedStrategyAddress = strategyAddress as Address
-          } else if (stakingManagerAddress) {
+          } else if (stakingManagerAddress && needsStrategy) {
+            // Update deploy-strategy step to pending
+            const deployStep = steps.find((s) => s.id === 'deploy-strategy')
+            if (deployStep) {
+              deployStep.status = 'pending'
+            }
+            reportProgress(steps, 'deploy-strategy')
+
             const moduleFactoryAddress = await launch.getModuleFactory()
             const feeTreasuryAddress = (await publicClient.readContract({
               address: floorAddress,
@@ -532,13 +636,30 @@ export function useLaunch(options?: UseLaunchOptions) {
               account: creatorAddress,
             })
 
+            // Update to confirming
+            if (deployStep) {
+              deployStep.status = 'confirming'
+              deployStep.txHash = deployStrategyHash
+            }
+            reportProgress(steps, 'deploy-strategy')
+
             const deployStrategyReceipt = await publicClient.waitForTransactionReceipt({
               hash: deployStrategyHash,
             })
             if (deployStrategyReceipt.status === 'reverted') {
+              if (deployStep) {
+                deployStep.status = 'failed'
+                deployStep.error = 'Strategy deployment reverted'
+              }
+              reportProgress(steps)
               throw new Error(
                 `TestnetStrategy deployment reverted. Hash: ${deployStrategyHash}. Check the transaction for details.`
               )
+            }
+
+            // Update to confirmed
+            if (deployStep) {
+              deployStep.status = 'confirmed'
             }
 
             autoDeployedStrategyAddress = extractModuleAddressesFromLogs(
@@ -547,17 +668,30 @@ export function useLaunch(options?: UseLaunchOptions) {
             ).strategyAddress
 
             if (!autoDeployedStrategyAddress) {
+              if (deployStep) {
+                deployStep.status = 'failed'
+                deployStep.error = 'Strategy address not found in logs'
+              }
+              reportProgress(steps)
               throw new Error(
                 `TestnetStrategy deployment succeeded but strategy address was not found in logs. Hash: ${deployStrategyHash}`
               )
             }
           }
         }
+
         const strategyAddresses = userProvidedStrategyAddress
           ? [userProvidedStrategyAddress]
           : autoDeployedStrategyAddress
             ? [autoDeployedStrategyAddress]
             : undefined
+
+        // Update configure-market step to pending
+        const configureStep = steps.find((s) => s.id === 'configure-market')
+        if (configureStep) {
+          configureStep.status = 'pending'
+        }
+        reportProgress(steps, 'configure-market')
 
         // Step 3: Configure the market
         const configureResult = await launch.configure({
@@ -576,36 +710,28 @@ export function useLaunch(options?: UseLaunchOptions) {
           strategyAddresses,
         })
 
-        // Auto-register strategy when create flow deployed it implicitly.
-        if (autoDeployedStrategyAddress && stakingManagerAddress) {
-          const isApproved = (await publicClient.readContract({
-            address: stakingManagerAddress,
-            abi: StakingManager_v1,
-            functionName: 'isStrategyApproved',
-            args: [autoDeployedStrategyAddress],
-          })) as boolean
-
-          if (!isApproved) {
-            const addStrategyHash = await walletClient.writeContract({
-              address: stakingManagerAddress,
-              abi: StakingManager_v1,
-              functionName: 'addStrategy',
-              args: [autoDeployedStrategyAddress],
-              account: creatorAddress,
-            })
-            const addStrategyReceipt = await publicClient.waitForTransactionReceipt({
-              hash: addStrategyHash,
-            })
-            if (addStrategyReceipt.status === 'reverted') {
-              throw new Error(
-                `Staking strategy registration reverted. Hash: ${addStrategyHash}. Check the transaction for details.`
-              )
-            }
-          }
+        // Update configure step to confirmed
+        if (configureStep) {
+          configureStep.status = 'confirmed'
+          configureStep.txHash = configureResult.transactionHash
         }
 
+        reportProgress(steps)
         return { launch: launchResult, configure: configureResult }
       } catch (configError) {
+        // Mark current step as failed
+        const currentStep = steps.find((s) => s.status === 'pending' || s.status === 'confirming')
+        if (currentStep) {
+          currentStep.status = 'failed'
+          currentStep.error = configError instanceof Error ? configError.message : 'Unknown error'
+        }
+        reportProgress(steps)
+
+        // If launch failed, rethrow to let the mutation error handler deal with it
+        if (!launchResult) {
+          throw configError
+        }
+
         // Create succeeded but configure failed — return create result with error
         return {
           launch: launchResult,
@@ -643,11 +769,14 @@ export function useLaunch(options?: UseLaunchOptions) {
     configureError: configureMutation.error,
     /** Error from create and configure mutation */
     createAndConfigureError: createAndConfigureMutation.error,
+    /** Current transaction progress */
+    transactionProgress,
     /** Reset all mutations */
     reset: () => {
       createMutation.reset()
       configureMutation.reset()
       createAndConfigureMutation.reset()
+      setTransactionProgress(null)
     },
   }
 }
