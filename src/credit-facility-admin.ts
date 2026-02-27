@@ -500,11 +500,14 @@ export class CreditFacilityAdmin {
   }: TBuyAndBorrowForParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
 
-    if (leverage < 1) {
-      throw new Error('Leverage must be at least 1')
+    if (leverage < 1 || leverage > 255) {
+      throw new Error('Leverage must be between 1 and 255')
+    }
+    if (!Number.isInteger(leverage)) {
+      throw new Error('Leverage must be a whole number')
     }
 
-    const loops = BigInt(Math.floor(leverage))
+    const loops = BigInt(leverage)
 
     try {
       lifecycle?.onPendingWallet?.()

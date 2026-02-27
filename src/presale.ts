@@ -962,8 +962,11 @@ export class Presale {
     const walletClient = this.requireWalletClient()
     this.assertPositiveAmount(depositAmount)
 
-    if (leverageIndex <= 0) {
-      throw new Error('Leverage index must be greater than 0')
+    if (leverageIndex < 1 || leverageIndex > 255) {
+      throw new Error('Leverage index must be between 1 and 255')
+    }
+    if (!Number.isInteger(leverageIndex)) {
+      throw new Error('Leverage index must be a whole number')
     }
 
     const accountAddress = this.getWalletAddress(walletClient)
