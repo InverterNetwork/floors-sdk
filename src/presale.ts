@@ -6,7 +6,6 @@ import ERC20Issuance_v1 from './abis/ERC20Issuance_v1'
 import Presale_v1 from './abis/Presale_v1'
 import type { TPresale } from './graphql/api'
 import type { PopPublicClient, PopWalletClient } from './types'
-import { getParsedError } from './utils/handle-error'
 import {
   CREDIT_FACILITY_SELECTORS,
   DEFAULT_LIVE_BORROW_FEE_BPS,
@@ -16,6 +15,7 @@ import {
   PUBLIC_ROLE,
   type SingleCall,
 } from './utils/selectors'
+import { validateLoopCount } from './utils/validation'
 
 // Re-export presale selectors for convenience
 export { PRESALE_SELECTORS }
@@ -925,8 +925,6 @@ export class Presale {
           account: accountAddress,
         })
       } catch (error) {
-        console.log('error happends')
-
         throw error
       }
       lifecycle?.onSubmitted?.(hash)
@@ -942,8 +940,6 @@ export class Presale {
 
       return receipt
     } catch (error) {
-      const parsed = getParsedError({ error })
-      lifecycle?.onFailed?.(new Error(parsed.prettyMessage))
       throw error
     }
   }
@@ -962,12 +958,7 @@ export class Presale {
     const walletClient = this.requireWalletClient()
     this.assertPositiveAmount(depositAmount)
 
-    if (leverageIndex < 1 || leverageIndex > 255) {
-      throw new Error('Leverage index must be between 1 and 255')
-    }
-    if (!Number.isInteger(leverageIndex)) {
-      throw new Error('Leverage index must be a whole number')
-    }
+    validateLoopCount(leverageIndex)
 
     const accountAddress = this.getWalletAddress(walletClient)
 

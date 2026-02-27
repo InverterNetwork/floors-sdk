@@ -8,6 +8,7 @@ import type { Address, TransactionReceipt } from 'viem'
 import { CreditFacility_v1 } from './abis'
 import type { TransactionLifecycleCallbacks } from './presale'
 import type { PopPublicClient, PopWalletClient } from './types'
+import { validateLoopCount, validateMaxLeverage } from './utils/validation'
 
 // =============================================================================
 // Types
@@ -297,7 +298,7 @@ export class CreditFacilityAdmin {
     lifecycle,
   }: TSetMaxLeverageParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
-    this.validateMaxLeverage(maxLeverage)
+    this.validateMaxLeverageParam(maxLeverage)
 
     try {
       lifecycle?.onPendingWallet?.()
@@ -500,12 +501,7 @@ export class CreditFacilityAdmin {
   }: TBuyAndBorrowForParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
 
-    if (leverage < 1 || leverage > 255) {
-      throw new Error('Leverage must be between 1 and 255')
-    }
-    if (!Number.isInteger(leverage)) {
-      throw new Error('Leverage must be a whole number')
-    }
+    validateLoopCount(leverage)
 
     const loops = BigInt(leverage)
 
@@ -575,12 +571,7 @@ export class CreditFacilityAdmin {
     }
   }
 
-  private validateMaxLeverage(leverage: number): void {
-    if (leverage < 1 || leverage > 255) {
-      throw new Error('Max leverage must be between 1 and 255')
-    }
-    if (!Number.isInteger(leverage)) {
-      throw new Error('Max leverage must be a whole number')
-    }
+  private validateMaxLeverageParam(leverage: number): void {
+    validateMaxLeverage(leverage)
   }
 }

@@ -9,6 +9,8 @@
  * - numberOfSteps:   16 bits  (offset 240) - Steps in segment (1–65,535)
  */
 
+import { PROTOCOL_LIMITS } from './validation'
+
 /**
  * @description Packed segment type (bytes32 hex string)
  */
@@ -387,11 +389,12 @@ export function generateDefaultCurve(
  * Index 0 = direct buy fee, subsequent indices = loop fees
  */
 export function generateCommissionSchedule(maxLeverage: number): bigint[] {
-  if (maxLeverage < 1) {
-    throw new Error('Max leverage must be at least 1')
-  }
-  if (maxLeverage > 255) {
-    throw new Error('Max leverage cannot exceed 255')
+  if (
+    !Number.isInteger(maxLeverage) ||
+    maxLeverage < 1 ||
+    maxLeverage > PROTOCOL_LIMITS.MAX_LOOPS
+  ) {
+    throw new Error(`Max leverage must be an integer between 1 and ${PROTOCOL_LIMITS.MAX_LOOPS}`)
   }
 
   const schedule: bigint[] = []
@@ -412,8 +415,12 @@ export function generatePriceBreakpoints(
   maxLeverage: number,
   unlockPrice: bigint = BigInt(1e18)
 ): bigint[][] {
-  if (maxLeverage < 1) {
-    throw new Error('Max leverage must be at least 1')
+  if (
+    !Number.isInteger(maxLeverage) ||
+    maxLeverage < 1 ||
+    maxLeverage > PROTOCOL_LIMITS.MAX_LOOPS
+  ) {
+    throw new Error(`Max leverage must be an integer between 1 and ${PROTOCOL_LIMITS.MAX_LOOPS}`)
   }
 
   const breakpoints: bigint[][] = []

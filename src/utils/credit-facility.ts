@@ -3,6 +3,8 @@
  * Provides standalone functions for validating config and calculating borrowing power
  */
 
+import { PROTOCOL_LIMITS } from './validation'
+
 // =============================================================================
 // Constants (matching smart contract)
 // =============================================================================
@@ -99,19 +101,19 @@ export function validateCreditFacilityConfig(
     warnings.push('LTV above 99% reduces safety margin significantly')
   }
 
-  // Leverage validation
+  // Leverage validation (enforces PROTOCOL_LIMITS.MAX_LOOPS)
   if (!Number.isInteger(maxLeverage)) {
     errors.push('Leverage must be a whole number')
   }
   if (maxLeverage < CREDIT_FACILITY_CONSTANTS.MIN_LEVERAGE) {
     errors.push(`Leverage must be at least ${CREDIT_FACILITY_CONSTANTS.MIN_LEVERAGE}`)
   }
-  if (maxLeverage > CREDIT_FACILITY_CONSTANTS.MAX_LEVERAGE) {
-    errors.push(`Leverage cannot exceed ${CREDIT_FACILITY_CONSTANTS.MAX_LEVERAGE}`)
+  if (maxLeverage > PROTOCOL_LIMITS.MAX_LOOPS) {
+    errors.push(`Leverage cannot exceed ${PROTOCOL_LIMITS.MAX_LOOPS}`)
   }
   if (
     maxLeverage > CREDIT_FACILITY_CONSTANTS.HIGH_LEVERAGE_THRESHOLD &&
-    maxLeverage <= CREDIT_FACILITY_CONSTANTS.MAX_LEVERAGE
+    maxLeverage <= PROTOCOL_LIMITS.MAX_LOOPS
   ) {
     warnings.push('High leverage (>50x) significantly increases gas costs')
   }
