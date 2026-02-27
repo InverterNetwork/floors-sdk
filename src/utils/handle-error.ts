@@ -41,6 +41,7 @@ import type {
 import { decodeErrorResult, keccak256, toHex } from 'viem'
 
 import * as abis from '../abis'
+import type { PopPublicClient, PopWalletClient } from '../types'
 import {
   ERROR_METADATA,
   isKnownErrorSignature,
@@ -1218,41 +1219,14 @@ export async function getParsedErrorAsync(params: HandleErrorParams): Promise<En
 // safeWrite — simulate → write → receipt, with structured error handling
 // ============================================================================
 
-/**
- * Minimal structural interface satisfied by any viem PublicClient.
- * Kept narrow so consumers don't need to thread its full generic stack.
- */
-interface SafeWritePublicClient {
-  simulateContract(params: {
-    address: Address
-    abi: Abi
-    functionName: string
-    args?: readonly unknown[]
-    account?: Address | { address: Address }
-    value?: bigint
-  }): Promise<{ request: unknown; result: unknown }>
-  waitForTransactionReceipt(params: {
-    hash: Hex
-    confirmations?: number
-  }): Promise<TransactionReceipt>
-}
-
-/**
- * Minimal structural interface satisfied by any viem WalletClient.
- */
-interface SafeWriteWalletClient {
-  account?: { address: Address } | undefined
-  writeContract(request: unknown): Promise<Hex>
-}
-
 export type SafeWriteParams<
   TAbi extends Abi,
   TFunctionName extends ContractFunctionName<TAbi, 'nonpayable' | 'payable'>,
 > = {
   /** Public client — used for simulation and waiting for the receipt */
-  publicClient: SafeWritePublicClient
+  publicClient: PopPublicClient
   /** Wallet client — used to sign and broadcast the transaction */
-  walletClient: SafeWriteWalletClient
+  walletClient: PopWalletClient
   /** Target contract address */
   address: Address
   /** Contract ABI — drives both the call and error decoding at every stage */
@@ -1275,6 +1249,14 @@ export type SafeWriteParams<
    * The original error is re-thrown after this callback fires.
    */
   onWriteError?: (parsed: EnhancedParsedError) => void
+  /** Optional UI-level lifecycle callbacks fired at each transaction stage */
+  lifecycle?: {
+    onPendingWallet?: () => void
+    onSubmitted?: (hash: Hex) => void
+    onPendingConfirmation?: (hash: Hex) => void
+    onConfirmed?: (receipt: TransactionReceipt) => void
+    onFailed?: (error: Error) => void
+  }
 }
 
 export type SafeWriteResult = {
@@ -1333,26 +1315,31 @@ export async function safeWrite<
     value,
     onSimError,
     onWriteError,
+    lifecycle,
   } = params
 
   // ── 1. simulate ─────────────────────────────────────────────────────────────
   let simResult: unknown
   let request: unknown
 
+  lifecycle?.onPendingWallet?.()
+
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const sim = await publicClient.simulateContract({
       address,
-      abi,
+      abi: abi as Abi,
       functionName: functionName as string,
       args: args as readonly unknown[],
       ...(value !== undefined && { value }),
       account: walletClient.account,
-    })
+    } as any)
     simResult = sim.result
     request = sim.request
   } catch (simError) {
     const parsed = getParsedError({ error: simError, abi })
     onSimError?.(parsed)
+    lifecycle?.onFailed?.(simError instanceof Error ? simError : new Error(String(simError)))
     throw simError
   }
 
@@ -1360,15 +1347,28 @@ export async function safeWrite<
   let hash: Hex
 
   try {
-    hash = await walletClient.writeContract(request)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    hash = await walletClient.writeContract(request as any)
   } catch (writeError) {
     const parsed = getParsedError({ error: writeError, abi })
     onWriteError?.(parsed)
+    lifecycle?.onFailed?.(writeError instanceof Error ? writeError : new Error(String(writeError)))
     throw writeError
   }
 
+  lifecycle?.onSubmitted?.(hash)
+
   // ── 3. wait for receipt (1 confirmation) ─────────────────────────────────────
+  lifecycle?.onPendingConfirmation?.(hash)
   const receipt = await publicClient.waitForTransactionReceipt({ hash, confirmations: 1 })
+
+  if (receipt.status === 'success') {
+    lifecycle?.onConfirmed?.(receipt)
+  } else {
+    const revertError = new Error('Transaction reverted')
+    lifecycle?.onFailed?.(revertError)
+    throw revertError
+  }
 
   return { hash, receipt, simResult }
 }

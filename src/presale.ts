@@ -1,4 +1,10 @@
-import type { Address, TransactionReceipt } from 'viem'
+import type {
+  Abi,
+  Address,
+  ContractFunctionArgs,
+  ContractFunctionName,
+  TransactionReceipt,
+} from 'viem'
 import { encodeFunctionData, getAddress } from 'viem'
 
 import { AUT_Roles_v2, CreditFacility_v1, Floor_v1, TransactionForwarder_v1 } from './abis'
@@ -6,6 +12,7 @@ import ERC20Issuance_v1 from './abis/ERC20Issuance_v1'
 import Presale_v1 from './abis/Presale_v1'
 import type { TPresale } from './graphql/api'
 import type { PopPublicClient, PopWalletClient } from './types'
+import { safeWrite } from './utils/handle-error'
 import {
   CREDIT_FACILITY_SELECTORS,
   DEFAULT_LIVE_BORROW_FEE_BPS,
@@ -911,37 +918,14 @@ export class Presale {
         `Insufficient allowance. Please approve the Presale contract to spend your tokens first.\n\nRequired: ${depositAmount.toString()}\nCurrent: ${allowance.toString()}`
       )
     }
-
-    try {
-      // Stage 1: Pending wallet signature
-      lifecycle?.onPendingWallet?.()
-      let hash
-      try {
-        hash = await walletClient.writeContract({
-          address: this.address,
-          abi: Presale_v1,
-          functionName: 'buyPresale',
-          args: [depositAmount, minAmountOut],
-          account: accountAddress,
-        })
-      } catch (error) {
-        throw error
-      }
-      lifecycle?.onSubmitted?.(hash)
-
-      lifecycle?.onPendingConfirmation?.(hash)
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      throw error
-    }
+  console.log('BEFORE EXEC WRITE')
+    return this.execWrite({
+      address: this.address,
+      abi: Presale_v1,
+      functionName: 'buyPresale',
+      args: [depositAmount, minAmountOut],
+      lifecycle,
+    })
   }
 
   /**
@@ -978,38 +962,13 @@ export class Presale {
       )
     }
 
-    try {
-      // Stage 1: Pending wallet signature
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Presale_v1,
-        functionName: 'buyPresaleWithLoops',
-        args: [depositAmount, BigInt(leverageIndex), minAmountOut],
-        account: accountAddress,
-      })
-
-      // Stage 2: Transaction submitted
-      lifecycle?.onSubmitted?.(hash)
-
-      // Stage 3: Pending confirmation
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      // Stage 4: Confirmed or Failed based on status
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return this.execWrite({
+      address: this.address,
+      abi: Presale_v1,
+      functionName: 'buyPresaleWithLoops',
+      args: [depositAmount, BigInt(leverageIndex), minAmountOut],
+      lifecycle,
+    })
   }
 
   /**
@@ -1021,35 +980,13 @@ export class Presale {
     positionId,
     lifecycle,
   }: TPresaleClaimParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
-
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Presale_v1,
-        functionName: 'claimAll',
-        args: [positionId],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return this.execWrite({
+      address: this.address,
+      abi: Presale_v1,
+      functionName: 'claimAll',
+      args: [positionId],
+      lifecycle,
+    })
   }
 
   /**
@@ -1061,36 +998,15 @@ export class Presale {
     amount,
     lifecycle,
   }: TPresaleApproveParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
     this.assertPositiveAmount(amount)
 
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: this.purchaseTokenAddress,
-        abi: ERC20Issuance_v1,
-        functionName: 'approve',
-        args: [this.address, amount],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Approval transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return this.execWrite({
+      address: this.purchaseTokenAddress,
+      abi: ERC20Issuance_v1,
+      functionName: 'approve',
+      args: [this.address, amount],
+      lifecycle,
+    })
   }
 
   // =========================================================================
@@ -1106,35 +1022,13 @@ export class Presale {
     state,
     lifecycle,
   }: TSetPresaleStateParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
-
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Presale_v1,
-        functionName: 'setPresaleState',
-        args: [state],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('setPresaleState transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return this.execWrite({
+      address: this.address,
+      abi: Presale_v1,
+      functionName: 'setPresaleState',
+      args: [state],
+      lifecycle,
+    })
   }
 
   /**
@@ -1147,35 +1041,13 @@ export class Presale {
     perAddressCap,
     lifecycle,
   }: TSetCapsParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
-
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Presale_v1,
-        functionName: 'setCaps',
-        args: [globalCap, perAddressCap],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('setCaps transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return this.execWrite({
+      address: this.address,
+      abi: Presale_v1,
+      functionName: 'setCaps',
+      args: [globalCap, perAddressCap],
+      lifecycle,
+    })
   }
 
   /**
@@ -1187,35 +1059,13 @@ export class Presale {
     endTimestamp,
     lifecycle,
   }: TSetEndTimestampParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
-
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Presale_v1,
-        functionName: 'setEndTimestamp',
-        args: [endTimestamp],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('setEndTimestamp transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return this.execWrite({
+      address: this.address,
+      abi: Presale_v1,
+      functionName: 'setEndTimestamp',
+      args: [endTimestamp],
+      lifecycle,
+    })
   }
 
   /**
@@ -1227,35 +1077,13 @@ export class Presale {
     merkleRoot,
     lifecycle,
   }: TSetMerkleRootParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
-
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Presale_v1,
-        functionName: 'setMerkleRoot',
-        args: [merkleRoot],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('setMerkleRoot transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return this.execWrite({
+      address: this.address,
+      abi: Presale_v1,
+      functionName: 'setMerkleRoot',
+      args: [merkleRoot],
+      lifecycle,
+    })
   }
 
   /**
@@ -1268,39 +1096,17 @@ export class Presale {
     proof,
     lifecycle,
   }: TAddToWhitelistWithProofParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
-
     if (proof.length === 0) {
       throw new Error('Merkle proof is required')
     }
 
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Presale_v1,
-        functionName: 'addToWhitelistWithProof',
-        args: [proof],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('addToWhitelistWithProof transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return this.execWrite({
+      address: this.address,
+      abi: Presale_v1,
+      functionName: 'addToWhitelistWithProof',
+      args: [proof],
+      lifecycle,
+    })
   }
 
   /**
@@ -1310,35 +1116,13 @@ export class Presale {
     creditFacility,
     lifecycle,
   }: TSetCreditFacilityParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
-
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Presale_v1,
-        functionName: 'setCreditFacility',
-        args: [creditFacility],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('setCreditFacility transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return this.execWrite({
+      address: this.address,
+      abi: Presale_v1,
+      functionName: 'setCreditFacility',
+      args: [creditFacility],
+      lifecycle,
+    })
   }
 
   /**
@@ -1348,35 +1132,13 @@ export class Presale {
     multiplier,
     lifecycle,
   }: TSetInitialMultiplierParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
-
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Presale_v1,
-        functionName: 'setInitialMultiplier',
-        args: [multiplier],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('setInitialMultiplier transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return this.execWrite({
+      address: this.address,
+      abi: Presale_v1,
+      functionName: 'setInitialMultiplier',
+      args: [multiplier],
+      lifecycle,
+    })
   }
 
   /**
@@ -1386,35 +1148,13 @@ export class Presale {
     duration,
     lifecycle,
   }: TSetDecayDurationParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
-
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Presale_v1,
-        functionName: 'setDecayDuration',
-        args: [duration],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('setDecayDuration transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return this.execWrite({
+      address: this.address,
+      abi: Presale_v1,
+      functionName: 'setDecayDuration',
+      args: [duration],
+      lifecycle,
+    })
   }
 
   /**
@@ -1424,35 +1164,13 @@ export class Presale {
     startTime,
     lifecycle,
   }: TSetStartTimeParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
-
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Presale_v1,
-        functionName: 'setStartTime',
-        args: [startTime],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('setStartTime transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return this.execWrite({
+      address: this.address,
+      abi: Presale_v1,
+      functionName: 'setStartTime',
+      args: [startTime],
+      lifecycle,
+    })
   }
 
   // =========================================================================
@@ -1712,7 +1430,6 @@ export class Presale {
    * @returns Transaction receipt after confirmation
    */
   public async goLive(params: TGoLiveParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
     const { lifecycle } = params
 
     const liveBuyFeeBps = params.liveBuyFeeBps ?? DEFAULT_LIVE_BUY_FEE_BPS
@@ -1807,33 +1524,13 @@ export class Presale {
       }
     }
 
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: params.transactionForwarderAddress,
-        abi: TransactionForwarder_v1,
-        functionName: 'executeMulticall',
-        args: [calls],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('goLive transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return this.execWrite({
+      address: params.transactionForwarderAddress,
+      abi: TransactionForwarder_v1,
+      functionName: 'executeMulticall',
+      args: [calls],
+      lifecycle,
+    })
   }
 
   /**
@@ -1854,7 +1551,6 @@ export class Presale {
    * @returns Transaction receipt after confirmation
    */
   public async setLiveFees(params: TSetLiveFeesParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
     const { lifecycle } = params
 
     const buyFeeBps = params.buyFeeBps ?? DEFAULT_LIVE_BUY_FEE_BPS
@@ -1886,33 +1582,13 @@ export class Presale {
       })
     }
 
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: params.transactionForwarderAddress,
-        abi: TransactionForwarder_v1,
-        functionName: 'executeMulticall',
-        args: [calls],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('setLiveFees transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return this.execWrite({
+      address: params.transactionForwarderAddress,
+      abi: TransactionForwarder_v1,
+      functionName: 'executeMulticall',
+      args: [calls],
+      lifecycle,
+    })
   }
 
   /**
@@ -1924,7 +1600,6 @@ export class Presale {
   public async enablePublicTrading(
     params: TEnablePublicTradingParams
   ): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
     const { lifecycle } = params
 
     const calls: SingleCall[] = []
@@ -1959,33 +1634,13 @@ export class Presale {
       }),
     })
 
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: params.transactionForwarderAddress,
-        abi: TransactionForwarder_v1,
-        functionName: 'executeMulticall',
-        args: [calls],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('enablePublicTrading transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return this.execWrite({
+      address: params.transactionForwarderAddress,
+      abi: TransactionForwarder_v1,
+      functionName: 'executeMulticall',
+      args: [calls],
+      lifecycle,
+    })
   }
 
   /**
@@ -1997,7 +1652,6 @@ export class Presale {
   public async enablePublicBorrowing(
     params: TEnablePublicBorrowingParams
   ): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
     const { lifecycle } = params
 
     const calls: SingleCall[] = []
@@ -2022,38 +1676,41 @@ export class Presale {
       })
     }
 
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: params.transactionForwarderAddress,
-        abi: TransactionForwarder_v1,
-        functionName: 'executeMulticall',
-        args: [calls],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('enablePublicBorrowing transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return this.execWrite({
+      address: params.transactionForwarderAddress,
+      abi: TransactionForwarder_v1,
+      functionName: 'executeMulticall',
+      args: [calls],
+      lifecycle,
+    })
   }
 
   // =========================================================================
   // PRIVATE HELPER METHODS
   // =========================================================================
+
+  private async execWrite<
+    TAbi extends Abi,
+    TFunctionName extends ContractFunctionName<TAbi, 'nonpayable' | 'payable'>,
+  >(params: {
+    address: Address
+    abi: TAbi
+    functionName: TFunctionName
+    args?: ContractFunctionArgs<TAbi, 'nonpayable' | 'payable', TFunctionName>
+    lifecycle?: TransactionLifecycleCallbacks
+  }): Promise<TransactionReceipt> {
+    const walletClient = this.requireWalletClient()
+    const { receipt } = await safeWrite({
+      publicClient: this.publicClient,
+      walletClient,
+      address: params.address,
+      abi: params.abi,
+      functionName: params.functionName,
+      args: params.args,
+      lifecycle: params.lifecycle,
+    })
+    return receipt
+  }
 
   private static resolvePresaleAddress(data: TPresale): Address {
     if (!data?.id) {
