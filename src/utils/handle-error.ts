@@ -494,6 +494,86 @@ function decodeErrorArgs(
 }
 
 // ============================================================================
+// Viem Pre-Decoded Error Extraction
+// ============================================================================
+
+/**
+ * Checks if viem has already ABI-decoded the revert in its cause chain.
+ *
+ * When `writeContract` / `simulateContract` is called with a contract ABI,
+ * viem decodes the revert automatically and stores the result on
+ * `ContractFunctionRevertedError.data` as `{ errorName, args }`.
+ * This avoids re-decoding what viem has already done.
+ */
+function extractViemDecodedCause(
+  error: unknown,
+  depth = 0
+): { errorName: string; args?: readonly unknown[] } | null {
+  if (depth > 10 || !error || typeof error !== 'object') return null
+
+  const err = error as Record<string, unknown>
+
+  if (
+    'data' in err &&
+    err.data !== null &&
+    typeof err.data === 'object' &&
+    !Array.isArray(err.data)
+  ) {
+    const data = err.data as Record<string, unknown>
+    if ('errorName' in data && typeof data.errorName === 'string') {
+      return {
+        errorName: data.errorName,
+        args: 'args' in data ? (data.args as readonly unknown[]) : undefined,
+      }
+    }
+  }
+
+  if ('cause' in err && err.cause) {
+    return extractViemDecodedCause(err.cause, depth + 1)
+  }
+
+  return null
+}
+
+/**
+ * Extracts a human-readable revert reason from viem's cause chain.
+ *
+ * Handles `require(false, "reason string")` reverts, which viem stores
+ * as `cause.reason` on `ContractFunctionRevertedError`.
+ */
+function extractViemRevertReason(error: unknown, depth = 0): string | null {
+  if (depth > 10 || !error || typeof error !== 'object') return null
+
+  const err = error as Record<string, unknown>
+
+  if ('reason' in err && typeof err.reason === 'string' && err.reason.length > 0) {
+    return err.reason
+  }
+
+  if ('cause' in err && err.cause) {
+    return extractViemRevertReason(err.cause, depth + 1)
+  }
+
+  return null
+}
+
+/**
+ * Finds the 4-byte selector for an error by its name across known ABIs.
+ * Reverse lookup of matchSelectorToAbiErrorName.
+ */
+function matchSelectorFromName(errors: AbiItem[], errorName: string): Hex | null {
+  for (const item of errors) {
+    if (item.type !== 'error' || !('name' in item) || item.name !== errorName) continue
+
+    const inputs = 'inputs' in item && Array.isArray(item.inputs) ? item.inputs : []
+    const types = inputs.map((i: { type: string }) => i.type).join(',')
+    const sig = `${item.name}(${types})`
+    return keccak256(toHex(sig)).slice(0, 10) as Hex
+  }
+  return null
+}
+
+// ============================================================================
 // Main Parsing Functions
 // ============================================================================
 
@@ -545,10 +625,67 @@ function parseError(params: HandleErrorParams): EnhancedParsedError {
       ? error.message
       : String(error)
 
+  // Check if viem already decoded the error via its ABI (simulateContract / writeContract path).
+  // This fires when the contract ABI is known to viem at call time.
+  const viemDecoded = extractViemDecodedCause(error)
+  if (viemDecoded) {
+    const { errorName } = viemDecoded
+    const abiList = abi ? [...getAllAbis(), abi as Abi] : getAllAbis()
+    const abiErrors = extractErrors(abiList)
+    const viemSig = matchSelectorFromName(abiErrors, errorName)
+
+    if (viemSig && hasUXMapping(viemSig)) {
+      const uxMapping = ERROR_UX_MAPPINGS[viemSig as KnownErrorSignature]
+      return {
+        message: extractContractCallDetails(errorMessage, errorName),
+        prettyMessage: uxMapping.prettyMessage,
+        errorName,
+        isUserRejection: false,
+        category: uxMapping.category,
+        severity: uxMapping.severity,
+        suggestion: uxMapping.suggestion,
+        recoveryActions: uxMapping.recoveryActions,
+        originalError: error,
+        signature: viemSig,
+        context,
+        formattedErrorName: formatErrorNameWithSource(errorName).formatted,
+      }
+    }
+
+    return {
+      message: extractContractCallDetails(errorMessage, errorName),
+      prettyMessage: parseErrorNameToPrettyMessage(errorName),
+      errorName,
+      isUserRejection: false,
+      category: 'unknown',
+      severity: 'error',
+      suggestion: 'This error is not yet documented. Please report it.',
+      recoveryActions: [{ label: 'Report issue', type: 'contact_support' }],
+      originalError: error,
+      signature: viemSig ?? undefined,
+      context,
+      formattedErrorName: formatErrorNameWithSource(errorName).formatted,
+    }
+  }
+
   // Extract error signature
   const signature = extractErrorSignature(error)
 
   if (!signature) {
+    // Check for string revert reason: require(false, "reason") stores the
+    // reason string in viem's cause.reason field.
+    const revertReason = extractViemRevertReason(error)
+    if (revertReason) {
+      return {
+        ...defaultResult,
+        message: errorMessage,
+        prettyMessage: revertReason,
+        suggestion: 'The contract rejected this transaction.',
+        category: 'system',
+        recoveryActions: [{ label: 'Try again', type: 'retry', primary: true }],
+      }
+    }
+
     // No signature found - try to provide better context based on error type
     const lowerMessage = errorMessage.toLowerCase()
 

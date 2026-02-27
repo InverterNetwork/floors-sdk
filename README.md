@@ -36,6 +36,71 @@ server-only code.
 
 Check out the [Changelog](./CHANGELOG.md) to see what changed in the last releases.
 
+## Error Handling
+
+`handle-error` parses any error thrown by a viem write action into a structured
+object with a UI-ready message, category, suggestion, and recovery actions.
+
+```ts
+import { getParsedError, isUserRejection, getRecoveryActions } from '@floorsfi/sdk'
+
+// ── basic usage ────────────────────────────────────────────────────────────────
+try {
+  await market.buy({ depositAmount: 100n * 10n ** 18n })
+} catch (error) {
+  const parsed = getParsedError({ error })
+
+  if (parsed.isUserRejection) return // user cancelled — silent exit
+
+  // show toast
+  toast.error(parsed.prettyMessage)
+  // e.g. "Need approval for 100. Current: 0"
+  // e.g. "Insufficient balance"
+  // e.g. "Not authorized for this action"
+
+  // log structured detail for debugging
+  console.error('[tx failed]', {
+    errorName: parsed.errorName, // "ERC20InsufficientAllowance"
+    signature: parsed.signature, // "0xfb8f41b2"
+    category: parsed.category, // "token"
+    suggestion: parsed.suggestion, // "Approve the contract to spend your tokens first"
+    args: parsed.decodedArgs, // { spender, allowance, needed }
+  })
+}
+
+// ── recovery actions ───────────────────────────────────────────────────────────
+const actions = getRecoveryActions(error)
+// [{ label: 'Approve token', type: 'approve_token', primary: true }]
+
+actions.forEach((action) => {
+  if (action.type === 'approve_token') showApproveButton()
+  if (action.type === 'retry') showRetryButton()
+})
+
+// ── convenience guards ─────────────────────────────────────────────────────────
+if (isUserRejection(error)) return // wallet rejection
+if (isErrorType(error, 'ERC20InsufficientAllowance')) showApproveFlow()
+if (isPermissionError(error)) showPermissionBanner()
+
+// ── with a custom ABI (for errors not in the registry) ────────────────────────
+const parsed = getParsedError({ error, abi: MyContract.abi })
+
+// ── async 4-byte lookup for completely unknown selectors ───────────────────────
+const parsed = await getParsedErrorAsync({ error })
+// queries openchain.xyz if the selector is not in the local registry
+```
+
+### What gets decoded
+
+| Revert type                         | Example                                   | Decoded via                        |
+| ----------------------------------- | ----------------------------------------- | ---------------------------------- |
+| Known ERC20 / protocol error        | `ERC20InsufficientAllowance`              | `data` field (selector + ABI args) |
+| viem pre-decoded (simulateContract) | any error when ABI is passed to viem      | `cause.data.errorName`             |
+| Nested cause chain                  | `ContractFunctionRevertedError.signature` | recursive cause walk               |
+| Selector in error message           | `"reverted with 0xfb8f41b2"`              | regex pattern matching             |
+| String revert reason                | `require(false, "Market is paused")`      | `cause.reason`                     |
+| Custom / project-specific error     | `Market__BuyClosed`                       | custom `abi` param                 |
+
 ## Install
 
 ```bash

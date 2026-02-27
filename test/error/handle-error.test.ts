@@ -2,13 +2,13 @@ import { describe, expect, it } from 'bun:test'
 import type { Abi, Hex } from 'viem'
 import { keccak256, toHex } from 'viem'
 
-import * as abis from '../src/abis'
+import * as abis from '../../src/abis'
 import {
   ERROR_METADATA,
   getAllErrorSignatures,
   isKnownErrorSignature,
-} from '../src/utils/error-signatures.generated'
-import { hasUXMapping } from '../src/utils/error-ux-mappings'
+} from '../../src/utils/error-signatures.generated'
+import { hasUXMapping } from '../../src/utils/error-ux-mappings'
 import {
   getParsedError,
   getParsedErrorAsync,
@@ -16,7 +16,7 @@ import {
   handleError,
   isUserRejection,
   lookup4ByteSelector,
-} from '../src/utils/handle-error'
+} from '../../src/utils/handle-error'
 
 // ============================================================================
 // Helpers
