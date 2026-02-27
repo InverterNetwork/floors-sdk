@@ -51,6 +51,8 @@ export interface TMarketBuyAndBorrowParams {
   amount: bigint
   leverage: number
   consolidate?: boolean
+  /** Minimum amount out for slippage protection (defaults to 0n) */
+  minAmountOut?: bigint
   /** Optional lifecycle callbacks for multi-stage feedback */
   lifecycle?: TransactionLifecycleCallbacks
 }
@@ -548,6 +550,7 @@ export class Market {
     amount,
     leverage,
     consolidate = false,
+    minAmountOut = BigInt(0),
     lifecycle,
   }: TMarketBuyAndBorrowParams): Promise<TMarketMutationResult> {
     const walletClient = this.requireWalletClient()
@@ -568,7 +571,7 @@ export class Market {
         address: creditFacility,
         abi: CreditFacility_v1,
         functionName: 'buyAndBorrow',
-        args: [amount, loops, consolidate, BigInt(0)],
+        args: [amount, loops, consolidate, minAmountOut],
         account: this.getWalletAddress(walletClient),
       })
 
