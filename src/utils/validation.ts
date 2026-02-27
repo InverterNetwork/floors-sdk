@@ -22,7 +22,7 @@ export const RECOMMENDED_MAX_LTV_BPS = 9_900
  * Admin functions (setMaxLeverage) still allow up to MAX_LEVERAGE (255).
  */
 export const PROTOCOL_LIMITS = {
-  MAX_LOOPS: 10,
+  MAX_LOOPS: 25,
 } as const
 
 // =============================================================================
