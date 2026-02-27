@@ -1,10 +1,4 @@
-import type {
-  Abi,
-  Address,
-  ContractFunctionArgs,
-  ContractFunctionName,
-  TransactionReceipt,
-} from 'viem'
+import type { Address, TransactionReceipt } from 'viem'
 import { encodeFunctionData, getAddress } from 'viem'
 
 import { AUT_Roles_v2, CreditFacility_v1, Floor_v1, TransactionForwarder_v1 } from './abis'
@@ -12,7 +6,7 @@ import ERC20Issuance_v1 from './abis/ERC20Issuance_v1'
 import Presale_v1 from './abis/Presale_v1'
 import type { TPresale } from './graphql/api'
 import type { PopPublicClient, PopWalletClient } from './types'
-import { safeWrite } from './utils/handle-error'
+import { SafeWrite } from './utils/safe-write'
 import {
   CREDIT_FACILITY_SELECTORS,
   DEFAULT_LIVE_BORROW_FEE_BPS,
@@ -346,6 +340,7 @@ export class Presale {
   private readonly purchaseTokenAddress: Address
   private readonly publicClient: PopPublicClient
   private readonly walletClient?: PopWalletClient
+  private readonly safeWrite?: SafeWrite
   private readonly floorAddress?: Address
   private readonly authorizerAddress?: Address
   private readonly creditFacilityAddress?: Address
@@ -362,6 +357,7 @@ export class Presale {
     this.purchaseTokenAddress = Presale.resolvePurchaseTokenAddress(data)
     this.publicClient = publicClient
     this.walletClient = walletClient
+    this.safeWrite = walletClient ? new SafeWrite({ publicClient, walletClient }) : undefined
     this.floorAddress = floorAddress
     this.authorizerAddress = authorizerAddress
     this.creditFacilityAddress = creditFacilityAddress
@@ -918,14 +914,14 @@ export class Presale {
         `Insufficient allowance. Please approve the Presale contract to spend your tokens first.\n\nRequired: ${depositAmount.toString()}\nCurrent: ${allowance.toString()}`
       )
     }
-  console.log('BEFORE EXEC WRITE')
-    return this.execWrite({
+    const { receipt } = await this.requireSafeWrite().write({
       address: this.address,
       abi: Presale_v1,
       functionName: 'buyPresale',
       args: [depositAmount, minAmountOut],
       lifecycle,
     })
+    return receipt
   }
 
   /**
@@ -962,13 +958,14 @@ export class Presale {
       )
     }
 
-    return this.execWrite({
+    const { receipt } = await this.requireSafeWrite().write({
       address: this.address,
       abi: Presale_v1,
       functionName: 'buyPresaleWithLoops',
       args: [depositAmount, BigInt(leverageIndex), minAmountOut],
       lifecycle,
     })
+    return receipt
   }
 
   /**
@@ -980,13 +977,14 @@ export class Presale {
     positionId,
     lifecycle,
   }: TPresaleClaimParams): Promise<TransactionReceipt> {
-    return this.execWrite({
+    const { receipt } = await this.requireSafeWrite().write({
       address: this.address,
       abi: Presale_v1,
       functionName: 'claimAll',
       args: [positionId],
       lifecycle,
     })
+    return receipt
   }
 
   /**
@@ -1000,13 +998,14 @@ export class Presale {
   }: TPresaleApproveParams): Promise<TransactionReceipt> {
     this.assertPositiveAmount(amount)
 
-    return this.execWrite({
+    const { receipt } = await this.requireSafeWrite().write({
       address: this.purchaseTokenAddress,
       abi: ERC20Issuance_v1,
       functionName: 'approve',
       args: [this.address, amount],
       lifecycle,
     })
+    return receipt
   }
 
   // =========================================================================
@@ -1022,13 +1021,14 @@ export class Presale {
     state,
     lifecycle,
   }: TSetPresaleStateParams): Promise<TransactionReceipt> {
-    return this.execWrite({
+    const { receipt } = await this.requireSafeWrite().write({
       address: this.address,
       abi: Presale_v1,
       functionName: 'setPresaleState',
       args: [state],
       lifecycle,
     })
+    return receipt
   }
 
   /**
@@ -1041,13 +1041,14 @@ export class Presale {
     perAddressCap,
     lifecycle,
   }: TSetCapsParams): Promise<TransactionReceipt> {
-    return this.execWrite({
+    const { receipt } = await this.requireSafeWrite().write({
       address: this.address,
       abi: Presale_v1,
       functionName: 'setCaps',
       args: [globalCap, perAddressCap],
       lifecycle,
     })
+    return receipt
   }
 
   /**
@@ -1059,13 +1060,14 @@ export class Presale {
     endTimestamp,
     lifecycle,
   }: TSetEndTimestampParams): Promise<TransactionReceipt> {
-    return this.execWrite({
+    const { receipt } = await this.requireSafeWrite().write({
       address: this.address,
       abi: Presale_v1,
       functionName: 'setEndTimestamp',
       args: [endTimestamp],
       lifecycle,
     })
+    return receipt
   }
 
   /**
@@ -1077,13 +1079,14 @@ export class Presale {
     merkleRoot,
     lifecycle,
   }: TSetMerkleRootParams): Promise<TransactionReceipt> {
-    return this.execWrite({
+    const { receipt } = await this.requireSafeWrite().write({
       address: this.address,
       abi: Presale_v1,
       functionName: 'setMerkleRoot',
       args: [merkleRoot],
       lifecycle,
     })
+    return receipt
   }
 
   /**
@@ -1100,13 +1103,14 @@ export class Presale {
       throw new Error('Merkle proof is required')
     }
 
-    return this.execWrite({
+    const { receipt } = await this.requireSafeWrite().write({
       address: this.address,
       abi: Presale_v1,
       functionName: 'addToWhitelistWithProof',
       args: [proof],
       lifecycle,
     })
+    return receipt
   }
 
   /**
@@ -1116,13 +1120,14 @@ export class Presale {
     creditFacility,
     lifecycle,
   }: TSetCreditFacilityParams): Promise<TransactionReceipt> {
-    return this.execWrite({
+    const { receipt } = await this.requireSafeWrite().write({
       address: this.address,
       abi: Presale_v1,
       functionName: 'setCreditFacility',
       args: [creditFacility],
       lifecycle,
     })
+    return receipt
   }
 
   /**
@@ -1132,13 +1137,14 @@ export class Presale {
     multiplier,
     lifecycle,
   }: TSetInitialMultiplierParams): Promise<TransactionReceipt> {
-    return this.execWrite({
+    const { receipt } = await this.requireSafeWrite().write({
       address: this.address,
       abi: Presale_v1,
       functionName: 'setInitialMultiplier',
       args: [multiplier],
       lifecycle,
     })
+    return receipt
   }
 
   /**
@@ -1148,13 +1154,14 @@ export class Presale {
     duration,
     lifecycle,
   }: TSetDecayDurationParams): Promise<TransactionReceipt> {
-    return this.execWrite({
+    const { receipt } = await this.requireSafeWrite().write({
       address: this.address,
       abi: Presale_v1,
       functionName: 'setDecayDuration',
       args: [duration],
       lifecycle,
     })
+    return receipt
   }
 
   /**
@@ -1164,13 +1171,14 @@ export class Presale {
     startTime,
     lifecycle,
   }: TSetStartTimeParams): Promise<TransactionReceipt> {
-    return this.execWrite({
+    const { receipt } = await this.requireSafeWrite().write({
       address: this.address,
       abi: Presale_v1,
       functionName: 'setStartTime',
       args: [startTime],
       lifecycle,
     })
+    return receipt
   }
 
   // =========================================================================
@@ -1524,13 +1532,14 @@ export class Presale {
       }
     }
 
-    return this.execWrite({
+    const { receipt } = await this.requireSafeWrite().write({
       address: params.transactionForwarderAddress,
       abi: TransactionForwarder_v1,
       functionName: 'executeMulticall',
       args: [calls],
       lifecycle,
     })
+    return receipt
   }
 
   /**
@@ -1582,13 +1591,14 @@ export class Presale {
       })
     }
 
-    return this.execWrite({
+    const { receipt } = await this.requireSafeWrite().write({
       address: params.transactionForwarderAddress,
       abi: TransactionForwarder_v1,
       functionName: 'executeMulticall',
       args: [calls],
       lifecycle,
     })
+    return receipt
   }
 
   /**
@@ -1634,13 +1644,14 @@ export class Presale {
       }),
     })
 
-    return this.execWrite({
+    const { receipt } = await this.requireSafeWrite().write({
       address: params.transactionForwarderAddress,
       abi: TransactionForwarder_v1,
       functionName: 'executeMulticall',
       args: [calls],
       lifecycle,
     })
+    return receipt
   }
 
   /**
@@ -1676,41 +1687,19 @@ export class Presale {
       })
     }
 
-    return this.execWrite({
+    const { receipt } = await this.requireSafeWrite().write({
       address: params.transactionForwarderAddress,
       abi: TransactionForwarder_v1,
       functionName: 'executeMulticall',
       args: [calls],
       lifecycle,
     })
+    return receipt
   }
 
   // =========================================================================
   // PRIVATE HELPER METHODS
   // =========================================================================
-
-  private async execWrite<
-    TAbi extends Abi,
-    TFunctionName extends ContractFunctionName<TAbi, 'nonpayable' | 'payable'>,
-  >(params: {
-    address: Address
-    abi: TAbi
-    functionName: TFunctionName
-    args?: ContractFunctionArgs<TAbi, 'nonpayable' | 'payable', TFunctionName>
-    lifecycle?: TransactionLifecycleCallbacks
-  }): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
-    const { receipt } = await safeWrite({
-      publicClient: this.publicClient,
-      walletClient,
-      address: params.address,
-      abi: params.abi,
-      functionName: params.functionName,
-      args: params.args,
-      lifecycle: params.lifecycle,
-    })
-    return receipt
-  }
 
   private static resolvePresaleAddress(data: TPresale): Address {
     if (!data?.id) {
@@ -1730,6 +1719,13 @@ export class Presale {
     if (amount <= ZERO_AMOUNT) {
       throw new Error('Amount must be greater than zero')
     }
+  }
+
+  private requireSafeWrite(): SafeWrite {
+    if (!this.safeWrite) {
+      throw new Error('Wallet not connected. Please connect your wallet to continue.')
+    }
+    return this.safeWrite
   }
 
   private requireWalletClient(): PopWalletClient {

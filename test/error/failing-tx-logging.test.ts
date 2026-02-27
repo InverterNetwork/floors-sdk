@@ -1,7 +1,7 @@
 /**
- * @description safeWrite harness — end-to-end tests
+ * @description SafeWrite harness — end-to-end tests
  *
- * Validates the simulate → write → receipt utility exported from handle-error.ts.
+ * Validates the simulate → write → receipt utility exported from safe-write.ts.
  * Mock clients stand in for viem PublicClient / WalletClient so every branch
  * can be exercised without a live node.
  *
@@ -18,8 +18,10 @@
 import { describe, expect, it } from 'bun:test'
 import type { Abi, Hex, TransactionReceipt } from 'viem'
 
-import type { EnhancedParsedError, SafeWriteResult } from '../../src/utils/handle-error'
-import { safeWrite } from '../../src/utils/handle-error'
+import type { PopPublicClient, PopWalletClient } from '../../src/types'
+import type { EnhancedParsedError } from '../../src/utils/handle-error'
+import type { SafeWriteResult } from '../../src/utils/safe-write'
+import { SafeWrite } from '../../src/utils/safe-write'
 
 // ============================================================================
 // Test ABI
@@ -112,16 +114,18 @@ const MOCK_RECEIPT: TransactionReceipt = {
 const makePublicClient = (
   simulateImpl: () => Promise<{ request: unknown; result: unknown }>,
   receipt: TransactionReceipt = MOCK_RECEIPT
-) => ({
-  simulateContract: (_params: unknown) => simulateImpl(),
-  waitForTransactionReceipt: (_params: unknown) => Promise.resolve(receipt),
-})
+) =>
+  ({
+    simulateContract: (_params: unknown) => simulateImpl(),
+    waitForTransactionReceipt: (_params: unknown) => Promise.resolve(receipt),
+  }) as unknown as PopPublicClient
 
 /** Builds a mock WalletClient that resolves or rejects writeContract */
-const makeWalletClient = (writeImpl: () => Promise<Hex>) => ({
-  account: { address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266' as const },
-  writeContract: (_request: unknown) => writeImpl(),
-})
+const makeWalletClient = (writeImpl: () => Promise<Hex>) =>
+  ({
+    account: { address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266' as const },
+    writeContract: (_request: unknown) => writeImpl(),
+  }) as unknown as PopWalletClient
 
 const simOk = (simResult: unknown = 0n) =>
   makePublicClient(() => Promise.resolve({ request: { _tag: 'simRequest' }, result: simResult }))
@@ -141,9 +145,10 @@ describe('sim fails — known ABI error', () => {
     let captured: EnhancedParsedError | undefined
 
     await expect(
-      safeWrite({
+      new SafeWrite({
         publicClient: makePublicClient(() => Promise.reject(err)),
         walletClient: writeOk(),
+      }).write({
         address: CONTRACT_ADDRESS,
         abi: MARKET_ABI,
         functionName: 'buy',
@@ -173,9 +178,10 @@ describe('sim fails — known ABI error', () => {
     )
 
     await expect(
-      safeWrite({
+      new SafeWrite({
         publicClient: makePublicClient(() => Promise.reject(err)),
         walletClient: writeOk(),
+      }).write({
         address: CONTRACT_ADDRESS,
         abi: MARKET_ABI,
         functionName: 'buy',
@@ -191,9 +197,10 @@ describe('sim fails — known ABI error', () => {
     let writeErrorCalled = false
 
     await expect(
-      safeWrite({
+      new SafeWrite({
         publicClient: makePublicClient(() => Promise.reject(err)),
         walletClient: writeOk(),
+      }).write({
         address: CONTRACT_ADDRESS,
         abi: MARKET_ABI,
         functionName: 'buy',
@@ -222,9 +229,10 @@ describe('sim fails — deep cause chain (cause.data.errorName)', () => {
     let captured: EnhancedParsedError | undefined
 
     await expect(
-      safeWrite({
+      new SafeWrite({
         publicClient: makePublicClient(() => Promise.reject(err)),
         walletClient: writeOk(),
+      }).write({
         address: CONTRACT_ADDRESS,
         abi: MARKET_ABI,
         functionName: 'buy',
@@ -256,9 +264,10 @@ describe('sim fails — string revert reason (cause.reason)', () => {
     let captured: EnhancedParsedError | undefined
 
     await expect(
-      safeWrite({
+      new SafeWrite({
         publicClient: makePublicClient(() => Promise.reject(err)),
         walletClient: writeOk(),
+      }).write({
         address: CONTRACT_ADDRESS,
         abi: MARKET_ABI,
         functionName: 'buy',
@@ -290,9 +299,10 @@ describe('sim passes, write reverts', () => {
     let captured: EnhancedParsedError | undefined
 
     await expect(
-      safeWrite({
+      new SafeWrite({
         publicClient: simOk(),
         walletClient: makeWalletClient(() => Promise.reject(err)),
+      }).write({
         address: CONTRACT_ADDRESS,
         abi: MARKET_ABI,
         functionName: 'buy',
@@ -322,9 +332,10 @@ describe('sim passes, write reverts', () => {
     )
 
     await expect(
-      safeWrite({
+      new SafeWrite({
         publicClient: simOk(),
         walletClient: makeWalletClient(() => Promise.reject(err)),
+      }).write({
         address: CONTRACT_ADDRESS,
         abi: MARKET_ABI,
         functionName: 'buy',
@@ -344,9 +355,10 @@ describe('both succeed', () => {
     let simErrorCalled = false
     let writeErrorCalled = false
 
-    const result: SafeWriteResult = await safeWrite({
+    const result: SafeWriteResult = await new SafeWrite({
       publicClient: simOk(SIM_RESULT),
       walletClient: writeOk(),
+    }).write({
       address: CONTRACT_ADDRESS,
       abi: MARKET_ABI,
       functionName: 'buy',
@@ -373,9 +385,7 @@ describe('both succeed', () => {
   })
 
   it('works for payable functions with a value param', async () => {
-    const result = await safeWrite({
-      publicClient: simOk(),
-      walletClient: writeOk(),
+    const result = await new SafeWrite({ publicClient: simOk(), walletClient: writeOk() }).write({
       address: CONTRACT_ADDRESS,
       abi: MARKET_ABI,
       functionName: 'donate',
@@ -394,9 +404,7 @@ describe('both succeed', () => {
 
 describe('receipt', () => {
   it('receipt has status, blockNumber, and transactionHash', async () => {
-    const result = await safeWrite({
-      publicClient: simOk(),
-      walletClient: writeOk(),
+    const result = await new SafeWrite({ publicClient: simOk(), walletClient: writeOk() }).write({
       address: CONTRACT_ADDRESS,
       abi: MARKET_ABI,
       functionName: 'buy',
@@ -415,12 +423,13 @@ describe('receipt', () => {
       gasUsed: 55000n,
     }
 
-    const result = await safeWrite({
+    const result = await new SafeWrite({
       publicClient: makePublicClient(
         () => Promise.resolve({ request: {}, result: null }),
         customReceipt
       ),
       walletClient: writeOk(),
+    }).write({
       address: CONTRACT_ADDRESS,
       abi: MARKET_ABI,
       functionName: 'buy',
@@ -439,9 +448,7 @@ describe('receipt', () => {
 describe('type safety', () => {
   it('accepts correctly typed args for the chosen functionName', async () => {
     // Primarily a compile-time check — tsc/tsgo errors here if args mismatch the ABI
-    const result = await safeWrite({
-      publicClient: simOk(),
-      walletClient: writeOk(),
+    const result = await new SafeWrite({ publicClient: simOk(), walletClient: writeOk() }).write({
       address: CONTRACT_ADDRESS,
       abi: MARKET_ABI,
       functionName: 'buy' as const,
