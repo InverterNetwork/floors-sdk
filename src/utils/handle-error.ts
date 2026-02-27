@@ -29,7 +29,15 @@
  * ```
  */
 
-import type { Abi, AbiItem, Hex } from 'viem'
+import type {
+  Abi,
+  AbiItem,
+  Address,
+  ContractFunctionArgs,
+  ContractFunctionName,
+  Hex,
+  TransactionReceipt,
+} from 'viem'
 import { decodeErrorResult, keccak256, toHex } from 'viem'
 
 import * as abis from '../abis'
@@ -1204,6 +1212,165 @@ export async function getParsedErrorAsync(params: HandleErrorParams): Promise<En
   }
 
   return result
+}
+
+// ============================================================================
+// safeWrite — simulate → write → receipt, with structured error handling
+// ============================================================================
+
+/**
+ * Minimal structural interface satisfied by any viem PublicClient.
+ * Kept narrow so consumers don't need to thread its full generic stack.
+ */
+interface SafeWritePublicClient {
+  simulateContract(params: {
+    address: Address
+    abi: Abi
+    functionName: string
+    args?: readonly unknown[]
+    account?: Address | { address: Address }
+    value?: bigint
+  }): Promise<{ request: unknown; result: unknown }>
+  waitForTransactionReceipt(params: {
+    hash: Hex
+    confirmations?: number
+  }): Promise<TransactionReceipt>
+}
+
+/**
+ * Minimal structural interface satisfied by any viem WalletClient.
+ */
+interface SafeWriteWalletClient {
+  account?: { address: Address } | undefined
+  writeContract(request: unknown): Promise<Hex>
+}
+
+export type SafeWriteParams<
+  TAbi extends Abi,
+  TFunctionName extends ContractFunctionName<TAbi, 'nonpayable' | 'payable'>,
+> = {
+  /** Public client — used for simulation and waiting for the receipt */
+  publicClient: SafeWritePublicClient
+  /** Wallet client — used to sign and broadcast the transaction */
+  walletClient: SafeWriteWalletClient
+  /** Target contract address */
+  address: Address
+  /** Contract ABI — drives both the call and error decoding at every stage */
+  abi: TAbi
+  /** Write function name, restricted to nonpayable / payable via the ABI */
+  functionName: TFunctionName
+  /** Arguments typed against the ABI function signature */
+  args?: ContractFunctionArgs<TAbi, 'nonpayable' | 'payable', TFunctionName>
+  /** ETH value for payable functions */
+  value?: bigint
+  /**
+   * Called when `simulateContract` reverts.
+   * Receives a fully parsed error for logging / toast display.
+   * The original error is re-thrown after this callback fires.
+   */
+  onSimError?: (parsed: EnhancedParsedError) => void
+  /**
+   * Called when simulation passed but `writeContract` reverts.
+   * Rare in practice (nonce race, gas spike between sim and broadcast).
+   * The original error is re-thrown after this callback fires.
+   */
+  onWriteError?: (parsed: EnhancedParsedError) => void
+}
+
+export type SafeWriteResult = {
+  /** Transaction hash from writeContract */
+  hash: Hex
+  /** On-chain receipt with status, logs, gas used, block number, etc. */
+  receipt: TransactionReceipt
+  /** Return value from simulateContract (cast to a concrete type as needed) */
+  simResult: unknown
+}
+
+/**
+ * Single utility for contract write actions: simulate → write → receipt.
+ *
+ * Every stage uses the same ABI for full error decoding, so custom contract
+ * errors are always surfaced with a human-readable `prettyMessage`.
+ *
+ * Execution chain:
+ *   1. `simulateContract` — catches reverts before spending gas. On failure,
+ *      calls `onSimError(parsed)` then re-throws the original error.
+ *   2. `writeContract(sim.request)` — broadcasts the exact calldata from
+ *      simulation. On failure (nonce race / gas spike), calls `onWriteError(parsed)`
+ *      then re-throws.
+ *   3. `waitForTransactionReceipt` — waits for 1 confirmation and returns the
+ *      full on-chain receipt alongside the hash and sim return value.
+ *
+ * @example
+ * ```ts
+ * import { safeWrite } from '@floorsfi/sdk'
+ *
+ * const { hash, receipt, simResult } = await safeWrite({
+ *   publicClient,
+ *   walletClient,
+ *   address: marketAddress,
+ *   abi: marketAbi,
+ *   functionName: 'buy',           // autocompleted from marketAbi
+ *   args: [depositAmount, minOut],  // typed against the ABI
+ *   onSimError:   (e) => toast.error(e.prettyMessage),
+ *   onWriteError: (e) => toast.error(e.prettyMessage),
+ * })
+ *
+ * console.log('confirmed in block', receipt.blockNumber)
+ * ```
+ */
+export async function safeWrite<
+  const TAbi extends Abi,
+  TFunctionName extends ContractFunctionName<TAbi, 'nonpayable' | 'payable'>,
+>(params: SafeWriteParams<TAbi, TFunctionName>): Promise<SafeWriteResult> {
+  const {
+    publicClient,
+    walletClient,
+    address,
+    abi,
+    functionName,
+    args,
+    value,
+    onSimError,
+    onWriteError,
+  } = params
+
+  // ── 1. simulate ─────────────────────────────────────────────────────────────
+  let simResult: unknown
+  let request: unknown
+
+  try {
+    const sim = await publicClient.simulateContract({
+      address,
+      abi,
+      functionName: functionName as string,
+      args: args as readonly unknown[],
+      ...(value !== undefined && { value }),
+      account: walletClient.account,
+    })
+    simResult = sim.result
+    request = sim.request
+  } catch (simError) {
+    const parsed = getParsedError({ error: simError, abi })
+    onSimError?.(parsed)
+    throw simError
+  }
+
+  // ── 2. write ─────────────────────────────────────────────────────────────────
+  let hash: Hex
+
+  try {
+    hash = await walletClient.writeContract(request)
+  } catch (writeError) {
+    const parsed = getParsedError({ error: writeError, abi })
+    onWriteError?.(parsed)
+    throw writeError
+  }
+
+  // ── 3. wait for receipt (1 confirmation) ─────────────────────────────────────
+  const receipt = await publicClient.waitForTransactionReceipt({ hash, confirmations: 1 })
+
+  return { hash, receipt, simResult }
 }
 
 // ============================================================================

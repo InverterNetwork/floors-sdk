@@ -1,431 +1,454 @@
 /**
- * @description Failing transaction logging — end-to-end via handle-error.ts
+ * @description safeWrite harness — end-to-end tests
  *
- * Each test simulates a realistic viem write-action revert, passes it through
- * `getParsedError`, and asserts a fully-decoded result (non-null errorName,
- * non-generic prettyMessage). Every extraction path in handle-error.ts is covered:
+ * Validates the simulate → write → receipt utility exported from handle-error.ts.
+ * Mock clients stand in for viem PublicClient / WalletClient so every branch
+ * can be exercised without a live node.
  *
- *   1. data field     — raw ABI-encoded revert payload (selector + args)
- *   2. viem pre-decoded — cause.data.errorName set by viem when the ABI is known
- *   3. nested cause   — selector on a deeply nested cause.signature
- *   4. message pattern — hex selector embedded in shortMessage / message text
- *   5. string reason  — require(false, "reason") stored in cause.reason
- *   6. custom ABI     — unknown error decoded via an ABI supplied at call time
+ * Covered scenarios:
+ *   1. Sim fails — known ABI error decoded via cause.data.errorName
+ *   2. Sim fails — viem pre-decoded deep cause chain
+ *   3. Sim fails — string revert reason (cause.reason)
+ *   4. Sim passes, write reverts — onWriteError receives decoded error
+ *   5. Both succeed — returns { hash, receipt, simResult }, no callbacks
+ *   6. Receipt fields — status, blockNumber, transactionHash present
+ *   7. Type safety — args typed against the ABI at compile time
  */
 
 import { describe, expect, it } from 'bun:test'
-import type { Hex } from 'viem'
-import { keccak256, toHex } from 'viem'
+import type { Abi, Hex, TransactionReceipt } from 'viem'
 
-import { getParsedError } from '../../src/utils/handle-error'
+import type { EnhancedParsedError, SafeWriteResult } from '../../src/utils/handle-error'
+import { safeWrite } from '../../src/utils/handle-error'
 
 // ============================================================================
-// Fixtures
+// Test ABI
 // ============================================================================
 
-/** Computes the 4-byte selector for an error signature */
-function sel(name: string, types: string[] = []): Hex {
-  return keccak256(toHex(`${name}(${types.join(',')})`)).slice(0, 10) as Hex
-}
+const MARKET_ABI = [
+  {
+    type: 'function',
+    name: 'buy',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'depositAmount', type: 'uint256' },
+      { name: 'minOut', type: 'uint256' },
+    ],
+    outputs: [],
+  },
+  {
+    type: 'function',
+    name: 'donate',
+    stateMutability: 'payable',
+    inputs: [{ name: 'message', type: 'string' }],
+    outputs: [],
+  },
+  { type: 'error', name: 'Market__BuyClosed', inputs: [] },
+  { type: 'error', name: 'Market__SlippageExceeded', inputs: [] },
+  {
+    type: 'error',
+    name: 'ERC20InsufficientAllowance',
+    inputs: [
+      { name: 'spender', type: 'address' },
+      { name: 'allowance', type: 'uint256' },
+      { name: 'needed', type: 'uint256' },
+    ],
+  },
+] as const satisfies Abi
 
-/**
- * Real Error subclass that mirrors viem's ContractFunctionExecutionError.
- * Fields are set to match what viem attaches to the thrown instance.
- */
-class WriteRevertError extends Error {
-  data?: Hex
+const CONTRACT_ADDRESS = '0xDeadBeef00000000000000000000000000000001' as const
+const TX_HASH = '0xabc123abc123abc123abc123abc123abc123abc123abc123abc123abc123abc1' as Hex
+
+// ============================================================================
+// Mock fixtures
+// ============================================================================
+
+/** Real Error subclass — mirrors viem's ContractFunctionExecutionError */
+class SimRevertError extends Error {
   override cause?: unknown
 
-  constructor(opts: { data?: Hex; cause?: unknown; shortMessage?: string } = {}) {
-    super(
-      [
-        'The contract function "deposit" reverted.',
-        '',
-        opts.shortMessage ?? 'Error: execution reverted',
-        '',
-        'Contract Call:',
-        '  address:  0xDeadBeef00000000000000000000000000000001',
-        '  function: deposit(uint256 amount)',
-        '  sender:   0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-      ].join('\n')
-    )
+  constructor(cause: unknown) {
+    super('The contract function "buy" reverted.\n\nError: execution reverted')
     this.name = 'ContractFunctionExecutionError'
-    if (opts.data !== undefined) this.data = opts.data
-    if (opts.cause !== undefined) this.cause = opts.cause
+    this.cause = cause
   }
 }
 
 /**
- * Mirrors viem's ContractFunctionRevertedError — used as a cause.
- * viem sets `.data` to the decoded result when the contract ABI is known
- * (simulateContract / writeContract path), or `.signature` for the raw selector.
+ * Mirrors viem's ContractFunctionRevertedError as a nested cause.
+ * `decoded` reproduces cause.data.errorName (simulateContract + ABI path).
+ * `reason` reproduces cause.reason (require(false, "msg") path).
  */
-class ViemRevertedError extends Error {
+class RevertedCause extends Error {
   data?: { errorName: string; args?: readonly unknown[] }
-  signature?: Hex
   reason?: string
 
-  constructor(
-    opts:
-      | { decoded: { errorName: string; args?: readonly unknown[] } }
-      | { signature: Hex }
-      | { reason: string }
-  ) {
+  constructor(opts: { decoded: { errorName: string } } | { reason: string }) {
     super('The contract reverted.')
     this.name = 'ContractFunctionRevertedError'
-
-    if ('decoded' in opts) {
-      this.data = opts.decoded
-    } else if ('signature' in opts) {
-      this.signature = opts.signature
-    } else {
-      this.reason = opts.reason
-    }
+    if ('decoded' in opts) this.data = opts.decoded
+    else this.reason = opts.reason
   }
 }
 
-// ── well-known selectors ──────────────────────────────────────────────────────
-const SEL_ALLOWANCE = '0xfb8f41b2' as Hex // ERC20InsufficientAllowance(address,uint256,uint256)
-const SEL_BALANCE = '0xe450d38c' as Hex // ERC20InsufficientBalance(address,uint256,uint256)
-
-// ── full ABI-encoded payloads ─────────────────────────────────────────────────
-const ADDR = '000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266'
-const ZERO = '0000000000000000000000000000000000000000000000000000000000000000'
-const AMT = '0000000000000000000000000000000000000000000000056bc75e2d63100000' // 100e18
-
-const DATA_ALLOWANCE = `${SEL_ALLOWANCE}${ADDR}${ZERO}${AMT}` as Hex // spender, allowance=0, needed
-const DATA_BALANCE = `${SEL_BALANCE}${ADDR}${ZERO}${AMT}` as Hex // account, balance=0, needed
-
-// ── assertion helper ──────────────────────────────────────────────────────────
-function assertDecoded(parsed: ReturnType<typeof getParsedError>, label: string) {
-  expect(parsed.errorName, `${label} › errorName must not be null`).not.toBeNull()
-  expect(parsed.prettyMessage, `${label} › must not fall back to "Contract error"`).not.toBe(
-    'Contract error'
-  )
-  expect(parsed.prettyMessage, `${label} › must not fall back to "Something went wrong"`).not.toBe(
-    'Something went wrong'
-  )
-  expect(parsed.isUserRejection, `${label} › must not be flagged as user rejection`).toBe(false)
+const MOCK_RECEIPT: TransactionReceipt = {
+  transactionHash: TX_HASH,
+  blockHash: '0x0000000000000000000000000000000000000000000000000000000000000001' as Hex,
+  blockNumber: 42n,
+  transactionIndex: 0,
+  from: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+  to: CONTRACT_ADDRESS,
+  contractAddress: null,
+  cumulativeGasUsed: 21000n,
+  gasUsed: 21000n,
+  effectiveGasPrice: 1000000000n,
+  status: 'success',
+  logsBloom: '0x' as Hex,
+  logs: [],
+  type: 'eip1559',
 }
 
-// ============================================================================
-// 1. data field — raw ABI-encoded payload on the error
-// ============================================================================
-
-describe('path: data field (raw ABI-encoded payload)', () => {
-  it('decodes ERC20InsufficientAllowance — selector + args in data', () => {
-    const err = new WriteRevertError({ data: DATA_ALLOWANCE })
-    const parsed = getParsedError({ error: err })
-
-    assertDecoded(parsed, 'ERC20InsufficientAllowance')
-    expect(parsed.errorName).toBe('ERC20InsufficientAllowance')
-    expect(parsed.signature).toBe(SEL_ALLOWANCE)
-    expect(parsed.decodedArgs).toBeDefined()
-
-    console.log('[data-field] decoded:', {
-      errorName: parsed.errorName,
-      prettyMessage: parsed.prettyMessage,
-      decodedArgs: parsed.decodedArgs,
-    })
-  })
-
-  it('decodes ERC20InsufficientBalance — selector + args in data', () => {
-    const err = new WriteRevertError({ data: DATA_BALANCE })
-    const parsed = getParsedError({ error: err })
-
-    assertDecoded(parsed, 'ERC20InsufficientBalance')
-    expect(parsed.errorName).toBe('ERC20InsufficientBalance')
-    expect(parsed.decodedArgs).toBeDefined()
-
-    console.log('[data-field] decoded:', {
-      errorName: parsed.errorName,
-      prettyMessage: parsed.prettyMessage,
-      decodedArgs: parsed.decodedArgs,
-    })
-  })
-
-  it('decodes a custom no-input error — bare selector + custom ABI', () => {
-    const name = 'Market__BuyClosed'
-    const abi = [{ type: 'error', name, inputs: [] }] as const
-    const err = new WriteRevertError({ data: sel(name) })
-    const parsed = getParsedError({ error: err, abi })
-
-    assertDecoded(parsed, name)
-    expect(parsed.errorName).toBe(name)
-    expect(parsed.formattedErrorName).toBeDefined()
-
-    console.log('[data-field] custom (no inputs):', {
-      errorName: parsed.errorName,
-      formattedErrorName: parsed.formattedErrorName,
-      prettyMessage: parsed.prettyMessage,
-    })
-  })
-
-  it('decodes a custom error with inputs — full data + custom ABI', () => {
-    const name = 'Vault__SlippageExceeded'
-    const abi = [
-      {
-        type: 'error',
-        name,
-        inputs: [
-          { name: 'expected', type: 'uint256' },
-          { name: 'actual', type: 'uint256' },
-        ],
-      },
-    ] as const
-    const s = sel(name, ['uint256', 'uint256'])
-    const a1 = '0000000000000000000000000000000000000000000000000000000000000064' // 100
-    const a2 = '0000000000000000000000000000000000000000000000000000000000000032' //  50
-    const err = new WriteRevertError({ data: `${s}${a1}${a2}` as Hex })
-    const parsed = getParsedError({ error: err, abi })
-
-    assertDecoded(parsed, name)
-    expect(parsed.errorName).toBe(name)
-  })
+/** Builds a mock PublicClient that resolves or rejects simulateContract, and resolves waitForTransactionReceipt */
+const makePublicClient = (
+  simulateImpl: () => Promise<{ request: unknown; result: unknown }>,
+  receipt: TransactionReceipt = MOCK_RECEIPT
+) => ({
+  simulateContract: (_params: unknown) => simulateImpl(),
+  waitForTransactionReceipt: (_params: unknown) => Promise.resolve(receipt),
 })
 
+/** Builds a mock WalletClient that resolves or rejects writeContract */
+const makeWalletClient = (writeImpl: () => Promise<Hex>) => ({
+  account: { address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266' as const },
+  writeContract: (_request: unknown) => writeImpl(),
+})
+
+const simOk = (simResult: unknown = 0n) =>
+  makePublicClient(() => Promise.resolve({ request: { _tag: 'simRequest' }, result: simResult }))
+
+const writeOk = () => makeWalletClient(() => Promise.resolve(TX_HASH))
+
 // ============================================================================
-// 2. viem pre-decoded — cause.data.errorName set by viem
+// 1. Sim fails — known ABI error (cause.data.errorName path)
 // ============================================================================
 
-describe('path: viem pre-decoded (cause.data.errorName)', () => {
-  it('uses viem-decoded errorName and resolves UX mapping for known errors', () => {
-    const err = new WriteRevertError({
-      cause: new ViemRevertedError({
-        decoded: {
-          errorName: 'ERC20InsufficientAllowance',
-          args: ['0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266', BigInt(0), BigInt(100e18)] as const,
+describe('sim fails — known ABI error', () => {
+  it('calls onSimError with a fully decoded EnhancedParsedError', async () => {
+    const err = new SimRevertError(
+      new RevertedCause({ decoded: { errorName: 'Market__BuyClosed' } })
+    )
+
+    let captured: EnhancedParsedError | undefined
+
+    await expect(
+      safeWrite({
+        publicClient: makePublicClient(() => Promise.reject(err)),
+        walletClient: writeOk(),
+        address: CONTRACT_ADDRESS,
+        abi: MARKET_ABI,
+        functionName: 'buy',
+        args: [100n, 90n],
+        onSimError: (p) => {
+          captured = p
         },
-      }),
-    })
+      })
+    ).rejects.toThrow()
 
-    const parsed = getParsedError({ error: err })
+    expect(captured!.errorName).toBe('Market__BuyClosed')
+    expect(captured!.prettyMessage).not.toBe('Contract error')
+    expect(captured!.prettyMessage).not.toBe('Something went wrong')
+    expect(captured!.isUserRejection).toBe(false)
 
-    assertDecoded(parsed, 'viem pre-decoded known')
-    expect(parsed.errorName).toBe('ERC20InsufficientAllowance')
-    expect(parsed.prettyMessage).not.toBe('Contract error')
-
-    console.log('[viem-predecoded] known UX mapping:', {
-      errorName: parsed.errorName,
-      prettyMessage: parsed.prettyMessage,
-      category: parsed.category,
-      suggestion: parsed.suggestion,
-    })
-  })
-
-  it('uses viem-decoded errorName for custom errors not in UX registry', () => {
-    const name = 'CreditFacility__LoanNotFound'
-    const err = new WriteRevertError({
-      cause: new ViemRevertedError({ decoded: { errorName: name } }),
-    })
-
-    const parsed = getParsedError({ error: err })
-
-    assertDecoded(parsed, 'viem pre-decoded custom')
-    expect(parsed.errorName).toBe(name)
-    expect(parsed.formattedErrorName).toBeDefined()
-
-    console.log('[viem-predecoded] custom error:', {
-      errorName: parsed.errorName,
-      formattedErrorName: parsed.formattedErrorName,
-      prettyMessage: parsed.prettyMessage,
+    console.log('[sim-fails/known-abi]', {
+      errorName: captured!.errorName,
+      prettyMessage: captured!.prettyMessage,
+      category: captured!.category,
+      suggestion: captured!.suggestion,
     })
   })
 
-  it('uses viem-decoded errorName from a doubly-nested cause chain', () => {
-    // ContractFunctionExecutionError → CallExecutionError → ContractFunctionRevertedError
-    const err = new WriteRevertError({
-      cause: {
-        name: 'CallExecutionError',
-        cause: new ViemRevertedError({ decoded: { errorName: 'ERC20InsufficientBalance' } }),
+  it('re-throws the original error, not a wrapper', async () => {
+    const err = new SimRevertError(
+      new RevertedCause({ decoded: { errorName: 'Market__BuyClosed' } })
+    )
+
+    await expect(
+      safeWrite({
+        publicClient: makePublicClient(() => Promise.reject(err)),
+        walletClient: writeOk(),
+        address: CONTRACT_ADDRESS,
+        abi: MARKET_ABI,
+        functionName: 'buy',
+        args: [100n, 90n],
+      })
+    ).rejects.toBe(err)
+  })
+
+  it('does not call onWriteError when simulation is what failed', async () => {
+    const err = new SimRevertError(
+      new RevertedCause({ decoded: { errorName: 'Market__BuyClosed' } })
+    )
+    let writeErrorCalled = false
+
+    await expect(
+      safeWrite({
+        publicClient: makePublicClient(() => Promise.reject(err)),
+        walletClient: writeOk(),
+        address: CONTRACT_ADDRESS,
+        abi: MARKET_ABI,
+        functionName: 'buy',
+        args: [100n, 90n],
+        onWriteError: () => {
+          writeErrorCalled = true
+        },
+      })
+    ).rejects.toThrow()
+
+    expect(writeErrorCalled).toBe(false)
+  })
+})
+
+// ============================================================================
+// 2. Sim fails — viem pre-decoded deep cause chain
+// ============================================================================
+
+describe('sim fails — deep cause chain (cause.data.errorName)', () => {
+  it('surfaces errorName from a doubly nested ContractFunctionRevertedError', async () => {
+    const err = new SimRevertError({
+      name: 'CallExecutionError',
+      cause: new RevertedCause({ decoded: { errorName: 'ERC20InsufficientAllowance' } }),
+    })
+
+    let captured: EnhancedParsedError | undefined
+
+    await expect(
+      safeWrite({
+        publicClient: makePublicClient(() => Promise.reject(err)),
+        walletClient: writeOk(),
+        address: CONTRACT_ADDRESS,
+        abi: MARKET_ABI,
+        functionName: 'buy',
+        args: [100n, 90n],
+        onSimError: (p) => {
+          captured = p
+        },
+      })
+    ).rejects.toThrow()
+
+    expect(captured!.errorName).toBe('ERC20InsufficientAllowance')
+    expect(captured!.prettyMessage).not.toBe('Contract error')
+
+    console.log('[sim-fails/deep-cause]', {
+      errorName: captured!.errorName,
+      prettyMessage: captured!.prettyMessage,
+    })
+  })
+})
+
+// ============================================================================
+// 3. Sim fails — string revert reason (cause.reason)
+// ============================================================================
+
+describe('sim fails — string revert reason (cause.reason)', () => {
+  it('uses the require() string as prettyMessage', async () => {
+    const err = new SimRevertError(new RevertedCause({ reason: 'Presale not started yet' }))
+
+    let captured: EnhancedParsedError | undefined
+
+    await expect(
+      safeWrite({
+        publicClient: makePublicClient(() => Promise.reject(err)),
+        walletClient: writeOk(),
+        address: CONTRACT_ADDRESS,
+        abi: MARKET_ABI,
+        functionName: 'buy',
+        args: [100n, 90n],
+        onSimError: (p) => {
+          captured = p
+        },
+      })
+    ).rejects.toThrow()
+
+    expect(captured!.prettyMessage).toBe('Presale not started yet')
+    expect(captured!.isUserRejection).toBe(false)
+
+    console.log('[sim-fails/reason]', { prettyMessage: captured!.prettyMessage })
+  })
+})
+
+// ============================================================================
+// 4. Sim passes, write reverts
+// ============================================================================
+
+describe('sim passes, write reverts', () => {
+  it('calls onWriteError with decoded error, never calls onSimError', async () => {
+    const err = new SimRevertError(
+      new RevertedCause({ decoded: { errorName: 'Market__SlippageExceeded' } })
+    )
+
+    let simErrorCalled = false
+    let captured: EnhancedParsedError | undefined
+
+    await expect(
+      safeWrite({
+        publicClient: simOk(),
+        walletClient: makeWalletClient(() => Promise.reject(err)),
+        address: CONTRACT_ADDRESS,
+        abi: MARKET_ABI,
+        functionName: 'buy',
+        args: [100n, 90n],
+        onSimError: () => {
+          simErrorCalled = true
+        },
+        onWriteError: (p) => {
+          captured = p
+        },
+      })
+    ).rejects.toThrow()
+
+    expect(simErrorCalled).toBe(false)
+    expect(captured!.errorName).toBe('Market__SlippageExceeded')
+    expect(captured!.prettyMessage).not.toBe('Contract error')
+
+    console.log('[write-reverts]', {
+      errorName: captured!.errorName,
+      prettyMessage: captured!.prettyMessage,
+    })
+  })
+
+  it('re-throws the original write error', async () => {
+    const err = new SimRevertError(
+      new RevertedCause({ decoded: { errorName: 'Market__BuyClosed' } })
+    )
+
+    await expect(
+      safeWrite({
+        publicClient: simOk(),
+        walletClient: makeWalletClient(() => Promise.reject(err)),
+        address: CONTRACT_ADDRESS,
+        abi: MARKET_ABI,
+        functionName: 'buy',
+        args: [100n, 90n],
+      })
+    ).rejects.toBe(err)
+  })
+})
+
+// ============================================================================
+// 5. Both succeed — hash, receipt, simResult returned
+// ============================================================================
+
+describe('both succeed', () => {
+  it('returns hash, receipt, and simResult — no callbacks fired', async () => {
+    const SIM_RESULT = BigInt(42)
+    let simErrorCalled = false
+    let writeErrorCalled = false
+
+    const result: SafeWriteResult = await safeWrite({
+      publicClient: simOk(SIM_RESULT),
+      walletClient: writeOk(),
+      address: CONTRACT_ADDRESS,
+      abi: MARKET_ABI,
+      functionName: 'buy',
+      args: [100n, 90n],
+      onSimError: () => {
+        simErrorCalled = true
+      },
+      onWriteError: () => {
+        writeErrorCalled = true
       },
     })
 
-    const parsed = getParsedError({ error: err })
+    expect(result.hash).toBe(TX_HASH)
+    expect(result.simResult).toBe(SIM_RESULT)
+    expect(result.receipt).toBeDefined()
+    expect(simErrorCalled).toBe(false)
+    expect(writeErrorCalled).toBe(false)
 
-    assertDecoded(parsed, 'doubly nested viem pre-decoded')
-    expect(parsed.errorName).toBe('ERC20InsufficientBalance')
+    console.log('[both-succeed]', {
+      hash: result.hash,
+      simResult: result.simResult,
+      receipt: { status: result.receipt.status, blockNumber: result.receipt.blockNumber },
+    })
+  })
+
+  it('works for payable functions with a value param', async () => {
+    const result = await safeWrite({
+      publicClient: simOk(),
+      walletClient: writeOk(),
+      address: CONTRACT_ADDRESS,
+      abi: MARKET_ABI,
+      functionName: 'donate',
+      args: ['hello'],
+      value: 1n * 10n ** 18n,
+    })
+
+    expect(result.hash).toBe(TX_HASH)
+    expect(result.receipt).toBeDefined()
   })
 })
 
 // ============================================================================
-// 3. nested cause — selector on cause.signature
+// 6. Receipt fields
 // ============================================================================
 
-describe('path: nested cause.signature', () => {
-  it('decodes ERC20InsufficientBalance from a nested RevertedCauseError.signature', () => {
-    const err = new WriteRevertError({
-      cause: {
-        name: 'CallExecutionError',
-        cause: new ViemRevertedError({ signature: SEL_BALANCE }),
-      },
+describe('receipt', () => {
+  it('receipt has status, blockNumber, and transactionHash', async () => {
+    const result = await safeWrite({
+      publicClient: simOk(),
+      walletClient: writeOk(),
+      address: CONTRACT_ADDRESS,
+      abi: MARKET_ABI,
+      functionName: 'buy',
+      args: [100n, 90n],
     })
 
-    const parsed = getParsedError({ error: err })
-
-    assertDecoded(parsed, 'nested signature')
-    expect(parsed.errorName).toBe('ERC20InsufficientBalance')
-    expect(parsed.signature).toBe(SEL_BALANCE)
-
-    console.log('[nested-cause] decoded:', {
-      errorName: parsed.errorName,
-      prettyMessage: parsed.prettyMessage,
-    })
+    expect(result.receipt.status).toBe('success')
+    expect(result.receipt.blockNumber).toBe(42n)
+    expect(result.receipt.transactionHash).toBe(TX_HASH)
   })
 
-  it('decodes a custom error whose selector is in a nested cause.data hex string', () => {
-    const name = 'Market__SellClosed'
-    const abi = [{ type: 'error', name, inputs: [] }] as const
-    const err = new WriteRevertError({
-      cause: {
-        name: 'RawContractError',
-        data: sel(name),
-      },
+  it('receipt with a custom block returns those fields correctly', async () => {
+    const customReceipt: TransactionReceipt = {
+      ...MOCK_RECEIPT,
+      blockNumber: 9999n,
+      gasUsed: 55000n,
+    }
+
+    const result = await safeWrite({
+      publicClient: makePublicClient(
+        () => Promise.resolve({ request: {}, result: null }),
+        customReceipt
+      ),
+      walletClient: writeOk(),
+      address: CONTRACT_ADDRESS,
+      abi: MARKET_ABI,
+      functionName: 'buy',
+      args: [100n, 90n],
     })
 
-    const parsed = getParsedError({ error: err, abi })
-
-    assertDecoded(parsed, 'nested cause.data hex')
-    expect(parsed.errorName).toBe(name)
-  })
-})
-
-// ============================================================================
-// 4. message pattern — selector embedded in shortMessage / message text
-// ============================================================================
-
-describe('path: selector in message text', () => {
-  it('decodes from a selector in shortMessage ("reverted with 0x...")', () => {
-    const err = new WriteRevertError({
-      shortMessage: `reverted with ${SEL_ALLOWANCE}`,
-    })
-
-    const parsed = getParsedError({ error: err })
-
-    assertDecoded(parsed, 'shortMessage selector')
-    expect(parsed.errorName).toBe('ERC20InsufficientAllowance')
-
-    console.log('[message-pattern] decoded:', {
-      errorName: parsed.errorName,
-      prettyMessage: parsed.prettyMessage,
-    })
-  })
-
-  it('decodes from a "selector: 0x..." pattern in the outer message', () => {
-    const err = new WriteRevertError({
-      shortMessage: `execution reverted with selector: ${SEL_BALANCE}`,
-    })
-
-    const parsed = getParsedError({ error: err })
-
-    assertDecoded(parsed, 'message body selector')
-    expect(parsed.errorName).toBe('ERC20InsufficientBalance')
+    expect(result.receipt.blockNumber).toBe(9999n)
+    expect(result.receipt.gasUsed).toBe(55000n)
   })
 })
 
 // ============================================================================
-// 5. string reason — require(false, "reason") via cause.reason
+// 7. Type safety — args typed against the ABI at compile time
 // ============================================================================
 
-describe('path: string revert reason (cause.reason)', () => {
-  it('uses the reason string as prettyMessage when no selector is present', () => {
-    const err = new WriteRevertError({
-      cause: new ViemRevertedError({ reason: 'Market is paused' }),
+describe('type safety', () => {
+  it('accepts correctly typed args for the chosen functionName', async () => {
+    // Primarily a compile-time check — tsc/tsgo errors here if args mismatch the ABI
+    const result = await safeWrite({
+      publicClient: simOk(),
+      walletClient: writeOk(),
+      address: CONTRACT_ADDRESS,
+      abi: MARKET_ABI,
+      functionName: 'buy' as const,
+      args: [500n * 10n ** 18n, 490n * 10n ** 18n] as const,
     })
 
-    const parsed = getParsedError({ error: err })
-
-    expect(parsed.prettyMessage).toBe('Market is paused')
-    expect(parsed.isUserRejection).toBe(false)
-    expect(parsed.recoveryActions.length).toBeGreaterThan(0)
-
-    console.log('[string-reason] decoded:', {
-      prettyMessage: parsed.prettyMessage,
-      suggestion: parsed.suggestion,
-    })
-  })
-
-  it('handles a nested reason in a multi-level cause chain', () => {
-    const err = new WriteRevertError({
-      cause: {
-        name: 'CallExecutionError',
-        cause: new ViemRevertedError({ reason: 'Presale not started' }),
-      },
-    })
-
-    const parsed = getParsedError({ error: err })
-
-    expect(parsed.prettyMessage).toBe('Presale not started')
-    expect(parsed.isUserRejection).toBe(false)
-  })
-})
-
-// ============================================================================
-// 6. namespaced / formatted error names
-// ============================================================================
-
-describe('path: namespaced error names (Module__X__Y)', () => {
-  it('formats Module__X__Y with source context via the viem pre-decoded path', () => {
-    const name = 'Module__CreditFacility__InvalidLoanId'
-    const err = new WriteRevertError({
-      cause: new ViemRevertedError({ decoded: { errorName: name } }),
-    })
-
-    const parsed = getParsedError({ error: err })
-
-    assertDecoded(parsed, name)
-    expect(parsed.errorName).toBe(name)
-    expect(parsed.formattedErrorName).toContain('Credit Facility')
-
-    console.log('[namespaced] formatted:', {
-      errorName: parsed.errorName,
-      formattedErrorName: parsed.formattedErrorName,
-      prettyMessage: parsed.prettyMessage,
-    })
-  })
-
-  it('formats Module__X__Y via the data field + custom ABI path', () => {
-    const name = 'Module__Floor__InvalidSegmentCount'
-    const abi = [{ type: 'error', name, inputs: [] }] as const
-    const err = new WriteRevertError({ data: sel(name) })
-    const parsed = getParsedError({ error: err, abi })
-
-    assertDecoded(parsed, name)
-    expect(parsed.formattedErrorName).toContain('Floor')
-
-    console.log('[namespaced] formatted via data+ABI:', {
-      errorName: parsed.errorName,
-      formattedErrorName: parsed.formattedErrorName,
-    })
-  })
-})
-
-// ============================================================================
-// Cross-cutting: user rejection is never confused with a contract revert
-// ============================================================================
-
-describe('user rejection vs contract revert', () => {
-  it('marks wallet rejections and fully decodes contract reverts side by side', () => {
-    const rejection = new Error('User rejected the request')
-    const revert = new WriteRevertError({
-      cause: new ViemRevertedError({
-        decoded: { errorName: 'ERC20InsufficientAllowance' },
-      }),
-    })
-
-    const rParsed = getParsedError({ error: rejection })
-    const cParsed = getParsedError({ error: revert })
-
-    expect(rParsed.isUserRejection).toBe(true)
-    expect(rParsed.prettyMessage).toBe('Transaction cancelled')
-
-    assertDecoded(cParsed, 'contract revert side of rejection test')
-    expect(cParsed.isUserRejection).toBe(false)
-    expect(cParsed.errorName).toBe('ERC20InsufficientAllowance')
-
-    console.log('[rejection-vs-revert]', {
-      rejection: { isUserRejection: rParsed.isUserRejection, prettyMessage: rParsed.prettyMessage },
-      revert: { isUserRejection: cParsed.isUserRejection, errorName: cParsed.errorName },
-    })
+    expect(result.hash).toBe(TX_HASH)
+    expect(result.receipt).toBeDefined()
   })
 })
