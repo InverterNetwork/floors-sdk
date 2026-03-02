@@ -1,4 +1,4 @@
-import { HttpApiEndpoint, HttpApiGroup, HttpApiSchema } from '@effect/platform'
+import { HttpApiEndpoint, HttpApiGroup } from '@effect/platform'
 import { Schema } from 'effect'
 
 import * as SessionSchema from './session.schema'
@@ -12,12 +12,9 @@ export const VerifyResponse = Schema.Struct({
   success: Schema.Boolean,
 })
 
-export const NonceResponse = Schema.String.pipe(
-  HttpApiSchema.withEncoding({
-    kind: 'Text',
-    contentType: 'text/plain',
-  })
-)
+export const NonceResponse = Schema.Struct({
+  nonce: Schema.String,
+})
 
 export const SignOutResponse = Schema.Struct({
   success: Schema.Boolean,
