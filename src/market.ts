@@ -4,6 +4,7 @@ import { CreditFacility_v1, ERC20Issuance_v1, Floor_v1 } from './abis'
 import type { TFloorAssetData } from './graphql/api'
 import type { TransactionLifecycleCallbacks } from './presale'
 import type { PopPublicClient, PopWalletClient } from './types'
+import { SafeWrite } from './utils/safe-write'
 import { BASIS_POINTS, validateAddress, validateLoopCount } from './utils/validation'
 
 export interface TMarketBuyParams {
@@ -87,6 +88,7 @@ export class Market {
   private readonly creditFacilityAddress?: Address
   private readonly publicClient: PopPublicClient
   private readonly walletClient?: PopWalletClient
+  private readonly safeWrite?: SafeWrite
 
   constructor({ data, publicClient, walletClient }: MarketConstructorArgs) {
     this.address = Market.resolveMarketAddress(data)
@@ -95,6 +97,7 @@ export class Market {
     this.creditFacilityAddress = Market.resolveCreditFacilityAddress(data)
     this.publicClient = publicClient
     this.walletClient = walletClient
+    this.safeWrite = walletClient ? new SafeWrite({ publicClient, walletClient }) : undefined
   }
 
   public getAddress(): Address {
@@ -184,40 +187,20 @@ export class Market {
     slippageBps = 50,
     lifecycle,
   }: TMarketBuyParams): Promise<TMarketMutationResult> {
-    const walletClient = this.requireWalletClient()
     this.assertPositiveAmount(depositAmount)
     const normalizedSlippage = this.normalizeSlippage(slippageBps)
 
     const expectedOut = await this.previewBuy(depositAmount)
     const minAmountOut = this.applySlippage(expectedOut, normalizedSlippage)
 
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Floor_v1,
-        functionName: 'buy',
-        args: [depositAmount, minAmountOut],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.address,
+      abi: Floor_v1,
+      functionName: 'buy',
+      args: [depositAmount, minAmountOut],
+      lifecycle,
+    })
+    return receipt
   }
 
   public async buyFor({
@@ -226,7 +209,6 @@ export class Market {
     slippageBps = 50,
     lifecycle,
   }: TMarketBuyForParams): Promise<TMarketMutationResult> {
-    const walletClient = this.requireWalletClient()
     validateAddress(receiver, 'receiver')
     this.assertPositiveAmount(depositAmount)
     const normalizedSlippage = this.normalizeSlippage(slippageBps)
@@ -234,33 +216,14 @@ export class Market {
     const expectedOut = await this.previewBuy(depositAmount)
     const minAmountOut = this.applySlippage(expectedOut, normalizedSlippage)
 
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Floor_v1,
-        functionName: 'buyFor',
-        args: [receiver, depositAmount, minAmountOut],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.address,
+      abi: Floor_v1,
+      functionName: 'buyFor',
+      args: [receiver, depositAmount, minAmountOut],
+      lifecycle,
+    })
+    return receipt
   }
 
   /**
@@ -330,33 +293,14 @@ export class Market {
     const expectedOut = await this.previewSell(depositAmount)
     const minAmountOut = this.applySlippage(expectedOut, normalizedSlippage)
 
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Floor_v1,
-        functionName: 'sell',
-        args: [depositAmount, minAmountOut],
-        account: accountAddress,
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.address,
+      abi: Floor_v1,
+      functionName: 'sell',
+      args: [depositAmount, minAmountOut],
+      lifecycle,
+    })
+    return receipt
   }
 
   public async sellTo({
@@ -405,68 +349,45 @@ export class Market {
     const expectedOut = await this.previewSell(depositAmount)
     const minAmountOut = this.applySlippage(expectedOut, normalizedSlippage)
 
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Floor_v1,
-        functionName: 'sellTo',
-        args: [receiver, depositAmount, minAmountOut],
-        account: accountAddress,
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.address,
+      abi: Floor_v1,
+      functionName: 'sellTo',
+      args: [receiver, depositAmount, minAmountOut],
+      lifecycle,
+    })
+    return receipt
   }
 
-  public async approveFToken({ amount }: TMarketApproveParams): Promise<TMarketMutationResult> {
-    const walletClient = this.requireWalletClient()
+  public async approveFToken({
+    amount,
+    lifecycle,
+  }: TMarketApproveParams): Promise<TMarketMutationResult> {
     this.assertPositiveAmount(amount)
 
-    const hash = await walletClient.writeContract({
+    const { receipt } = await this.requireSafeWrite().write({
       address: this.issuanceTokenAddress,
       abi: ERC20Issuance_v1,
       functionName: 'approve',
       args: [this.address, amount],
-      account: this.getWalletAddress(walletClient),
+      lifecycle,
     })
-
-    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
     return receipt
   }
 
   public async approveReserveToken({
     amount,
+    lifecycle,
   }: TMarketApproveParams): Promise<TMarketMutationResult> {
-    const walletClient = this.requireWalletClient()
     this.assertPositiveAmount(amount)
 
-    const hash = await walletClient.writeContract({
+    const { receipt } = await this.requireSafeWrite().write({
       address: this.reserveTokenAddress,
       abi: ERC20Issuance_v1,
       functionName: 'approve',
       args: [this.address, amount],
-      account: this.getWalletAddress(walletClient),
+      lifecycle,
     })
-
-    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
     return receipt
   }
 
@@ -475,21 +396,18 @@ export class Market {
    */
   public async approveFTokenForCreditFacility({
     amount,
+    lifecycle,
   }: TMarketApproveParams): Promise<TMarketMutationResult> {
-    const walletClient = this.requireWalletClient()
     const creditFacility = this.requireCreditFacility()
     this.assertPositiveAmount(amount)
 
-    const hash = await walletClient.writeContract({
+    const { receipt } = await this.requireSafeWrite().write({
       address: this.issuanceTokenAddress,
       abi: ERC20Issuance_v1,
       functionName: 'approve',
       args: [creditFacility, amount],
-      account: this.getWalletAddress(walletClient),
+      lifecycle,
     })
-
-    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
     return receipt
   }
 
@@ -504,39 +422,17 @@ export class Market {
     borrowAmount,
     lifecycle,
   }: TMarketBorrowParams): Promise<TMarketMutationResult> {
-    const walletClient = this.requireWalletClient()
     const creditFacility = this.requireCreditFacility()
     this.assertPositiveAmount(borrowAmount)
 
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: creditFacility,
-        abi: CreditFacility_v1,
-        functionName: 'borrow',
-        args: [borrowAmount],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        const error = new Error('Borrow transaction reverted')
-        lifecycle?.onFailed?.(error)
-        throw error
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    const { receipt } = await this.requireSafeWrite().write({
+      address: creditFacility,
+      abi: CreditFacility_v1,
+      functionName: 'borrow',
+      args: [borrowAmount],
+      lifecycle,
+    })
+    return receipt
   }
 
   /**
@@ -555,7 +451,6 @@ export class Market {
     minAmountOut = BigInt(0),
     lifecycle,
   }: TMarketBuyAndBorrowParams): Promise<TMarketMutationResult> {
-    const walletClient = this.requireWalletClient()
     const creditFacility = this.requireCreditFacility()
     this.assertPositiveAmount(amount)
 
@@ -564,35 +459,14 @@ export class Market {
     // Contract expects loop count (iterations), not BPS
     const loops = BigInt(leverage)
 
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: creditFacility,
-        abi: CreditFacility_v1,
-        functionName: 'buyAndBorrow',
-        args: [amount, loops, consolidate, minAmountOut],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        const error = new Error('Buy and borrow transaction reverted')
-        lifecycle?.onFailed?.(error)
-        throw error
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    const { receipt } = await this.requireSafeWrite().write({
+      address: creditFacility,
+      abi: CreditFacility_v1,
+      functionName: 'buyAndBorrow',
+      args: [amount, loops, consolidate, minAmountOut],
+      lifecycle,
+    })
+    return receipt
   }
 
   /**
@@ -607,39 +481,17 @@ export class Market {
     loanId,
     lifecycle,
   }: TMarketRepayParams): Promise<TMarketMutationResult> {
-    const walletClient = this.requireWalletClient()
     const creditFacility = this.requireCreditFacility()
     this.assertPositiveAmount(repayAmount)
 
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: creditFacility,
-        abi: CreditFacility_v1,
-        functionName: 'repay',
-        args: [loanId, repayAmount],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        const error = new Error('Repay transaction reverted')
-        lifecycle?.onFailed?.(error)
-        throw error
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    const { receipt } = await this.requireSafeWrite().write({
+      address: creditFacility,
+      abi: CreditFacility_v1,
+      functionName: 'repay',
+      args: [loanId, repayAmount],
+      lifecycle,
+    })
+    return receipt
   }
 
   /**
@@ -731,6 +583,13 @@ export class Market {
     return (amount * slippage) / BigInt(BASIS_POINTS.MAX)
   }
 
+  private requireSafeWrite(): SafeWrite {
+    if (!this.safeWrite) {
+      throw new Error('Wallet not connected. Please connect your wallet to continue.')
+    }
+    return this.safeWrite
+  }
+
   private requireWalletClient(): PopWalletClient {
     if (!this.walletClient) {
       throw new Error('Wallet not connected. Please connect your wallet to continue.')
@@ -743,21 +602,18 @@ export class Market {
    */
   public async approveReserveTokenForCreditFacility({
     amount,
+    lifecycle,
   }: TMarketApproveParams): Promise<TMarketMutationResult> {
-    const walletClient = this.requireWalletClient()
     const creditFacility = this.requireCreditFacility()
     this.assertPositiveAmount(amount)
 
-    const hash = await walletClient.writeContract({
+    const { receipt } = await this.requireSafeWrite().write({
       address: this.reserveTokenAddress,
       abi: ERC20Issuance_v1,
       functionName: 'approve',
       args: [creditFacility, amount],
-      account: this.getWalletAddress(walletClient),
+      lifecycle,
     })
-
-    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
     return receipt
   }
 
