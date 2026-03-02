@@ -11,6 +11,8 @@ type CallbackId = string
 export type SubscriptionCallback<T extends subscription_rootGenqlSelection & { __name?: string }> =
   (data: SubscriptionResult<T>) => void
 
+export type SubscriptionErrorCallback = (error: string) => void
+
 /**
  * SubscriptionManager manages GraphQL subscriptions with URQL,
  * allows dynamic addition/removal of callbacks, and auto-handles subscriptions.
@@ -19,6 +21,7 @@ export type SubscriptionCallback<T extends subscription_rootGenqlSelection & { _
  */
 export class SubscriptionManager<T extends subscription_rootGenqlSelection & { __name?: string }> {
   public callbacks: Map<CallbackId, SubscriptionCallback<T>> = new Map()
+  public errorCallbacks: Map<CallbackId, SubscriptionErrorCallback> = new Map()
   private fields: subscription_rootGenqlSelection & { __name?: string }
   private subscriptionOperation: (() => void) | null = null
   private isSubscribed = false
@@ -47,11 +50,18 @@ export class SubscriptionManager<T extends subscription_rootGenqlSelection & { _
    * Add a new callback for the subscription data.
    * Starts the subscription if this is the first callback.
    * @param callback - Function to handle subscription events.
+   * @param onError - Optional function to handle subscription errors.
    * @returns CallbackId - A unique ID for the callback.
    */
-  public addCallback(callback: SubscriptionCallback<T>): CallbackId {
+  public addCallback(
+    callback: SubscriptionCallback<T>,
+    onError?: SubscriptionErrorCallback
+  ): CallbackId {
     const id = this.generateCallbackId()
     this.callbacks.set(id, callback)
+    if (onError) {
+      this.errorCallbacks.set(id, onError)
+    }
 
     // If no previous subscription, start listening
     if (!this.isSubscribed) {
@@ -68,6 +78,7 @@ export class SubscriptionManager<T extends subscription_rootGenqlSelection & { _
    */
   public removeCallback(id: CallbackId) {
     this.callbacks.delete(id)
+    this.errorCallbacks.delete(id)
 
     // Stop subscription if no callbacks remain
     if (this.callbacks.size === 0) {
@@ -91,6 +102,11 @@ export class SubscriptionManager<T extends subscription_rootGenqlSelection & { _
     const { unsubscribe } = pipe(
       Client.get().subscription(query, variables),
       subscribe((result) => {
+        if (result.error) {
+          const message = result.error.message || 'Subscription error'
+          console.error('[SubscriptionManager] Error:', message)
+          this.triggerErrorCallbacks(message)
+        }
         if (result.data) {
           this.triggerCallbacks(result.data as SubscriptionResult<T>)
         }
@@ -118,6 +134,14 @@ export class SubscriptionManager<T extends subscription_rootGenqlSelection & { _
    */
   private triggerCallbacks(data: SubscriptionResult<T>) {
     this.callbacks.forEach((callback) => callback(data))
+  }
+
+  /**
+   * Trigger all registered error callbacks with the error message.
+   * @param error - The error message from the subscription.
+   */
+  private triggerErrorCallbacks(error: string) {
+    this.errorCallbacks.forEach((callback) => callback(error))
   }
 
   /**

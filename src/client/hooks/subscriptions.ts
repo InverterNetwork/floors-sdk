@@ -123,7 +123,10 @@ export const useSubscription = <T extends GraphQLSubscriptionArgs>({
 
     try {
       const sub = subscription(fields)
-      const callbackId = sub.addCallback(setData)
+      const callbackId = sub.addCallback(setData, (errMsg) => {
+        console.error('[useSubscription] Subscription error:', errMsg)
+        setError(errMsg)
+      })
 
       return () => {
         sub.removeCallback(callbackId)
