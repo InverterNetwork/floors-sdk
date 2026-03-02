@@ -5,6 +5,7 @@ import { AUT_Roles_v2 } from './abis'
 import type { TAuthorizerRole } from './graphql/api'
 import type { PopPublicClient, PopWalletClient } from './types'
 import { DEFAULT_ADMIN_ROLE, PUBLIC_ROLE } from './utils/selectors'
+import { validateAddress } from './utils/validation'
 
 export type TAuthorizerMutationResult = TransactionReceipt
 
@@ -145,11 +146,12 @@ export class Authorizer {
     roleId,
   }: AccessPermissionParams): Promise<TAuthorizerMutationResult> {
     const walletClient = this.requireWalletClient()
+    const validatedTarget = validateAddress(target, 'target')
     const hash = await walletClient.writeContract({
       address: this.address,
       abi: AUT_Roles_v2,
       functionName: 'addAccessPermission',
-      args: [getAddress(target), selector, roleId],
+      args: [validatedTarget, selector, roleId],
       account: this.getWalletAddress(walletClient),
     })
 
@@ -162,11 +164,12 @@ export class Authorizer {
     roleId,
   }: AccessPermissionParams): Promise<TAuthorizerMutationResult> {
     const walletClient = this.requireWalletClient()
+    const validatedTarget = validateAddress(target, 'target')
     const hash = await walletClient.writeContract({
       address: this.address,
       abi: AUT_Roles_v2,
       functionName: 'removeAccessPermission',
-      args: [getAddress(target), selector, roleId],
+      args: [validatedTarget, selector, roleId],
       account: this.getWalletAddress(walletClient),
     })
 
@@ -180,14 +183,15 @@ export class Authorizer {
     permissions,
   }: CreateRoleWithPermissionsParams): Promise<TAuthorizerMutationResult> {
     const walletClient = this.requireWalletClient()
-    const targets = permissions.map((p) => getAddress(p.target))
+    const validatedInitialMembers = initialMembers.map((a) => validateAddress(a, 'initialMembers'))
+    const targets = permissions.map((p) => validateAddress(p.target, 'permissions.target'))
     const selectors = permissions.map((p) => p.selectors)
 
     const hash = await walletClient.writeContract({
       address: this.address,
       abi: AUT_Roles_v2,
       functionName: 'createRoleAndAddAccessPermissions',
-      args: [roleName, adminRoleId, initialMembers, targets, selectors],
+      args: [roleName, adminRoleId, validatedInitialMembers, targets, selectors],
       account: this.getWalletAddress(walletClient),
     })
 
@@ -199,7 +203,7 @@ export class Authorizer {
     account,
   }: RoleAccountParams): Promise<TAuthorizerMutationResult> {
     const walletClient = this.requireWalletClient()
-    const targetAccount = getAddress(account ?? this.getWalletAddress(walletClient))
+    const targetAccount = validateAddress(account ?? this.getWalletAddress(walletClient), 'account')
 
     const hash = await walletClient.writeContract({
       address: this.address,
@@ -217,7 +221,7 @@ export class Authorizer {
     account,
   }: RoleAccountParams): Promise<TAuthorizerMutationResult> {
     const walletClient = this.requireWalletClient()
-    const targetAccount = getAddress(account ?? this.getWalletAddress(walletClient))
+    const targetAccount = validateAddress(account ?? this.getWalletAddress(walletClient), 'account')
 
     const hash = await walletClient.writeContract({
       address: this.address,
@@ -277,7 +281,7 @@ export class Authorizer {
     account,
   }: RoleAccountParams): Promise<TAuthorizerMutationResult> {
     const walletClient = this.requireWalletClient()
-    const targetAccount = getAddress(account ?? this.getWalletAddress(walletClient))
+    const targetAccount = validateAddress(account ?? this.getWalletAddress(walletClient), 'account')
 
     const hash = await walletClient.writeContract({
       address: this.address,

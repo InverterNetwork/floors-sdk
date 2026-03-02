@@ -8,7 +8,7 @@ import type { Address, TransactionReceipt } from 'viem'
 import { CreditFacility_v1 } from './abis'
 import type { TransactionLifecycleCallbacks } from './presale'
 import type { PopPublicClient, PopWalletClient } from './types'
-import { validateLoopCount, validateMaxLeverage } from './utils/validation'
+import { validateAddress, validateLoopCount, validateMaxLeverage } from './utils/validation'
 
 // =============================================================================
 // Types
@@ -338,6 +338,7 @@ export class CreditFacilityAdmin {
     lifecycle,
   }: TTransferLoanParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
+    validateAddress(newBorrower, 'newBorrower')
 
     try {
       lifecycle?.onPendingWallet?.()
@@ -458,6 +459,7 @@ export class CreditFacilityAdmin {
     lifecycle,
   }: TBorrowForParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
+    validateAddress(receiver, 'receiver')
 
     try {
       lifecycle?.onPendingWallet?.()
@@ -500,7 +502,7 @@ export class CreditFacilityAdmin {
     lifecycle,
   }: TBuyAndBorrowForParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
-
+    validateAddress(receiver, 'receiver')
     validateLoopCount(leverage)
 
     const loops = BigInt(leverage)

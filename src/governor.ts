@@ -3,6 +3,7 @@ import type { Address, GetContractEventsReturnType, TransactionReceipt } from 'v
 import { Governor_v1, InverterBeacon_v1 } from './abis'
 import type { TransactionLifecycleCallbacks } from './presale'
 import type { PopPublicClient, PopWalletClient } from './types'
+import { validateAddress } from './utils/validation'
 
 // =============================================================================
 // Types
@@ -226,6 +227,7 @@ export class Governor {
     address,
     lifecycle,
   }: TSetModuleFactoryParams): Promise<TransactionReceipt> {
+    validateAddress(address, 'address')
     return this.executeTransaction({
       functionName: 'setModuleFactory',
       args: [address],
@@ -260,6 +262,7 @@ export class Governor {
     beacon,
     lifecycle,
   }: TBeaconAddressParams): Promise<TransactionReceipt> {
+    validateAddress(beacon, 'beacon')
     return this.executeTransaction({
       functionName: 'registerNonModuleBeacon',
       args: [beacon],
@@ -274,6 +277,8 @@ export class Governor {
     newPatchVersion,
     lifecycle,
   }: TUpgradeBeaconParams): Promise<TransactionReceipt> {
+    validateAddress(beacon, 'beacon')
+    validateAddress(newImplementation, 'newImplementation')
     return this.executeTransaction({
       functionName: 'upgradeBeaconWithTimelock',
       args: [beacon, newImplementation, newMinorVersion, newPatchVersion],
@@ -285,6 +290,7 @@ export class Governor {
     beacon,
     lifecycle,
   }: TBeaconAddressParams): Promise<TransactionReceipt> {
+    validateAddress(beacon, 'beacon')
     return this.executeTransaction({
       functionName: 'triggerUpgradeBeaconWithTimelock',
       args: [beacon],
@@ -296,6 +302,7 @@ export class Governor {
     beacon,
     lifecycle,
   }: TBeaconAddressParams): Promise<TransactionReceipt> {
+    validateAddress(beacon, 'beacon')
     return this.executeTransaction({
       functionName: 'cancelUpgrade',
       args: [beacon],
@@ -307,6 +314,7 @@ export class Governor {
     beacon,
     lifecycle,
   }: TBeaconAddressParams): Promise<TransactionReceipt> {
+    validateAddress(beacon, 'beacon')
     return this.executeTransaction({
       functionName: 'initiateBeaconShutdown',
       args: [beacon],
@@ -331,6 +339,8 @@ export class Governor {
     newPatchVersion,
     lifecycle,
   }: TUpgradeBeaconParams): Promise<TransactionReceipt> {
+    validateAddress(beacon, 'beacon')
+    validateAddress(newImplementation, 'newImplementation')
     return this.executeTransaction({
       functionName: 'forceUpgradeBeaconAndRestartImplementation',
       args: [beacon, newImplementation, newMinorVersion, newPatchVersion],
@@ -342,6 +352,7 @@ export class Governor {
     beacon,
     lifecycle,
   }: TBeaconAddressParams): Promise<TransactionReceipt> {
+    validateAddress(beacon, 'beacon')
     return this.executeTransaction({
       functionName: 'restartBeaconImplementation',
       args: [beacon],
@@ -353,6 +364,7 @@ export class Governor {
     address,
     lifecycle,
   }: TAcceptOwnershipParams): Promise<TransactionReceipt> {
+    validateAddress(address, 'address')
     return this.executeTransaction({
       functionName: 'acceptOwnership',
       args: [address],

@@ -3,6 +3,7 @@ import type { Address, TransactionReceipt } from 'viem'
 import { ERC20Issuance_v1, StakingManager_v1, TestnetStrategy_v1 } from './abis'
 import type { TransactionLifecycleCallbacks } from './presale'
 import type { PopPublicClient, PopWalletClient } from './types'
+import { validateAddress } from './utils/validation'
 
 export interface TStakingStakeParams {
   strategyAddress: Address
@@ -284,6 +285,8 @@ export class Staking {
     lifecycle,
   }: TStakingHarvestYieldParams): Promise<TStakingMutationResult> {
     const walletClient = this.requireWalletClient()
+    validateAddress(strategyAddress, 'strategyAddress')
+    validateAddress(receiverAddress, 'receiverAddress')
 
     try {
       lifecycle?.onPendingWallet?.()
@@ -331,6 +334,8 @@ export class Staking {
     lifecycle,
   }: TStakingWithdrawParams): Promise<TStakingMutationResult> {
     const walletClient = this.requireWalletClient()
+    validateAddress(strategyAddress, 'strategyAddress')
+    validateAddress(receiverAddress, 'receiverAddress')
     this.assertPositiveAmount(collateralAmount)
 
     try {
@@ -375,6 +380,7 @@ export class Staking {
     lifecycle,
   }: TStakingRebalanceParams): Promise<TStakingMutationResult> {
     const walletClient = this.requireWalletClient()
+    validateAddress(strategyAddress, 'strategyAddress')
 
     try {
       lifecycle?.onPendingWallet?.()
@@ -464,6 +470,7 @@ export class Staking {
     lifecycle,
   }: TStakingAddStrategyParams): Promise<TStakingMutationResult> {
     const walletClient = this.requireWalletClient()
+    validateAddress(strategyAddress, 'strategyAddress')
 
     try {
       lifecycle?.onPendingWallet?.()
@@ -505,6 +512,7 @@ export class Staking {
     lifecycle,
   }: TStakingRemoveStrategyParams): Promise<TStakingMutationResult> {
     const walletClient = this.requireWalletClient()
+    validateAddress(strategyAddress, 'strategyAddress')
 
     try {
       lifecycle?.onPendingWallet?.()

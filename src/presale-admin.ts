@@ -8,6 +8,7 @@ import type { Address, TransactionReceipt } from 'viem'
 import { Presale_v1 } from './abis'
 import { PresaleState, type TransactionLifecycleCallbacks } from './presale'
 import type { PopPublicClient, PopWalletClient } from './types'
+import { validateAddress } from './utils/validation'
 
 // Re-export PresaleState for convenience (already exported from presale.ts)
 export { PresaleState }
@@ -516,6 +517,7 @@ export class PresaleAdmin {
     lifecycle,
   }: TPresaleAdminSetCreditFacilityParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
+    validateAddress(creditFacility, 'creditFacility')
 
     try {
       lifecycle?.onPendingWallet?.()
