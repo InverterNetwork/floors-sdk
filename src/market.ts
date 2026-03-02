@@ -4,7 +4,7 @@ import { CreditFacility_v1, ERC20Issuance_v1, Floor_v1 } from './abis'
 import type { TFloorAssetData } from './graphql/api'
 import type { TransactionLifecycleCallbacks } from './presale'
 import type { PopPublicClient, PopWalletClient } from './types'
-import { validateAddress, validateLoopCount } from './utils/validation'
+import { BASIS_POINTS, validateAddress, validateLoopCount } from './utils/validation'
 
 export interface TMarketBuyParams {
   depositAmount: bigint
@@ -73,7 +73,6 @@ interface MarketConstructorArgs {
   walletClient?: PopWalletClient
 }
 
-const BASIS_POINTS = BigInt(10_000)
 const ZERO_AMOUNT = BigInt(0)
 
 /**
@@ -723,13 +722,13 @@ export class Market {
   private normalizeSlippage(slippageBps: number): number {
     if (Number.isNaN(slippageBps)) return 50
     if (slippageBps < 0) return 0
-    if (slippageBps > 10_000) return 10_000
+    if (slippageBps > BASIS_POINTS.MAX) return BASIS_POINTS.MAX
     return slippageBps
   }
 
   private applySlippage(amount: bigint, slippageBps: number): bigint {
-    const slippage = BigInt(10_000 - slippageBps)
-    return (amount * slippage) / BASIS_POINTS
+    const slippage = BigInt(BASIS_POINTS.MAX - slippageBps)
+    return (amount * slippage) / BigInt(BASIS_POINTS.MAX)
   }
 
   private requireWalletClient(): PopWalletClient {

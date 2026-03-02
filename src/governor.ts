@@ -3,7 +3,7 @@ import type { Address, GetContractEventsReturnType, TransactionReceipt } from 'v
 import { Governor_v1, InverterBeacon_v1 } from './abis'
 import type { TransactionLifecycleCallbacks } from './presale'
 import type { PopPublicClient, PopWalletClient } from './types'
-import { validateAddress } from './utils/validation'
+import { validateAddress, validateNonNegativeBigint } from './utils/validation'
 
 // =============================================================================
 // Types
@@ -239,6 +239,7 @@ export class Governor {
     period,
     lifecycle,
   }: TSetTimelockPeriodParams): Promise<TransactionReceipt> {
+    validateNonNegativeBigint(period, 'period')
     return this.executeTransaction({
       functionName: 'setTimelockPeriod',
       args: [period],
@@ -279,6 +280,8 @@ export class Governor {
   }: TUpgradeBeaconParams): Promise<TransactionReceipt> {
     validateAddress(beacon, 'beacon')
     validateAddress(newImplementation, 'newImplementation')
+    validateNonNegativeBigint(newMinorVersion, 'newMinorVersion')
+    validateNonNegativeBigint(newPatchVersion, 'newPatchVersion')
     return this.executeTransaction({
       functionName: 'upgradeBeaconWithTimelock',
       args: [beacon, newImplementation, newMinorVersion, newPatchVersion],
@@ -341,6 +344,8 @@ export class Governor {
   }: TUpgradeBeaconParams): Promise<TransactionReceipt> {
     validateAddress(beacon, 'beacon')
     validateAddress(newImplementation, 'newImplementation')
+    validateNonNegativeBigint(newMinorVersion, 'newMinorVersion')
+    validateNonNegativeBigint(newPatchVersion, 'newPatchVersion')
     return this.executeTransaction({
       functionName: 'forceUpgradeBeaconAndRestartImplementation',
       args: [beacon, newImplementation, newMinorVersion, newPatchVersion],

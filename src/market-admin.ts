@@ -9,6 +9,7 @@ import { decodeEventLog, parseAbiItem } from 'viem'
 import { Floor_v1 } from './abis'
 import type { TransactionLifecycleCallbacks } from './presale'
 import type { PopPublicClient, PopWalletClient } from './types'
+import { assertPositiveAmount, validateNonNegativeBigint } from './utils/validation'
 
 // =============================================================================
 // Types
@@ -507,6 +508,7 @@ export class MarketAdmin {
     lifecycle,
   }: TApproveCollateralParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
+    validateNonNegativeBigint(amount, 'amount')
     const collateralToken = await this.getCollateralTokenAddress()
 
     try {
@@ -838,6 +840,10 @@ export class MarketAdmin {
     lifecycle,
   }: TReconfigureSegmentsParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
+    if (!segments?.length) {
+      throw new Error('segments must be a non-empty array')
+    }
+    validateNonNegativeBigint(suppliedCollateral, 'suppliedCollateral')
 
     try {
       lifecycle?.onPendingWallet?.()
@@ -876,6 +882,7 @@ export class MarketAdmin {
     lifecycle,
   }: TSetVirtualCollateralSupplyParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
+    validateNonNegativeBigint(virtualSupply, 'virtualSupply')
 
     try {
       lifecycle?.onPendingWallet?.()
@@ -914,6 +921,7 @@ export class MarketAdmin {
     lifecycle,
   }: TWithdrawCollateralParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
+    assertPositiveAmount(amount, 'amount')
 
     try {
       lifecycle?.onPendingWallet?.()
@@ -952,6 +960,7 @@ export class MarketAdmin {
     lifecycle,
   }: TDepositCollateralParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
+    assertPositiveAmount(amount, 'amount')
 
     try {
       lifecycle?.onPendingWallet?.()

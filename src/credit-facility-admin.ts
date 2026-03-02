@@ -8,7 +8,12 @@ import type { Address, TransactionReceipt } from 'viem'
 import { CreditFacility_v1 } from './abis'
 import type { TransactionLifecycleCallbacks } from './presale'
 import type { PopPublicClient, PopWalletClient } from './types'
-import { validateAddress, validateLoopCount, validateMaxLeverage } from './utils/validation'
+import {
+  assertPositiveAmount,
+  validateAddress,
+  validateLoopCount,
+  validateMaxLeverage,
+} from './utils/validation'
 
 // =============================================================================
 // Types
@@ -377,6 +382,7 @@ export class CreditFacilityAdmin {
     lifecycle,
   }: TRebalanceLoanParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
+    assertPositiveAmount(loanId, 'loanId')
 
     try {
       lifecycle?.onPendingWallet?.()
@@ -460,6 +466,7 @@ export class CreditFacilityAdmin {
   }: TBorrowForParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
     validateAddress(receiver, 'receiver')
+    assertPositiveAmount(requestedLoanAmount, 'requestedLoanAmount')
 
     try {
       lifecycle?.onPendingWallet?.()

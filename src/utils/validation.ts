@@ -17,12 +17,25 @@ export const MAX_SLIPPAGE_BPS = 5_000
 export const RECOMMENDED_MAX_LTV_BPS = 9_900
 
 /**
+ * @description Standard basis points (bps) constants for fee and percentage representation.
+ * 10000 bps = 100%.
+ */
+export const BASIS_POINTS = {
+  ONE_PERCENT: 100,
+  FIVE_PERCENT: 500,
+  TEN_PERCENT: 1_000,
+  MAX: 10_000,
+} as const
+
+/**
  * @description Protocol-level limits for safety enforcement.
  * MAX_LOOPS caps the loop count for user-facing operations (buyAndBorrow, presale leverage).
  * Admin functions (setMaxLeverage) still allow up to MAX_LEVERAGE (255).
  */
 export const PROTOCOL_LIMITS = {
   MAX_LOOPS: 25,
+  DEFAULT_SLIPPAGE_BPS: 100,
+  MAX_SLIPPAGE_BPS: 500,
 } as const
 
 // =============================================================================
@@ -90,7 +103,7 @@ export function validateBps(
   value: number,
   paramName: string,
   min = 0,
-  max: number = MAX_BPS
+  max: number = BASIS_POINTS.MAX
 ): void {
   if (!Number.isInteger(value)) {
     throw new Error(`${paramName} must be a whole number (integer basis points)`)
@@ -155,5 +168,80 @@ export function validateLoopCount(loops: number): void {
   }
   if (loops < 1 || loops > PROTOCOL_LIMITS.MAX_LOOPS) {
     throw new Error(`Loop count must be between 1 and ${PROTOCOL_LIMITS.MAX_LOOPS}`)
+  }
+}
+
+/**
+ * @description Validates a Unix timestamp (non-negative integer).
+ * @param value - The timestamp value (number or bigint)
+ * @param paramName - Name of the parameter (for error messages)
+ * @throws If value is negative or not an integer
+ */
+export function validateTimestamp(value: number | bigint, paramName: string): void {
+  const n = typeof value === 'bigint' ? Number(value) : value
+  if (!Number.isInteger(n) || n < 0) {
+    throw new Error(`${paramName} must be a non-negative integer (Unix timestamp)`)
+  }
+}
+
+/**
+ * @description Validates a bytes32 hex string (0x + 64 hex characters).
+ * @param value - The hex string to validate
+ * @param paramName - Name of the parameter (for error messages)
+ * @throws If value is not a valid bytes32 format
+ */
+export function validateBytes32(value: string, paramName: string): void {
+  if (!value || typeof value !== 'string') {
+    throw new Error(`${paramName} must be a non-empty string`)
+  }
+  if (!/^0x[0-9a-fA-F]{64}$/.test(value)) {
+    throw new Error(`${paramName} must be a bytes32 hex string (0x followed by 64 hex characters)`)
+  }
+}
+
+/**
+ * @description Validates that a value is one of the allowed enum values.
+ * @param value - The value to check
+ * @param validValues - Array or set of allowed values
+ * @param paramName - Name of the parameter (for error messages)
+ * @throws If value is not in validValues
+ */
+export function validateEnum<T>(
+  value: T,
+  validValues: readonly T[] | Set<T>,
+  paramName: string
+): void {
+  const allowed = validValues instanceof Set ? validValues : new Set(validValues)
+  if (!allowed.has(value)) {
+    const list = validValues instanceof Set ? [...validValues] : [...validValues]
+    throw new Error(`${paramName} must be one of: ${list.join(', ')}`)
+  }
+}
+
+/**
+ * @description Asserts that a bigint is non-negative (>= 0).
+ * @param amount - The amount to check
+ * @param paramName - Name of the parameter (for error messages)
+ * @throws If amount is negative
+ */
+export function validateNonNegativeBigint(amount: bigint, paramName: string): void {
+  if (amount < BigInt(0)) {
+    throw new Error(`${paramName} must be non-negative`)
+  }
+}
+
+/** uint32 max value for multiplier validation */
+const UINT32_MAX = 4_294_967_295
+
+/**
+ * @description Validates a value fits in uint32 range (0 to 4294967295).
+ * @param value - The value to check (number or bigint)
+ * @param paramName - Name of the parameter (for error messages)
+ * @throws If value is out of range or not an integer
+ */
+export function validateUint32(value: number | bigint, paramName: string): void {
+  const n = typeof value === 'bigint' ? Number(value) : value
+  if (!Number.isInteger(n) || n < 0 || n > UINT32_MAX) {
+    throw new Error(`${paramName} must be an integer between 0 and ${UINT32_MAX} (uint32)`)
   }
 }

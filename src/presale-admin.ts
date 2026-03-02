@@ -8,7 +8,14 @@ import type { Address, TransactionReceipt } from 'viem'
 import { Presale_v1 } from './abis'
 import { PresaleState, type TransactionLifecycleCallbacks } from './presale'
 import type { PopPublicClient, PopWalletClient } from './types'
-import { validateAddress } from './utils/validation'
+import {
+  validateAddress,
+  validateBytes32,
+  validateEnum,
+  validateNonNegativeBigint,
+  validateTimestamp,
+  validateUint32,
+} from './utils/validation'
 
 // Re-export PresaleState for convenience (already exported from presale.ts)
 export { PresaleState }
@@ -261,6 +268,11 @@ export class PresaleAdmin {
     lifecycle,
   }: TPresaleAdminSetStateParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
+    validateEnum(
+      state,
+      [PresaleState.NotOpen, PresaleState.Whitelist, PresaleState.Public, PresaleState.Closed],
+      'state'
+    )
 
     try {
       lifecycle?.onPendingWallet?.()
@@ -336,6 +348,8 @@ export class PresaleAdmin {
     lifecycle,
   }: TPresaleAdminSetCapsParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
+    validateNonNegativeBigint(globalCap, 'globalCap')
+    validateNonNegativeBigint(perAddressCap, 'perAddressCap')
 
     try {
       lifecycle?.onPendingWallet?.()
@@ -378,6 +392,7 @@ export class PresaleAdmin {
     lifecycle,
   }: TPresaleAdminSetEndTimestampParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
+    validateTimestamp(timestamp, 'timestamp')
 
     try {
       lifecycle?.onPendingWallet?.()
@@ -421,6 +436,7 @@ export class PresaleAdmin {
     lifecycle,
   }: TPresaleAdminSetMerkleRootParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
+    validateBytes32(merkleRoot, 'merkleRoot')
 
     try {
       lifecycle?.onPendingWallet?.()
@@ -556,6 +572,7 @@ export class PresaleAdmin {
     lifecycle,
   }: TPresaleAdminSetInitialMultiplierParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
+    validateUint32(multiplier, 'multiplier')
 
     try {
       lifecycle?.onPendingWallet?.()
@@ -594,6 +611,7 @@ export class PresaleAdmin {
     lifecycle,
   }: TPresaleAdminSetDecayDurationParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
+    validateNonNegativeBigint(duration, 'duration')
 
     try {
       lifecycle?.onPendingWallet?.()
@@ -632,6 +650,7 @@ export class PresaleAdmin {
     lifecycle,
   }: TPresaleAdminSetStartTimeParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
+    validateTimestamp(startTime, 'startTime')
 
     try {
       lifecycle?.onPendingWallet?.()

@@ -8,7 +8,7 @@ import type { Address, TransactionReceipt } from 'viem'
 import { SplitterTreasury_v1 } from './abis'
 import type { TransactionLifecycleCallbacks } from './presale'
 import type { PopPublicClient, PopWalletClient } from './types'
-import { validateAddress } from './utils/validation'
+import { assertPositiveAmount, validateAddress } from './utils/validation'
 
 // =============================================================================
 // Types
@@ -209,6 +209,7 @@ export class TreasuryAdmin {
   }: TFetchFundsParams): Promise<TransactionReceipt> {
     const walletClient = this.requireWalletClient()
     validateAddress(token, 'token')
+    assertPositiveAmount(amount, 'amount')
 
     try {
       lifecycle?.onPendingWallet?.()
