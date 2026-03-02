@@ -3,7 +3,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { type ReactElement, type ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import type { Address } from 'viem'
-import { useAccount, useBalance } from 'wagmi'
+import { useAccount, useBalance, usePublicClient } from 'wagmi'
 
 import {
   FloorsContext,
@@ -50,6 +50,8 @@ export const FloorsProvider = ({
   const [selectedMarketId, setSelectedMarketId] = useState<string | null>(null)
   const [selectedPresaleId, setSelectedPresaleId] = useState<string | null>(null)
   const { address: walletAddress } = useAccount()
+  const publicClient = usePublicClient()
+  const chainId = publicClient?.chain.id
 
   const marketsQuery = useMarketsQuery(marketsOptions)
   const marketQuery = useMarketQuery(selectedMarketId, marketOptions)
@@ -83,6 +85,7 @@ export const FloorsProvider = ({
   const reserveBalance = useBalance({
     address: walletAddress,
     token: reserveTokenMetadata.address ?? undefined,
+    chainId,
     query: {
       enabled: Boolean(walletAddress && reserveTokenMetadata.address),
       staleTime: 30_000,
@@ -92,6 +95,7 @@ export const FloorsProvider = ({
   const issuanceBalance = useBalance({
     address: walletAddress,
     token: issuanceTokenMetadata.address ?? undefined,
+    chainId,
     query: {
       enabled: Boolean(walletAddress && issuanceTokenMetadata.address),
       staleTime: 30_000,
