@@ -138,19 +138,14 @@ export const buildMarketActivityQuery = (
 }
 
 // ============================================================================
-// Subscription Definition
+// Subscription Definitions (one top-level field each, as required by GraphQL)
 // ============================================================================
 
 /**
- * @description Builds a combined subscription for market activity (trades + loans + floor elevations + staking)
- * Uses WebSocket for real-time updates via Hasura subscriptions
+ * @description Builds a subscription for market trades (activity view)
  */
-export const buildMarketActivitySubscription = (
-  marketId: string,
-  limit: number = 100,
-  stakingManagerId?: string
-) => {
-  const base = {
+export const buildTradeActivitySubscription = (marketId: string, limit: number = 100) =>
+  ({
     Trade: {
       __args: {
         where: { market_id: { _eq: marketId } },
@@ -159,6 +154,13 @@ export const buildMarketActivitySubscription = (
       },
       ...tradeActivityFields,
     },
+  }) satisfies GraphQLSubscriptionArgs
+
+/**
+ * @description Builds a subscription for market loans (activity view)
+ */
+export const buildLoanActivitySubscription = (marketId: string, limit: number = 100) =>
+  ({
     Loan: {
       __args: {
         where: { market_id: { _eq: marketId } },
@@ -167,6 +169,13 @@ export const buildMarketActivitySubscription = (
       },
       ...loanActivityFields,
     },
+  }) satisfies GraphQLSubscriptionArgs
+
+/**
+ * @description Builds a subscription for market floor elevations (activity view)
+ */
+export const buildFloorElevationActivitySubscription = (marketId: string, limit: number = 100) =>
+  ({
     FloorElevation: {
       __args: {
         where: { market_id: { _eq: marketId } },
@@ -175,12 +184,13 @@ export const buildMarketActivitySubscription = (
       },
       ...floorElevationActivityFields,
     },
-  } satisfies GraphQLSubscriptionArgs
+  }) satisfies GraphQLSubscriptionArgs
 
-  if (!stakingManagerId) return base
-
-  return {
-    ...base,
+/**
+ * @description Builds a subscription for staking activities (activity view)
+ */
+export const buildStakingActivitySubscription = (stakingManagerId: string, limit: number = 100) =>
+  ({
     StakingActivity: {
       __args: {
         where: { stakingManager_id: { _eq: stakingManagerId } },
@@ -189,10 +199,14 @@ export const buildMarketActivitySubscription = (
       },
       ...stakingActivityFields,
     },
-  } satisfies GraphQLSubscriptionArgs
-}
+  }) satisfies GraphQLSubscriptionArgs
 
-export type MarketActivitySubscriptionFields = ReturnType<typeof buildMarketActivitySubscription>
+export type TradeActivitySubscriptionFields = ReturnType<typeof buildTradeActivitySubscription>
+export type LoanActivitySubscriptionFields = ReturnType<typeof buildLoanActivitySubscription>
+export type FloorElevationActivitySubscriptionFields = ReturnType<
+  typeof buildFloorElevationActivitySubscription
+>
+export type StakingActivitySubscriptionFields = ReturnType<typeof buildStakingActivitySubscription>
 
 export type MarketActivityQueryType = ReturnType<typeof buildMarketActivityQuery>
 export type MarketActivityQueryResultType = GraphQLQueryResult<MarketActivityQueryType>

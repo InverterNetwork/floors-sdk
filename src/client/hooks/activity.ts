@@ -2,7 +2,10 @@ import { useQuery, type UseQueryOptions, type UseQueryResult } from '@tanstack/r
 import { useMemo } from 'react'
 
 import {
-  buildMarketActivitySubscription,
+  buildFloorElevationActivitySubscription,
+  buildLoanActivitySubscription,
+  buildStakingActivitySubscription,
+  buildTradeActivitySubscription,
   combineMarketActivity,
   fetchMarketActivity,
   type TGraphQLFloorElevationActivity,
@@ -95,33 +98,60 @@ export const useMarketActivityData = ({
     enabled: isEnabled,
   })
 
-  // Subscription for live updates
-  const fields = useMemo(
+  // Separate subscriptions for live updates (GraphQL subscriptions require one top-level field each)
+  const tradeFields = useMemo(
+    () => (isEnabled && marketId ? buildTradeActivitySubscription(marketId, limit) : null),
+    [isEnabled, marketId, limit]
+  )
+  const loanFields = useMemo(
+    () => (isEnabled && marketId ? buildLoanActivitySubscription(marketId, limit) : null),
+    [isEnabled, marketId, limit]
+  )
+  const elevationFields = useMemo(
+    () => (isEnabled && marketId ? buildFloorElevationActivitySubscription(marketId, limit) : null),
+    [isEnabled, marketId, limit]
+  )
+  const stakingFields = useMemo(
     () =>
-      isEnabled && marketId
-        ? buildMarketActivitySubscription(marketId, limit, resolvedStakingId)
+      isEnabled && resolvedStakingId
+        ? buildStakingActivitySubscription(resolvedStakingId, limit)
         : null,
-    [isEnabled, marketId, limit, resolvedStakingId]
+    [isEnabled, resolvedStakingId, limit]
   )
 
-  const subResult = useSubscription({
-    fields: fields ?? ({} as NonNullable<typeof fields>),
-    enabled: isEnabled && fields !== null,
+  const tradeSub = useSubscription({
+    fields: tradeFields ?? ({} as NonNullable<typeof tradeFields>),
+    enabled: isEnabled && tradeFields !== null,
   })
+  const loanSub = useSubscription({
+    fields: loanFields ?? ({} as NonNullable<typeof loanFields>),
+    enabled: isEnabled && loanFields !== null,
+  })
+  const elevationSub = useSubscription({
+    fields: elevationFields ?? ({} as NonNullable<typeof elevationFields>),
+    enabled: isEnabled && elevationFields !== null,
+  })
+  const stakingSub = useSubscription({
+    fields: stakingFields ?? ({} as NonNullable<typeof stakingFields>),
+    enabled: isEnabled && stakingFields !== null,
+  })
+
+  const subError = tradeSub.error ?? loanSub.error ?? elevationSub.error ?? stakingSub.error
 
   // Transform subscription data into unified activity format
   const subscriptionActivity = useMemo(() => {
-    if (!subResult.data) return null
+    // Wait until at least one subscription has returned data
+    if (!tradeSub.data && !loanSub.data && !elevationSub.data && !stakingSub.data) return null
 
-    const trades = (subResult.data.Trade ?? []) as TGraphQLTradeActivity[]
-    const loans = (subResult.data.Loan ?? []) as TGraphQLLoanActivity[]
-    const floorElevations = (subResult.data.FloorElevation ??
+    const trades = (tradeSub.data?.Trade ?? []) as TGraphQLTradeActivity[]
+    const loans = (loanSub.data?.Loan ?? []) as TGraphQLLoanActivity[]
+    const floorElevations = (elevationSub.data?.FloorElevation ??
       []) as TGraphQLFloorElevationActivity[]
-    const stakingActivities = ((subResult.data as any).StakingActivity ??
+    const stakingActivities = (stakingSub.data?.StakingActivity ??
       []) as TGraphQLStakingActivityItem[]
 
     return combineMarketActivity(trades, loans, floorElevations, stakingActivities)
-  }, [subResult.data])
+  }, [tradeSub.data, loanSub.data, elevationSub.data, stakingSub.data])
 
   // Prefer subscription data when available, fall back to query data
   const activity = subscriptionActivity ?? queryResult.data ?? []
@@ -129,7 +159,7 @@ export const useMarketActivityData = ({
   return {
     key,
     activity,
-    error: subResult.error ?? queryResult.error?.message ?? null,
+    error: subError ?? queryResult.error?.message ?? null,
     isLoading: queryResult.isLoading && !subscriptionActivity,
   }
 }
