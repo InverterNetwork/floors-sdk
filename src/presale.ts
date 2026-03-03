@@ -63,6 +63,23 @@ export interface TPresaleBuyWithLeverageParams {
   lifecycle?: TransactionLifecycleCallbacks
 }
 
+export interface TPresaleSimulateBuyParams {
+  depositAmount: bigint
+  account: Address
+}
+
+export interface TPresaleSimulateBuyWithLeverageParams {
+  depositAmount: bigint
+  leverageIndex: number
+  account: Address
+}
+
+export interface TPresaleSimulateBuyResult {
+  positionId: bigint
+  feePaid: bigint
+  tokensMinted: bigint
+}
+
 export interface TPresaleClaimParams {
   positionId: bigint
   /** Optional lifecycle callbacks for multi-stage feedback */
@@ -966,6 +983,50 @@ export class Presale {
       lifecycle,
     })
     return receipt
+  }
+
+  /**
+   * @description Simulate a presale buy to get the exact tokens minted from the bonding curve.
+   * Uses simulateContract (dry-run) with minAmountOut=0 so it never reverts on slippage.
+   */
+  public async simulateBuyPresale({
+    depositAmount,
+    account,
+  }: TPresaleSimulateBuyParams): Promise<TPresaleSimulateBuyResult> {
+    this.assertPositiveAmount(depositAmount)
+
+    const sim = await this.publicClient.simulateContract({
+      address: this.address,
+      abi: Presale_v1,
+      functionName: 'buyPresale',
+      args: [depositAmount, BigInt(0)],
+      account,
+    })
+    const [positionId, feePaid, tokensMinted] = sim.result as [bigint, bigint, bigint]
+    return { positionId, feePaid, tokensMinted }
+  }
+
+  /**
+   * @description Simulate a leveraged presale buy to get the exact tokens minted from the bonding curve.
+   * Uses simulateContract (dry-run) with minAmountOut=0 so it never reverts on slippage.
+   */
+  public async simulateBuyPresaleWithLeverage({
+    depositAmount,
+    leverageIndex,
+    account,
+  }: TPresaleSimulateBuyWithLeverageParams): Promise<TPresaleSimulateBuyResult> {
+    this.assertPositiveAmount(depositAmount)
+    validateLoopCount(leverageIndex)
+
+    const sim = await this.publicClient.simulateContract({
+      address: this.address,
+      abi: Presale_v1,
+      functionName: 'buyPresaleWithLoops',
+      args: [depositAmount, BigInt(leverageIndex), BigInt(0)],
+      account,
+    })
+    const [positionId, feePaid, tokensMinted] = sim.result as [bigint, bigint, bigint]
+    return { positionId, feePaid, tokensMinted }
   }
 
   /**

@@ -32,6 +32,9 @@ import {
   type TPresaleClaimParams,
   type TPresaleMutationResult,
   type TPresalePositionWithState,
+  type TPresaleSimulateBuyParams,
+  type TPresaleSimulateBuyResult,
+  type TPresaleSimulateBuyWithLeverageParams,
   type TPresaleTransitionStatus,
   type TSetCapsParams,
   type TSetCreditFacilityParams,
@@ -202,6 +205,12 @@ export type UsePresaleMutationsReturnType = {
     Error,
     Address | undefined
   >
+  simulateBuyPresale: UseMutationResult<TPresaleSimulateBuyResult, Error, TPresaleSimulateBuyParams>
+  simulateBuyPresaleWithLeverage: UseMutationResult<
+    TPresaleSimulateBuyResult,
+    Error,
+    TPresaleSimulateBuyWithLeverageParams
+  >
 }
 
 /**
@@ -364,6 +373,16 @@ export const usePresaleMutations = (): UsePresaleMutationsReturnType => {
       ensurePresale().getUserTotalTokens(ensureWalletAddress(userAddress)),
   })
 
+  const simulateBuyPresale = useMutation({
+    mutationFn: async (params: TPresaleSimulateBuyParams) =>
+      ensurePresale().simulateBuyPresale(params),
+  })
+
+  const simulateBuyPresaleWithLeverage = useMutation({
+    mutationFn: async (params: TPresaleSimulateBuyWithLeverageParams) =>
+      ensurePresale().simulateBuyPresaleWithLeverage(params),
+  })
+
   return {
     buyPresale,
     buyPresaleWithLeverage,
@@ -389,6 +408,8 @@ export const usePresaleMutations = (): UsePresaleMutationsReturnType => {
     isDecayEnded,
     getMultiplierState,
     getUserTotalTokens,
+    simulateBuyPresale,
+    simulateBuyPresaleWithLeverage,
   }
 }
 
