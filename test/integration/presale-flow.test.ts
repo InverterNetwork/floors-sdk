@@ -266,7 +266,6 @@ describe('Presale Flow - Integration', () => {
         globalIssuanceCap: BigInt(0),
         perAddressIssuanceCap: BigInt(0),
         globalIssuance: BigInt(0),
-        whitelistCount: 0,
         merkleRoot: '0x' as `0x${string}`,
         baseCommissionBps: [],
         priceBreakpoints: [],
