@@ -5,12 +5,32 @@ import { useCallback } from 'react'
 import type { Address, TransactionReceipt } from 'viem'
 import { usePublicClient, useWalletClient } from 'wagmi'
 
+import type { TransactionLifecycleCallbacks } from '../../presale'
 import {
   type TFetchFundsParams,
   TreasuryAdmin,
   type TTreasuryAdminState,
   type TTreasuryRecipient,
 } from '../../treasury-admin'
+
+// =============================================================================
+// Mutation Param Types (include lifecycle for progressive toast support)
+// =============================================================================
+
+export interface TSetRecipientsMutationParams {
+  recipients: TTreasuryRecipient[]
+  lifecycle?: TransactionLifecycleCallbacks
+}
+
+export interface TSetFloorFeePercentageMutationParams {
+  percentageBps: number
+  lifecycle?: TransactionLifecycleCallbacks
+}
+
+export interface TSetFloorFeeTreasuryMutationParams {
+  treasuryAddress: Address
+  lifecycle?: TransactionLifecycleCallbacks
+}
 
 // =============================================================================
 // Types
@@ -25,17 +45,17 @@ export type UseTreasuryAdminOptions = {
   autoFetch?: boolean
   /** Mutation options for setRecipients */
   setRecipientsOptions?: Omit<
-    UseMutationOptions<TransactionReceipt, Error, TTreasuryRecipient[]>,
+    UseMutationOptions<TransactionReceipt, Error, TSetRecipientsMutationParams>,
     'mutationFn'
   >
   /** Mutation options for setFloorFeePercentage */
   setFloorFeePercentageOptions?: Omit<
-    UseMutationOptions<TransactionReceipt, Error, number>,
+    UseMutationOptions<TransactionReceipt, Error, TSetFloorFeePercentageMutationParams>,
     'mutationFn'
   >
   /** Mutation options for setFloorFeeTreasury */
   setFloorFeeTreasuryOptions?: Omit<
-    UseMutationOptions<TransactionReceipt, Error, Address>,
+    UseMutationOptions<TransactionReceipt, Error, TSetFloorFeeTreasuryMutationParams>,
     'mutationFn'
   >
 }
@@ -123,25 +143,27 @@ export function useTreasuryAdmin(options: UseTreasuryAdminOptions) {
   // ===========================================================================
 
   const setRecipientsMutation = useMutation({
-    mutationFn: async (recipients: TTreasuryRecipient[]): Promise<TransactionReceipt> => {
+    mutationFn: async (params: TSetRecipientsMutationParams): Promise<TransactionReceipt> => {
       const admin = getTreasuryAdminInstance()
-      return admin.setRecipients({ recipients })
+      return admin.setRecipients(params)
     },
     ...options.setRecipientsOptions,
   })
 
   const setFloorFeePercentageMutation = useMutation({
-    mutationFn: async (percentageBps: number): Promise<TransactionReceipt> => {
+    mutationFn: async (
+      params: TSetFloorFeePercentageMutationParams
+    ): Promise<TransactionReceipt> => {
       const admin = getTreasuryAdminInstance()
-      return admin.setFloorFeePercentage({ percentageBps })
+      return admin.setFloorFeePercentage(params)
     },
     ...options.setFloorFeePercentageOptions,
   })
 
   const setFloorFeeTreasuryMutation = useMutation({
-    mutationFn: async (treasuryAddressParam: Address): Promise<TransactionReceipt> => {
+    mutationFn: async (params: TSetFloorFeeTreasuryMutationParams): Promise<TransactionReceipt> => {
       const admin = getTreasuryAdminInstance()
-      return admin.setFloorFeeTreasury({ treasuryAddress: treasuryAddressParam })
+      return admin.setFloorFeeTreasury(params)
     },
     ...options.setFloorFeeTreasuryOptions,
   })

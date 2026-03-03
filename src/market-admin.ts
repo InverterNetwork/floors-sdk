@@ -9,6 +9,7 @@ import { decodeEventLog, parseAbiItem } from 'viem'
 import { Floor_v1 } from './abis'
 import type { TransactionLifecycleCallbacks } from './presale'
 import type { PopPublicClient, PopWalletClient } from './types'
+import { SafeWrite } from './utils/safe-write'
 import { assertPositiveAmount, validateNonNegativeBigint } from './utils/validation'
 
 // =============================================================================
@@ -105,6 +106,8 @@ export interface TMarketAdminState {
   collateralTokenDecimals: number
   /** Reserve token balance held by market contract (backs the bonding curve) */
   reserveBalance: bigint
+  /** Current total supply of the issuance token */
+  issuanceTokenSupply: bigint
 }
 
 interface MarketAdminConstructorArgs {
@@ -149,13 +152,13 @@ interface MarketAdminConstructorArgs {
 export class MarketAdmin {
   private readonly address: Address
   private readonly publicClient: PopPublicClient
-  private readonly walletClient?: PopWalletClient
+  private readonly safeWrite?: SafeWrite
   private cachedCollateralTokenAddress: Address | null = null
 
   constructor({ address, publicClient, walletClient }: MarketAdminConstructorArgs) {
     this.address = address
     this.publicClient = publicClient
-    this.walletClient = walletClient
+    this.safeWrite = walletClient ? new SafeWrite({ publicClient, walletClient }) : undefined
   }
 
   // ===========================================================================
@@ -187,6 +190,7 @@ export class MarketAdmin {
       currentPrice,
       virtualSupply,
       collateralTokenAddress,
+      floorMetrics,
     ] = await Promise.all([
       this.publicClient.readContract({
         address: this.address,
@@ -228,6 +232,11 @@ export class MarketAdmin {
         abi: Floor_v1,
         functionName: 'getCollateralToken',
       }) as Promise<Address>,
+      this.publicClient.readContract({
+        address: this.address,
+        abi: Floor_v1,
+        functionName: 'getFloorMetrics',
+      }) as Promise<readonly [bigint, bigint, bigint, bigint]>,
     ])
 
     // Second batch: reserve balance + decimals from collateral token
@@ -256,6 +265,7 @@ export class MarketAdmin {
       collateralTokenAddress,
       collateralTokenDecimals,
       reserveBalance,
+      issuanceTokenSupply: floorMetrics[2],
     }
   }
 
@@ -507,37 +517,18 @@ export class MarketAdmin {
     amount,
     lifecycle,
   }: TApproveCollateralParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
     validateNonNegativeBigint(amount, 'amount')
     const collateralToken = await this.getCollateralTokenAddress()
 
-    try {
-      lifecycle?.onPendingWallet?.()
+    const { receipt } = await this.requireSafeWrite().write({
+      address: collateralToken,
+      abi: ERC20_ABI,
+      functionName: 'approve',
+      args: [this.address, amount],
+      lifecycle,
+    })
 
-      const hash = await walletClient.writeContract({
-        address: collateralToken,
-        abi: ERC20_ABI,
-        functionName: 'approve',
-        args: [this.address, amount],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Approval transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return receipt
   }
 
   // ===========================================================================
@@ -550,34 +541,14 @@ export class MarketAdmin {
    * @returns Transaction receipt
    */
   public async openBuy(params?: TMarketAdminParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.address,
+      abi: Floor_v1,
+      functionName: 'enableBuy',
+      lifecycle: params?.lifecycle,
+    })
 
-    try {
-      params?.lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Floor_v1,
-        functionName: 'enableBuy',
-        account: this.getWalletAddress(walletClient),
-      })
-
-      params?.lifecycle?.onSubmitted?.(hash)
-      params?.lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        params?.lifecycle?.onConfirmed?.(receipt)
-      } else {
-        params?.lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      params?.lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return receipt
   }
 
   /**
@@ -586,34 +557,14 @@ export class MarketAdmin {
    * @returns Transaction receipt
    */
   public async closeBuy(params?: TMarketAdminParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.address,
+      abi: Floor_v1,
+      functionName: 'disableBuy',
+      lifecycle: params?.lifecycle,
+    })
 
-    try {
-      params?.lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Floor_v1,
-        functionName: 'disableBuy',
-        account: this.getWalletAddress(walletClient),
-      })
-
-      params?.lifecycle?.onSubmitted?.(hash)
-      params?.lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        params?.lifecycle?.onConfirmed?.(receipt)
-      } else {
-        params?.lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      params?.lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return receipt
   }
 
   /**
@@ -622,34 +573,14 @@ export class MarketAdmin {
    * @returns Transaction receipt
    */
   public async openSell(params?: TMarketAdminParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.address,
+      abi: Floor_v1,
+      functionName: 'enableSell',
+      lifecycle: params?.lifecycle,
+    })
 
-    try {
-      params?.lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Floor_v1,
-        functionName: 'enableSell',
-        account: this.getWalletAddress(walletClient),
-      })
-
-      params?.lifecycle?.onSubmitted?.(hash)
-      params?.lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        params?.lifecycle?.onConfirmed?.(receipt)
-      } else {
-        params?.lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      params?.lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return receipt
   }
 
   /**
@@ -658,34 +589,14 @@ export class MarketAdmin {
    * @returns Transaction receipt
    */
   public async closeSell(params?: TMarketAdminParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.address,
+      abi: Floor_v1,
+      functionName: 'disableSell',
+      lifecycle: params?.lifecycle,
+    })
 
-    try {
-      params?.lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Floor_v1,
-        functionName: 'disableSell',
-        account: this.getWalletAddress(walletClient),
-      })
-
-      params?.lifecycle?.onSubmitted?.(hash)
-      params?.lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        params?.lifecycle?.onConfirmed?.(receipt)
-      } else {
-        params?.lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      params?.lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return receipt
   }
 
   // ===========================================================================
@@ -698,36 +609,17 @@ export class MarketAdmin {
    * @returns Transaction receipt
    */
   public async setBuyFee({ feeBps, lifecycle }: TSetFeeParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
     this.validateFeeBps(feeBps)
 
-    try {
-      lifecycle?.onPendingWallet?.()
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.address,
+      abi: Floor_v1,
+      functionName: 'setBuyFee',
+      args: [BigInt(feeBps)],
+      lifecycle,
+    })
 
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Floor_v1,
-        functionName: 'setBuyFee',
-        args: [BigInt(feeBps)],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return receipt
   }
 
   /**
@@ -736,36 +628,17 @@ export class MarketAdmin {
    * @returns Transaction receipt
    */
   public async setSellFee({ feeBps, lifecycle }: TSetFeeParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
     this.validateFeeBps(feeBps)
 
-    try {
-      lifecycle?.onPendingWallet?.()
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.address,
+      abi: Floor_v1,
+      functionName: 'setSellFee',
+      args: [BigInt(feeBps)],
+      lifecycle,
+    })
 
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Floor_v1,
-        functionName: 'setSellFee',
-        args: [BigInt(feeBps)],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return receipt
   }
 
   // ===========================================================================
@@ -779,51 +652,21 @@ export class MarketAdmin {
    * @note Caller must first approve sufficient collateral via approveCollateral()
    */
   public async raiseFloor(params: TRaiseFloorParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
     const { collateralAmount, lifecycle } = params
 
     if (collateralAmount <= BigInt(0)) {
       throw new Error('Collateral amount must be greater than 0')
     }
 
-    const account = this.getWalletAddress(walletClient)
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.address,
+      abi: Floor_v1,
+      functionName: 'raiseFloor',
+      args: [collateralAmount],
+      lifecycle,
+    })
 
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      // Simulate first to surface revert reasons (wallets often swallow them)
-      await this.publicClient.simulateContract({
-        address: this.address,
-        abi: Floor_v1,
-        functionName: 'raiseFloor',
-        args: [collateralAmount],
-        account,
-      })
-
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Floor_v1,
-        functionName: 'raiseFloor',
-        args: [collateralAmount],
-        account,
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return receipt
   }
 
   // ===========================================================================
@@ -839,39 +682,20 @@ export class MarketAdmin {
     selfSupplied,
     lifecycle,
   }: TReconfigureSegmentsParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
     if (!segments?.length) {
       throw new Error('segments must be a non-empty array')
     }
     validateNonNegativeBigint(suppliedCollateral, 'suppliedCollateral')
 
-    try {
-      lifecycle?.onPendingWallet?.()
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.address,
+      abi: Floor_v1,
+      functionName: 'reconfigureSegments',
+      args: [segments, suppliedCollateral, selfSupplied],
+      lifecycle,
+    })
 
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Floor_v1,
-        functionName: 'reconfigureSegments',
-        args: [segments, suppliedCollateral, selfSupplied],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return receipt
   }
 
   /**
@@ -881,36 +705,17 @@ export class MarketAdmin {
     virtualSupply,
     lifecycle,
   }: TSetVirtualCollateralSupplyParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
     validateNonNegativeBigint(virtualSupply, 'virtualSupply')
 
-    try {
-      lifecycle?.onPendingWallet?.()
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.address,
+      abi: Floor_v1,
+      functionName: 'setVirtualCollateralSupply',
+      args: [virtualSupply],
+      lifecycle,
+    })
 
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Floor_v1,
-        functionName: 'setVirtualCollateralSupply',
-        args: [virtualSupply],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return receipt
   }
 
   /**
@@ -920,36 +725,17 @@ export class MarketAdmin {
     amount,
     lifecycle,
   }: TWithdrawCollateralParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
     assertPositiveAmount(amount, 'amount')
 
-    try {
-      lifecycle?.onPendingWallet?.()
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.address,
+      abi: Floor_v1,
+      functionName: 'withdrawCollateralTo',
+      args: [amount],
+      lifecycle,
+    })
 
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Floor_v1,
-        functionName: 'withdrawCollateralTo',
-        args: [amount],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return receipt
   }
 
   /**
@@ -959,55 +745,28 @@ export class MarketAdmin {
     amount,
     lifecycle,
   }: TDepositCollateralParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
     assertPositiveAmount(amount, 'amount')
 
-    try {
-      lifecycle?.onPendingWallet?.()
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.address,
+      abi: Floor_v1,
+      functionName: 'depositCollateralFrom',
+      args: [amount],
+      lifecycle,
+    })
 
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: Floor_v1,
-        functionName: 'depositCollateralFrom',
-        args: [amount],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return receipt
   }
 
   // ===========================================================================
   // Private Helpers
   // ===========================================================================
 
-  private requireWalletClient(): PopWalletClient {
-    if (!this.walletClient) {
+  private requireSafeWrite(): SafeWrite {
+    if (!this.safeWrite) {
       throw new Error('Wallet not connected. Please connect your wallet to continue.')
     }
-    return this.walletClient
-  }
-
-  private getWalletAddress(walletClient: PopWalletClient): Address {
-    const account = walletClient.account
-    if (!account?.address) {
-      throw new Error('Wallet not connected. Please connect your wallet to continue.')
-    }
-    return account.address as Address
+    return this.safeWrite
   }
 
   private validateFeeBps(feeBps: number): void {

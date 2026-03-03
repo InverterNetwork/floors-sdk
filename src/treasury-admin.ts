@@ -8,6 +8,7 @@ import type { Address, TransactionReceipt } from 'viem'
 import { SplitterTreasury_v1 } from './abis'
 import type { TransactionLifecycleCallbacks } from './presale'
 import type { PopPublicClient, PopWalletClient } from './types'
+import { SafeWrite } from './utils/safe-write'
 import { assertPositiveAmount, validateAddress } from './utils/validation'
 
 // =============================================================================
@@ -107,12 +108,12 @@ interface TreasuryAdminConstructorArgs {
 export class TreasuryAdmin {
   private readonly address: Address
   private readonly publicClient: PopPublicClient
-  private readonly walletClient?: PopWalletClient
+  private readonly safeWrite?: SafeWrite
 
   constructor({ address, publicClient, walletClient }: TreasuryAdminConstructorArgs) {
     this.address = address
     this.publicClient = publicClient
-    this.walletClient = walletClient
+    this.safeWrite = walletClient ? new SafeWrite({ publicClient, walletClient }) : undefined
   }
 
   // ===========================================================================
@@ -207,37 +208,17 @@ export class TreasuryAdmin {
     amount,
     lifecycle,
   }: TFetchFundsParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
     validateAddress(token, 'token')
     assertPositiveAmount(amount, 'amount')
 
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: SplitterTreasury_v1,
-        functionName: 'fetchFunds',
-        args: [token, amount],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.address,
+      abi: SplitterTreasury_v1,
+      functionName: 'fetchFunds',
+      args: [token, amount],
+      lifecycle,
+    })
+    return receipt
   }
 
   /**
@@ -249,8 +230,6 @@ export class TreasuryAdmin {
     recipients,
     lifecycle,
   }: TSetRecipientsParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
-
     if (recipients.length === 0) {
       throw new Error('At least one recipient is required')
     }
@@ -264,33 +243,14 @@ export class TreasuryAdmin {
     const addresses = recipients.map((r) => r.address)
     const shares = recipients.map((r) => r.shares)
 
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: SplitterTreasury_v1,
-        functionName: 'setRecipients',
-        args: [addresses, shares],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.address,
+      abi: SplitterTreasury_v1,
+      functionName: 'setRecipients',
+      args: [addresses, shares],
+      lifecycle,
+    })
+    return receipt
   }
 
   /**
@@ -301,36 +261,16 @@ export class TreasuryAdmin {
     percentageBps,
     lifecycle,
   }: TSetFloorFeePercentageParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
     this.validatePercentage(percentageBps)
 
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: SplitterTreasury_v1,
-        functionName: 'setFloorFeePercentage',
-        args: [BigInt(percentageBps)],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.address,
+      abi: SplitterTreasury_v1,
+      functionName: 'setFloorFeePercentage',
+      args: [BigInt(percentageBps)],
+      lifecycle,
+    })
+    return receipt
   }
 
   /**
@@ -341,58 +281,29 @@ export class TreasuryAdmin {
     treasuryAddress,
     lifecycle,
   }: TSetFloorFeeTreasuryParams): Promise<TransactionReceipt> {
-    const walletClient = this.requireWalletClient()
-
     if (!treasuryAddress || treasuryAddress === '0x0000000000000000000000000000000000000000') {
       throw new Error('Invalid treasury address')
     }
 
-    try {
-      lifecycle?.onPendingWallet?.()
-
-      const hash = await walletClient.writeContract({
-        address: this.address,
-        abi: SplitterTreasury_v1,
-        functionName: 'setFloorFeeTreasury',
-        args: [treasuryAddress],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.address,
+      abi: SplitterTreasury_v1,
+      functionName: 'setFloorFeeTreasury',
+      args: [treasuryAddress],
+      lifecycle,
+    })
+    return receipt
   }
 
   // ===========================================================================
   // Private Helpers
   // ===========================================================================
 
-  private requireWalletClient(): PopWalletClient {
-    if (!this.walletClient) {
+  private requireSafeWrite(): SafeWrite {
+    if (!this.safeWrite) {
       throw new Error('Wallet not connected. Please connect your wallet to continue.')
     }
-    return this.walletClient
-  }
-
-  private getWalletAddress(walletClient: PopWalletClient): Address {
-    const account = walletClient.account
-    if (!account?.address) {
-      throw new Error('Wallet not connected. Please connect your wallet to continue.')
-    }
-    return account.address as Address
+    return this.safeWrite
   }
 
   private validatePercentage(percentageBps: number): void {
