@@ -32,6 +32,7 @@ import {
   STAKING_MANAGER_METADATA,
   TREASURY_METADATA,
 } from './constants/metadata'
+import type { TransactionLifecycleCallbacks } from './presale'
 import {
   type CreditFacilityConfig,
   CreditFacilityConfigSchema,
@@ -47,6 +48,7 @@ import {
   TreasuryConfigSchema,
 } from './schemas/launch.schema'
 import type { PopPublicClient, PopWalletClient } from './types'
+import { SafeWrite } from './utils/safe-write'
 import {
   CREDIT_FACILITY_SELECTORS,
   FLOOR_SELECTORS,
@@ -182,11 +184,13 @@ export class Launch {
   private readonly floorFactoryAddress: Address
   private readonly publicClient: PopPublicClient
   private readonly walletClient?: PopWalletClient
+  private readonly safeWrite?: SafeWrite
 
   constructor({ floorFactoryAddress, publicClient, walletClient }: LaunchConstructorArgs) {
     this.floorFactoryAddress = floorFactoryAddress
     this.publicClient = publicClient
     this.walletClient = walletClient
+    this.safeWrite = walletClient ? new SafeWrite({ publicClient, walletClient }) : undefined
   }
 
   // ===========================================================================
@@ -197,8 +201,10 @@ export class Launch {
    * @description Create a new Floor Market with all required modules
    * Validates config with Effect Schema before encoding and submitting
    */
-  public async create(params: LaunchConfig): Promise<LaunchResult> {
-    const walletClient = this.requireWalletClient()
+  public async create(
+    params: LaunchConfig & { lifecycle?: TransactionLifecycleCallbacks }
+  ): Promise<LaunchResult> {
+    const safeWrite = this.requireSafeWrite()
 
     // Validate with Effect Schema (throws ParseError on invalid)
     const validated = Schema.decodeUnknownSync(LaunchConfigSchema)(params)
@@ -247,8 +253,8 @@ export class Launch {
       )
     }
 
-    // Execute transaction
-    const hash = await walletClient.writeContract({
+    // Execute transaction via SafeWrite (simulate → write → receipt)
+    const { hash, receipt } = await safeWrite.write({
       address: this.floorFactoryAddress,
       abi: FloorFactory_v1,
       functionName: 'createFloor',
@@ -270,17 +276,8 @@ export class Launch {
           configData: m.configData,
         })),
       ],
-      account: this.getWalletAddress(walletClient),
+      lifecycle: params.lifecycle,
     })
-
-    const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-    // Check if transaction succeeded
-    if (receipt.status === 'reverted') {
-      throw new Error(
-        `createFloor transaction reverted. Hash: ${hash}. Check the transaction for details.`
-      )
-    }
 
     // Parse FloorCreated event from transaction logs
     const floorCreatedEvent = this.parseFloorCreatedEvent(receipt)
@@ -320,8 +317,10 @@ export class Launch {
    *    - Grants buy permission on Floor
    *    - Grants buyAndBorrow permission on CreditFacility (if deployed)
    */
-  public async configure(params: ConfigureParams): Promise<ConfigureResult> {
-    const walletClient = this.requireWalletClient()
+  public async configure(
+    params: ConfigureParams & { lifecycle?: TransactionLifecycleCallbacks }
+  ): Promise<ConfigureResult> {
+    const safeWrite = this.requireSafeWrite()
 
     const calls: SingleCall[] = []
 
@@ -702,21 +701,13 @@ export class Launch {
     )
 
     if (canUseForwarder) {
-      const hash = await walletClient.writeContract({
+      const { hash, receipt } = await safeWrite.write({
         address: params.transactionForwarderAddress,
         abi: TransactionForwarder_v1,
         functionName: 'executeMulticall',
         args: [calls],
-        account: this.getWalletAddress(walletClient),
+        lifecycle: params.lifecycle,
       })
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'reverted') {
-        throw new Error(
-          `configure transaction reverted. Hash: ${hash}. Check the transaction for details.`
-        )
-      }
 
       return {
         transactionHash: hash,
@@ -726,7 +717,11 @@ export class Launch {
       }
     }
 
-    const directResult = await this.executeCallsDirectly(calls, walletClient, 'configure')
+    const directResult = await this.executeCallsDirectly(
+      calls,
+      this.requireWalletClient(),
+      'configure'
+    )
     return {
       transactionHash: directResult.lastHash,
       receipt: directResult.lastReceipt,
@@ -747,8 +742,9 @@ export class Launch {
       target: Address
       selector: `0x${string}`
     }>
+    lifecycle?: TransactionLifecycleCallbacks
   }): Promise<ConfigureResult> {
-    const walletClient = this.requireWalletClient()
+    const safeWrite = this.requireSafeWrite()
 
     const calls: SingleCall[] = params.permissions.map((perm) => ({
       target: params.authorizerAddress,
@@ -766,21 +762,13 @@ export class Launch {
     )
 
     if (canUseForwarder) {
-      const hash = await walletClient.writeContract({
+      const { hash, receipt } = await safeWrite.write({
         address: params.transactionForwarderAddress,
         abi: TransactionForwarder_v1,
         functionName: 'executeMulticall',
         args: [calls],
-        account: this.getWalletAddress(walletClient),
+        lifecycle: params.lifecycle,
       })
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'reverted') {
-        throw new Error(
-          `addRolePermissions transaction reverted. Hash: ${hash}. Check the transaction for details.`
-        )
-      }
 
       return {
         transactionHash: hash,
@@ -790,7 +778,11 @@ export class Launch {
       }
     }
 
-    const directResult = await this.executeCallsDirectly(calls, walletClient, 'addRolePermissions')
+    const directResult = await this.executeCallsDirectly(
+      calls,
+      this.requireWalletClient(),
+      'addRolePermissions'
+    )
     return {
       transactionHash: directResult.lastHash,
       receipt: directResult.lastReceipt,
@@ -1064,6 +1056,13 @@ export class Launch {
       throw new Error('Wallet not connected. Please connect your wallet to create a market.')
     }
     return this.walletClient
+  }
+
+  private requireSafeWrite(): SafeWrite {
+    if (!this.safeWrite) {
+      throw new Error('Wallet not connected. Please connect your wallet to continue.')
+    }
+    return this.safeWrite
   }
 
   private getWalletAddress(walletClient: PopWalletClient): Address {
