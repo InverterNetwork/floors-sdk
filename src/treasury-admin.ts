@@ -59,10 +59,12 @@ export interface TTreasuryAdminState {
   floorFeePercentage: number
   /** Address receiving floor fees */
   floorFeeTreasury: Address
-  /** Current recipients (would need indexer data for full list) */
+  /** Number of configured recipients */
   recipientCount: number
   /** Total shares across all recipients */
   totalShares: bigint
+  /** Current recipients with their share allocations */
+  recipients: TTreasuryRecipient[]
 }
 
 interface TreasuryAdminConstructorArgs {
@@ -124,29 +126,33 @@ export class TreasuryAdmin {
    * @description Get the current treasury configuration state
    */
   public async getTreasuryState(): Promise<TTreasuryAdminState> {
-    const [floorFeePercentage, floorFeeTreasury, totalShares] = await Promise.all([
-      this.publicClient.readContract({
-        address: this.address,
-        abi: SplitterTreasury_v1,
-        functionName: 'getFloorFeePercentage',
-      }) as Promise<bigint>,
-      this.publicClient.readContract({
-        address: this.address,
-        abi: SplitterTreasury_v1,
-        functionName: 'getFloorFeeTreasury',
-      }) as Promise<Address>,
-      this.publicClient.readContract({
-        address: this.address,
-        abi: SplitterTreasury_v1,
-        functionName: 'getTotalShares',
-      }) as Promise<bigint>,
-    ])
+    const contract = { address: this.address, abi: SplitterTreasury_v1 } as const
+
+    const results = await this.publicClient.multicall({
+      contracts: [
+        { ...contract, functionName: 'getFloorFeePercentage' },
+        { ...contract, functionName: 'getFloorFeeTreasury' },
+        { ...contract, functionName: 'getRecipientsAndShares' },
+      ],
+    })
+
+    const floorFeePercentage = results[0].result as bigint
+    const floorFeeTreasury = results[1].result as Address
+    const [addresses, shares] = results[2].result as [Address[], bigint[]]
+
+    const recipients: TTreasuryRecipient[] = addresses.map((address, i) => ({
+      address,
+      shares: shares[i],
+    }))
+
+    const totalShares = shares.reduce((sum, s) => sum + s, BigInt(0))
 
     return {
       floorFeePercentage: Number(floorFeePercentage),
       floorFeeTreasury,
-      recipientCount: 0, // Would need indexer data
+      recipientCount: recipients.length,
       totalShares,
+      recipients,
     }
   }
 
