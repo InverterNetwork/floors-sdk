@@ -7,7 +7,7 @@ import type { Abi, AbiFunction, ExtractAbiFunctionNames } from 'abitype'
 import type { Address } from 'viem'
 import { toFunctionSelector } from 'viem'
 
-import { CreditFacility_v1, Floor_v1 } from '../abis'
+import { CreditFacility_v1, Floor_v1, SplitterTreasury_v1 } from '../abis'
 import Presale_v1 from '../abis/Presale_v1'
 
 // =============================================================================
@@ -153,13 +153,34 @@ export const PRESALE_SELECTORS = {
 } as const
 
 // =============================================================================
+// Treasury Selectors
+// =============================================================================
+
+/**
+ * @description SplitterTreasury function selectors for permission granting
+ * Extracted from SplitterTreasury_v1 ABI for type safety
+ */
+export const TREASURY_SELECTORS = {
+  setFloorFeePercentage: getSelector(SplitterTreasury_v1, 'setFloorFeePercentage'),
+  setFloorFeeTreasury: getSelector(SplitterTreasury_v1, 'setFloorFeeTreasury'),
+  setRecipients: getSelector(SplitterTreasury_v1, 'setRecipients'),
+  getFunds: getSelector(SplitterTreasury_v1, 'getFunds'),
+} as const
+
+// =============================================================================
 // Selector Registry (for UI dropdowns and lookups)
 // =============================================================================
 
 /**
  * @description Module types for categorizing selectors
  */
-export type SelectorModuleType = 'floor' | 'creditFacility' | 'presale'
+export type SelectorModuleType =
+  | 'floor'
+  | 'creditFacility'
+  | 'presale'
+  | 'staking'
+  | 'strategyBase'
+  | 'treasury'
 
 /**
  * @description A registered function selector with metadata
@@ -345,6 +366,90 @@ export const SELECTOR_REGISTRY: RegisteredSelector[] = [
     module: 'presale',
     description: 'Self-register to whitelist with Merkle proof',
   },
+
+  // Staking Manager functions
+  {
+    name: 'stake',
+    selector: STAKING_SELECTORS.stake,
+    module: 'staking',
+    description: 'Stake tokens',
+  },
+  {
+    name: 'harvestYield',
+    selector: STAKING_SELECTORS.harvestYield,
+    module: 'staking',
+    description: 'Harvest staking yield',
+  },
+  {
+    name: 'withdrawFunds',
+    selector: STAKING_SELECTORS.withdrawFunds,
+    module: 'staking',
+    description: 'Withdraw staked funds',
+  },
+  {
+    name: 'rebalance',
+    selector: STAKING_SELECTORS.rebalance,
+    module: 'staking',
+    description: 'Rebalance staking allocations',
+  },
+  {
+    name: 'addStrategy',
+    selector: STAKING_SELECTORS.addStrategy,
+    module: 'staking',
+    description: 'Add a staking strategy',
+  },
+  {
+    name: 'removeStrategy',
+    selector: STAKING_SELECTORS.removeStrategy,
+    module: 'staking',
+    description: 'Remove a staking strategy',
+  },
+  {
+    name: 'setPerformanceFeeBps',
+    selector: STAKING_SELECTORS.setPerformanceFeeBps,
+    module: 'staking',
+    description: 'Set performance fee in basis points',
+  },
+
+  // Strategy Base functions
+  {
+    name: 'deposit',
+    selector: STRATEGY_BASE_SELECTORS.deposit,
+    module: 'strategyBase',
+    description: 'Deposit into strategy',
+  },
+  {
+    name: 'withdraw',
+    selector: STRATEGY_BASE_SELECTORS.withdraw,
+    module: 'strategyBase',
+    description: 'Withdraw from strategy',
+  },
+
+  // Treasury functions
+  {
+    name: 'setFloorFeePercentage',
+    selector: TREASURY_SELECTORS.setFloorFeePercentage,
+    module: 'treasury',
+    description: 'Set floor fee percentage',
+  },
+  {
+    name: 'setFloorFeeTreasury',
+    selector: TREASURY_SELECTORS.setFloorFeeTreasury,
+    module: 'treasury',
+    description: 'Set floor fee treasury address',
+  },
+  {
+    name: 'setRecipients',
+    selector: TREASURY_SELECTORS.setRecipients,
+    module: 'treasury',
+    description: 'Set treasury recipients and shares',
+  },
+  {
+    name: 'getFunds',
+    selector: TREASURY_SELECTORS.getFunds,
+    module: 'treasury',
+    description: 'Distribute funds to recipients',
+  },
 ] as const
 
 /**
@@ -381,6 +486,9 @@ export function getSelectorsByModule(): Record<SelectorModuleType, RegisteredSel
     floor: SELECTOR_REGISTRY.filter((s) => s.module === 'floor'),
     creditFacility: SELECTOR_REGISTRY.filter((s) => s.module === 'creditFacility'),
     presale: SELECTOR_REGISTRY.filter((s) => s.module === 'presale'),
+    staking: SELECTOR_REGISTRY.filter((s) => s.module === 'staking'),
+    strategyBase: SELECTOR_REGISTRY.filter((s) => s.module === 'strategyBase'),
+    treasury: SELECTOR_REGISTRY.filter((s) => s.module === 'treasury'),
   }
 }
 
@@ -391,4 +499,7 @@ export const MODULE_DISPLAY_NAMES: Record<SelectorModuleType, string> = {
   floor: 'Floor (Issuance)',
   creditFacility: 'Credit Facility',
   presale: 'Presale',
+  staking: 'Staking Manager',
+  strategyBase: 'Strategy Base',
+  treasury: 'Fee Treasury',
 }
