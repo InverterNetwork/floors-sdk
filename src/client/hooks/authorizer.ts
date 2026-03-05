@@ -166,7 +166,7 @@ export const useAuthorizerMutations = (
   })
 
   const burnRoleAdmin = useMutation({
-    mutationFn: (roleId: Hex) => ensureAuthorizer().burnRoleAdmin(roleId),
+    mutationFn: (roleId: Hex) => ensureAuthorizer().burnRoleAdmin({ roleId }),
     onSuccess: async () => {
       await invalidateRolesQueries()
     },

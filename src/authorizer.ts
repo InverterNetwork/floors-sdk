@@ -3,7 +3,9 @@ import { getAddress } from 'viem'
 
 import { AUT_Roles_v2 } from './abis'
 import type { TAuthorizerRole } from './graphql/api'
+import type { TransactionLifecycleCallbacks } from './presale'
 import type { PopPublicClient, PopWalletClient } from './types'
+import { SafeWrite } from './utils/safe-write'
 import { DEFAULT_ADMIN_ROLE, PUBLIC_ROLE } from './utils/selectors'
 import { validateAddress } from './utils/validation'
 
@@ -16,29 +18,33 @@ interface AuthorizerConstructorArgs {
   roles?: TAuthorizerRole[]
 }
 
-interface CreateRoleParams {
+interface AuthorizerBaseParams {
+  lifecycle?: TransactionLifecycleCallbacks
+}
+
+interface CreateRoleParams extends AuthorizerBaseParams {
   roleName: string
   adminRoleId: Hex
   initialMembers?: Address[]
 }
 
-interface LabelRoleParams {
+interface LabelRoleParams extends AuthorizerBaseParams {
   roleId: Hex
   newRoleName: string
 }
 
-interface TransferAdminRoleParams {
+interface TransferAdminRoleParams extends AuthorizerBaseParams {
   roleId: Hex
   newAdminRoleId: Hex
 }
 
-interface AccessPermissionParams {
+interface AccessPermissionParams extends AuthorizerBaseParams {
   target: Address
   selector: Hex // bytes4 selector
   roleId: Hex
 }
 
-interface CreateRoleWithPermissionsParams {
+interface CreateRoleWithPermissionsParams extends AuthorizerBaseParams {
   roleName: string
   adminRoleId: Hex
   initialMembers?: Address[]
@@ -48,25 +54,30 @@ interface CreateRoleWithPermissionsParams {
   }[]
 }
 
-interface RoleAccountParams {
+interface RoleAccountParams extends AuthorizerBaseParams {
   roleId: Hex
   account?: Address
 }
 
+interface BurnRoleAdminParams extends AuthorizerBaseParams {
+  roleId: Hex
+}
+
 /**
  * @description Authorizer helper for role + permission mutations.
- *              Uses viem clients; no React/wagmi dependency.
+ *              Uses SafeWrite for simulate → write → receipt flow with
+ *              full ABI error decoding at every stage.
  */
 export class Authorizer {
   private readonly address: Address
-  private readonly publicClient: PopPublicClient
+  private readonly safeWrite?: SafeWrite
   private readonly walletClient?: PopWalletClient
   private readonly roles?: TAuthorizerRole[]
 
   constructor({ authorizerAddress, publicClient, walletClient, roles }: AuthorizerConstructorArgs) {
     this.address = getAddress(authorizerAddress)
-    this.publicClient = publicClient
     this.walletClient = walletClient
+    this.safeWrite = walletClient ? new SafeWrite({ publicClient, walletClient }) : undefined
     this.roles = roles
   }
 
@@ -82,98 +93,94 @@ export class Authorizer {
     roleName,
     adminRoleId,
     initialMembers = [],
+    lifecycle,
   }: CreateRoleParams): Promise<TAuthorizerMutationResult> {
-    const walletClient = this.requireWalletClient()
-    const hash = await walletClient.writeContract({
+    const { receipt } = await this.requireSafeWrite().write({
       address: this.address,
       abi: AUT_Roles_v2,
       functionName: 'createRole',
       args: [roleName, adminRoleId, initialMembers],
-      account: this.getWalletAddress(walletClient),
+      lifecycle,
     })
-
-    return this.publicClient.waitForTransactionReceipt({ hash })
+    return receipt
   }
 
   public async labelRole({
     roleId,
     newRoleName,
+    lifecycle,
   }: LabelRoleParams): Promise<TAuthorizerMutationResult> {
-    const walletClient = this.requireWalletClient()
-    const hash = await walletClient.writeContract({
+    const { receipt } = await this.requireSafeWrite().write({
       address: this.address,
       abi: AUT_Roles_v2,
       functionName: 'labelRole',
       args: [roleId, newRoleName],
-      account: this.getWalletAddress(walletClient),
+      lifecycle,
     })
-
-    return this.publicClient.waitForTransactionReceipt({ hash })
+    return receipt
   }
 
   public async transferAdminRole({
     roleId,
     newAdminRoleId,
+    lifecycle,
   }: TransferAdminRoleParams): Promise<TAuthorizerMutationResult> {
-    const walletClient = this.requireWalletClient()
-    const hash = await walletClient.writeContract({
+    const { receipt } = await this.requireSafeWrite().write({
       address: this.address,
       abi: AUT_Roles_v2,
       functionName: 'transferAdminRole',
       args: [roleId, newAdminRoleId],
-      account: this.getWalletAddress(walletClient),
+      lifecycle,
     })
-
-    return this.publicClient.waitForTransactionReceipt({ hash })
+    return receipt
   }
 
-  public async burnRoleAdmin(roleId: Hex): Promise<TAuthorizerMutationResult> {
-    const walletClient = this.requireWalletClient()
-    const hash = await walletClient.writeContract({
+  public async burnRoleAdmin({
+    roleId,
+    lifecycle,
+  }: BurnRoleAdminParams): Promise<TAuthorizerMutationResult> {
+    const { receipt } = await this.requireSafeWrite().write({
       address: this.address,
       abi: AUT_Roles_v2,
       functionName: 'burnRoleAdmin',
       args: [roleId],
-      account: this.getWalletAddress(walletClient),
+      lifecycle,
     })
-
-    return this.publicClient.waitForTransactionReceipt({ hash })
+    return receipt
   }
 
   public async addAccessPermission({
     target,
     selector,
     roleId,
+    lifecycle,
   }: AccessPermissionParams): Promise<TAuthorizerMutationResult> {
-    const walletClient = this.requireWalletClient()
     const validatedTarget = validateAddress(target, 'target')
-    const hash = await walletClient.writeContract({
+    const { receipt } = await this.requireSafeWrite().write({
       address: this.address,
       abi: AUT_Roles_v2,
       functionName: 'addAccessPermission',
       args: [validatedTarget, selector, roleId],
-      account: this.getWalletAddress(walletClient),
+      lifecycle,
     })
-
-    return this.publicClient.waitForTransactionReceipt({ hash })
+    return receipt
   }
 
   public async removeAccessPermission({
     target,
     selector,
     roleId,
+    lifecycle,
   }: AccessPermissionParams): Promise<TAuthorizerMutationResult> {
-    const walletClient = this.requireWalletClient()
     const validatedTarget = validateAddress(target, 'target')
-    const hash = await walletClient.writeContract({
+    const { receipt } = await this.requireSafeWrite().write({
       address: this.address,
       abi: AUT_Roles_v2,
       functionName: 'removeAccessPermission',
       args: [validatedTarget, selector, roleId],
-      account: this.getWalletAddress(walletClient),
+      lifecycle,
     })
-
-    return this.publicClient.waitForTransactionReceipt({ hash })
+    return receipt
   }
 
   public async createRoleAndAddAccessPermissions({
@@ -181,57 +188,52 @@ export class Authorizer {
     adminRoleId,
     initialMembers = [],
     permissions,
+    lifecycle,
   }: CreateRoleWithPermissionsParams): Promise<TAuthorizerMutationResult> {
-    const walletClient = this.requireWalletClient()
     const validatedInitialMembers = initialMembers.map((a) => validateAddress(a, 'initialMembers'))
     const targets = permissions.map((p) => validateAddress(p.target, 'permissions.target'))
     const selectors = permissions.map((p) => p.selectors)
 
-    const hash = await walletClient.writeContract({
+    const { receipt } = await this.requireSafeWrite().write({
       address: this.address,
       abi: AUT_Roles_v2,
       functionName: 'createRoleAndAddAccessPermissions',
       args: [roleName, adminRoleId, validatedInitialMembers, targets, selectors],
-      account: this.getWalletAddress(walletClient),
+      lifecycle,
     })
-
-    return this.publicClient.waitForTransactionReceipt({ hash })
+    return receipt
   }
 
   public async grantRole({
     roleId,
     account,
+    lifecycle,
   }: RoleAccountParams): Promise<TAuthorizerMutationResult> {
-    const walletClient = this.requireWalletClient()
-    const targetAccount = validateAddress(account ?? this.getWalletAddress(walletClient), 'account')
-
-    const hash = await walletClient.writeContract({
+    const targetAccount = this.resolveAccount(account)
+    const { receipt } = await this.requireSafeWrite().write({
       address: this.address,
       abi: AUT_Roles_v2,
       functionName: 'grantRole',
       args: [roleId, targetAccount],
-      account: this.getWalletAddress(walletClient),
+      lifecycle,
     })
-
-    return this.publicClient.waitForTransactionReceipt({ hash })
+    return receipt
   }
 
   public async revokeRole({
     roleId,
     account,
+    lifecycle,
   }: RoleAccountParams): Promise<TAuthorizerMutationResult> {
-    const walletClient = this.requireWalletClient()
-    const targetAccount = validateAddress(account ?? this.getWalletAddress(walletClient), 'account')
-
-    const hash = await walletClient.writeContract({
+    const targetAccount = this.resolveAccount(account)
+    const { receipt } = await this.requireSafeWrite().write({
       address: this.address,
       abi: AUT_Roles_v2,
       functionName: 'revokeRole',
       args: [roleId, targetAccount],
-      account: this.getWalletAddress(walletClient),
+      lifecycle,
     })
-
-    return this.publicClient.waitForTransactionReceipt({ hash })
+    return receipt
   }
 
   /**
@@ -279,33 +281,32 @@ export class Authorizer {
   public async renounceRole({
     roleId,
     account,
+    lifecycle,
   }: RoleAccountParams): Promise<TAuthorizerMutationResult> {
-    const walletClient = this.requireWalletClient()
-    const targetAccount = validateAddress(account ?? this.getWalletAddress(walletClient), 'account')
-
-    const hash = await walletClient.writeContract({
+    const targetAccount = this.resolveAccount(account)
+    const { receipt } = await this.requireSafeWrite().write({
       address: this.address,
       abi: AUT_Roles_v2,
       functionName: 'renounceRole',
       args: [roleId, targetAccount],
-      account: targetAccount,
+      lifecycle,
     })
-
-    return this.publicClient.waitForTransactionReceipt({ hash })
+    return receipt
   }
 
-  private requireWalletClient(): PopWalletClient {
-    if (!this.walletClient) {
+  private requireSafeWrite(): SafeWrite {
+    if (!this.safeWrite) {
       throw new Error('Wallet not connected. Please connect your wallet to continue.')
     }
-    return this.walletClient
+    return this.safeWrite
   }
 
-  private getWalletAddress(walletClient: PopWalletClient): Address {
-    const account = walletClient.account
-    if (!account?.address) {
+  private resolveAccount(account?: Address): Address {
+    if (account) return validateAddress(account, 'account')
+    const walletAddress = this.walletClient?.account?.address
+    if (!walletAddress) {
       throw new Error('Wallet not connected. Please connect your wallet to continue.')
     }
-    return account.address as Address
+    return walletAddress as Address
   }
 }
