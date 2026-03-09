@@ -503,3 +503,12 @@ export const MODULE_DISPLAY_NAMES: Record<SelectorModuleType, string> = {
   strategyBase: 'Strategy Base',
   treasury: 'Fee Treasury',
 }
+
+/**
+ * @description Get selectors filtered by a specific module type
+ * @param moduleType - The module type to filter by
+ * @returns Array of selectors for that module
+ */
+export function getSelectorsByModuleType(moduleType: SelectorModuleType): RegisteredSelector[] {
+  return SELECTOR_REGISTRY.filter((s) => s.module === moduleType)
+}

@@ -114,13 +114,13 @@ export type ConfigureParams = {
   strategyAddresses?: Address[]
   /** Whether to grant minter role to Floor on issuance token (default: true) */
   grantMinterRole?: boolean
-  /** Whether to open buy after configuration (default: true) */
+  /** Whether to open buy after configuration (default: false) */
   openBuy?: boolean
   /** Whether to open sell after configuration (default: false) */
   openSell?: boolean
   /** Whether to enable public borrowing (default: false) */
   openBorrow?: boolean
-  /** Whether to open public staking user actions (default: true when stakingManagerAddress is set) */
+  /** Whether to open public staking user actions (default: false when stakingManagerAddress is set) */
   openStaking?: boolean
   /** Whether to grant admin role access to staking admin actions (default: true) */
   enableStakingAdmin?: boolean
@@ -304,18 +304,25 @@ export class Launch {
    *
    * This method performs the following setup (matching Solidity deployment scripts):
    * 1. Grants minter role to Floor on the issuance token (if grantMinterRole is true)
-   * 2. Opens buy on the Floor (optional, default: true)
-   * 3. Opens sell on the Floor (optional, default: false)
-   * 4. Grants PUBLIC_ROLE permissions for buy/sell/borrow based on options
-   * 5. If CreditFacility is deployed:
+   * 2. Grants PUBLIC_ROLE permissions for buy/sell (permissions only, trading remains disabled)
+   * 3. Optionally enables buy/sell on the Floor (if openBuy/openSell is true, default: false)
+   * 4. If CreditFacility is deployed:
    *    - Creates CreditFacility role with creditFacility as member
    *    - Grants buy permission on Floor
    *    - Grants withdrawCollateralTo permission on Floor
    *    - Grants depositCollateralFrom permission on Floor
-   * 6. If Presale is deployed:
+   * 5. If Presale is deployed:
    *    - Creates Presale role with presale as member
    *    - Grants buy permission on Floor
    *    - Grants buyAndBorrow permission on CreditFacility (if deployed)
+   * 6. If StakingManager is deployed:
+   *    - Creates StakingManager role with collateral access permissions
+   *    - Optionally grants PUBLIC_ROLE for staking functions (if openStaking is true, default: false)
+   *
+   * Key design: Permission grants are separated from function enablement.
+   * - PUBLIC_ROLE permissions for buy/sell are always granted by default
+   * - But enableBuy/enableSell must be called separately to actually open trading
+   * - This allows flexible phased rollouts (e.g., presale phase before open trading)
    */
   public async configure(
     params: ConfigureParams & { lifecycle?: TransactionLifecycleCallbacks }
@@ -340,8 +347,20 @@ export class Launch {
       })
     }
 
-    // 2. Open buy on Floor (if enabled, default: true)
-    if (params.openBuy !== false) {
+    // 2. Grant PUBLIC_ROLE permission to call buy (permission setup, does not enable trading)
+    // Note: This grants permission but buy/sell remain disabled until enableBuy/enableSell is called
+    calls.push({
+      target: params.authorizerAddress,
+      allowFailure: false,
+      callData: encodeFunctionData({
+        abi: AUT_Roles_v2,
+        functionName: 'addAccessPermission',
+        args: [params.floorAddress, FLOOR_SELECTORS.buy, PUBLIC_ROLE],
+      }),
+    })
+
+    // 2b. Optionally enable buy immediately (calls enableBuy on Floor)
+    if (params.openBuy === true) {
       calls.push({
         target: params.floorAddress,
         allowFailure: false,
@@ -350,20 +369,20 @@ export class Launch {
           functionName: 'enableBuy',
         }),
       })
-
-      // Grant PUBLIC_ROLE permission to call buy
-      calls.push({
-        target: params.authorizerAddress,
-        allowFailure: false,
-        callData: encodeFunctionData({
-          abi: AUT_Roles_v2,
-          functionName: 'addAccessPermission',
-          args: [params.floorAddress, FLOOR_SELECTORS.buy, PUBLIC_ROLE],
-        }),
-      })
     }
 
-    // 3. Open sell on Floor (if enabled, default: false)
+    // 3. Grant PUBLIC_ROLE permission to call sell (permission setup, does not enable trading)
+    calls.push({
+      target: params.authorizerAddress,
+      allowFailure: false,
+      callData: encodeFunctionData({
+        abi: AUT_Roles_v2,
+        functionName: 'addAccessPermission',
+        args: [params.floorAddress, FLOOR_SELECTORS.sell, PUBLIC_ROLE],
+      }),
+    })
+
+    // 3b. Optionally enable sell immediately (calls enableSell on Floor)
     if (params.openSell === true) {
       calls.push({
         target: params.floorAddress,
@@ -371,17 +390,6 @@ export class Launch {
         callData: encodeFunctionData({
           abi: Floor_v1,
           functionName: 'enableSell',
-        }),
-      })
-
-      // Grant PUBLIC_ROLE permission to call sell
-      calls.push({
-        target: params.authorizerAddress,
-        allowFailure: false,
-        callData: encodeFunctionData({
-          abi: AUT_Roles_v2,
-          functionName: 'addAccessPermission',
-          args: [params.floorAddress, FLOOR_SELECTORS.sell, PUBLIC_ROLE],
         }),
       })
     }
@@ -546,7 +554,9 @@ export class Launch {
 
     // 6. Configure StakingManager if deployed
     if (params.stakingManagerAddress) {
-      if (params.openStaking !== false) {
+      // Grant PUBLIC_ROLE permission for staking functions (permission setup only)
+      // Note: openStaking defaults to false, so staking is disabled by default
+      if (params.openStaking === true) {
         calls.push(
           {
             target: params.authorizerAddress,
