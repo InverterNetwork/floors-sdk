@@ -7,9 +7,10 @@ const MONTH = 30 * DAY
 
 /**
  * Get the current timestamp in seconds
+ * Uses chain timestamp if provided, otherwise falls back to wall-clock
  */
-function now(): number {
-  return Math.floor(Date.now() / 1000)
+function now(chainTimestamp?: number): number {
+  return chainTimestamp ?? Math.floor(Date.now() / 1000)
 }
 
 /**
@@ -272,15 +273,17 @@ export type TimeRange = keyof typeof TIME_BUCKET_INTERVALS
  * @param data - Sparse data points (may have gaps)
  * @param timeRange - The time range ('24h', '7d', '30d')
  * @param currentValues - Optional current values to use as the last point
+ * @param chainTimestamp - Optional chain timestamp (defaults to wall-clock)
  * @returns Dense array of data points at regular intervals
  */
 export function fillChartDataGaps(
   data: TChartDataPoint[],
   timeRange: TimeRange,
-  currentValues?: { tvl: number; marketCap: number; volume: number }
+  currentValues?: { tvl: number; marketCap: number; volume: number },
+  chainTimestamp?: number
 ): TChartDataPoint[] {
   const interval = TIME_BUCKET_INTERVALS[timeRange]
-  const currentTime = now()
+  const currentTime = now(chainTimestamp)
 
   // Calculate start time based on range
   const rangeDuration = {
@@ -417,7 +420,8 @@ export function computeGlobalMetricsWithHistory(
   currentData: GlobalStatsHistoryQueryResultType,
   chart24hData?: Chart24hQueryResultType,
   chart7dData?: Chart7dQueryResultType,
-  chart30dData?: Chart30dQueryResultType
+  chart30dData?: Chart30dQueryResultType,
+  chainTimestamp?: number
 ): TGlobalMetricsWithHistory {
   const markets = currentData.Market || []
   const snapshots24hAgo = currentData.MarketSnapshot || []
@@ -490,9 +494,9 @@ export function computeGlobalMetricsWithHistory(
   }
 
   // Fill gaps in chart data with interpolated values at regular intervals
-  const chartData24h = fillChartDataGaps(rawChartData24h, '24h', currentValues)
-  const chartData7d = fillChartDataGaps(rawChartData7d, '7d', currentValues)
-  const chartData30d = fillChartDataGaps(rawChartData30d, '30d', currentValues)
+  const chartData24h = fillChartDataGaps(rawChartData24h, '24h', currentValues, chainTimestamp)
+  const chartData7d = fillChartDataGaps(rawChartData7d, '7d', currentValues, chainTimestamp)
+  const chartData30d = fillChartDataGaps(rawChartData30d, '30d', currentValues, chainTimestamp)
 
   return {
     totalValueLocked: currentTVL,
@@ -506,6 +510,6 @@ export function computeGlobalMetricsWithHistory(
     chartData7d,
     chartData30d,
 
-    lastUpdatedAt: Math.floor(Date.now() / 1000),
+    lastUpdatedAt: chainTimestamp ?? Math.floor(Date.now() / 1000),
   }
 }

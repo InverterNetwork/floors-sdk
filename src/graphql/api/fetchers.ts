@@ -54,7 +54,7 @@ import {
   mapRolesToAuthorizerRoles,
   mapTradeToTradeData,
 } from './mappers'
-import { cloneQuery, type ExtendableQueryArgs, mergeFieldArgs } from './utils'
+import { cloneQuery, type ExtendableQueryArgs, mergeFieldArgs, toNumber } from './utils'
 
 export const buildMarketsQuery = (
   args?: ExtendableQueryArgs<MarketsQueryType['Market']['__args']>
@@ -207,8 +207,16 @@ export async function fetchMarketById(id: string): Promise<TFloorAssetData | nul
 }
 
 export async function fetchPlatformMetrics(): Promise<TPlatformMetrics> {
-  const response = await query(buildPlatformMetricsQuery())
-  return computePlatformMetrics(response)
+  // Fetch GlobalStats to get chain timestamp
+  const [response, globalStatsResponse] = await Promise.all([
+    query(buildPlatformMetricsQuery()),
+    query(buildGlobalStatsQuery()),
+  ])
+  const globalStats = (globalStatsResponse.GlobalStats ?? [])[0]
+  const chainTimestamp = globalStats?.lastUpdatedAt
+    ? toNumber(globalStats.lastUpdatedAt)
+    : undefined
+  return computePlatformMetrics(response, chainTimestamp)
 }
 
 export async function fetchGlobalStats(): Promise<TGlobalStats | null> {
@@ -222,6 +230,13 @@ export async function fetchGlobalStats(): Promise<TGlobalStats | null> {
  * Returns TVL, Market Cap, and volume with 24h/7d/30d changes + chart data
  */
 export async function fetchGlobalMetricsWithHistory(): Promise<TGlobalMetricsWithHistory> {
+  // Fetch GlobalStats first to get chain timestamp
+  const globalStatsResponse = await query(buildGlobalStatsQuery())
+  const globalStats = (globalStatsResponse.GlobalStats ?? [])[0]
+  const chainTimestamp = globalStats?.lastUpdatedAt
+    ? toNumber(globalStats.lastUpdatedAt)
+    : undefined
+
   // Fetch all data in parallel
   const [currentData, chart24hData, chart7dData, chart30dData] = await Promise.all([
     query(createGlobalStatsHistoryQuery()),
@@ -230,7 +245,13 @@ export async function fetchGlobalMetricsWithHistory(): Promise<TGlobalMetricsWit
     query(createChart30dQuery()),
   ])
 
-  return computeGlobalMetricsWithHistory(currentData, chart24hData, chart7dData, chart30dData)
+  return computeGlobalMetricsWithHistory(
+    currentData,
+    chart24hData,
+    chart7dData,
+    chart30dData,
+    chainTimestamp
+  )
 }
 
 export async function fetchTradesByMarket(marketId: string): Promise<TTradeData[]> {
@@ -284,28 +305,53 @@ export function buildCreditPositionsFromLoans(
  * Fetch all presales
  */
 export async function fetchPresales(): Promise<TPresale[]> {
-  const response = await query(buildPresalesQuery())
+  // Fetch GlobalStats to get the latest chain timestamp
+  const [response, globalStatsResponse] = await Promise.all([
+    query(buildPresalesQuery()),
+    query(buildGlobalStatsQuery()),
+  ])
   const presales = response.PreSaleContract ?? []
-  return presales.map((presale) => mapPresaleToPresaleData(presale))
+  const globalStats = (globalStatsResponse.GlobalStats ?? [])[0]
+  const chainTimestampMs = globalStats?.lastUpdatedAt
+    ? toNumber(globalStats.lastUpdatedAt) * 1000
+    : undefined
+
+  return presales.map((presale) => mapPresaleToPresaleData(presale, chainTimestampMs))
 }
 
 /**
  * Fetch a single presale by ID
  */
 export async function fetchPresaleById(id: string): Promise<TPresale | null> {
-  const response = await query(buildPresalesQuery({ where: { id: { _eq: id } } }))
+  // Fetch GlobalStats to get the latest chain timestamp
+  const [response, globalStatsResponse] = await Promise.all([
+    query(buildPresalesQuery({ where: { id: { _eq: id } } })),
+    query(buildGlobalStatsQuery()),
+  ])
   const presale = (response.PreSaleContract ?? [])[0]
+  const globalStats = (globalStatsResponse.GlobalStats ?? [])[0]
+  const chainTimestampMs = globalStats?.lastUpdatedAt
+    ? toNumber(globalStats.lastUpdatedAt) * 1000
+    : undefined
   if (!presale) return null
-  return mapPresaleToPresaleData(presale)
+  return mapPresaleToPresaleData(presale, chainTimestampMs)
 }
 
 /**
  * Fetch presales by market ID
  */
 export async function fetchPresalesByMarket(marketId: string): Promise<TPresale[]> {
-  const response = await query(buildPresalesQuery({ where: { market_id: { _eq: marketId } } }))
+  // Fetch GlobalStats to get the latest chain timestamp
+  const [response, globalStatsResponse] = await Promise.all([
+    query(buildPresalesQuery({ where: { market_id: { _eq: marketId } } })),
+    query(buildGlobalStatsQuery()),
+  ])
   const presales = response.PreSaleContract ?? []
-  return presales.map((presale) => mapPresaleToPresaleData(presale))
+  const globalStats = (globalStatsResponse.GlobalStats ?? [])[0]
+  const chainTimestampMs = globalStats?.lastUpdatedAt
+    ? toNumber(globalStats.lastUpdatedAt) * 1000
+    : undefined
+  return presales.map((presale) => mapPresaleToPresaleData(presale, chainTimestampMs))
 }
 
 /**
@@ -433,9 +479,15 @@ export async function fetchPremiumChange24h(
   currentFloorPrice: number
 ): Promise<number | null> {
   try {
-    // Calculate 24 hours ago timestamp (in seconds)
-    const now = Math.floor(Date.now() / 1000)
-    const twentyFourHoursAgo = now - 86400 // 24 hours in seconds
+    // Fetch GlobalStats to get chain timestamp
+    const globalStatsResponse = await query(buildGlobalStatsQuery())
+    const globalStats = (globalStatsResponse.GlobalStats ?? [])[0]
+    const chainTimestamp = globalStats?.lastUpdatedAt
+      ? toNumber(globalStats.lastUpdatedAt)
+      : Math.floor(Date.now() / 1000)
+
+    // Calculate 24 hours ago timestamp (in seconds) using chain time
+    const twentyFourHoursAgo = chainTimestamp - 86400 // 24 hours in seconds
 
     // Query for MarketSnapshot closest to 24h ago
     const snapshotResponse = await query(

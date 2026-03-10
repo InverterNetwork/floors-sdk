@@ -76,10 +76,16 @@ export interface TPlatformMetrics {
 }
 
 // Function to compute platform metrics from GraphQL data
-export function computePlatformMetrics(data: PlatformMetricsQueryResultType): TPlatformMetrics {
+export function computePlatformMetrics(
+  data: PlatformMetricsQueryResultType,
+  chainTimestamp?: number
+): TPlatformMetrics {
   const markets = data.Market || []
   const accounts = data.Account || []
   const loans = data.Loan || []
+
+  // Use chain timestamp if provided, otherwise fall back to wall-clock
+  const now = chainTimestamp ?? Math.floor(Date.now() / 1000)
 
   // Calculate TVL from total supply and prices (includes locked tokens)
   const totalValueLocked = markets.reduce((sum, market) => {
@@ -108,8 +114,8 @@ export function computePlatformMetrics(data: PlatformMetricsQueryResultType): TP
     )
   }, 0)
 
-  // Calculate assets created in last 24h
-  const oneDayAgo = Math.floor(Date.now() / 1000) - 86400
+  // Calculate assets created in last 24h using chain time
+  const oneDayAgo = now - 86400
   const assetsCreated24h = markets.filter(
     (market) => parseInt(String(market.createdAt || '0')) > oneDayAgo
   ).length

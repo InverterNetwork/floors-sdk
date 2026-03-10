@@ -319,8 +319,20 @@ export function buildAccountUserPositions(
     .filter(Boolean) as TUserAssetPosition[]
 }
 
-export function mapPresaleToPresaleData(presale: TGraphQLPresale): TPresale {
-  const now = Date.now()
+/**
+ * @description Maps GraphQL Presale data to client DTO
+ * @param presale - Presale from GraphQL query result
+ * @param chainTimestampMs - Optional chain timestamp in milliseconds.
+ *        If provided, uses chain time instead of Date.now() for calculations.
+ *        This ensures time-dependent calculations stay synced with block timestamps.
+ * @returns Mapped presale data for UI consumption
+ */
+export function mapPresaleToPresaleData(
+  presale: TGraphQLPresale,
+  chainTimestampMs?: number
+): TPresale {
+  // Use chain timestamp if provided, otherwise fall back to wall-clock time
+  const now = chainTimestampMs ?? Date.now()
   const startTime = toNumber(presale.startTime) * 1000
   const endTime = toNumber(presale.endTime) * 1000
   const totalRaised = toNumber(presale.totalRaisedFormatted || presale.totalRaisedRaw)

@@ -54,11 +54,11 @@ export interface DerivedMultiplierState extends MultiplierState {
  * Formula: Mult = BPS + (InitialMult - BPS) * ((T - t) / T)^4
  *
  * @param state Multiplier state from contract
- * @param timestamp Current timestamp in seconds (defaults to now)
+ * @param timestamp Current timestamp in seconds (REQUIRED - must use chain block time)
  * @returns Current multiplier value
  */
-export function calculateMultiplier(state: MultiplierState, timestamp?: bigint): bigint {
-  const now = timestamp ?? BigInt(Math.floor(Date.now() / 1000))
+export function calculateMultiplier(state: MultiplierState, timestamp: bigint): bigint {
+  const now = timestamp
 
   // If decay duration is 0, return BPS (1x)
   if (state.decayDuration === BigInt(0)) {
@@ -91,11 +91,11 @@ export function calculateMultiplier(state: MultiplierState, timestamp?: bigint):
 /**
  * @description Get decay progress as a number between 0 and 1
  * @param state Multiplier state
- * @param timestamp Current timestamp (defaults to now)
+ * @param timestamp Current timestamp in seconds (REQUIRED - must use chain block time)
  * @returns Progress 0-1 (0 = just started, 1 = ended)
  */
-export function getMultiplierProgress(state: MultiplierState, timestamp?: bigint): number {
-  const now = timestamp ?? BigInt(Math.floor(Date.now() / 1000))
+export function getMultiplierProgress(state: MultiplierState, timestamp: bigint): number {
+  const now = timestamp
 
   if (state.decayDuration === BigInt(0) || state.startTime === BigInt(0)) {
     return 0
@@ -116,11 +116,11 @@ export function getMultiplierProgress(state: MultiplierState, timestamp?: bigint
 /**
  * @description Get time remaining until decay ends
  * @param state Multiplier state
- * @param timestamp Current timestamp (defaults to now)
+ * @param timestamp Current timestamp in seconds (REQUIRED - must use chain block time)
  * @returns Time remaining in seconds, or null if not active
  */
-export function getTimeUntilDecayEnd(state: MultiplierState, timestamp?: bigint): bigint | null {
-  const now = timestamp ?? BigInt(Math.floor(Date.now() / 1000))
+export function getTimeUntilDecayEnd(state: MultiplierState, timestamp: bigint): bigint | null {
+  const now = timestamp
 
   if (state.decayDuration === BigInt(0) || state.startTime === BigInt(0)) {
     return null
@@ -142,10 +142,10 @@ export function getTimeUntilDecayEnd(state: MultiplierState, timestamp?: bigint)
 /**
  * @description Check if decay is currently active
  * @param state Multiplier state
- * @param timestamp Current timestamp (defaults to now)
+ * @param timestamp Current timestamp in seconds (REQUIRED - must use chain block time)
  */
-export function isDecayActive(state: MultiplierState, timestamp?: bigint): boolean {
-  const now = timestamp ?? BigInt(Math.floor(Date.now() / 1000))
+export function isDecayActive(state: MultiplierState, timestamp: bigint): boolean {
+  const now = timestamp
 
   if (state.decayDuration === BigInt(0) || state.startTime === BigInt(0)) {
     return false
@@ -157,10 +157,10 @@ export function isDecayActive(state: MultiplierState, timestamp?: bigint): boole
 /**
  * @description Check if decay has ended
  * @param state Multiplier state
- * @param timestamp Current timestamp (defaults to now)
+ * @param timestamp Current timestamp in seconds (REQUIRED - must use chain block time)
  */
-export function isDecayEnded(state: MultiplierState, timestamp?: bigint): boolean {
-  const now = timestamp ?? BigInt(Math.floor(Date.now() / 1000))
+export function isDecayEnded(state: MultiplierState, timestamp: bigint): boolean {
+  const now = timestamp
 
   if (state.decayDuration === BigInt(0)) {
     return true // No decay configured means it's effectively "ended" at 1x
@@ -176,10 +176,10 @@ export function isDecayEnded(state: MultiplierState, timestamp?: bigint): boolea
 /**
  * @description Check if decay has started
  * @param state Multiplier state
- * @param timestamp Current timestamp (defaults to now)
+ * @param timestamp Current timestamp in seconds (REQUIRED - must use chain block time)
  */
-export function hasDecayStarted(state: MultiplierState, timestamp?: bigint): boolean {
-  const now = timestamp ?? BigInt(Math.floor(Date.now() / 1000))
+export function hasDecayStarted(state: MultiplierState, timestamp: bigint): boolean {
+  const now = timestamp
 
   if (state.startTime === BigInt(0)) {
     return false
@@ -200,12 +200,12 @@ export function multiplierToDisplay(multiplier: bigint): number {
 /**
  * @description Get derived multiplier state with all computed values
  * @param state Multiplier state from contract
- * @param timestamp Current timestamp (defaults to now)
+ * @param timestamp Current timestamp in seconds (REQUIRED - must use chain block time)
  * @returns Derived state with computed values
  */
 export function getDerivedMultiplierState(
   state: MultiplierState,
-  timestamp?: bigint
+  timestamp: bigint
 ): DerivedMultiplierState {
   const calculatedMultiplier = calculateMultiplier(state, timestamp)
 

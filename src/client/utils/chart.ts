@@ -49,10 +49,10 @@ export function getCandlePeriodForTimeframe(timeframe: ChartTimeframe): CandlePe
 }
 
 /** Get the time cutoff in milliseconds for a given timeframe */
-export function getTimeframeCutoff(timeframe: ChartTimeframe): number {
+export function getTimeframeCutoff(timeframe: ChartTimeframe, chainTimestampMs?: number): number {
   if (timeframe === 'ALL') return 0
 
-  const now = Date.now()
+  const now = chainTimestampMs ?? Date.now()
   const MS_PER_DAY = 24 * 60 * 60 * 1000
 
   const cutoffs: Record<string, number> = {
@@ -70,10 +70,11 @@ export function getTimeframeCutoff(timeframe: ChartTimeframe): number {
 /** Filter candles by timeframe cutoff */
 export function filterCandlesByTimeframe(
   candles: TPriceCandle[],
-  timeframe: ChartTimeframe
+  timeframe: ChartTimeframe,
+  chainTimestampMs?: number
 ): TPriceCandle[] {
   if (timeframe === 'ALL') return candles
-  const cutoff = getTimeframeCutoff(timeframe)
+  const cutoff = getTimeframeCutoff(timeframe, chainTimestampMs)
   return candles.filter((candle) => Number(candle.timestamp) * 1000 >= cutoff)
 }
 
@@ -145,7 +146,8 @@ function formatCandleDate(timestamp: number, period: TPriceCandle['period']): st
  */
 export function getChartDataForTimeframe(
   priceCandles: TPriceCandlesByPeriod | undefined,
-  timeframe: ChartTimeframe
+  timeframe: ChartTimeframe,
+  chainTimestampMs?: number
 ): TransformedCandleData[] {
   if (!priceCandles) return []
 
@@ -160,7 +162,7 @@ export function getChartDataForTimeframe(
 
     // Apply timeframe cutoff only to preferred period
     const filteredCandles = isPreferredPeriod
-      ? filterCandlesByTimeframe(candles, timeframe)
+      ? filterCandlesByTimeframe(candles, timeframe, chainTimestampMs)
       : candles
 
     if (filteredCandles.length >= MIN_CHART_POINTS) {
@@ -185,7 +187,8 @@ export function getChartDataForTimeframe(
  */
 export function getBestAvailableCandles(
   priceCandles: TPriceCandlesByPeriod | undefined,
-  timeframe: ChartTimeframe
+  timeframe: ChartTimeframe,
+  chainTimestampMs?: number
 ): CandlesWithPeriod | null {
   if (!priceCandles) return null
 
@@ -199,7 +202,7 @@ export function getBestAvailableCandles(
     const isPreferredPeriod = i === 0
 
     const filteredCandles = isPreferredPeriod
-      ? filterCandlesByTimeframe(candles, timeframe)
+      ? filterCandlesByTimeframe(candles, timeframe, chainTimestampMs)
       : candles
 
     if (filteredCandles.length >= MIN_CHART_POINTS) {
