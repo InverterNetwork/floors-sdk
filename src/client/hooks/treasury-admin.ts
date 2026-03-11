@@ -147,6 +147,9 @@ export function useTreasuryAdmin(options: UseTreasuryAdminOptions) {
       const admin = getTreasuryAdminInstance()
       return admin.setRecipients(params)
     },
+    onSuccess: async () => {
+      await treasuryStateQuery.refetch()
+    },
     ...options.setRecipientsOptions,
   })
 
@@ -157,6 +160,9 @@ export function useTreasuryAdmin(options: UseTreasuryAdminOptions) {
       const admin = getTreasuryAdminInstance()
       return admin.setFloorFeePercentage(params)
     },
+    onSuccess: async () => {
+      await treasuryStateQuery.refetch()
+    },
     ...options.setFloorFeePercentageOptions,
   })
 
@@ -164,6 +170,9 @@ export function useTreasuryAdmin(options: UseTreasuryAdminOptions) {
     mutationFn: async (params: TSetFloorFeeTreasuryMutationParams): Promise<TransactionReceipt> => {
       const admin = getTreasuryAdminInstance()
       return admin.setFloorFeeTreasury(params)
+    },
+    onSuccess: async () => {
+      await treasuryStateQuery.refetch()
     },
     ...options.setFloorFeeTreasuryOptions,
   })

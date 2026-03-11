@@ -1,4 +1,9 @@
-import { useMutation, type UseMutationResult, useQuery } from '@tanstack/react-query'
+import {
+  useMutation,
+  type UseMutationResult,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
 import { useCallback, useMemo } from 'react'
 import type { Address } from 'viem'
 import { usePublicClient, useWalletClient } from 'wagmi'
@@ -76,10 +81,16 @@ interface UseStakingMutationsOptions {
 export const useStakingMutations = (
   options?: UseStakingMutationsOptions
 ): UseStakingMutationsReturnType => {
+  const queryClient = useQueryClient()
   const floorsContext = useFloors()
   const resolvedMarket = floorsContext.market.data ?? null
   const {
-    refetch: { market: refetchMarket, issuanceBalance: refetchIssuanceBalance },
+    refetch: {
+      market: refetchMarket,
+      issuanceBalance: refetchIssuanceBalance,
+      reserveBalance: refetchReserveBalance,
+      userPosition: refetchUserPosition,
+    },
   } = floorsContext
   const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()
@@ -129,8 +140,20 @@ export const useStakingMutations = (
   )
 
   const refetchAfterMutation = useCallback(async () => {
-    await Promise.allSettled([refetchMarket(), refetchIssuanceBalance()])
-  }, [refetchIssuanceBalance, refetchMarket])
+    await Promise.allSettled([
+      refetchMarket(),
+      refetchIssuanceBalance(),
+      refetchReserveBalance(),
+      refetchUserPosition(),
+      queryClient.invalidateQueries({ queryKey: ['stake-positions'] }),
+    ])
+  }, [
+    queryClient,
+    refetchIssuanceBalance,
+    refetchMarket,
+    refetchReserveBalance,
+    refetchUserPosition,
+  ])
 
   const stake = useMutation({
     mutationFn: (params: TStakingStakeParams) => ensureStaking().stake(params),

@@ -228,6 +228,9 @@ export function useMarketAdmin(options: UseMarketAdminOptions) {
       const admin = getMarketAdminInstance()
       return admin.openBuy(params)
     },
+    onSuccess: async () => {
+      await marketStateQuery.refetch()
+    },
     ...options.openBuyOptions,
   })
 
@@ -235,6 +238,9 @@ export function useMarketAdmin(options: UseMarketAdminOptions) {
     mutationFn: async (params?: TMarketAdminParams): Promise<TransactionReceipt> => {
       const admin = getMarketAdminInstance()
       return admin.closeBuy(params)
+    },
+    onSuccess: async () => {
+      await marketStateQuery.refetch()
     },
     ...options.closeBuyOptions,
   })
@@ -244,6 +250,9 @@ export function useMarketAdmin(options: UseMarketAdminOptions) {
       const admin = getMarketAdminInstance()
       return admin.openSell(params)
     },
+    onSuccess: async () => {
+      await marketStateQuery.refetch()
+    },
     ...options.openSellOptions,
   })
 
@@ -251,6 +260,9 @@ export function useMarketAdmin(options: UseMarketAdminOptions) {
     mutationFn: async (params?: TMarketAdminParams): Promise<TransactionReceipt> => {
       const admin = getMarketAdminInstance()
       return admin.closeSell(params)
+    },
+    onSuccess: async () => {
+      await marketStateQuery.refetch()
     },
     ...options.closeSellOptions,
   })
@@ -264,6 +276,9 @@ export function useMarketAdmin(options: UseMarketAdminOptions) {
       const admin = getMarketAdminInstance()
       return admin.setBuyFee(params)
     },
+    onSuccess: async () => {
+      await marketStateQuery.refetch()
+    },
     ...options.setBuyFeeOptions,
   })
 
@@ -271,6 +286,9 @@ export function useMarketAdmin(options: UseMarketAdminOptions) {
     mutationFn: async (params: TSetFeeParams): Promise<TransactionReceipt> => {
       const admin = getMarketAdminInstance()
       return admin.setSellFee(params)
+    },
+    onSuccess: async () => {
+      await marketStateQuery.refetch()
     },
     ...options.setSellFeeOptions,
   })

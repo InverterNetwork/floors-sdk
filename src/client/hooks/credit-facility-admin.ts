@@ -152,6 +152,9 @@ export function useCreditFacilityAdmin(options: UseCreditFacilityAdminOptions) {
       const admin = getCreditFacilityAdminInstance()
       return admin.setLoanToValueRatio(params)
     },
+    onSuccess: async () => {
+      await creditFacilityStateQuery.refetch()
+    },
     ...options.setLTVOptions,
   })
 
@@ -160,6 +163,9 @@ export function useCreditFacilityAdmin(options: UseCreditFacilityAdminOptions) {
       const admin = getCreditFacilityAdminInstance()
       return admin.setBorrowingFeeRate(params)
     },
+    onSuccess: async () => {
+      await creditFacilityStateQuery.refetch()
+    },
     ...options.setBorrowingFeeOptions,
   })
 
@@ -167,6 +173,9 @@ export function useCreditFacilityAdmin(options: UseCreditFacilityAdminOptions) {
     mutationFn: async (params: TSetMaxLeverageParams): Promise<TransactionReceipt> => {
       const admin = getCreditFacilityAdminInstance()
       return admin.setMaxLeverage(params)
+    },
+    onSuccess: async () => {
+      await creditFacilityStateQuery.refetch()
     },
     ...options.setMaxLeverageOptions,
   })

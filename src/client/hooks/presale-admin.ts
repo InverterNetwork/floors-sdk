@@ -142,6 +142,9 @@ export function usePresaleAdminConfig(options: UsePresaleAdminConfigOptions) {
       const admin = getPresaleAdminInstance()
       return admin.setPresaleState(params)
     },
+    onSuccess: async () => {
+      await presaleStateQuery.refetch()
+    },
     ...options.setStateOptions,
   })
 
@@ -150,6 +153,9 @@ export function usePresaleAdminConfig(options: UsePresaleAdminConfigOptions) {
       const admin = getPresaleAdminInstance()
       return admin.goLive(params)
     },
+    onSuccess: async () => {
+      await presaleStateQuery.refetch()
+    },
   })
 
   const closePresaleMutation = useMutation({
@@ -157,12 +163,18 @@ export function usePresaleAdminConfig(options: UsePresaleAdminConfigOptions) {
       const admin = getPresaleAdminInstance()
       return admin.closePresale(params)
     },
+    onSuccess: async () => {
+      await presaleStateQuery.refetch()
+    },
   })
 
   const setWhitelistPhaseMutation = useMutation({
     mutationFn: async (params?: TPresaleAdminParams): Promise<TransactionReceipt> => {
       const admin = getPresaleAdminInstance()
       return admin.setWhitelistPhase(params)
+    },
+    onSuccess: async () => {
+      await presaleStateQuery.refetch()
     },
   })
 
@@ -174,6 +186,9 @@ export function usePresaleAdminConfig(options: UsePresaleAdminConfigOptions) {
     mutationFn: async (params: TPresaleAdminSetCapsParams): Promise<TransactionReceipt> => {
       const admin = getPresaleAdminInstance()
       return admin.setCaps(params)
+    },
+    onSuccess: async () => {
+      await presaleStateQuery.refetch()
     },
     ...options.setCapsOptions,
   })
@@ -187,6 +202,9 @@ export function usePresaleAdminConfig(options: UsePresaleAdminConfigOptions) {
       const admin = getPresaleAdminInstance()
       return admin.setEndTimestamp(params)
     },
+    onSuccess: async () => {
+      await presaleStateQuery.refetch()
+    },
     ...options.setEndTimestampOptions,
   })
 
@@ -199,6 +217,9 @@ export function usePresaleAdminConfig(options: UsePresaleAdminConfigOptions) {
       const admin = getPresaleAdminInstance()
       return admin.setMerkleRoot(params)
     },
+    onSuccess: async () => {
+      await presaleStateQuery.refetch()
+    },
     ...options.setMerkleRootOptions,
   })
 
@@ -210,6 +231,9 @@ export function usePresaleAdminConfig(options: UsePresaleAdminConfigOptions) {
     mutationFn: async (params: TPresaleAdminSetCommissionParams): Promise<TransactionReceipt> => {
       const admin = getPresaleAdminInstance()
       return admin.setBaseCommissionAndPriceBreakpoints(params)
+    },
+    onSuccess: async () => {
+      await presaleStateQuery.refetch()
     },
   })
 
@@ -224,6 +248,9 @@ export function usePresaleAdminConfig(options: UsePresaleAdminConfigOptions) {
       const admin = getPresaleAdminInstance()
       return admin.setCreditFacility(params)
     },
+    onSuccess: async () => {
+      await presaleStateQuery.refetch()
+    },
   })
 
   const setInitialMultiplierMutation = useMutation({
@@ -232,6 +259,9 @@ export function usePresaleAdminConfig(options: UsePresaleAdminConfigOptions) {
     ): Promise<TransactionReceipt> => {
       const admin = getPresaleAdminInstance()
       return admin.setInitialMultiplier(params)
+    },
+    onSuccess: async () => {
+      await presaleStateQuery.refetch()
     },
   })
 
@@ -242,12 +272,18 @@ export function usePresaleAdminConfig(options: UsePresaleAdminConfigOptions) {
       const admin = getPresaleAdminInstance()
       return admin.setDecayDuration(params)
     },
+    onSuccess: async () => {
+      await presaleStateQuery.refetch()
+    },
   })
 
   const setStartTimeMutation = useMutation({
     mutationFn: async (params: TPresaleAdminSetStartTimeParams): Promise<TransactionReceipt> => {
       const admin = getPresaleAdminInstance()
       return admin.setStartTime(params)
+    },
+    onSuccess: async () => {
+      await presaleStateQuery.refetch()
     },
   })
 
