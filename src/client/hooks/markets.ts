@@ -143,8 +143,10 @@ export const useMarketMutations = (): UseMarketMutationsReturnType => {
   )
 
   const refetchAfterMutation = useCallback(async () => {
+    // Invalidate market queries to force fresh data from the indexer
+    await queryClient.invalidateQueries({ queryKey: ['market'] })
     await Promise.allSettled([refetchMarket(), refetchReserveBalance(), refetchIssuanceBalance()])
-  }, [refetchIssuanceBalance, refetchMarket, refetchReserveBalance])
+  }, [queryClient, refetchIssuanceBalance, refetchMarket, refetchReserveBalance])
 
   const buy = useMutation({
     mutationFn: (params: TMarketBuyParams) => ensureMarket().buy(params),
