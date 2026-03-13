@@ -88,9 +88,7 @@ export const useUserLoansSubscription = (
 
   const loans = useMemo(() => {
     if (!sub.data?.Loan) return []
-    const mapped = mapLoansToUserLoanData(sub.data.Loan as unknown as TGraphQLLoan[])
-    // Filter out loans with zero remaining debt (indexer may lag status update to REPAID)
-    return mapped.filter((loan) => loan.remainingDebt > 0)
+    return mapLoansToUserLoanData(sub.data.Loan as unknown as TGraphQLLoan[])
   }, [sub.data])
 
   return {
