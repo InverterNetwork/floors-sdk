@@ -148,6 +148,13 @@ export const useMarketMutations = (): UseMarketMutationsReturnType => {
     await Promise.allSettled([refetchMarket(), refetchReserveBalance(), refetchIssuanceBalance()])
   }, [queryClient, refetchIssuanceBalance, refetchMarket, refetchReserveBalance])
 
+  // Helper to refetch user loans after mutations
+  const refetchUserLoans = useCallback(async () => {
+    await queryClient.invalidateQueries({
+      predicate: (query) => query.queryKey[0] === 'user-loans',
+    })
+  }, [queryClient])
+
   const buy = useMutation({
     mutationFn: (params: TMarketBuyParams) => ensureMarket().buy(params),
     onSuccess: async () => {
@@ -208,8 +215,9 @@ export const useMarketMutations = (): UseMarketMutationsReturnType => {
     onSuccess: async () => {
       await refetchAfterMutation()
       await floorsContext.refetch.userPosition()
-      // Invalidate user loans queries to update both Borrow and Repay forms
-      await queryClient.invalidateQueries({ queryKey: ['user-loans'] })
+      // Wait for indexer to process the new loan, then invalidate user loans queries
+      await new Promise((resolve) => setTimeout(resolve, 500))
+      await refetchUserLoans()
     },
   })
 
@@ -218,8 +226,9 @@ export const useMarketMutations = (): UseMarketMutationsReturnType => {
     onSuccess: async () => {
       await refetchAfterMutation()
       await floorsContext.refetch.userPosition()
-      // Invalidate user loans queries to update both Borrow and Repay forms
-      await queryClient.invalidateQueries({ queryKey: ['user-loans'] })
+      // Wait for indexer to process the new loan(s), then invalidate user loans queries
+      await new Promise((resolve) => setTimeout(resolve, 500))
+      await refetchUserLoans()
     },
   })
 
@@ -228,8 +237,9 @@ export const useMarketMutations = (): UseMarketMutationsReturnType => {
     onSuccess: async () => {
       await refetchAfterMutation()
       await floorsContext.refetch.userPosition()
-      // Invalidate user loans queries to update both Borrow and Repay forms
-      await queryClient.invalidateQueries({ queryKey: ['user-loans'] })
+      // Wait for indexer to process the repayment, then invalidate user loans queries
+      await new Promise((resolve) => setTimeout(resolve, 500))
+      await refetchUserLoans()
     },
   })
 
