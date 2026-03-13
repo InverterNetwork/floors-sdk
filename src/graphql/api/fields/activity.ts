@@ -665,6 +665,10 @@ export function stakingActivityToActivity(sa: TGraphQLStakingActivityItem): TMar
  * @description Combines and sorts trades, loans, and floor elevations into unified activity list
  * Detects "loop" transactions by matching BUY trades with loans that share the same txHash
  * Price impact is calculated from each trade's own execution data (effective price vs post-trade price)
+ *
+ * FIX: For loop activities, uses the loan's borrower_id instead of trade's user_id
+ * This ensures the actual user who executed the loop is shown, not the event receiver
+ * which may differ in buyAndBorrow contexts.
  */
 export function combineMarketActivity(
   trades: TGraphQLTradeActivity[],
@@ -672,9 +676,10 @@ export function combineMarketActivity(
   floorElevations: TGraphQLFloorElevationActivity[] = [],
   stakingActivities: TGraphQLStakingActivityItem[] = []
 ): TMarketActivityData[] {
-  // Create a set of loan transaction hashes for quick lookup
+  // Create a map of loans by txHash for quick lookup (not just a Set)
   // These are loans created in the same tx as a buy (indicating a loop/buyAndBorrow)
-  const loanTxHashes = new Set(loans.map((loan) => loan.transactionHash.toLowerCase()))
+  const loanByTxHash = new Map(loans.map((loan) => [loan.transactionHash.toLowerCase(), loan]))
+  const loanTxHashes = new Set(loanByTxHash.keys())
 
   // Sort trades by timestamp ascending (oldest first) to calculate price impact
   // Each trade's "before price" is the previous trade's "newPrice"
@@ -694,7 +699,14 @@ export function combineMarketActivity(
 
     // If this is a BUY and there's a loan with the same txHash, it's a loop
     if (trade.tradeType === 'BUY' && loanTxHashes.has(trade.transactionHash.toLowerCase())) {
-      tradeActivities.push({ ...activity, type: 'loop' as TActivityType })
+      const loan = loanByTxHash.get(trade.transactionHash.toLowerCase())!
+      tradeActivities.push({
+        ...activity,
+        type: 'loop' as TActivityType,
+        // Use loan's borrower_id - this is the actual user who executed the loop
+        // The trade's user_id may be incorrect (e.g., receiver_ param instead of msg.sender)
+        user_id: loan.borrower_id,
+      })
     } else {
       tradeActivities.push(activity)
     }
