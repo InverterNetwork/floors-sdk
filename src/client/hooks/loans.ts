@@ -1,9 +1,17 @@
 import { useQuery, type UseQueryOptions, type UseQueryResult } from '@tanstack/react-query'
-import type { Address } from 'viem'
+import { useMemo } from 'react'
+import { type Address, getAddress } from 'viem'
 
-import { fetchAllUserLoans, fetchUserLoans, type TUserLoanData } from '../../graphql/api'
+import {
+  buildUserLoansSubscription,
+  fetchAllUserLoans,
+  fetchUserLoans,
+  type TGraphQLLoan,
+  type TUserLoanData,
+} from '../../graphql/api'
 import { mapLoansToUserLoanData } from '../../graphql/api/mappers'
 import { allUserLoansQueryKey, userLoansQueryKey } from '../query-keys'
+import { useSubscription } from './subscriptions'
 
 export type UseUserLoansQueryOptions<TData = TUserLoanData[]> = Omit<
   UseQueryOptions<TUserLoanData[], Error, TData, ReturnType<typeof userLoansQueryKey>>,
@@ -42,6 +50,52 @@ export const useUserLoansQuery = <TData = TUserLoanData[]>(
     ...options,
     enabled,
   })
+}
+
+/**
+ * @description Live subscription for user's active loans in a specific market.
+ * Uses GraphQL subscriptions via the indexer for real-time updates instead of polling.
+ * Falls back gracefully when subscription is not available.
+ *
+ * @param userAddress - The user's wallet address
+ * @param marketId - The market to subscribe to
+ */
+export const useUserLoansSubscription = (
+  userAddress: Address | string | null | undefined,
+  marketId: string | null | undefined
+): {
+  data: TUserLoanData[]
+  error: string | null
+  isLoading: boolean
+} => {
+  const isEnabled = Boolean(userAddress && marketId)
+
+  const subFields = useMemo(() => {
+    if (!isEnabled || !userAddress || !marketId) return null
+    try {
+      const normalizedAddress = getAddress(userAddress as `0x${string}`)
+      const normalizedMarket = getAddress(marketId as `0x${string}`)
+      return buildUserLoansSubscription(normalizedAddress, normalizedMarket)
+    } catch {
+      return null
+    }
+  }, [isEnabled, userAddress, marketId])
+
+  const sub = useSubscription({
+    fields: subFields ?? ({} as NonNullable<typeof subFields>),
+    enabled: isEnabled && subFields !== null,
+  })
+
+  const loans = useMemo(() => {
+    if (!sub.data?.Loan) return []
+    return mapLoansToUserLoanData(sub.data.Loan as unknown as TGraphQLLoan[])
+  }, [sub.data])
+
+  return {
+    data: loans,
+    error: sub.error,
+    isLoading: sub.isLoading,
+  }
 }
 
 /**

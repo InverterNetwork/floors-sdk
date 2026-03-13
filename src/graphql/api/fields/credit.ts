@@ -1,4 +1,4 @@
-import type { GraphQLQueryArgs, GraphQLQueryResult } from '../..'
+import type { GraphQLQueryArgs, GraphQLQueryResult, GraphQLSubscriptionArgs } from '../..'
 import type { TFloorAssetData } from './assets'
 import type { TTokenData } from './tokens'
 
@@ -37,6 +37,49 @@ export type LoansQueryResultType = GraphQLQueryResult<typeof loansQuery>
 
 // Type alias for individual Loan from GraphQL result
 export type TGraphQLLoan = NonNullable<LoansQueryResultType['Loan']>[0]
+
+/** Loan fields needed for the user loans subscription (matches loansQuery fields) */
+const userLoanSubscriptionFields = {
+  id: true,
+  borrower_id: true,
+  facility_id: true,
+  market_id: true,
+  lockedCollateralRaw: true,
+  lockedCollateralFormatted: true,
+  borrowAmountRaw: true,
+  borrowAmountFormatted: true,
+  originationFeeRaw: true,
+  originationFeeFormatted: true,
+  remainingDebtRaw: true,
+  remainingDebtFormatted: true,
+  floorPriceAtBorrowRaw: true,
+  floorPriceAtBorrowFormatted: true,
+  status: true,
+  openedAt: true,
+  closedAt: true,
+  lastUpdatedAt: true,
+  transactionHash: true,
+} as const
+
+/**
+ * @description Builds a subscription for user loans filtered by borrower and market
+ */
+export const buildUserLoansSubscription = (borrowerId: string, marketId: string) =>
+  ({
+    Loan: {
+      __args: {
+        where: {
+          borrower_id: { _eq: borrowerId },
+          market_id: { _eq: marketId },
+          status: { _neq: 'REPAID' },
+        },
+        order_by: [{ openedAt: 'asc' as const }],
+      },
+      ...userLoanSubscriptionFields,
+    },
+  }) satisfies GraphQLSubscriptionArgs
+
+export type UserLoansSubscriptionFields = ReturnType<typeof buildUserLoansSubscription>
 
 // GraphQL Query Args for Credit Facilities
 export const creditFacilitiesQuery = {
