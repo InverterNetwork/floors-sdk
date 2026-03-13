@@ -3,6 +3,7 @@ import type { Address, TransactionReceipt } from 'viem'
 import { ERC20Issuance_v1, StakingManager_v1, TestnetStrategy_v1 } from './abis'
 import type { TransactionLifecycleCallbacks } from './presale'
 import type { PopPublicClient, PopWalletClient } from './types'
+import { SafeWrite } from './utils/safe-write'
 import { validateAddress } from './utils/validation'
 
 export interface TStakingStakeParams {
@@ -100,7 +101,7 @@ export class Staking {
   private readonly stakingManagerAddress: Address
   private readonly issuanceTokenAddress: Address
   private readonly publicClient: PopPublicClient
-  private readonly walletClient?: PopWalletClient
+  private readonly safeWrite?: SafeWrite
 
   constructor({
     stakingManagerAddress,
@@ -111,7 +112,7 @@ export class Staking {
     this.stakingManagerAddress = stakingManagerAddress
     this.issuanceTokenAddress = issuanceTokenAddress
     this.publicClient = publicClient
-    this.walletClient = walletClient
+    this.safeWrite = walletClient ? new SafeWrite({ publicClient, walletClient }) : undefined
   }
 
   public getStakingManagerAddress(): Address {
@@ -240,36 +241,17 @@ export class Staking {
     issuanceTokenAmount,
     lifecycle,
   }: TStakingStakeParams): Promise<TStakingMutationResult> {
-    const walletClient = this.requireWalletClient()
     this.assertPositiveAmount(issuanceTokenAmount)
 
-    try {
-      lifecycle?.onPendingWallet?.()
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.stakingManagerAddress,
+      abi: StakingManager_v1,
+      functionName: 'stake',
+      args: [strategyAddress, issuanceTokenAmount],
+      lifecycle,
+    })
 
-      const hash = await walletClient.writeContract({
-        address: this.stakingManagerAddress,
-        abi: StakingManager_v1,
-        functionName: 'stake',
-        args: [strategyAddress, issuanceTokenAmount],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return receipt
   }
 
   /**
@@ -284,39 +266,18 @@ export class Staking {
     receiverAddress,
     lifecycle,
   }: TStakingHarvestYieldParams): Promise<TStakingMutationResult> {
-    const walletClient = this.requireWalletClient()
     validateAddress(strategyAddress, 'strategyAddress')
     validateAddress(receiverAddress, 'receiverAddress')
 
-    try {
-      lifecycle?.onPendingWallet?.()
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.stakingManagerAddress,
+      abi: StakingManager_v1,
+      functionName: 'harvestYield',
+      args: [strategyAddress, receiverAddress],
+      lifecycle,
+    })
 
-      const hash = await walletClient.writeContract({
-        address: this.stakingManagerAddress,
-        abi: StakingManager_v1,
-        functionName: 'harvestYield',
-        args: [strategyAddress, receiverAddress],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        const error = new Error('Harvest yield transaction reverted')
-        lifecycle?.onFailed?.(error)
-        throw error
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return receipt
   }
 
   /**
@@ -333,40 +294,19 @@ export class Staking {
     receiverAddress,
     lifecycle,
   }: TStakingWithdrawParams): Promise<TStakingMutationResult> {
-    const walletClient = this.requireWalletClient()
     validateAddress(strategyAddress, 'strategyAddress')
     validateAddress(receiverAddress, 'receiverAddress')
     this.assertPositiveAmount(collateralAmount)
 
-    try {
-      lifecycle?.onPendingWallet?.()
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.stakingManagerAddress,
+      abi: StakingManager_v1,
+      functionName: 'withdrawFunds',
+      args: [strategyAddress, collateralAmount, receiverAddress],
+      lifecycle,
+    })
 
-      const hash = await walletClient.writeContract({
-        address: this.stakingManagerAddress,
-        abi: StakingManager_v1,
-        functionName: 'withdrawFunds',
-        args: [strategyAddress, collateralAmount, receiverAddress],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        const error = new Error('Withdraw funds transaction reverted')
-        lifecycle?.onFailed?.(error)
-        throw error
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return receipt
   }
 
   /**
@@ -379,38 +319,17 @@ export class Staking {
     strategyAddress,
     lifecycle,
   }: TStakingRebalanceParams): Promise<TStakingMutationResult> {
-    const walletClient = this.requireWalletClient()
     validateAddress(strategyAddress, 'strategyAddress')
 
-    try {
-      lifecycle?.onPendingWallet?.()
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.stakingManagerAddress,
+      abi: StakingManager_v1,
+      functionName: 'rebalance',
+      args: [strategyAddress],
+      lifecycle,
+    })
 
-      const hash = await walletClient.writeContract({
-        address: this.stakingManagerAddress,
-        abi: StakingManager_v1,
-        functionName: 'rebalance',
-        args: [strategyAddress],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        const error = new Error('Rebalance transaction reverted')
-        lifecycle?.onFailed?.(error)
-        throw error
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return receipt
   }
 
   /**
@@ -423,36 +342,17 @@ export class Staking {
     amount,
     lifecycle,
   }: TStakingApproveParams): Promise<TStakingMutationResult> {
-    const walletClient = this.requireWalletClient()
     this.assertPositiveAmount(amount)
 
-    try {
-      lifecycle?.onPendingWallet?.()
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.issuanceTokenAddress,
+      abi: ERC20Issuance_v1,
+      functionName: 'approve',
+      args: [this.stakingManagerAddress, amount],
+      lifecycle,
+    })
 
-      const hash = await walletClient.writeContract({
-        address: this.issuanceTokenAddress,
-        abi: ERC20Issuance_v1,
-        functionName: 'approve',
-        args: [this.stakingManagerAddress, amount],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return receipt
   }
 
   // ===========================================================================
@@ -469,36 +369,17 @@ export class Staking {
     strategyAddress,
     lifecycle,
   }: TStakingAddStrategyParams): Promise<TStakingMutationResult> {
-    const walletClient = this.requireWalletClient()
     validateAddress(strategyAddress, 'strategyAddress')
 
-    try {
-      lifecycle?.onPendingWallet?.()
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.stakingManagerAddress,
+      abi: StakingManager_v1,
+      functionName: 'addStrategy',
+      args: [strategyAddress],
+      lifecycle,
+    })
 
-      const hash = await walletClient.writeContract({
-        address: this.stakingManagerAddress,
-        abi: StakingManager_v1,
-        functionName: 'addStrategy',
-        args: [strategyAddress],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return receipt
   }
 
   /**
@@ -511,36 +392,17 @@ export class Staking {
     strategyAddress,
     lifecycle,
   }: TStakingRemoveStrategyParams): Promise<TStakingMutationResult> {
-    const walletClient = this.requireWalletClient()
     validateAddress(strategyAddress, 'strategyAddress')
 
-    try {
-      lifecycle?.onPendingWallet?.()
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.stakingManagerAddress,
+      abi: StakingManager_v1,
+      functionName: 'removeStrategy',
+      args: [strategyAddress],
+      lifecycle,
+    })
 
-      const hash = await walletClient.writeContract({
-        address: this.stakingManagerAddress,
-        abi: StakingManager_v1,
-        functionName: 'removeStrategy',
-        args: [strategyAddress],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return receipt
   }
 
   /**
@@ -553,39 +415,19 @@ export class Staking {
     feeBps,
     lifecycle,
   }: TStakingSetPerformanceFeeParams): Promise<TStakingMutationResult> {
-    const walletClient = this.requireWalletClient()
-
     if (feeBps < 0 || feeBps > 10_000) {
       throw new Error('Performance fee must be between 0 and 10000 basis points')
     }
 
-    try {
-      lifecycle?.onPendingWallet?.()
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.stakingManagerAddress,
+      abi: StakingManager_v1,
+      functionName: 'setPerformanceFeeBps',
+      args: [BigInt(feeBps)],
+      lifecycle,
+    })
 
-      const hash = await walletClient.writeContract({
-        address: this.stakingManagerAddress,
-        abi: StakingManager_v1,
-        functionName: 'setPerformanceFeeBps',
-        args: [BigInt(feeBps)],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return receipt
   }
 
   // ===========================================================================
@@ -604,36 +446,17 @@ export class Staking {
     amount,
     lifecycle,
   }: TStakingInjectYieldParams): Promise<TStakingMutationResult> {
-    const walletClient = this.requireWalletClient()
     this.assertPositiveAmount(amount)
 
-    try {
-      lifecycle?.onPendingWallet?.()
+    const { receipt } = await this.requireSafeWrite().write({
+      address: strategyAddress,
+      abi: TestnetStrategy_v1,
+      functionName: 'injectYield',
+      args: [amount],
+      lifecycle,
+    })
 
-      const hash = await walletClient.writeContract({
-        address: strategyAddress,
-        abi: TestnetStrategy_v1,
-        functionName: 'injectYield',
-        args: [amount],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Inject yield transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return receipt
   }
 
   /**
@@ -648,36 +471,17 @@ export class Staking {
     amount,
     lifecycle,
   }: TStakingSimulateLossParams): Promise<TStakingMutationResult> {
-    const walletClient = this.requireWalletClient()
     this.assertPositiveAmount(amount)
 
-    try {
-      lifecycle?.onPendingWallet?.()
+    const { receipt } = await this.requireSafeWrite().write({
+      address: strategyAddress,
+      abi: TestnetStrategy_v1,
+      functionName: 'simulateLoss',
+      args: [amount],
+      lifecycle,
+    })
 
-      const hash = await walletClient.writeContract({
-        address: strategyAddress,
-        abi: TestnetStrategy_v1,
-        functionName: 'simulateLoss',
-        args: [amount],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Simulate loss transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return receipt
   }
 
   /**
@@ -706,7 +510,6 @@ export class Staking {
     amount,
     lifecycle,
   }: TStakingApproveCollateralForStrategyParams): Promise<TStakingMutationResult> {
-    const walletClient = this.requireWalletClient()
     this.assertPositiveAmount(amount)
 
     // Read the collateral token address from the strategy
@@ -717,33 +520,15 @@ export class Staking {
       args: [],
     })) as Address
 
-    try {
-      lifecycle?.onPendingWallet?.()
+    const { receipt } = await this.requireSafeWrite().write({
+      address: collateralToken,
+      abi: ERC20Issuance_v1,
+      functionName: 'approve',
+      args: [strategyAddress, amount],
+      lifecycle,
+    })
 
-      const hash = await walletClient.writeContract({
-        address: collateralToken,
-        abi: ERC20Issuance_v1,
-        functionName: 'approve',
-        args: [strategyAddress, amount],
-        account: this.getWalletAddress(walletClient),
-      })
-
-      lifecycle?.onSubmitted?.(hash)
-      lifecycle?.onPendingConfirmation?.(hash)
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash })
-
-      if (receipt.status === 'success') {
-        lifecycle?.onConfirmed?.(receipt)
-      } else {
-        lifecycle?.onFailed?.(new Error('Approve collateral transaction reverted'))
-      }
-
-      return receipt
-    } catch (error) {
-      lifecycle?.onFailed?.(error instanceof Error ? error : new Error(String(error)))
-      throw error
-    }
+    return receipt
   }
 
   // ===========================================================================
@@ -756,18 +541,10 @@ export class Staking {
     }
   }
 
-  private requireWalletClient(): PopWalletClient {
-    if (!this.walletClient) {
+  private requireSafeWrite(): SafeWrite {
+    if (!this.safeWrite) {
       throw new Error('Wallet not connected. Please connect your wallet to continue.')
     }
-    return this.walletClient
-  }
-
-  private getWalletAddress(walletClient: PopWalletClient): Address {
-    const account = walletClient.account
-    if (!account?.address) {
-      throw new Error('Wallet not connected. Please connect your wallet to continue.')
-    }
-    return account.address as Address
+    return this.safeWrite
   }
 }
