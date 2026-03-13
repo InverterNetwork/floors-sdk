@@ -199,6 +199,8 @@ export interface TGoLiveParams {
   creditFacilityAddress?: Address
   /** Live buy fee in basis points (default: 50 = 0.5%) */
   liveBuyFeeBps?: number
+  /** Live sell fee in basis points (if provided, sets sell fee during go-live) */
+  liveSellFeeBps?: number
   /** Live borrow fee in basis points (default: 600 = 6%) */
   liveBorrowFeeBps?: number
   /** Optional lifecycle callbacks for multi-stage feedback */
@@ -217,6 +219,8 @@ export interface TSetLiveFeesParams {
   creditFacilityAddress?: Address
   /** Buy fee in basis points (default: 50 = 0.5%) */
   buyFeeBps?: number
+  /** Sell fee in basis points (if provided, sets sell fee) */
+  sellFeeBps?: number
   /** Borrow fee in basis points (default: 600 = 6%) */
   borrowFeeBps?: number
   /** Optional lifecycle callbacks */
@@ -1528,6 +1532,19 @@ export class Presale {
       }),
     })
 
+    // 2b. Set Floor sell fee (if provided)
+    if (params.liveSellFeeBps != null) {
+      calls.push({
+        target: params.floorAddress,
+        allowFailure: false,
+        callData: encodeFunctionData({
+          abi: Floor_v1,
+          functionName: 'setSellFee',
+          args: [BigInt(params.liveSellFeeBps)],
+        }),
+      })
+    }
+
     // 3. Set CreditFacility borrow fee (if credit facility exists)
     if (params.creditFacilityAddress) {
       calls.push({
@@ -1638,6 +1655,19 @@ export class Presale {
         args: [BigInt(buyFeeBps)],
       }),
     })
+
+    // Set Floor sell fee (if provided)
+    if (params.sellFeeBps != null) {
+      calls.push({
+        target: params.floorAddress,
+        allowFailure: false,
+        callData: encodeFunctionData({
+          abi: Floor_v1,
+          functionName: 'setSellFee',
+          args: [BigInt(params.sellFeeBps)],
+        }),
+      })
+    }
 
     // Set CreditFacility borrow fee (if credit facility exists)
     if (params.creditFacilityAddress) {
