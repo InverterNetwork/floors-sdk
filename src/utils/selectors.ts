@@ -150,6 +150,7 @@ export const PRESALE_SELECTORS = {
   setEndTimestamp: getSelector(Presale_v1, 'setEndTimestamp'),
   setMerkleRoot: getSelector(Presale_v1, 'setMerkleRoot'),
   addToWhitelistWithProof: getSelector(Presale_v1, 'addToWhitelistWithProof'),
+  claimAll: getSelector(Presale_v1, 'claimAll'),
 } as const
 
 // =============================================================================
@@ -365,6 +366,12 @@ export const SELECTOR_REGISTRY: RegisteredSelector[] = [
     selector: PRESALE_SELECTORS.addToWhitelistWithProof,
     module: 'presale',
     description: 'Self-register to whitelist with Merkle proof',
+  },
+  {
+    name: 'claimAll',
+    selector: PRESALE_SELECTORS.claimAll,
+    module: 'presale',
+    description: 'Claim presale tokens',
   },
 
   // Staking Manager functions
