@@ -20,3 +20,6 @@ export * from './selectors'
 
 // Shared validation utilities
 export * from './validation'
+
+// Strategy display utilities
+export * from './strategy'

@@ -10,6 +10,12 @@ export const strategiesQuery = {
     isActive: true,
     name: true,
     symbol: true,
+    collateralToken: {
+      id: true,
+      name: true,
+      symbol: true,
+      decimals: true,
+    },
     addedAt: true,
     removedAt: true,
     transactionHash: true,

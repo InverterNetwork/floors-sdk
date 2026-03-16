@@ -637,6 +637,9 @@ export type StakingManager_select_column = 'createdAt' | 'id' | 'lastUpdatedAt' 
 /** columns and relationships of "Strategy" */
 export interface Strategy {
     addedAt: Scalars['numeric']
+    /** An object relationship */
+    collateralToken: (Token | null)
+    collateralToken_id: (Scalars['String'] | null)
     id: Scalars['String']
     isActive: Scalars['Boolean']
     name: (Scalars['String'] | null)
@@ -651,7 +654,7 @@ export interface Strategy {
 
 
 /** select columns of table "Strategy" */
-export type Strategy_select_column = 'addedAt' | 'id' | 'isActive' | 'name' | 'removedAt' | 'stakingManager_id' | 'symbol' | 'transactionHash'
+export type Strategy_select_column = 'addedAt' | 'collateralToken_id' | 'id' | 'isActive' | 'name' | 'removedAt' | 'stakingManager_id' | 'symbol' | 'transactionHash'
 
 
 /** columns and relationships of "Token" */
@@ -2985,6 +2988,9 @@ export interface StakingManager_stream_cursor_value_input {createdAt?: (Scalars[
 /** columns and relationships of "Strategy" */
 export interface StrategyGenqlSelection{
     addedAt?: boolean | number
+    /** An object relationship */
+    collateralToken?: TokenGenqlSelection
+    collateralToken_id?: boolean | number
     id?: boolean | number
     isActive?: boolean | number
     name?: boolean | number
@@ -3018,19 +3024,19 @@ export interface Strategy_avg_order_by {addedAt?: (order_by | null),removedAt?: 
 
 
 /** Boolean expression to filter rows from the table "Strategy". All fields are combined with a logical 'AND'. */
-export interface Strategy_bool_exp {_and?: (Strategy_bool_exp[] | null),_not?: (Strategy_bool_exp | null),_or?: (Strategy_bool_exp[] | null),addedAt?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),isActive?: (Boolean_comparison_exp | null),name?: (String_comparison_exp | null),positions?: (StakePosition_bool_exp | null),removedAt?: (numeric_comparison_exp | null),stakingManager_id?: (String_comparison_exp | null),symbol?: (String_comparison_exp | null),transactionHash?: (String_comparison_exp | null)}
+export interface Strategy_bool_exp {_and?: (Strategy_bool_exp[] | null),_not?: (Strategy_bool_exp | null),_or?: (Strategy_bool_exp[] | null),addedAt?: (numeric_comparison_exp | null),collateralToken?: (Token_bool_exp | null),collateralToken_id?: (String_comparison_exp | null),id?: (String_comparison_exp | null),isActive?: (Boolean_comparison_exp | null),name?: (String_comparison_exp | null),positions?: (StakePosition_bool_exp | null),removedAt?: (numeric_comparison_exp | null),stakingManager_id?: (String_comparison_exp | null),symbol?: (String_comparison_exp | null),transactionHash?: (String_comparison_exp | null)}
 
 
 /** order by max() on columns of table "Strategy" */
-export interface Strategy_max_order_by {addedAt?: (order_by | null),id?: (order_by | null),name?: (order_by | null),removedAt?: (order_by | null),stakingManager_id?: (order_by | null),symbol?: (order_by | null),transactionHash?: (order_by | null)}
+export interface Strategy_max_order_by {addedAt?: (order_by | null),collateralToken_id?: (order_by | null),id?: (order_by | null),name?: (order_by | null),removedAt?: (order_by | null),stakingManager_id?: (order_by | null),symbol?: (order_by | null),transactionHash?: (order_by | null)}
 
 
 /** order by min() on columns of table "Strategy" */
-export interface Strategy_min_order_by {addedAt?: (order_by | null),id?: (order_by | null),name?: (order_by | null),removedAt?: (order_by | null),stakingManager_id?: (order_by | null),symbol?: (order_by | null),transactionHash?: (order_by | null)}
+export interface Strategy_min_order_by {addedAt?: (order_by | null),collateralToken_id?: (order_by | null),id?: (order_by | null),name?: (order_by | null),removedAt?: (order_by | null),stakingManager_id?: (order_by | null),symbol?: (order_by | null),transactionHash?: (order_by | null)}
 
 
 /** Ordering options when selecting data from "Strategy". */
-export interface Strategy_order_by {addedAt?: (order_by | null),id?: (order_by | null),isActive?: (order_by | null),name?: (order_by | null),positions_aggregate?: (StakePosition_aggregate_order_by | null),removedAt?: (order_by | null),stakingManager_id?: (order_by | null),symbol?: (order_by | null),transactionHash?: (order_by | null)}
+export interface Strategy_order_by {addedAt?: (order_by | null),collateralToken?: (Token_order_by | null),collateralToken_id?: (order_by | null),id?: (order_by | null),isActive?: (order_by | null),name?: (order_by | null),positions_aggregate?: (StakePosition_aggregate_order_by | null),removedAt?: (order_by | null),stakingManager_id?: (order_by | null),symbol?: (order_by | null),transactionHash?: (order_by | null)}
 
 
 /** order by stddev() on columns of table "Strategy" */
@@ -3054,7 +3060,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface Strategy_stream_cursor_value_input {addedAt?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),isActive?: (Scalars['Boolean'] | null),name?: (Scalars['String'] | null),removedAt?: (Scalars['numeric'] | null),stakingManager_id?: (Scalars['String'] | null),symbol?: (Scalars['String'] | null),transactionHash?: (Scalars['String'] | null)}
+export interface Strategy_stream_cursor_value_input {addedAt?: (Scalars['numeric'] | null),collateralToken_id?: (Scalars['String'] | null),id?: (Scalars['String'] | null),isActive?: (Scalars['Boolean'] | null),name?: (Scalars['String'] | null),removedAt?: (Scalars['numeric'] | null),stakingManager_id?: (Scalars['String'] | null),symbol?: (Scalars['String'] | null),transactionHash?: (Scalars['String'] | null)}
 
 
 /** order by sum() on columns of table "Strategy" */
@@ -5453,6 +5459,7 @@ export const enumStakingManagerSelectColumn = {
 
 export const enumStrategySelectColumn = {
    addedAt: 'addedAt' as const,
+   collateralToken_id: 'collateralToken_id' as const,
    id: 'id' as const,
    isActive: 'isActive' as const,
    name: 'name' as const,

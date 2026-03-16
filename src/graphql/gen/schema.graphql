@@ -5422,6 +5422,10 @@ columns and relationships of "Strategy"
 """
 type Strategy {
   addedAt: numeric!
+
+  """An object relationship"""
+  collateralToken: Token
+  collateralToken_id: String
   id: String!
   isActive: Boolean!
   name: String
@@ -5482,6 +5486,8 @@ input Strategy_bool_exp {
   _not: Strategy_bool_exp
   _or: [Strategy_bool_exp!]
   addedAt: numeric_comparison_exp
+  collateralToken: Token_bool_exp
+  collateralToken_id: String_comparison_exp
   id: String_comparison_exp
   isActive: Boolean_comparison_exp
   name: String_comparison_exp
@@ -5497,6 +5503,7 @@ order by max() on columns of table "Strategy"
 """
 input Strategy_max_order_by {
   addedAt: order_by
+  collateralToken_id: order_by
   id: order_by
   name: order_by
   removedAt: order_by
@@ -5510,6 +5517,7 @@ order by min() on columns of table "Strategy"
 """
 input Strategy_min_order_by {
   addedAt: order_by
+  collateralToken_id: order_by
   id: order_by
   name: order_by
   removedAt: order_by
@@ -5521,6 +5529,8 @@ input Strategy_min_order_by {
 """Ordering options when selecting data from "Strategy"."""
 input Strategy_order_by {
   addedAt: order_by
+  collateralToken: Token_order_by
+  collateralToken_id: order_by
   id: order_by
   isActive: order_by
   name: order_by
@@ -5537,6 +5547,9 @@ select columns of table "Strategy"
 enum Strategy_select_column {
   """column name"""
   addedAt
+
+  """column name"""
+  collateralToken_id
 
   """column name"""
   id
@@ -5598,6 +5611,7 @@ input Strategy_stream_cursor_input {
 """Initial value of the column from where the streaming should start"""
 input Strategy_stream_cursor_value_input {
   addedAt: numeric
+  collateralToken_id: String
   id: String
   isActive: Boolean
   name: String
