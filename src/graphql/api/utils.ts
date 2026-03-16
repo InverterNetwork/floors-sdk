@@ -96,3 +96,40 @@ export const calculatePremiumChange24h = (
   if (premiumRate24hAgo === 0) return 0
   return ((currentPremiumRate - premiumRate24hAgo) / Math.abs(premiumRate24hAgo)) * 100
 }
+
+/**
+ * @description Calculates the 24h price change percentage from trade data.
+ * Uses the trade closest to the 24h boundary as baseline.
+ * @param trades - Array of trades with newPriceFormatted/newPriceRaw and timestamp
+ * @param currentPrice - Current market price
+ * @returns Percentage change (positive = increase, negative = decrease), or 0 if insufficient data
+ */
+export const calculate24hPriceChangeFromTrades = (
+  trades: Array<{
+    newPriceFormatted?: string | null
+    newPriceRaw?: string | number | null
+    timestamp: string | number
+  }>,
+  currentPrice: number
+): number => {
+  if (trades.length === 0 || currentPrice <= 0) return 0
+
+  const now = Math.floor(Date.now() / 1000)
+  const cutoff = now - 24 * 3600
+
+  // Find the trade closest to 24h ago (must be older than 24h)
+  const olderTrades = trades.filter((t) => toNumber(t.timestamp) <= cutoff)
+  if (olderTrades.length === 0) return 0
+
+  // Sort by timestamp descending to get the one closest to the cutoff
+  const baseline = olderTrades.reduce((closest, t) => {
+    const tTs = toNumber(t.timestamp)
+    const closestTs = toNumber(closest.timestamp)
+    return Math.abs(tTs - cutoff) < Math.abs(closestTs - cutoff) ? t : closest
+  })
+
+  const baselinePrice = toNumber(baseline.newPriceFormatted || baseline.newPriceRaw)
+  if (baselinePrice === 0) return 0
+
+  return ((currentPrice - baselinePrice) / baselinePrice) * 100
+}

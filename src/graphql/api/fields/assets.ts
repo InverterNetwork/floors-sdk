@@ -185,6 +185,7 @@ export interface TComputedAssetData {
     totalValueLocked: number
     marketCap: number
     floorAPR: number
+    priceChange24h: number
   }
 
   timestamps: {
