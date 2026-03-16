@@ -399,11 +399,35 @@ export function mapPresaleToPresaleData(
       const txHash = participation.transactionHash
       const existing = acc.get(txHash)
 
-      // If no existing record, or current has positionId and existing doesn't, use current
-      if (!existing || (participation.positionId != null && existing.positionId == null)) {
+      // Pick the best record: prefer one with both positionId AND mintedAmountRaw.
+      // If neither record has both, prefer the one with positionId.
+      if (!existing) {
         acc.set(txHash, participation)
+      } else {
+        const existingHasMinted =
+          existing.mintedAmountRaw != null && existing.mintedAmountRaw !== '0'
+        const currentHasMinted =
+          participation.mintedAmountRaw != null && participation.mintedAmountRaw !== '0'
+        const existingHasPosition = existing.positionId != null
+        const currentHasPosition = participation.positionId != null
+
+        // Prefer the record that has both positionId and mintedAmount
+        if (currentHasPosition && currentHasMinted) {
+          acc.set(txHash, participation)
+        } else if (!existingHasPosition && currentHasPosition && !currentHasMinted) {
+          // Current has positionId but no minted — merge minted from existing
+          acc.set(txHash, {
+            ...participation,
+            mintedAmountRaw: existingHasMinted
+              ? existing.mintedAmountRaw
+              : participation.mintedAmountRaw,
+            mintedAmountFormatted: existingHasMinted
+              ? existing.mintedAmountFormatted
+              : participation.mintedAmountFormatted,
+          })
+        }
+        // Otherwise keep existing
       }
-      // Otherwise keep existing (it has positionId or we already have a better record)
 
       return acc
     }, new Map<string, NonNullable<(typeof presale.participations)[0]>>())

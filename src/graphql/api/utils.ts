@@ -79,6 +79,7 @@ export const mergeFieldArgs = <T extends Record<string, unknown>, K extends keyo
  * @returns {number}
  */
 export const calculatePremiumRate = (marketPrice: number, floorPrice: number) => {
+  if (floorPrice === 0) return 0
   return ((marketPrice - floorPrice) / floorPrice) * 100
 }
 
