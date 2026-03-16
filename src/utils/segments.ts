@@ -124,71 +124,76 @@ export const DEFAULT_FLOOR_SEGMENT: SegmentConfig = {
 }
 
 /**
- * @description Default premium segments (9-segment curve from fAVAX standard config)
+ * @description Default premium segments — S-curve shape:
+ * Slow growth (1-3) → Acceleration (4-6) → Deceleration (7-9)
+ * Overall price range: ~1.0 to ~8.0
  */
 export const DEFAULT_PREMIUM_SEGMENTS: SegmentConfig[] = [
+  // --- Slow growth phase (segments 1-3) ---
   {
-    initialPrice: BigInt(1e18), // 1.00 AVAX
-    priceIncrease: BigInt(0.0045e18), // 0.0045 AVAX per step
-    supplyPerStep: BigInt(1_000e18), // 1k per step
-    numberOfSteps: 97,
-    // approxEndPrice: 1.4365 AVAX
+    initialPrice: BigInt(1e18), // 1.00
+    priceIncrease: BigInt(0.003e18), // slow
+    supplyPerStep: BigInt(1_000e18),
+    numberOfSteps: 100,
+    // endPrice ≈ 1.297
   },
   {
-    initialPrice: BigInt(1.4365e18), // 1.4365 AVAX
-    priceIncrease: BigInt(0.0055e18), // 0.0055 AVAX per step
-    supplyPerStep: BigInt(1_000e18), // 1k per step
+    initialPrice: BigInt(1.297e18), // 1.297
+    priceIncrease: BigInt(0.004e18),
+    supplyPerStep: BigInt(1_000e18),
     numberOfSteps: 95,
-    // approxEndPrice: 1.959 AVAX
+    // endPrice ≈ 1.673
   },
   {
-    initialPrice: BigInt(1.959e18), // 1.959 AVAX
-    priceIncrease: BigInt(0.0065e18), // 0.0065 AVAX per step
-    supplyPerStep: BigInt(1_000e18), // 1k per step
-    numberOfSteps: 93,
-    // approxEndPrice: 2.5635 AVAX
+    initialPrice: BigInt(1.673e18), // 1.673
+    priceIncrease: BigInt(0.005e18),
+    supplyPerStep: BigInt(1_000e18),
+    numberOfSteps: 90,
+    // endPrice ≈ 2.118
+  },
+  // --- Acceleration phase (segments 4-6) — steepest slopes ---
+  {
+    initialPrice: BigInt(2.118e18), // 2.118
+    priceIncrease: BigInt(0.009e18),
+    supplyPerStep: BigInt(1_000e18),
+    numberOfSteps: 85,
+    // endPrice ≈ 2.874
   },
   {
-    initialPrice: BigInt(2.5635e18), // 2.5635 AVAX
-    priceIncrease: BigInt(0.0075e18), // 0.0075 AVAX per step
-    supplyPerStep: BigInt(1_000e18), // 1k per step
-    numberOfSteps: 91,
-    // approxEndPrice: 3.246 AVAX
+    initialPrice: BigInt(2.874e18), // 2.874
+    priceIncrease: BigInt(0.012e18), // peak slope
+    supplyPerStep: BigInt(1_000e18),
+    numberOfSteps: 80,
+    // endPrice ≈ 3.822
   },
   {
-    initialPrice: BigInt(3.246e18), // 3.246 AVAX
-    priceIncrease: BigInt(0.0085e18), // 0.0085 AVAX per step
-    supplyPerStep: BigInt(1_000e18), // 1k per step
-    numberOfSteps: 89,
-    // approxEndPrice: 4.0025 AVAX
+    initialPrice: BigInt(3.822e18), // 3.822
+    priceIncrease: BigInt(0.011e18),
+    supplyPerStep: BigInt(1_000e18),
+    numberOfSteps: 85,
+    // endPrice ≈ 4.746
+  },
+  // --- Deceleration phase (segments 7-9) — slopes decrease ---
+  {
+    initialPrice: BigInt(4.746e18), // 4.746
+    priceIncrease: BigInt(0.01e18),
+    supplyPerStep: BigInt(1_000e18),
+    numberOfSteps: 90,
+    // endPrice ≈ 5.636
   },
   {
-    initialPrice: BigInt(4.0025e18), // 4.0025 AVAX
-    priceIncrease: BigInt(0.0095e18), // 0.0095 AVAX per step
-    supplyPerStep: BigInt(1_000e18), // 1k per step
-    numberOfSteps: 88,
-    // approxEndPrice: 4.8385 AVAX
+    initialPrice: BigInt(5.636e18), // 5.636
+    priceIncrease: BigInt(0.008e18),
+    supplyPerStep: BigInt(1_000e18),
+    numberOfSteps: 95,
+    // endPrice ≈ 6.388
   },
   {
-    initialPrice: BigInt(4.8385e18), // 4.8385 AVAX
-    priceIncrease: BigInt(0.01e18), // 0.01 AVAX per step
-    supplyPerStep: BigInt(1_000e18), // 1k per step
-    numberOfSteps: 86,
-    // approxEndPrice: 5.6985 AVAX
-  },
-  {
-    initialPrice: BigInt(5.6985e18), // 5.6985 AVAX
-    priceIncrease: BigInt(0.013e18), // 0.013 AVAX per step
-    supplyPerStep: BigInt(1_000e18), // 1k per step
-    numberOfSteps: 84,
-    // approxEndPrice: 6.7905 AVAX
-  },
-  {
-    initialPrice: BigInt(6.7905e18), // 6.7905 AVAX
-    priceIncrease: BigInt(0.015e18), // 0.015 AVAX per step
-    supplyPerStep: BigInt(1_000e18), // 1k per step
-    numberOfSteps: 77,
-    // approxEndPrice: 7.9455 AVAX
+    initialPrice: BigInt(6.388e18), // 6.388
+    priceIncrease: BigInt(0.006e18),
+    supplyPerStep: BigInt(1_000e18),
+    numberOfSteps: 100,
+    // endPrice ≈ 6.982
   },
 ]
 

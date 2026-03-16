@@ -33,6 +33,55 @@ import {
   toNumber,
 } from './utils'
 
+/**
+ * @description Calculate annualized floor APR from elevation events
+ * @param sortedElevations - Elevations sorted descending by timestamp
+ * @param floorPrice - Current floor price
+ * @returns Annualized floor APR (e.g. 0.5 = 50%), capped at 1000 (100,000%)
+ */
+export function calculateFloorAPR(
+  sortedElevations: Array<{
+    oldFloorPriceFormatted?: string | null
+    oldFloorPriceRaw?: string | number | null
+    newFloorPriceFormatted?: string | null
+    newFloorPriceRaw?: string | number | null
+    timestamp: string | number
+  }>,
+  floorPrice: number
+): number {
+  if (sortedElevations.length === 0 || floorPrice <= 0) return 0
+
+  const recentElevations = sortedElevations.slice(0, Math.min(30, sortedElevations.length))
+
+  const totalIncrease = recentElevations.reduce((sum, event) => {
+    const prev = toNumber(event.oldFloorPriceFormatted || event.oldFloorPriceRaw)
+    const next = toNumber(event.newFloorPriceFormatted || event.newFloorPriceRaw)
+    return sum + (next - prev)
+  }, 0)
+
+  const firstEvent = recentElevations[recentElevations.length - 1]
+  const lastEvent = recentElevations[0]
+
+  if (!firstEvent || !lastEvent) return 0
+
+  const timeSpanDays =
+    (toNumber(lastEvent.timestamp) * 1000 - toNumber(firstEvent.timestamp) * 1000) /
+    (1000 * 60 * 60 * 24)
+
+  let floorAPR: number
+
+  if (timeSpanDays > 0) {
+    floorAPR = (totalIncrease / floorPrice) * (365 / timeSpanDays)
+  } else if (recentElevations.length === 1) {
+    // Single event fallback — annualize assuming daily rate
+    floorAPR = (totalIncrease / floorPrice) * 365
+  } else {
+    return 0
+  }
+
+  return Math.min(floorAPR, 1000)
+}
+
 export function mapMarketToFloorAssetData(
   market: TGraphQLMarket,
   moduleRegistry?: {
@@ -151,35 +200,7 @@ export function mapMarketToFloorAssetData(
   const volumeTotal = totalVolume
 
   // APR Calculation
-  let floorAPR = 0
-  if (sortedElevations.length > 0) {
-    // Get recent elevations (up to 30)
-    const recentElevations = sortedElevations.slice(0, Math.min(30, sortedElevations.length))
-    // Calculate total price increase
-    const totalIncrease = recentElevations.reduce((sum, event) => {
-      const prev = toNumber(event.oldFloorPriceFormatted || event.oldFloorPriceRaw)
-      const next = toNumber(event.newFloorPriceFormatted || event.newFloorPriceRaw)
-      return sum + (next - prev)
-    }, 0)
-
-    // Time span
-    const firstEvent = recentElevations[recentElevations.length - 1]
-    const lastEvent = recentElevations[0]
-
-    if (firstEvent && lastEvent) {
-      const timeSpanDays =
-        (toNumber(lastEvent.timestamp) * 1000 - toNumber(firstEvent.timestamp) * 1000) /
-        (1000 * 60 * 60 * 24)
-
-      if (floorPrice > 0 && timeSpanDays > 0) {
-        // annualized
-        floorAPR = (totalIncrease / floorPrice) * (365 / timeSpanDays)
-      } else if (recentElevations.length === 1 && floorPrice > 0) {
-        // Single event fallback
-        floorAPR = totalIncrease / floorPrice
-      }
-    }
-  }
+  const floorAPR = calculateFloorAPR(sortedElevations, floorPrice)
 
   const metrics = {
     volume24h,
@@ -219,7 +240,7 @@ export function mapMarketToFloorAssetData(
     ...market,
     name,
     symbol,
-    description: `Floor price asset backed by market ${market.id}`,
+    description: name,
     projectLinks: {},
     pricing,
     supply,
