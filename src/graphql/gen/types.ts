@@ -9012,6 +9012,12 @@ export default {
             "addedAt": [
                 392
             ],
+            "collateralToken": [
+                324
+            ],
+            "collateralToken_id": [
+                321
+            ],
             "id": [
                 321
             ],
@@ -9121,6 +9127,12 @@ export default {
             "addedAt": [
                 393
             ],
+            "collateralToken": [
+                325
+            ],
+            "collateralToken_id": [
+                323
+            ],
             "id": [
                 323
             ],
@@ -9153,6 +9165,9 @@ export default {
             "addedAt": [
                 394
             ],
+            "collateralToken_id": [
+                394
+            ],
             "id": [
                 394
             ],
@@ -9179,6 +9194,9 @@ export default {
             "addedAt": [
                 394
             ],
+            "collateralToken_id": [
+                394
+            ],
             "id": [
                 394
             ],
@@ -9203,6 +9221,12 @@ export default {
         },
         "Strategy_order_by": {
             "addedAt": [
+                394
+            ],
+            "collateralToken": [
+                326
+            ],
+            "collateralToken_id": [
                 394
             ],
             "id": [
@@ -9281,6 +9305,9 @@ export default {
         "Strategy_stream_cursor_value_input": {
             "addedAt": [
                 392
+            ],
+            "collateralToken_id": [
+                321
             ],
             "id": [
                 321
