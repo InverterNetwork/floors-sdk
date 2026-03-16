@@ -27,6 +27,7 @@ import type {
 } from './fields'
 import {
   buildSegments,
+  calculate24hPriceChangeFromTrades,
   calculatePremiumChange24h,
   calculatePremiumRate,
   safePercentage,
@@ -256,6 +257,9 @@ export function mapMarketToFloorAssetData(
   // APR Calculation
   const floorAPR = calculateFloorAPR(sortedElevations, floorPrice)
 
+  // 24h price change from trades
+  const priceChange24h = calculate24hPriceChangeFromTrades(trades, marketPrice)
+
   const metrics = {
     volume24h,
     volumeTotal, // Sum of all fetched trades (limit 100)
@@ -265,6 +269,7 @@ export function mapMarketToFloorAssetData(
     totalValueLocked: totalSupply * marketPrice,
     marketCap: marketSupply * marketPrice,
     floorAPR,
+    priceChange24h,
   }
 
   const riskLevel: 'low' | 'medium' | 'high' =
