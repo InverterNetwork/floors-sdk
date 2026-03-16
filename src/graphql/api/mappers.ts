@@ -33,6 +33,60 @@ import {
   toNumber,
 } from './utils'
 
+/** Participation record shape used by deduplication (subset of GraphQL type) */
+export type ParticipationRecord = {
+  transactionHash: string
+  positionId: string | number | bigint | null
+  mintedAmountRaw: string | null
+  mintedAmountFormatted: string | null
+  [key: string]: unknown
+}
+
+/**
+ * Deduplicate participations by transaction hash.
+ * The contract emits both PresaleBought and PositionCreated events for each purchase.
+ * We prefer the record with both positionId AND mintedAmountRaw; when that isn't
+ * possible, we merge mintedAmount from the PresaleBought record into the
+ * PositionCreated record.
+ */
+export function deduplicateParticipations<T extends ParticipationRecord>(participations: T[]): T[] {
+  const map = new Map<string, T>()
+
+  for (const participation of participations) {
+    const txHash = participation.transactionHash
+    const existing = map.get(txHash)
+
+    if (!existing) {
+      map.set(txHash, participation)
+    } else {
+      const existingHasMinted = existing.mintedAmountRaw != null && existing.mintedAmountRaw !== '0'
+      const currentHasMinted =
+        participation.mintedAmountRaw != null && participation.mintedAmountRaw !== '0'
+      const existingHasPosition = existing.positionId != null
+      const currentHasPosition = participation.positionId != null
+
+      if (currentHasPosition && currentHasMinted) {
+        // Best case: current has both
+        map.set(txHash, participation)
+      } else if (!existingHasPosition && currentHasPosition && !currentHasMinted) {
+        // Current has positionId but no minted — merge minted from existing
+        map.set(txHash, {
+          ...participation,
+          mintedAmountRaw: existingHasMinted
+            ? existing.mintedAmountRaw
+            : participation.mintedAmountRaw,
+          mintedAmountFormatted: existingHasMinted
+            ? existing.mintedAmountFormatted
+            : participation.mintedAmountFormatted,
+        })
+      }
+      // Otherwise keep existing
+    }
+  }
+
+  return Array.from(map.values())
+}
+
 /**
  * @description Calculate annualized floor APR from elevation events
  * @param sortedElevations - Elevations sorted descending by timestamp
@@ -389,54 +443,13 @@ export function mapPresaleToPresaleData(
     : []
   const currentPrice = priceBreakpoints.length > 0 ? priceBreakpoints[0] : 0
 
-  // Deduplicate participations by transaction hash
-  // The contract emits both PresaleBought and PositionCreated events for each purchase.
-  // We prefer the PositionCreated record (has positionId) over PresaleBought (positionId is null)
-  // when both exist for the same transaction hash.
-  const deduplicatedParticipations = (presale.participations ?? [])
-    .filter((p): p is NonNullable<typeof p> => p !== null)
-    .reduce((acc, participation) => {
-      const txHash = participation.transactionHash
-      const existing = acc.get(txHash)
-
-      // Pick the best record: prefer one with both positionId AND mintedAmountRaw.
-      // If neither record has both, prefer the one with positionId.
-      if (!existing) {
-        acc.set(txHash, participation)
-      } else {
-        const existingHasMinted =
-          existing.mintedAmountRaw != null && existing.mintedAmountRaw !== '0'
-        const currentHasMinted =
-          participation.mintedAmountRaw != null && participation.mintedAmountRaw !== '0'
-        const existingHasPosition = existing.positionId != null
-        const currentHasPosition = participation.positionId != null
-
-        // Prefer the record that has both positionId and mintedAmount
-        if (currentHasPosition && currentHasMinted) {
-          acc.set(txHash, participation)
-        } else if (!existingHasPosition && currentHasPosition && !currentHasMinted) {
-          // Current has positionId but no minted — merge minted from existing
-          acc.set(txHash, {
-            ...participation,
-            mintedAmountRaw: existingHasMinted
-              ? existing.mintedAmountRaw
-              : participation.mintedAmountRaw,
-            mintedAmountFormatted: existingHasMinted
-              ? existing.mintedAmountFormatted
-              : participation.mintedAmountFormatted,
-          })
-        }
-        // Otherwise keep existing
-      }
-
-      return acc
-    }, new Map<string, NonNullable<(typeof presale.participations)[0]>>())
+  const deduplicatedParticipations = deduplicateParticipations(
+    (presale.participations ?? []).filter((p): p is NonNullable<typeof p> => p !== null)
+  )
 
   return {
     ...presale,
-    participations: Array.from(
-      deduplicatedParticipations.values()
-    ) as typeof presale.participations,
+    participations: deduplicatedParticipations as typeof presale.participations,
     progressPercent: Math.min(100, Math.max(0, progressPercent)),
     timeRemaining,
     isActive,
