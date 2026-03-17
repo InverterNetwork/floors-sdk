@@ -72,6 +72,7 @@
   },
   "dependencies": {
     "@urql/core": "^6.0.1",
+    "abitype": "^1.2.3",
     "debug": "^4.4.1",
     "graphql-ws": "^6.0.6",
     "type-fest-4": "npm:type-fest@latest",
