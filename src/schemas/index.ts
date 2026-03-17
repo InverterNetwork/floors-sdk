@@ -1,4 +1,4 @@
-export * from './auth.schema'
+// auth.schema removed - NextAuth handles all session management
 export * from './base.schema'
 export * from './launch.schema'
 export * from './session.schema'
