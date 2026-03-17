@@ -1,6 +1,11 @@
 'use client'
 
-import { useMutation, type UseMutationOptions, useQuery } from '@tanstack/react-query'
+import {
+  useMutation,
+  type UseMutationOptions,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
 import { useCallback } from 'react'
 import type { Address, TransactionReceipt } from 'viem'
 import { usePublicClient, useWalletClient } from 'wagmi'
@@ -83,6 +88,7 @@ export function usePresaleAdminConfig(options: UsePresaleAdminConfigOptions) {
   const { presaleAddress, autoFetch = true } = options
   const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()
+  const queryClient = useQueryClient()
 
   /**
    * @description Get a configured PresaleAdmin instance
@@ -137,12 +143,20 @@ export function usePresaleAdminConfig(options: UsePresaleAdminConfigOptions) {
   // Mutations - State Management
   // ===========================================================================
 
+  const stateQueryKey = ['presaleAdmin', 'state', presaleAddress] as const
+
   const setPresaleStateMutation = useMutation({
     mutationFn: async (params: TPresaleAdminSetStateParams): Promise<TransactionReceipt> => {
       const admin = getPresaleAdminInstance()
       return admin.setPresaleState(params)
     },
-    onSuccess: async () => {
+    onSuccess: async (_receipt, variables) => {
+      // Optimistically update the cached state so the UI reflects the change
+      // immediately — even if the RPC node hasn't caught up yet.
+      queryClient.setQueryData<TPresaleAdminState>(stateQueryKey, (old) =>
+        old ? { ...old, currentState: variables.state } : undefined
+      )
+      // Then refetch to sync the full on-chain state.
       await presaleStateQuery.refetch()
     },
     ...options.setStateOptions,
