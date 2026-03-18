@@ -263,4 +263,8 @@ export interface TUserLoanData {
   closedAt: Date | null
   lastUpdatedAt: Date
   transactionHash: string
+  /** Calculated leverage multiplier (borrowAmount / lockedCollateral) */
+  leverage: number
+  /** LTV band for grouping: 'low' (<50%), 'medium' (50-70%), 'high' (70-80%), 'very-high' (>80%) */
+  ltvBand: 'low' | 'medium' | 'high' | 'very-high'
 }

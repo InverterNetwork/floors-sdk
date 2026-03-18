@@ -662,7 +662,8 @@ export function stakingActivityToActivity(sa: TGraphQLStakingActivityItem): TMar
 }
 
 /**
- * @description Combines and sorts trades, loans, and floor elevations into unified activity list
+ * @description Combines and sorts trades, loans, and staking activities into unified activity list.
+ * Floor elevations are excluded - they appear only in the dedicated Floor History tab.
  * Detects "loop" transactions by matching BUY trades with loans that share the same txHash
  * Price impact is calculated from each trade's own execution data (effective price vs post-trade price)
  *
@@ -673,7 +674,7 @@ export function stakingActivityToActivity(sa: TGraphQLStakingActivityItem): TMar
 export function combineMarketActivity(
   trades: TGraphQLTradeActivity[],
   loans: TGraphQLLoanActivity[],
-  floorElevations: TGraphQLFloorElevationActivity[] = [],
+  _floorElevations: TGraphQLFloorElevationActivity[] = [],
   stakingActivities: TGraphQLStakingActivityItem[] = []
 ): TMarketActivityData[] {
   // Create a map of loans by txHash for quick lookup (not just a Set)
@@ -724,14 +725,12 @@ export function combineMarketActivity(
     return loanToActivity(loan, isLoopLoan)
   })
 
-  // Transform floor elevations
-  const floorElevationActivities = floorElevations.map(floorElevationToActivity)
-
   // Transform staking activities
   const stakingActs = stakingActivities.map(stakingActivityToActivity)
 
   // Combine and sort by timestamp (newest first)
-  return [...tradeActivities, ...loanActivities, ...floorElevationActivities, ...stakingActs].sort(
+  // Note: Floor elevations are excluded - they appear only in the dedicated Floor History tab
+  return [...tradeActivities, ...loanActivities, ...stakingActs].sort(
     (a, b) => Number.parseInt(b.timestamp) - Number.parseInt(a.timestamp)
   )
 }

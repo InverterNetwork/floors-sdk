@@ -590,14 +590,25 @@ export function mapLoanToUserLoanData(loan: TGraphQLLoan): TUserLoanData {
   const loanIdParts = loan.id.split('-')
   const loanIndex = loanIdParts.length > 1 ? BigInt(loanIdParts[1]) : BigInt(loan.id)
 
+  // Calculate leverage: borrowAmount / lockedCollateral
+  // This represents how many units of debt per unit of collateral
+  const lockedCollateralNum = toNumber(loan.lockedCollateralFormatted || loan.lockedCollateralRaw)
+  const borrowAmountNum = toNumber(loan.borrowAmountFormatted || loan.borrowAmountRaw)
+  const leverage = lockedCollateralNum > 0 ? borrowAmountNum / lockedCollateralNum : 0
+
+  // Calculate LTV band for grouping purposes
+  // LTV = remainingDebt / (lockedCollateral * floorPrice)
+  // But since we're grouping by leverage similarity, use the leverage ratio directly
+  const ltvBand = getLtvBand(leverage)
+
   return {
     id: loan.id,
     loanId: loanIndex,
     borrowerId: loan.borrower_id,
     marketId: loan.market_id,
-    lockedCollateral: toNumber(loan.lockedCollateralFormatted || loan.lockedCollateralRaw),
+    lockedCollateral: lockedCollateralNum,
     lockedCollateralRaw: loan.lockedCollateralRaw?.toString() ?? '0',
-    borrowAmount: toNumber(loan.borrowAmountFormatted || loan.borrowAmountRaw),
+    borrowAmount: borrowAmountNum,
     borrowAmountRaw: loan.borrowAmountRaw?.toString() ?? '0',
     remainingDebt: toNumber(loan.remainingDebtFormatted || loan.remainingDebtRaw),
     remainingDebtRaw: loan.remainingDebtRaw?.toString() ?? '0',
@@ -610,7 +621,23 @@ export function mapLoanToUserLoanData(loan: TGraphQLLoan): TUserLoanData {
       ? new Date(toNumber(loan.lastUpdatedAt) * 1000)
       : new Date(toNumber(loan.openedAt) * 1000),
     transactionHash: loan.transactionHash,
+    leverage,
+    ltvBand,
   }
+}
+
+/**
+ * @description Categorizes leverage into bands for UI grouping
+ * @param leverage - Leverage ratio (borrowAmount / lockedCollateral)
+ * @returns LTV band label
+ */
+function getLtvBand(leverage: number): 'low' | 'medium' | 'high' | 'very-high' {
+  // Leverage bands correspond to typical LTV ranges
+  // leverage ~0.5 = LTV 50% (2x effective), leverage ~0.8 = LTV 80% (5x effective)
+  if (leverage < 0.5) return 'low'
+  if (leverage < 0.7) return 'medium'
+  if (leverage < 0.8) return 'high'
+  return 'very-high'
 }
 
 /**
