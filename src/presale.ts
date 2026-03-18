@@ -1159,14 +1159,16 @@ export class Presale {
    * User must call this before buying in Whitelist phase.
    * @param params Merkle proof and optional lifecycle callbacks
    * @returns Transaction receipt after confirmation
+   * @note For single-address whitelists, the proof array will be empty - this is valid
+   *       because the leaf hash equals the root, requiring no sibling hashes to verify.
    */
   public async addToWhitelistWithProof({
     proof,
     lifecycle,
   }: TAddToWhitelistWithProofParams): Promise<TransactionReceipt> {
-    if (proof.length === 0) {
-      throw new Error('Merkle proof is required')
-    }
+    // Note: We do NOT validate proof.length here because single-address Merkle trees
+    // legitimately have empty proofs ([]). The contract will reject invalid proofs
+    // via the MerkleProof verification, so no additional validation is needed.
 
     const { receipt } = await this.requireSafeWrite().write({
       address: this.address,
