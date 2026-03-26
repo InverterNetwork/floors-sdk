@@ -110,6 +110,60 @@ export const stakingActivitiesQuery = {
   },
 } satisfies GraphQLQueryArgs
 
+/**
+ * Build a query for staking activities with optional filters
+ * @param stakingManagerId - Filter by staking manager ID
+ * @param activityType - Filter by activity type (e.g., 'HARVEST')
+ * @param limit - Maximum number of activities to fetch
+ * @param timestampGte - Filter activities after this timestamp (Unix seconds as string)
+ * @returns GraphQL query object
+ */
+export const buildStakingActivitiesQuery = (params?: {
+  stakingManagerId?: string
+  activityType?: 'STAKE' | 'HARVEST' | 'WITHDRAW' | 'REBALANCE'
+  limit?: number
+  timestampGte?: string
+}) => {
+  const { stakingManagerId, activityType, limit = 100, timestampGte } = params ?? {}
+
+  const whereClause: Record<string, unknown> = {}
+  if (stakingManagerId) {
+    whereClause.stakingManager_id = { _eq: stakingManagerId }
+  }
+  if (activityType) {
+    whereClause.activityType = { _eq: activityType }
+  }
+  if (timestampGte) {
+    whereClause.timestamp = { _gte: timestampGte }
+  }
+
+  return {
+    StakingActivity: {
+      __args: {
+        where: whereClause,
+        order_by: [{ timestamp: 'desc' as const }],
+        limit,
+      },
+      id: true,
+      position_id: true,
+      stakingManager_id: true,
+      user_id: true,
+      activityType: true,
+      issuanceTokenAmountRaw: true,
+      issuanceTokenAmountFormatted: true,
+      collateralAmountRaw: true,
+      collateralAmountFormatted: true,
+      yieldAmountRaw: true,
+      yieldAmountFormatted: true,
+      feeAmountRaw: true,
+      feeAmountFormatted: true,
+      timestamp: true,
+      transactionHash: true,
+      __typename: true,
+    },
+  } satisfies GraphQLQueryArgs
+}
+
 // Type exports
 export type TGraphQLStrategy = NonNullable<
   GraphQLQueryResult<typeof strategiesQuery>['Strategy']

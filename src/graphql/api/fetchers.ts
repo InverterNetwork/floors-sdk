@@ -5,8 +5,10 @@ import {
   accountsQuery,
   type AccountsQueryType,
   buildAuthorizerRolesQuery,
+  buildFloorElevationsQuery,
   buildMarketActivityQuery,
   buildPresalesQuery,
+  buildStakingActivitiesQuery,
   buildStrategiesQuery,
   combineMarketActivity,
   computeGlobalMetricsWithHistory,
@@ -33,7 +35,9 @@ import {
   type TGlobalMetricsWithHistory,
   type TGlobalStats,
   type TGraphQLAccount,
+  type TGraphQLFloorElevation,
   type TGraphQLLoan,
+  type TGraphQLStakingActivity,
   type TGraphQLStrategy,
   type TGraphQLUserMarketPosition,
   type TMarketActivityData,
@@ -574,6 +578,67 @@ export async function fetchGlobalRegistry(): Promise<{
     console.error('Error fetching GlobalRegistry:', error)
     return null
   }
+}
+
+/**
+ * Fetch floor elevation events for a specific market
+ * @param marketId - The market ID to fetch elevations for
+ * @param limit - Maximum number of elevations to fetch (default: 30)
+ * @returns Array of floor elevation events
+ */
+export async function fetchFloorElevations(
+  marketId: string,
+  limit: number = 30
+): Promise<TGraphQLFloorElevation[]> {
+  try {
+    const response = await query(buildFloorElevationsQuery(marketId, limit))
+    return response.FloorElevation ?? []
+  } catch (error) {
+    console.error('Error fetching floor elevations:', error)
+    return []
+  }
+}
+
+/**
+ * Fetch staking activities with optional filters
+ * @param params - Query parameters
+ * @param params.stakingManagerId - Filter by staking manager ID
+ * @param params.activityType - Filter by activity type (e.g., 'HARVEST')
+ * @param params.limit - Maximum number of activities to fetch (default: 100)
+ * @param params.timestampGte - Filter activities after this timestamp (Unix seconds)
+ * @returns Array of staking activities
+ */
+export async function fetchStakingActivities(params?: {
+  stakingManagerId?: string
+  activityType?: 'STAKE' | 'HARVEST' | 'WITHDRAW' | 'REBALANCE'
+  limit?: number
+  timestampGte?: string
+}): Promise<TGraphQLStakingActivity[]> {
+  try {
+    const response = await query(buildStakingActivitiesQuery(params))
+    return response.StakingActivity ?? []
+  } catch (error) {
+    console.error('Error fetching staking activities:', error)
+    return []
+  }
+}
+
+/**
+ * Fetch HARVEST events for a staking manager over a lookback period
+ * @param stakingManagerId - The staking manager ID
+ * @param days - Number of days to look back (default: 30)
+ * @returns Array of harvest activities
+ */
+export async function fetchHarvestEvents(
+  stakingManagerId: string,
+  days: number = 30
+): Promise<TGraphQLStakingActivity[]> {
+  const timestampGte = String(Math.floor(Date.now() / 1000) - days * 86400)
+  return fetchStakingActivities({
+    stakingManagerId,
+    activityType: 'HARVEST',
+    timestampGte,
+  })
 }
 
 /**

@@ -264,3 +264,40 @@ export interface TFloorAssetData extends TGraphQLMarket, TComputedAssetData {
   // PriceCandles organized by period for different chart timeframes
   priceCandles?: TPriceCandlesByPeriod
 }
+
+// =============================================================================
+// Floor Elevations Query (dedicated query for fetching elevations by market)
+// =============================================================================
+
+/**
+ * GraphQL query builder for fetching FloorElevation entities for a specific market
+ * @param marketId - The market ID to fetch elevations for
+ * @param limit - Maximum number of elevations to fetch (default: 30)
+ * @returns GraphQL query object for fetching floor elevations
+ */
+export const buildFloorElevationsQuery = (marketId: string, limit: number = 30) =>
+  ({
+    FloorElevation: {
+      __args: {
+        where: { market_id: { _eq: marketId } },
+        order_by: [{ timestamp: 'desc' }],
+        limit,
+      },
+      id: true,
+      market_id: true,
+      oldFloorPriceRaw: true,
+      oldFloorPriceFormatted: true,
+      newFloorPriceRaw: true,
+      newFloorPriceFormatted: true,
+      deployedAmountRaw: true,
+      deployedAmountFormatted: true,
+      timestamp: true,
+      transactionHash: true,
+      __typename: true,
+    },
+  }) satisfies GraphQLQueryArgs
+
+export type FloorElevationsQueryType = ReturnType<typeof buildFloorElevationsQuery>
+export type TGraphQLFloorElevation = NonNullable<
+  GraphQLQueryResult<FloorElevationsQueryType>['FloorElevation']
+>[0]

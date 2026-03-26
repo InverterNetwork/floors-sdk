@@ -8,7 +8,7 @@ import { useCallback, useMemo } from 'react'
 import type { Address } from 'viem'
 import { usePublicClient, useWalletClient } from 'wagmi'
 
-import { fetchAvailableStrategies } from '../../graphql/api/fetchers'
+import { fetchAvailableStrategies, fetchHarvestEvents } from '../../graphql/api/fetchers'
 import type { TGraphQLStrategy } from '../../graphql/api/fields/staking'
 import {
   Staking,
@@ -325,5 +325,64 @@ export const useAvailableStrategies = (activeOnly: boolean = true, limit: number
     queryFn: () => fetchAvailableStrategies(activeOnly, limit),
     staleTime: 60_000, // 1 minute
     gcTime: 5 * 60_000, // 5 minutes
+  })
+}
+
+// =============================================================================
+// Staking APY Query Hook
+// =============================================================================
+
+/**
+ * @description Hook to fetch and compute staking APY from strategy HARVEST events
+ * @param stakingManagerId - The staking manager ID to fetch APY for
+ * @param lookbackDays - Number of days to look back for harvest events (default: 30)
+ * @returns Query result with computed APY percentage (e.g., 0.05 = 5%)
+ *
+ * Calculation:
+ *   For each HARVEST event: yieldRate = yieldAmount / collateralAmount
+ *   Average yield rate across all harvests
+ *   Annualize: APY = avgYieldRate × (365 / lookbackDays)
+ *
+ * This is strategy-agnostic - works for TestnetStrategy_v1 (injected yield),
+ * AaveStrategy (lending yield), or any future strategy type.
+ */
+export const useStakingAPY = (stakingManagerId: string, lookbackDays: number = 30) => {
+  return useQuery<number>({
+    queryKey: ['staking-apy', stakingManagerId, lookbackDays],
+    queryFn: async () => {
+      if (!stakingManagerId) return 0
+
+      // Fetch HARVEST events over the lookback period
+      const harvests = await fetchHarvestEvents(stakingManagerId, lookbackDays)
+
+      // Filter to harvests with valid yield and collateral amounts
+      const validHarvests = harvests.filter((h) => {
+        const yieldAmount = Number(h.yieldAmountFormatted || h.yieldAmountRaw || 0)
+        const collateralAmount = Number(h.collateralAmountFormatted || h.collateralAmountRaw || 0)
+        return yieldAmount > 0 && collateralAmount > 0
+      })
+
+      if (validHarvests.length === 0) return 0
+
+      // Calculate yield rate for each harvest (yield / staked collateral)
+      // This gives us the return rate for that harvest event
+      const yieldRates = validHarvests.map((h) => {
+        const yieldAmount = Number(h.yieldAmountFormatted || h.yieldAmountRaw || 0)
+        const collateralAmount = Number(h.collateralAmountFormatted || h.collateralAmountRaw || 0)
+        return yieldAmount / collateralAmount
+      })
+
+      // Average the yield rates
+      const avgYieldRate = yieldRates.reduce((sum, rate) => sum + rate, 0) / yieldRates.length
+
+      // Annualize: if we observed this average rate over lookbackDays, what's the APY?
+      // Note: This assumes the yield rate is representative of the period
+      const annualizedAPY = avgYieldRate * (365 / lookbackDays)
+
+      return annualizedAPY
+    },
+    staleTime: 60_000, // 1 minute - APY doesn't need real-time updates
+    gcTime: 5 * 60_000, // 5 minutes
+    enabled: !!stakingManagerId,
   })
 }
