@@ -51,10 +51,28 @@ export const accountsQuery = {
       lockedCollateralFormatted: true,
       borrowAmountRaw: true,
       borrowAmountFormatted: true,
+      remainingDebtRaw: true,
+      remainingDebtFormatted: true,
       originationFeeRaw: true,
       originationFeeFormatted: true,
       openedAt: true,
       status: true,
+    },
+    presaleParticipations: {
+      __args: {
+        order_by: [{ timestamp: 'desc' }],
+        limit: 20,
+      },
+      id: true,
+      presale_id: true,
+      positionId: true,
+      depositAmountRaw: true,
+      depositAmountFormatted: true,
+      mintedAmountRaw: true,
+      mintedAmountFormatted: true,
+      leverage: true,
+      loopCount: true,
+      timestamp: true,
     },
     stakingPositions: {
       __args: {
