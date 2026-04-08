@@ -281,9 +281,11 @@ export async function fetchTradesByUser(userId: string): Promise<TTradeData[]> {
 }
 
 export async function fetchAccountById(id: string): Promise<TGraphQLAccount | null> {
+  // The indexer stores accounts with checksummed addresses (via getAddress from viem)
+  const normalizedId = id.startsWith('0x') ? getAddress(id as `0x${string}`) : id
   const response = await query(
     buildAccountsQuery({
-      where: { id: { _eq: id } },
+      where: { id: { _eq: normalizedId } },
       order_by: [{ id: 'desc' }],
       limit: 1,
     })
