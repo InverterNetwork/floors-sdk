@@ -284,8 +284,12 @@ export function mapMarketToFloorAssetData(
     riskLevel,
   }
 
-  const name = market.id ? `Floor Market ${market.id.slice(0, 6)}` : 'Floor Market'
-  const symbol = market.id ? `FM${market.id.slice(2, 6).toUpperCase()}` : 'FMKT'
+  const name =
+    market.issuanceToken?.name ||
+    (market.id ? `Floor Market ${market.id.slice(0, 6)}` : 'Floor Market')
+  const symbol =
+    market.issuanceToken?.symbol ||
+    (market.id ? `FM${market.id.slice(2, 6).toUpperCase()}` : 'FMKT')
 
   const segments = buildSegments(marketSupply, floorPrice, Math.max(totalSupply, 1))
 
