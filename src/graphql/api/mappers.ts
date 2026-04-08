@@ -140,6 +140,7 @@ export function calculateFloorAPR(
 export function mapMarketToFloorAssetData(
   market: TGraphQLMarket,
   moduleRegistry?: {
+    floor: string | null
     creditFacility: string | null
     authorizer: string | null
     presale: string | null
@@ -289,6 +290,7 @@ export function mapMarketToFloorAssetData(
   const segments = buildSegments(marketSupply, floorPrice, Math.max(totalSupply, 1))
 
   // Extract addresses from ModuleRegistry
+  const floorModuleAddress = moduleRegistry?.floor ?? null
   const creditFacilityAddress = moduleRegistry?.creditFacility ?? null
   const authorizerAddress = moduleRegistry?.authorizer ?? null
   const presaleAddress = moduleRegistry?.presale ?? null
@@ -316,6 +318,7 @@ export function mapMarketToFloorAssetData(
     contractAddress: market.id,
     isFloorElevating: floorElevations.length > 0,
     // Add addresses from ModuleRegistry
+    floorModuleAddress,
     creditFacility: creditFacilityAddress,
     authorizer: authorizerAddress,
     presale: presaleAddress,

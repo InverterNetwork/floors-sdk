@@ -255,6 +255,8 @@ export interface TFloorAssetData extends TGraphQLMarket, TComputedAssetData {
   authorizer?: string | null
   presale?: string | null
   treasury?: string | null
+  /** Floor module contract address (from ModuleRegistry.floor) */
+  floorModuleAddress?: string | null
   /** StakingManager contract address (from ModuleRegistry.staking) */
   stakingManagerAddress?: string | null
   /** Active strategy addresses for this market's StakingManager (from indexer) */
