@@ -32,7 +32,6 @@ import {
   calculatePremiumRate,
   safePercentage,
   toNumber,
-  toWadNumber,
 } from './utils'
 
 /** Participation record shape used by deduplication (subset of GraphQL type) */
@@ -110,8 +109,8 @@ export function calculateFloorAPR(
   const recentElevations = sortedElevations.slice(0, Math.min(30, sortedElevations.length))
 
   const totalIncrease = recentElevations.reduce((sum, event) => {
-    const prev = toWadNumber(event.oldFloorPriceFormatted, event.oldFloorPriceRaw)
-    const next = toWadNumber(event.newFloorPriceFormatted, event.newFloorPriceRaw)
+    const prev = toNumber(event.oldFloorPriceFormatted || event.oldFloorPriceRaw)
+    const next = toNumber(event.newFloorPriceFormatted || event.newFloorPriceRaw)
     return sum + (next - prev)
   }, 0)
 
@@ -149,8 +148,8 @@ export function mapMarketToFloorAssetData(
     staking: string | null
   } | null
 ): TFloorAssetData {
-  const floorPrice = toWadNumber(market.floorPriceFormatted, market.floorPriceRaw)
-  const marketPrice = toWadNumber(market.currentPriceFormatted, market.currentPriceRaw)
+  const floorPrice = toNumber(market.floorPriceFormatted || market.floorPriceRaw)
+  const marketPrice = toNumber(market.currentPriceFormatted || market.currentPriceRaw)
   const totalSupply = toNumber(market.totalSupplyFormatted || market.totalSupplyRaw)
   const marketSupply = toNumber(market.marketSupplyFormatted || market.marketSupplyRaw)
   const floorSupply = toNumber(market.floorSupplyFormatted || market.floorSupplyRaw)
@@ -173,16 +172,16 @@ export function mapMarketToFloorAssetData(
 
   const estimatedFloorIncrease =
     latestElevation && secondElevation
-      ? toWadNumber(latestElevation.newFloorPriceFormatted, latestElevation.newFloorPriceRaw) -
-        toWadNumber(secondElevation.newFloorPriceFormatted, secondElevation.newFloorPriceRaw)
+      ? toNumber(latestElevation.newFloorPriceFormatted || latestElevation.newFloorPriceRaw) -
+        toNumber(secondElevation.newFloorPriceFormatted || secondElevation.newFloorPriceRaw)
       : latestElevation
-        ? toWadNumber(latestElevation.newFloorPriceFormatted, latestElevation.newFloorPriceRaw) -
+        ? toNumber(latestElevation.newFloorPriceFormatted || latestElevation.newFloorPriceRaw) -
           floorPrice
         : 0
 
   const elevationHistory = sortedElevations.map((event, index) => {
-    const previousFloor = toWadNumber(event.oldFloorPriceFormatted, event.oldFloorPriceRaw)
-    const nextFloor = toWadNumber(event.newFloorPriceFormatted, event.newFloorPriceRaw)
+    const previousFloor = toNumber(event.oldFloorPriceFormatted || event.oldFloorPriceRaw)
+    const nextFloor = toNumber(event.newFloorPriceFormatted || event.newFloorPriceRaw)
     const feesDeployed = toNumber(event.deployedAmountFormatted || event.deployedAmountRaw)
     return {
       timestamp: new Date(toNumber(event.timestamp) * 1000),
@@ -451,9 +450,8 @@ export function mapPresaleToPresaleData(
   const remainingCapacity = Math.max(0, globalDepositCap - totalRaised)
 
   // Calculate current price (use first price breakpoint if available)
-  // Price breakpoints are WAD-encoded (1e18) bigint strings
   const priceBreakpoints = presale.priceBreakpointsFlat
-    ? presale.priceBreakpointsFlat.map((p) => toWadNumber(null, p))
+    ? presale.priceBreakpointsFlat.map((p) => toNumber(p))
     : []
   const currentPrice = priceBreakpoints.length > 0 ? priceBreakpoints[0] : 0
 
@@ -622,7 +620,7 @@ export function mapLoanToUserLoanData(loan: TGraphQLLoan): TUserLoanData {
     remainingDebt: toNumber(loan.remainingDebtFormatted || loan.remainingDebtRaw),
     remainingDebtRaw: loan.remainingDebtRaw?.toString() ?? '0',
     originationFee: toNumber(loan.originationFeeFormatted || loan.originationFeeRaw),
-    floorPriceAtBorrow: toWadNumber(loan.floorPriceAtBorrowFormatted, loan.floorPriceAtBorrowRaw),
+    floorPriceAtBorrow: toNumber(loan.floorPriceAtBorrowFormatted || loan.floorPriceAtBorrowRaw),
     status: loan.status as 'ACTIVE' | 'REPAID' | 'DEFAULTED',
     openedAt: new Date(toNumber(loan.openedAt) * 1000),
     closedAt: loan.closedAt ? new Date(toNumber(loan.closedAt) * 1000) : null,
@@ -681,8 +679,8 @@ export function mapMarketSnapshotToPremiumChange(
   }
 
   // Extract prices from snapshot
-  const price24hAgo = toWadNumber(snapshot.priceFormatted, snapshot.priceRaw)
-  const floorPrice24hAgo = toWadNumber(snapshot.floorPriceFormatted, snapshot.floorPriceRaw)
+  const price24hAgo = toNumber(snapshot.priceFormatted || snapshot.priceRaw)
+  const floorPrice24hAgo = toNumber(snapshot.floorPriceFormatted || snapshot.floorPriceRaw)
 
   // Validate we have valid prices
   if (

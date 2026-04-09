@@ -1,5 +1,4 @@
 import type { GraphQLQueryArgs, GraphQLQueryResult } from '../..'
-import { toWadNumber } from '../utils'
 
 // Time constants in seconds
 const DAY = 86400
@@ -215,7 +214,6 @@ function aggregateSnapshotsByTimestamp(
     totalSupplyFormatted?: string | null
     marketSupplyFormatted?: string | null
     priceFormatted?: string | null
-    priceRaw?: string | number | null
     volume24hFormatted?: string | null
   }>
 ): TChartDataPoint[] {
@@ -229,8 +227,7 @@ function aggregateSnapshotsByTimestamp(
 
     const supply = parseFormatted(snapshot.totalSupplyFormatted)
     const marketSupply = parseFormatted(snapshot.marketSupplyFormatted)
-    // Prices are WAD (1e18) — use toWadNumber for correct Raw fallback
-    const price = toWadNumber(snapshot.priceFormatted, snapshot.priceRaw)
+    const price = parseFormatted(snapshot.priceFormatted)
     const volume = parseFormatted(snapshot.volume24hFormatted)
 
     const tvl = supply * price
@@ -436,7 +433,7 @@ export function computeGlobalMetricsWithHistory(
   for (const market of markets) {
     const supply = parseFormatted(market.totalSupplyFormatted)
     const marketSupply = parseFormatted(market.marketSupplyFormatted)
-    const price = toWadNumber(market.currentPriceFormatted, (market as any).currentPriceRaw)
+    const price = parseFormatted(market.currentPriceFormatted)
 
     currentTVL += supply * price
     currentMarketCap += marketSupply * price
@@ -450,7 +447,6 @@ export function computeGlobalMetricsWithHistory(
       totalSupplyFormatted: string | null
       marketSupplyFormatted: string | null
       priceFormatted: string | null
-      priceRaw: string | number | null
     }
   >()
 
@@ -461,7 +457,6 @@ export function computeGlobalMetricsWithHistory(
         totalSupplyFormatted: snapshot.totalSupplyFormatted ?? null,
         marketSupplyFormatted: snapshot.marketSupplyFormatted ?? null,
         priceFormatted: snapshot.priceFormatted ?? null,
-        priceRaw: (snapshot as any).priceRaw ?? null,
       })
     }
   }
@@ -472,7 +467,7 @@ export function computeGlobalMetricsWithHistory(
   for (const snapshot of snapshotsByMarket.values()) {
     const supply = parseFormatted(snapshot.totalSupplyFormatted)
     const marketSupply = parseFormatted(snapshot.marketSupplyFormatted)
-    const price = toWadNumber(snapshot.priceFormatted, snapshot.priceRaw)
+    const price = parseFormatted(snapshot.priceFormatted)
 
     tvl24hAgo += supply * price
     marketCap24hAgo += marketSupply * price
