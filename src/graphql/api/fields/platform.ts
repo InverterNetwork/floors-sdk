@@ -1,4 +1,5 @@
 import type { GraphQLQueryArgs, GraphQLQueryResult } from '../..'
+import { toWadNumber } from '../utils'
 
 // GraphQL Query Args for Platform Metrics (aggregated from multiple entities)
 export const platformMetricsQuery = {
@@ -88,9 +89,10 @@ export function computePlatformMetrics(
   const now = chainTimestamp ?? Math.floor(Date.now() / 1000)
 
   // Calculate TVL from total supply and prices (includes locked tokens)
+  // Prices are WAD (1e18) — use toWadNumber for correct Raw fallback
   const totalValueLocked = markets.reduce((sum, market) => {
-    const supply = parseFloat(market.totalSupplyFormatted || market.totalSupplyRaw || '0')
-    const price = parseFloat(market.currentPriceFormatted || market.currentPriceRaw || '0')
+    const supply = parseFloat(market.totalSupplyFormatted || '0')
+    const price = toWadNumber(market.currentPriceFormatted, market.currentPriceRaw)
     return sum + supply * price
   }, 0)
 
@@ -98,8 +100,8 @@ export function computePlatformMetrics(
   // Market Cap = marketSupply × marketPrice (in reserve asset terms)
   // Note: USD conversion happens in frontend using reserve token USD price
   const totalMarketCap = markets.reduce((sum, market) => {
-    const marketSupply = parseFloat(market.marketSupplyFormatted || market.marketSupplyRaw || '0')
-    const price = parseFloat(market.currentPriceFormatted || market.currentPriceRaw || '0')
+    const marketSupply = parseFloat(market.marketSupplyFormatted || '0')
+    const price = toWadNumber(market.currentPriceFormatted, market.currentPriceRaw)
     return sum + marketSupply * price
   }, 0)
 
