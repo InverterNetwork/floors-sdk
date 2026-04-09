@@ -1,9 +1,7 @@
 import { clamp, cloneDeep, merge } from 'lodash'
-import { formatUnits } from 'viem'
 
 /**
  * @description Converts various value types into numbers while guarding against invalid inputs.
- * Use for non-price values (amounts, timestamps, counts). For price fields use {@link toWadNumber}.
  * @param {string | number | null | undefined} value
  * @returns {number}
  */
@@ -13,33 +11,6 @@ export const toNumber = (value?: string | number | null): number => {
   if (typeof value === 'string' && value.trim() === '') return 0
   const parsed = Number(value)
   return Number.isNaN(parsed) ? 0 : parsed
-}
-
-/**
- * Price conversion: returns the human-readable number for a price field.
- * Prefers `formatted`; falls back to `raw` interpreted with the given `decimals`.
- * Prices are stored in reserve-token precision (e.g. 6 for USDC, 18 for WETH).
- * For token *amounts* (supply, volume, fees) use {@link toNumber} with the formatted value.
- */
-export const toWadNumber = (
-  formatted?: string | number | null,
-  raw?: string | number | null,
-  decimals = 18
-): number => {
-  // Prefer the already-formatted (human-readable) value
-  if (formatted != null && formatted !== '') {
-    const n = Number(formatted)
-    if (!Number.isNaN(n)) return n
-  }
-  // Fallback: interpret raw with the given decimals
-  if (raw != null && raw !== '') {
-    try {
-      return Number(formatUnits(BigInt(raw), decimals))
-    } catch {
-      return 0
-    }
-  }
-  return 0
 }
 
 /**
@@ -157,7 +128,7 @@ export const calculate24hPriceChangeFromTrades = (
     return Math.abs(tTs - cutoff) < Math.abs(closestTs - cutoff) ? t : closest
   })
 
-  const baselinePrice = toWadNumber(baseline.newPriceFormatted, baseline.newPriceRaw)
+  const baselinePrice = toNumber(baseline.newPriceFormatted || baseline.newPriceRaw)
   if (baselinePrice === 0) return 0
 
   return ((currentPrice - baselinePrice) / baselinePrice) * 100
