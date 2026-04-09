@@ -1,11 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { formatUnits, parseUnits } from 'viem'
 
-import {
-  DEFAULT_FLOOR_SEGMENT,
-  DEFAULT_PREMIUM_SEGMENTS,
-  generateDefaultCurve,
-} from '../src/utils/segments'
+import { DEFAULT_FLOOR_SEGMENT, generateDefaultCurve } from '../src/utils/segments'
 
 /**
  * These tests demonstrate the decimal-awareness bug and its fix.
