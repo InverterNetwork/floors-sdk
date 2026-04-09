@@ -102,8 +102,7 @@ export function calculateFloorAPR(
     newFloorPriceRaw?: string | number | null
     timestamp: string | number
   }>,
-  floorPrice: number,
-  reserveDecimals = 18
+  floorPrice: number
 ): number {
   if (sortedElevations.length === 0 || floorPrice <= 0) return 0
 
@@ -154,7 +153,6 @@ export function mapMarketToFloorAssetData(
   const totalSupply = toNumber(market.totalSupplyFormatted || market.totalSupplyRaw)
   const marketSupply = toNumber(market.marketSupplyFormatted || market.marketSupplyRaw)
   const floorSupply = toNumber(market.floorSupplyFormatted || market.floorSupplyRaw)
-  const reserveDecimals = market.reserveToken?.decimals ?? 18
   const trades = market.trades ?? []
   const floorElevations = market.floorElevations ?? []
 
@@ -258,7 +256,7 @@ export function mapMarketToFloorAssetData(
   const volumeTotal = totalVolume
 
   // APR Calculation
-  const floorAPR = calculateFloorAPR(sortedElevations, floorPrice, reserveDecimals)
+  const floorAPR = calculateFloorAPR(sortedElevations, floorPrice)
 
   // 24h price change from trades
   const priceChange24h = calculate24hPriceChangeFromTrades(trades, marketPrice)
@@ -674,8 +672,7 @@ export function mapMarketSnapshotToPremiumChange(
     | null
     | undefined,
   currentMarketPrice: number,
-  currentFloorPrice: number,
-  reserveDecimals = 18
+  currentFloorPrice: number
 ): number | null {
   if (!snapshot) {
     return null
