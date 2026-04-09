@@ -1,3 +1,5 @@
+import { parseUnits } from 'viem'
+
 import type { GraphQLQueryArgs, GraphQLQueryResult, GraphQLSubscriptionArgs } from '../..'
 
 // ============================================================================
@@ -448,9 +450,9 @@ export function loanToActivity(
           user_id: loan.borrower_id,
           type: 'repay',
           timestamp: historyEntry.timestamp,
-          tokenAmountRaw: String(Math.round(collateralUnlocked * 1e18)), // Approximate
+          tokenAmountRaw: String(parseUnits(collateralUnlocked.toFixed(18), 18)), // Approximate (assumes 18-dec issuance)
           tokenAmountFormatted: collateralUnlocked.toFixed(6),
-          reserveAmountRaw: String(Math.round(repayAmount * 1e18)), // Approximate
+          reserveAmountRaw: String(parseUnits(repayAmount.toFixed(18), 18)), // Approximate (assumes 18-dec reserve)
           reserveAmountFormatted: repayAmount.toFixed(6),
           feeRaw: '0',
           feeFormatted: '0',
@@ -485,7 +487,7 @@ export function loanToActivity(
           timestamp: loan.closedAt,
           tokenAmountRaw: loan.lockedCollateralRaw,
           tokenAmountFormatted: loan.lockedCollateralFormatted,
-          reserveAmountRaw: String(Math.round(totalRepaid * 1e18)),
+          reserveAmountRaw: String(parseUnits(totalRepaid.toFixed(18), 18)), // Approximate (assumes 18-dec reserve)
           reserveAmountFormatted: totalRepaid.toFixed(6),
           feeRaw: '0',
           feeFormatted: '0',
@@ -515,9 +517,9 @@ export function loanToActivity(
         user_id: loan.borrower_id,
         type: 'repay',
         timestamp: loan.lastUpdatedAt,
-        tokenAmountRaw: String(Math.round(collateralUnlocked * 1e18)),
+        tokenAmountRaw: String(parseUnits(collateralUnlocked.toFixed(18), 18)), // Approximate (assumes 18-dec issuance)
         tokenAmountFormatted: collateralUnlocked.toFixed(6),
-        reserveAmountRaw: String(Math.round(totalRepaid * 1e18)),
+        reserveAmountRaw: String(parseUnits(totalRepaid.toFixed(18), 18)), // Approximate (assumes 18-dec reserve)
         reserveAmountFormatted: totalRepaid.toFixed(6),
         feeRaw: '0',
         feeFormatted: '0',

@@ -1,4 +1,5 @@
 import type { TPriceCandle, TPriceCandlesByPeriod } from '../../graphql/api'
+import { toWadNumber } from '../../graphql/api/utils'
 
 export type { TPriceCandle, TPriceCandlesByPeriod }
 
@@ -99,11 +100,13 @@ export function transformCandlesToChartData(candles: TPriceCandle[]): Transforme
 
   return sortedCandles.map((candle) => {
     const timestamp = Number(candle.timestamp) * 1000
-    const open = parseFloat(candle.openFormatted || String(candle.openRaw || 0))
-    const high = parseFloat(candle.highFormatted || String(candle.highRaw || 0))
-    const low = parseFloat(candle.lowFormatted || String(candle.lowRaw || 0))
-    const close = parseFloat(candle.closeFormatted || String(candle.closeRaw || 0))
-    const volume = parseFloat(candle.volumeFormatted || String(candle.volumeRaw || 0))
+    // OHLC prices are WAD (1e18) — use toWadNumber for correct Raw fallback
+    const open = toWadNumber(candle.openFormatted, candle.openRaw)
+    const high = toWadNumber(candle.highFormatted, candle.highRaw)
+    const low = toWadNumber(candle.lowFormatted, candle.lowRaw)
+    const close = toWadNumber(candle.closeFormatted, candle.closeRaw)
+    // Volume is in reserve token decimals — use Formatted only
+    const volume = parseFloat(candle.volumeFormatted || '0')
     const trades = Number(candle.trades || 0)
 
     return {
