@@ -1,4 +1,5 @@
-import type { GraphQLQueryArgs, GraphQLQueryResult } from '../..'
+import type { GraphQLQueryArgs, GraphQLQueryResult, GraphQLSubscriptionArgs } from '../..'
+import { cloneQuery, type ExtendableQueryArgs, mergeFieldArgs } from '../utils'
 import type { TUserAssetPosition } from './users'
 
 // GraphQL Query Args for Markets
@@ -303,3 +304,29 @@ export type FloorElevationsQueryType = ReturnType<typeof buildFloorElevationsQue
 export type TGraphQLFloorElevation = NonNullable<
   GraphQLQueryResult<FloorElevationsQueryType>['FloorElevation']
 >[0]
+
+// =============================================================================
+// Market subscriptions (indexer push updates)
+// =============================================================================
+
+/**
+ * @description Live subscription for the markets catalog — fields align with {@link marketsQuery}.
+ */
+export const buildMarketsSubscription = (
+  args?: ExtendableQueryArgs<MarketsQueryType['Market']['__args']>
+) => {
+  const selection = cloneQuery(marketsQuery) as Record<string, unknown>
+  return mergeFieldArgs(selection, 'Market', args) as GraphQLSubscriptionArgs
+}
+
+/**
+ * @description Live subscription for a single market row (pricing, trades, elevations, etc.).
+ */
+export const buildMarketSubscription = (marketId: string) =>
+  buildMarketsSubscription({
+    where: { id: { _eq: marketId } },
+    limit: 1,
+  })
+
+export type MarketsSubscriptionFields = ReturnType<typeof buildMarketsSubscription>
+export type MarketSubscriptionFields = ReturnType<typeof buildMarketSubscription>

@@ -12,15 +12,17 @@ import {
   type TTokenBalanceMetadata,
   useFloors,
 } from './floors-context'
+import { useGlobalStatsLiveSync } from './hooks/global-stats'
 import {
-  useMarketQuery,
   type UseMarketQueryOptions,
-  useMarketsQuery,
   type UseMarketsQueryOptions,
+  useMarketsSubscription,
+  useMarketSubscription,
 } from './hooks/markets'
-import { useUserMarketPositionQuery } from './hooks/positions'
+import { useUserMarketPositionSubscription } from './hooks/positions'
 import type { UsePresalesQueryOptions } from './hooks/presales'
-import { usePresaleQuery, usePresalesQuery } from './hooks/presales'
+import { usePresalesSubscription, usePresaleSubscription } from './hooks/presales'
+import { useAccountSubscription } from './hooks/users'
 
 type FloorsProviderProps = {
   children: ReactNode
@@ -53,14 +55,17 @@ export const FloorsProvider = ({
   const publicClient = usePublicClient()
   const chainId = publicClient?.chain.id
 
-  const marketsQuery = useMarketsQuery(marketsOptions)
-  const marketQuery = useMarketQuery(selectedMarketId, marketOptions)
-  const activeMarket = marketQuery.data
-  const presalesQuery = usePresalesQuery(presalesOptions)
-  const presaleQuery = usePresaleQuery(selectedPresaleId, undefined)
+  useGlobalStatsLiveSync()
+  useAccountSubscription(walletAddress ?? undefined)
 
-  // User position query - fetches collateral and debt data
-  const userPositionQuery = useUserMarketPositionQuery(walletAddress, selectedMarketId)
+  const marketsQuery = useMarketsSubscription(marketsOptions)
+  const marketQuery = useMarketSubscription(selectedMarketId, marketOptions)
+  const activeMarket = marketQuery.data
+  const presalesQuery = usePresalesSubscription(presalesOptions)
+  const presaleQuery = usePresaleSubscription(selectedPresaleId, undefined)
+
+  // User position: query bootstrap + live indexer subscription
+  const userPositionQuery = useUserMarketPositionSubscription(walletAddress, selectedMarketId)
 
   const reserveTokenMetadata = useMemo<TTokenBalanceMetadata>(
     () => ({

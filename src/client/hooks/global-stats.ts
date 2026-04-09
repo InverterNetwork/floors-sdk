@@ -1,12 +1,21 @@
-import { useQuery, type UseQueryOptions, type UseQueryResult } from '@tanstack/react-query'
+import {
+  useQuery,
+  useQueryClient,
+  type UseQueryOptions,
+  type UseQueryResult,
+} from '@tanstack/react-query'
+import { useEffect, useMemo } from 'react'
 
 import {
+  buildGlobalStatsSubscription,
   fetchGlobalMetricsWithHistory,
   fetchGlobalStats,
+  mapGlobalStats,
   type TGlobalMetricsWithHistory,
   type TGlobalStats,
 } from '../../graphql/api'
 import { globalMetricsHistoryQueryKey, globalStatsQueryKey } from '../query-keys'
+import { useSubscription } from './subscriptions'
 
 type UseGlobalStatsQueryOptions<TData = TGlobalStats | null> = Omit<
   UseQueryOptions<TGlobalStats | null, Error, TData, typeof globalStatsQueryKey>,
@@ -53,4 +62,50 @@ export const useGlobalMetricsHistoryQuery = <TData = TGlobalMetricsWithHistory>(
     staleTime,
     gcTime,
   })
+}
+
+/**
+ * @description Global stats row: initial query plus live subscription updates.
+ */
+export const useGlobalStatsSubscription = <TData = TGlobalStats | null>(
+  options?: UseGlobalStatsQueryOptions<TData>
+): UseQueryResult<TData, Error> => {
+  const queryClient = useQueryClient()
+  const gcTime = options?.gcTime ?? 5 * 60_000
+  const { staleTime: _st, ...restOptions } = options ?? {}
+
+  const queryResult = useQuery({
+    queryKey: globalStatsQueryKey,
+    queryFn: fetchGlobalStats,
+    ...restOptions,
+    staleTime: Number.POSITIVE_INFINITY,
+    gcTime,
+  })
+
+  const subFields = useMemo(() => buildGlobalStatsSubscription(), [])
+  const sub = useSubscription({ fields: subFields, enabled: true })
+
+  useEffect(() => {
+    const row = sub.data?.GlobalStats?.[0]
+    if (!row) return
+    queryClient.setQueryData(globalStatsQueryKey, mapGlobalStats(row))
+  }, [sub.data, queryClient])
+
+  return queryResult as UseQueryResult<TData, Error>
+}
+
+/**
+ * @description Pushes GlobalStats subscription updates into cache and refreshes metrics-with-history.
+ */
+export const useGlobalStatsLiveSync = (): void => {
+  const queryClient = useQueryClient()
+  const subFields = useMemo(() => buildGlobalStatsSubscription(), [])
+  const sub = useSubscription({ fields: subFields, enabled: true })
+
+  useEffect(() => {
+    const row = sub.data?.GlobalStats?.[0]
+    if (!row) return
+    queryClient.setQueryData(globalStatsQueryKey, mapGlobalStats(row))
+    void queryClient.invalidateQueries({ queryKey: globalMetricsHistoryQueryKey })
+  }, [sub.data, queryClient])
 }

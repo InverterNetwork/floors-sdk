@@ -6,11 +6,19 @@ import {
   type UseQueryOptions,
   type UseQueryResult,
 } from '@tanstack/react-query'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import type { Address } from 'viem'
 import { usePublicClient, useWalletClient } from 'wagmi'
 
-import { fetchMarketById, fetchMarkets, type TFloorAssetData } from '../../graphql/api'
+import {
+  buildMarketsSubscription,
+  buildMarketSubscription,
+  fetchMarketById,
+  fetchMarkets,
+  mapMarketToFloorAssetData,
+  type TFloorAssetData,
+  type TGraphQLMarket,
+} from '../../graphql/api'
 import {
   Market,
   type TMarketApproveParams,
@@ -24,6 +32,7 @@ import {
 } from '../../market'
 import { useFloors } from '../floors-context'
 import { marketQueryKey, marketsQueryKey } from '../query-keys'
+import { useSubscription } from './subscriptions'
 
 export type UseMarketsQueryOptions<TData = TFloorAssetData[]> = Omit<
   UseQueryOptions<TFloorAssetData[], Error, TData, typeof marketsQueryKey>,
@@ -98,6 +107,97 @@ export const useMarketQuery = <TData = TFloorAssetData | null>(
 }
 
 /**
+ * @description Markets catalog with an initial query plus live indexer updates via subscription.
+ */
+export const useMarketsSubscription = <TData = TFloorAssetData[]>(
+  options?: UseMarketsQueryOptions<TData>
+): UseQueryResult<TData, Error> => {
+  const queryClient = useQueryClient()
+  const gcTime = options?.gcTime ?? 5 * 60_000
+  const { staleTime: _st, ...restOptions } = options ?? {}
+
+  const queryResult = useQuery({
+    queryKey: marketsQueryKey,
+    queryFn: fetchMarkets,
+    ...restOptions,
+    staleTime: Number.POSITIVE_INFINITY,
+    gcTime,
+  })
+
+  const subFields = useMemo(() => buildMarketsSubscription(), [])
+  const sub = useSubscription({ fields: subFields, enabled: true })
+
+  useEffect(() => {
+    if (!sub.data?.Market?.length) return
+    const mapped = sub.data.Market.map((m) =>
+      mapMarketToFloorAssetData(m as unknown as TGraphQLMarket)
+    )
+    queryClient.setQueryData(marketsQueryKey, mapped)
+  }, [sub.data, queryClient])
+
+  return queryResult as UseQueryResult<TData, Error>
+}
+
+/**
+ * @description Single market: full initial load (module registry, candles) with live Market row updates.
+ */
+export const useMarketSubscription = <TData = TFloorAssetData | null>(
+  marketId: string | null | undefined,
+  options?: UseMarketQueryOptions<TData>
+): UseQueryResult<TData, Error> => {
+  const queryClient = useQueryClient()
+  const enabled = options?.enabled ?? Boolean(marketId)
+  const gcTime = options?.gcTime ?? 5 * 60_000
+  const { staleTime: _st, ...restOptions } = options ?? {}
+
+  const queryResult = useQuery({
+    queryKey: marketQueryKey(marketId),
+    queryFn: () => fetchMarketById(marketId!),
+    ...restOptions,
+    enabled,
+    staleTime: Number.POSITIVE_INFINITY,
+    gcTime,
+  })
+
+  const subFields = useMemo(() => (marketId ? buildMarketSubscription(marketId) : null), [marketId])
+  const sub = useSubscription({
+    fields: subFields ?? ({} as NonNullable<typeof subFields>),
+    enabled: enabled && subFields !== null,
+  })
+
+  useEffect(() => {
+    const row = sub.data?.Market?.[0]
+    if (!marketId || !row) return
+    queryClient.setQueryData(
+      marketQueryKey(marketId),
+      (old: TFloorAssetData | null | undefined) => {
+        const gqlMarket = row as unknown as TGraphQLMarket
+        const registry = old
+          ? {
+              floor: old.floorModuleAddress ?? null,
+              creditFacility: old.creditFacility ?? null,
+              authorizer: old.authorizer ?? null,
+              presale: old.presale ?? null,
+              feeTreasury: old.treasury ?? null,
+              staking: old.stakingManagerAddress ?? null,
+            }
+          : null
+        const mapped = mapMarketToFloorAssetData(gqlMarket, registry)
+        if (!old) return mapped as TFloorAssetData
+        return {
+          ...mapped,
+          priceCandles: old.priceCandles,
+          activeStrategyAddresses: old.activeStrategyAddresses,
+          firstStrategyAddress: old.firstStrategyAddress,
+        } as TFloorAssetData
+      }
+    )
+  }, [sub.data, marketId, queryClient])
+
+  return queryResult as UseQueryResult<TData, Error>
+}
+
+/**
  * @description Provides buy/sell/approve mutations backed by the pure Market class.
  */
 export const useMarketMutations = (): UseMarketMutationsReturnType => {
@@ -147,13 +247,6 @@ export const useMarketMutations = (): UseMarketMutationsReturnType => {
     await queryClient.invalidateQueries({ queryKey: ['market'] })
     await Promise.allSettled([refetchMarket(), refetchReserveBalance(), refetchIssuanceBalance()])
   }, [queryClient, refetchIssuanceBalance, refetchMarket, refetchReserveBalance])
-
-  // Helper to refetch user loans after mutations
-  const refetchUserLoans = useCallback(async () => {
-    await queryClient.invalidateQueries({
-      predicate: (query) => query.queryKey[0] === 'user-loans',
-    })
-  }, [queryClient])
 
   const buy = useMutation({
     mutationFn: (params: TMarketBuyParams) => ensureMarket().buy(params),
@@ -215,9 +308,6 @@ export const useMarketMutations = (): UseMarketMutationsReturnType => {
     onSuccess: async () => {
       await refetchAfterMutation()
       await floorsContext.refetch.userPosition()
-      // Wait for indexer to process the new loan, then invalidate user loans queries
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      await refetchUserLoans()
     },
   })
 
@@ -226,9 +316,6 @@ export const useMarketMutations = (): UseMarketMutationsReturnType => {
     onSuccess: async () => {
       await refetchAfterMutation()
       await floorsContext.refetch.userPosition()
-      // Wait for indexer to process the new loan(s), then invalidate user loans queries
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      await refetchUserLoans()
     },
   })
 
@@ -237,9 +324,6 @@ export const useMarketMutations = (): UseMarketMutationsReturnType => {
     onSuccess: async () => {
       await refetchAfterMutation()
       await floorsContext.refetch.userPosition()
-      // Wait for indexer to process the repayment, then invalidate user loans queries
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      await refetchUserLoans()
     },
   })
 

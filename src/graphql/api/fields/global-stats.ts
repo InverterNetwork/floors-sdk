@@ -1,4 +1,4 @@
-import type { GraphQLQueryArgs, GraphQLQueryResult } from '../..'
+import type { GraphQLQueryArgs, GraphQLQueryResult, GraphQLSubscriptionArgs } from '../..'
 
 export const globalStatsQuery = {
   GlobalStats: {
@@ -19,6 +19,28 @@ export type GlobalStatsQueryType = typeof globalStatsQuery
 export type GlobalStatsQueryResultType = GraphQLQueryResult<typeof globalStatsQuery>
 
 export type TGraphQLGlobalStats = NonNullable<GlobalStatsQueryResultType['GlobalStats']>[number]
+
+/**
+ * @description Live subscription for global hero / protocol totals row.
+ */
+export const buildGlobalStatsSubscription = () =>
+  ({
+    GlobalStats: {
+      __args: { limit: 1 },
+      id: true,
+      lastUpdatedAt: true,
+      totalLockedCollateralRaw: true,
+      totalLockedCollateralFormatted: true,
+      totalMarkets: true,
+      totalVolumeFormatted: true,
+      totalOutstandingDebtFormatted: true,
+      totalOutstandingDebtRaw: true,
+      totalVolumeRaw: true,
+      activeMarkets: true,
+    },
+  }) satisfies GraphQLSubscriptionArgs
+
+export type GlobalStatsSubscriptionFields = ReturnType<typeof buildGlobalStatsSubscription>
 
 export interface TGlobalStats {
   id: string

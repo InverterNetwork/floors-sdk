@@ -1,4 +1,7 @@
-import type { GraphQLQueryArgs, GraphQLQueryResult } from '../..'
+import { getAddress } from 'viem'
+
+import type { GraphQLQueryArgs, GraphQLQueryResult, GraphQLSubscriptionArgs } from '../..'
+import { cloneQuery, mergeFieldArgs } from '../utils'
 import type { TFloorAssetData } from './assets'
 
 // GraphQL Query Args for Accounts
@@ -101,6 +104,20 @@ export type AccountsQueryResultType = GraphQLQueryResult<typeof accountsQuery>
 
 // Type alias for individual Account from GraphQL result
 export type TGraphQLAccount = NonNullable<AccountsQueryResultType['Account']>[0]
+
+/**
+ * @description Live subscription for one account (portfolio hub: loans, trades, staking, presales).
+ */
+export const buildAccountSubscription = (accountId: string) => {
+  const normalized = accountId.startsWith('0x') ? getAddress(accountId as `0x${string}`) : accountId
+  const selection = cloneQuery(accountsQuery) as Record<string, unknown>
+  return mergeFieldArgs(selection, 'Account', {
+    where: { id: { _eq: normalized } },
+    limit: 1,
+  }) as GraphQLSubscriptionArgs
+}
+
+export type AccountSubscriptionFields = ReturnType<typeof buildAccountSubscription>
 
 // UI-specific computed types (not available in GraphQL schema)
 export interface TComputedUserData {

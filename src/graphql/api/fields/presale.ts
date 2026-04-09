@@ -187,6 +187,18 @@ export const buildPresalesQuery = (
   return mergeFieldArgs(selection, 'PreSaleContract', args)
 }
 
+/**
+ * @description Live subscription for the presale catalog — same projection as {@link presaleQuery}.
+ */
+export const buildPresalesSubscription = (
+  args?: ExtendableQueryArgs<PresaleQueryType['PreSaleContract']['__args']>
+) => {
+  const selection = cloneQuery(presaleQuery) as Record<string, unknown>
+  return mergeFieldArgs(selection, 'PreSaleContract', args) as GraphQLSubscriptionArgs
+}
+
+export type PresalesSubscriptionFields = ReturnType<typeof buildPresalesSubscription>
+
 // UI-specific computed types (not available in GraphQL schema)
 export interface TComputedPresaleData {
   // Progress percentage (0-100)

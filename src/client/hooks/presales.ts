@@ -2,10 +2,11 @@ import {
   useMutation,
   type UseMutationResult,
   useQuery,
+  useQueryClient,
   type UseQueryOptions,
   type UseQueryResult,
 } from '@tanstack/react-query'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import type { Address } from 'viem'
 import { usePublicClient, useWalletClient } from 'wagmi'
 
@@ -13,9 +14,12 @@ import {
   buildPresaleClaimSubscription,
   buildPresaleContractSubscription,
   buildPresaleParticipationSubscription,
+  buildPresalesSubscription,
   fetchPresaleById,
   fetchPresales,
   fetchPresalesByMarket,
+  mapPresaleToPresaleData,
+  type TGraphQLPresale,
   type TPresale,
 } from '../../graphql/api'
 import {
@@ -101,6 +105,78 @@ export const usePresaleQuery = <TData = TPresale | null>(
     enabled,
     staleTime,
   })
+}
+
+/**
+ * @description Presale catalog with an initial query plus live indexer updates.
+ */
+export const usePresalesSubscription = <TData = TPresale[]>(
+  options?: UsePresalesQueryOptions<TData>
+): UseQueryResult<TData, Error> => {
+  const queryClient = useQueryClient()
+  const gcTime = options?.gcTime ?? 5 * 60_000
+  const { staleTime: _st, ...restOptions } = options ?? {}
+
+  const queryResult = useQuery({
+    queryKey: presalesQueryKey,
+    queryFn: fetchPresales,
+    ...restOptions,
+    staleTime: Number.POSITIVE_INFINITY,
+    gcTime,
+  })
+
+  const subFields = useMemo(() => buildPresalesSubscription(), [])
+  const sub = useSubscription({ fields: subFields, enabled: true })
+
+  useEffect(() => {
+    const rows = sub.data?.PreSaleContract
+    if (!rows?.length) return
+    const mapped = rows.map((p) => mapPresaleToPresaleData(p as unknown as TGraphQLPresale))
+    queryClient.setQueryData(presalesQueryKey, mapped)
+  }, [sub.data, queryClient])
+
+  return queryResult as UseQueryResult<TData, Error>
+}
+
+/**
+ * @description Single presale with initial query plus live contract row updates.
+ */
+export const usePresaleSubscription = <TData = TPresale | null>(
+  presaleId: string | null | undefined,
+  options?: UsePresaleQueryOptions<TData>
+): UseQueryResult<TData, Error> => {
+  const queryClient = useQueryClient()
+  const enabled = options?.enabled ?? Boolean(presaleId)
+  const gcTime = options?.gcTime ?? 5 * 60_000
+  const { staleTime: _st, ...restOptions } = options ?? {}
+
+  const queryResult = useQuery({
+    queryKey: presaleQueryKey(presaleId),
+    queryFn: () => fetchPresaleById(presaleId!),
+    ...restOptions,
+    enabled,
+    staleTime: Number.POSITIVE_INFINITY,
+    gcTime,
+  })
+
+  const subFields = useMemo(
+    () =>
+      presaleId ? buildPresalesSubscription({ where: { id: { _eq: presaleId } }, limit: 1 }) : null,
+    [presaleId]
+  )
+  const sub = useSubscription({
+    fields: subFields ?? ({} as NonNullable<typeof subFields>),
+    enabled: enabled && subFields !== null,
+  })
+
+  useEffect(() => {
+    const row = sub.data?.PreSaleContract?.[0]
+    if (!presaleId || !row) return
+    const mapped = mapPresaleToPresaleData(row as unknown as TGraphQLPresale)
+    queryClient.setQueryData(presaleQueryKey(presaleId), mapped)
+  }, [sub.data, presaleId, queryClient])
+
+  return queryResult as UseQueryResult<TData, Error>
 }
 
 const presalesByMarketQueryKey = (marketId: string) => ['presales', 'market', marketId] as const
@@ -608,6 +684,10 @@ export type UsePresaleClaimsResult = {
  * })
  * ```
  */
+export const usePresaleClaimsSubscription = (
+  params: Omit<UsePresaleClaimsParams, 'type'>
+): UsePresaleClaimsResult => usePresaleClaims({ ...params, type: 'subscription' })
+
 export const usePresaleClaims = ({
   presaleId,
   type = 'subscription',
