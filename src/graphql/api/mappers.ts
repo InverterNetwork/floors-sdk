@@ -103,15 +103,16 @@ export function calculateFloorAPR(
     newFloorPriceRaw?: string | number | null
     timestamp: string | number
   }>,
-  floorPrice: number
+  floorPrice: number,
+  reserveDecimals = 18
 ): number {
   if (sortedElevations.length === 0 || floorPrice <= 0) return 0
 
   const recentElevations = sortedElevations.slice(0, Math.min(30, sortedElevations.length))
 
   const totalIncrease = recentElevations.reduce((sum, event) => {
-    const prev = toWadNumber(event.oldFloorPriceFormatted, event.oldFloorPriceRaw)
-    const next = toWadNumber(event.newFloorPriceFormatted, event.newFloorPriceRaw)
+    const prev = toWadNumber(event.oldFloorPriceFormatted, event.oldFloorPriceRaw, reserveDecimals)
+    const next = toWadNumber(event.newFloorPriceFormatted, event.newFloorPriceRaw, reserveDecimals)
     return sum + (next - prev)
   }, 0)
 
@@ -149,8 +150,13 @@ export function mapMarketToFloorAssetData(
     staking: string | null
   } | null
 ): TFloorAssetData {
-  const floorPrice = toWadNumber(market.floorPriceFormatted, market.floorPriceRaw)
-  const marketPrice = toWadNumber(market.currentPriceFormatted, market.currentPriceRaw)
+  const reserveDecimals = market.reserveToken?.decimals ?? 18
+  const floorPrice = toWadNumber(market.floorPriceFormatted, market.floorPriceRaw, reserveDecimals)
+  const marketPrice = toWadNumber(
+    market.currentPriceFormatted,
+    market.currentPriceRaw,
+    reserveDecimals
+  )
   const totalSupply = toNumber(market.totalSupplyFormatted || market.totalSupplyRaw)
   const marketSupply = toNumber(market.marketSupplyFormatted || market.marketSupplyRaw)
   const floorSupply = toNumber(market.floorSupplyFormatted || market.floorSupplyRaw)
@@ -173,16 +179,35 @@ export function mapMarketToFloorAssetData(
 
   const estimatedFloorIncrease =
     latestElevation && secondElevation
-      ? toWadNumber(latestElevation.newFloorPriceFormatted, latestElevation.newFloorPriceRaw) -
-        toWadNumber(secondElevation.newFloorPriceFormatted, secondElevation.newFloorPriceRaw)
+      ? toWadNumber(
+          latestElevation.newFloorPriceFormatted,
+          latestElevation.newFloorPriceRaw,
+          reserveDecimals
+        ) -
+        toWadNumber(
+          secondElevation.newFloorPriceFormatted,
+          secondElevation.newFloorPriceRaw,
+          reserveDecimals
+        )
       : latestElevation
-        ? toWadNumber(latestElevation.newFloorPriceFormatted, latestElevation.newFloorPriceRaw) -
-          floorPrice
+        ? toWadNumber(
+            latestElevation.newFloorPriceFormatted,
+            latestElevation.newFloorPriceRaw,
+            reserveDecimals
+          ) - floorPrice
         : 0
 
   const elevationHistory = sortedElevations.map((event, index) => {
-    const previousFloor = toWadNumber(event.oldFloorPriceFormatted, event.oldFloorPriceRaw)
-    const nextFloor = toWadNumber(event.newFloorPriceFormatted, event.newFloorPriceRaw)
+    const previousFloor = toWadNumber(
+      event.oldFloorPriceFormatted,
+      event.oldFloorPriceRaw,
+      reserveDecimals
+    )
+    const nextFloor = toWadNumber(
+      event.newFloorPriceFormatted,
+      event.newFloorPriceRaw,
+      reserveDecimals
+    )
     const feesDeployed = toNumber(event.deployedAmountFormatted || event.deployedAmountRaw)
     return {
       timestamp: new Date(toNumber(event.timestamp) * 1000),
@@ -257,7 +282,7 @@ export function mapMarketToFloorAssetData(
   const volumeTotal = totalVolume
 
   // APR Calculation
-  const floorAPR = calculateFloorAPR(sortedElevations, floorPrice)
+  const floorAPR = calculateFloorAPR(sortedElevations, floorPrice, reserveDecimals)
 
   // 24h price change from trades
   const priceChange24h = calculate24hPriceChangeFromTrades(trades, marketPrice)
@@ -674,15 +699,20 @@ export function mapMarketSnapshotToPremiumChange(
     | null
     | undefined,
   currentMarketPrice: number,
-  currentFloorPrice: number
+  currentFloorPrice: number,
+  reserveDecimals = 18
 ): number | null {
   if (!snapshot) {
     return null
   }
 
   // Extract prices from snapshot
-  const price24hAgo = toWadNumber(snapshot.priceFormatted, snapshot.priceRaw)
-  const floorPrice24hAgo = toWadNumber(snapshot.floorPriceFormatted, snapshot.floorPriceRaw)
+  const price24hAgo = toWadNumber(snapshot.priceFormatted, snapshot.priceRaw, reserveDecimals)
+  const floorPrice24hAgo = toWadNumber(
+    snapshot.floorPriceFormatted,
+    snapshot.floorPriceRaw,
+    reserveDecimals
+  )
 
   // Validate we have valid prices
   if (

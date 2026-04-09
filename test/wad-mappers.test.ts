@@ -20,9 +20,11 @@ import {
   mapPresaleToPresaleData,
 } from '../src/graphql/api/mappers'
 
-// WAD helpers
-const WAD = '1000000000000000000' // 1e18 = 1.0
+// Price helpers — prices are in reserve-token decimals (e.g. 6 for USDC, 18 for WETH)
+const WAD = '1000000000000000000' // 1e18 = 1.0 (for 18-decimal tokens)
 const toWad = (n: number) => String(BigInt(Math.round(n * 1e18)))
+// For USDC (6 decimals): price "1.8" is stored as 1800000 on-chain
+const toUsdcPrice = (n: number) => String(BigInt(Math.round(n * 1e6)))
 
 // ─── Fixtures ──────────────────────────────────────────────────────────────
 
@@ -34,12 +36,12 @@ function makeMarketWithWadOnlyPrices(overrides?: Record<string, any>) {
     factory_id: '0x0000',
     reserveToken_id: '0xUSDC',
     issuanceToken_id: '0xISSUE',
-    // Prices: only Raw (WAD), Formatted is null
-    currentPriceRaw: toWad(2.5),
+    // Prices: only Raw (reserve-decimal scaled), Formatted is null
+    currentPriceRaw: toUsdcPrice(2.5),
     currentPriceFormatted: null,
-    floorPriceRaw: toWad(1.8),
+    floorPriceRaw: toUsdcPrice(1.8),
     floorPriceFormatted: null,
-    initialFloorPriceRaw: toWad(1.0),
+    initialFloorPriceRaw: toUsdcPrice(1.0),
     initialFloorPriceFormatted: null,
     // Supply: use formatted (these are not prices, so toNumber is fine)
     totalSupplyRaw: '1000000000000000000000', // 1000 tokens at 18 dec
@@ -85,15 +87,14 @@ describe('mapMarketToFloorAssetData — WAD-only price fallback', () => {
     expect(result.pricing.currentMarketPrice).toBeCloseTo(2.5, 6)
   })
 
-  it('computes premium correctly from WAD-decoded prices', () => {
+  it('computes premium correctly from reserve-decimal-decoded prices', () => {
     const market = makeMarketWithWadOnlyPrices({
-      floorPriceRaw: toWad(2.0),
-      currentPriceRaw: toWad(3.0),
+      floorPriceRaw: toUsdcPrice(2.0),
+      currentPriceRaw: toUsdcPrice(3.0),
     })
     const result = mapMarketToFloorAssetData(market)
 
     // Premium = (market - floor) / floor = (3.0 - 2.0) / 2.0 = 0.5 = 50%
-    // The premiumRate is computed in price-card, but we check pricing consistency
     const premium =
       ((result.pricing.currentMarketPrice - result.pricing.currentFloorPrice) /
         result.pricing.currentFloorPrice) *
@@ -101,9 +102,9 @@ describe('mapMarketToFloorAssetData — WAD-only price fallback', () => {
     expect(premium).toBeCloseTo(50, 1)
   })
 
-  it('computes TVL and market cap from WAD-decoded prices', () => {
+  it('computes TVL and market cap from reserve-decimal-decoded prices', () => {
     const market = makeMarketWithWadOnlyPrices({
-      currentPriceRaw: toWad(5.0),
+      currentPriceRaw: toUsdcPrice(5.0),
       totalSupplyFormatted: '200',
       marketSupplyFormatted: '100',
     })
@@ -115,16 +116,16 @@ describe('mapMarketToFloorAssetData — WAD-only price fallback', () => {
     expect(result.metrics.marketCap).toBeCloseTo(500, 1)
   })
 
-  it('decodes elevation prices from WAD raw when formatted is null', () => {
+  it('decodes elevation prices from raw when formatted is null', () => {
     const market = makeMarketWithWadOnlyPrices({
-      floorPriceRaw: toWad(1.5),
+      floorPriceRaw: toUsdcPrice(1.5),
       floorElevations: [
         {
           id: 'e1',
           market_id: '0x1111111111111111111111111111111111111111',
-          oldFloorPriceRaw: toWad(1.0),
+          oldFloorPriceRaw: toUsdcPrice(1.0),
           oldFloorPriceFormatted: null,
-          newFloorPriceRaw: toWad(1.3),
+          newFloorPriceRaw: toUsdcPrice(1.3),
           newFloorPriceFormatted: null,
           deployedAmountRaw: '500',
           deployedAmountFormatted: '500',
@@ -135,9 +136,9 @@ describe('mapMarketToFloorAssetData — WAD-only price fallback', () => {
         {
           id: 'e2',
           market_id: '0x1111111111111111111111111111111111111111',
-          oldFloorPriceRaw: toWad(1.3),
+          oldFloorPriceRaw: toUsdcPrice(1.3),
           oldFloorPriceFormatted: null,
-          newFloorPriceRaw: toWad(1.5),
+          newFloorPriceRaw: toUsdcPrice(1.5),
           newFloorPriceFormatted: null,
           deployedAmountRaw: '300',
           deployedAmountFormatted: '300',
@@ -149,7 +150,7 @@ describe('mapMarketToFloorAssetData — WAD-only price fallback', () => {
     })
     const result = mapMarketToFloorAssetData(market)
 
-    // Elevation history should have decoded WAD prices
+    // Elevation history should have decoded prices in reserve-token decimals
     expect(result.floorElevation.elevationHistory).toHaveLength(2)
     // Sorted desc by timestamp: e2 first, then e1
     const latestElevation = result.floorElevation.elevationHistory[0]
@@ -162,16 +163,16 @@ describe('mapMarketToFloorAssetData — WAD-only price fallback', () => {
     expect(olderElevation.newFloorPrice).toBeCloseTo(1.3, 6)
   })
 
-  it('computes estimatedFloorIncrease from WAD-decoded elevations', () => {
+  it('computes estimatedFloorIncrease from reserve-decimal-decoded elevations', () => {
     const market = makeMarketWithWadOnlyPrices({
-      floorPriceRaw: toWad(1.5),
+      floorPriceRaw: toUsdcPrice(1.5),
       floorElevations: [
         {
           id: 'e1',
           market_id: '0x1111',
-          oldFloorPriceRaw: toWad(1.0),
+          oldFloorPriceRaw: toUsdcPrice(1.0),
           oldFloorPriceFormatted: null,
-          newFloorPriceRaw: toWad(1.2),
+          newFloorPriceRaw: toUsdcPrice(1.2),
           newFloorPriceFormatted: null,
           deployedAmountRaw: '100',
           deployedAmountFormatted: '100',
@@ -182,9 +183,9 @@ describe('mapMarketToFloorAssetData — WAD-only price fallback', () => {
         {
           id: 'e2',
           market_id: '0x1111',
-          oldFloorPriceRaw: toWad(1.2),
+          oldFloorPriceRaw: toUsdcPrice(1.2),
           oldFloorPriceFormatted: null,
-          newFloorPriceRaw: toWad(1.5),
+          newFloorPriceRaw: toUsdcPrice(1.5),
           newFloorPriceFormatted: null,
           deployedAmountRaw: '100',
           deployedAmountFormatted: '100',

@@ -16,24 +16,25 @@ export const toNumber = (value?: string | number | null): number => {
 }
 
 /**
- * WAD-aware price conversion: returns the human-readable number for a price field.
- * Prefers `formatted`; falls back to `raw` interpreted as WAD (1e18 fixed-point).
- * Use this for all bonding-curve prices (floor, buy, sell, candle OHLC, elevation prices).
+ * Price conversion: returns the human-readable number for a price field.
+ * Prefers `formatted`; falls back to `raw` interpreted with the given `decimals`.
+ * Prices are stored in reserve-token precision (e.g. 6 for USDC, 18 for WETH).
  * For token *amounts* (supply, volume, fees) use {@link toNumber} with the formatted value.
  */
 export const toWadNumber = (
   formatted?: string | number | null,
-  raw?: string | number | null
+  raw?: string | number | null,
+  decimals = 18
 ): number => {
   // Prefer the already-formatted (human-readable) value
   if (formatted != null && formatted !== '') {
     const n = Number(formatted)
     if (!Number.isNaN(n)) return n
   }
-  // Fallback: interpret raw as WAD (1e18)
+  // Fallback: interpret raw with the given decimals
   if (raw != null && raw !== '') {
     try {
-      return Number(formatUnits(BigInt(raw), 18))
+      return Number(formatUnits(BigInt(raw), decimals))
     } catch {
       return 0
     }
