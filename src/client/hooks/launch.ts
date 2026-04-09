@@ -234,6 +234,8 @@ export type LaunchFormData = {
   // Step 1: Tokens
   issuanceToken: IssuanceTokenFormData
   reserveTokenAddress: string
+  /** Reserve token decimals — used to scale segment prices for the bonding curve */
+  reserveTokenDecimals: number
 
   // Step 2: Curve
   floorSegment: SegmentFormData
@@ -349,8 +351,19 @@ export function useLaunch(options?: UseLaunchOptions) {
         throw new Error('Issuance token address is required')
       }
 
-      // Combine floor segment and premium segments
-      const segments = [formData.floorSegment, ...formData.premiumSegments]
+      // Combine floor segment and premium segments.
+      // Segment prices (initialPrice, priceIncrease) are bound to the collateral
+      // token's decimals. The form stores them in WAD (1e18) for UI display, so
+      // we scale them here to match the reserve token's actual decimals.
+      const reserveDec = formData.reserveTokenDecimals ?? 18
+      const priceScaleFactor = reserveDec < 18 ? BigInt(10) ** BigInt(18 - reserveDec) : BigInt(1)
+
+      const rawSegments = [formData.floorSegment, ...formData.premiumSegments]
+      const segments = rawSegments.map((seg) => ({
+        ...seg,
+        initialPrice: seg.initialPrice / priceScaleFactor,
+        priceIncrease: seg.priceIncrease / priceScaleFactor,
+      }))
 
       const floorConfig: FloorConfig = {
         issuanceTokenAddress,
