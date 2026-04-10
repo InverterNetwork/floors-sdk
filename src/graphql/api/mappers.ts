@@ -423,12 +423,14 @@ export function mapPresaleToPresaleData(
   const startTime = toNumber(presale.startTime) * 1000
   const endTime = toNumber(presale.endTime) * 1000
   const totalRaised = toNumber(presale.totalRaisedFormatted || presale.totalRaisedRaw)
+  const totalMinted = toNumber(presale.totalMintedFormatted || presale.totalMintedRaw)
+  // Note: globalDepositCap is actually the issuance cap (fTokens), not a deposit cap
   const globalDepositCap = toNumber(
     presale.globalDepositCapFormatted || presale.globalDepositCapRaw
   )
 
-  // Calculate progress
-  const progressPercent = globalDepositCap > 0 ? (totalRaised / globalDepositCap) * 100 : 0
+  // Calculate progress using minted fTokens against issuance cap
+  const progressPercent = globalDepositCap > 0 ? (totalMinted / globalDepositCap) * 100 : 0
   // Calculate time remaining
   const timeRemaining = Math.max(0, endTime - now)
 
@@ -446,8 +448,8 @@ export function mapPresaleToPresaleData(
   const commissionRate = commissionBps / 10000
   const commissionAmount = totalRaised * commissionRate
 
-  // Calculate remaining capacity
-  const remainingCapacity = Math.max(0, globalDepositCap - totalRaised)
+  // Calculate remaining issuance capacity (fTokens that can still be minted)
+  const remainingCapacity = Math.max(0, globalDepositCap - totalMinted)
 
   // Calculate current price (use first price breakpoint if available)
   const priceBreakpoints = presale.priceBreakpointsFlat

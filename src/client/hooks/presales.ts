@@ -501,6 +501,8 @@ export type TPresaleContractLiveData = {
   id: string
   totalRaisedRaw: string
   totalRaisedFormatted: string
+  totalMintedRaw: string
+  totalMintedFormatted: string
   totalParticipants: number
   currentState: number
   globalDepositCapRaw: string
