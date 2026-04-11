@@ -3,7 +3,6 @@
 import type { UseQueryResult } from '@tanstack/react-query'
 import { createContext, useContext } from 'react'
 import type { Address } from 'viem'
-import type { UseBalanceReturnType } from 'wagmi'
 
 import type { TFloorAssetData, TPresale } from '../graphql/api'
 import type { TUserMarketPositionData } from '../graphql/api/mappers'
@@ -16,8 +15,21 @@ export type TTokenBalanceMetadata = {
   logoUrl?: string
 }
 
-export type TTokenBalanceContextValue = UseBalanceReturnType & {
+export type TTokenBalanceData = {
+  value: bigint
+  decimals: number
+  formatted: string
+}
+
+export type TTokenBalanceContextValue = {
   token: TTokenBalanceMetadata
+  data: TTokenBalanceData | undefined
+  isLoading: boolean
+  isError: boolean
+  error: Error | null
+  refetch: () => Promise<unknown>
+  status: 'pending' | 'error' | 'success'
+  fetchStatus: 'fetching' | 'paused' | 'idle'
 }
 
 export type TFloorsTokenBalances = {
