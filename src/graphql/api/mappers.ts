@@ -238,7 +238,7 @@ export function mapMarketToFloorAssetData(
   }
 
   const maxLtv = toNumber(market.maxLTV)
-  const maxCreditRatio = maxLtv > 1 ? Math.min(1, maxLtv / 1e18) : Math.min(1, maxLtv)
+  const maxCreditRatio = maxLtv > 1 ? Math.min(1, maxLtv / 10_000) : Math.min(1, maxLtv)
 
   const credit = {
     totalCreditIssued: totalVolume * 0.8,
