@@ -6,6 +6,14 @@
 import type { Address } from 'viem'
 import { defineChain } from 'viem'
 
+/** Mirror `src/utils/chain.ts` — keep addresses in sync. */
+const ANVIL_FORK_MULTICALL3_CONTRACTS = {
+  multicall3: {
+    address: '0xcA11bde05977b3631167028862bE2a173976CA11' as const,
+    blockCreated: 11_907_934,
+  },
+} as const
+
 // =============================================================================
 // Environment URLs
 // =============================================================================
@@ -104,6 +112,9 @@ export const devnetChain = defineChain({
     },
   },
   testnet: true,
+  contracts: {
+    ...ANVIL_FORK_MULTICALL3_CONTRACTS,
+  },
 })
 
 /**
@@ -123,4 +134,7 @@ export const localAnvilChain = defineChain({
     },
   },
   testnet: true,
+  contracts: {
+    ...ANVIL_FORK_MULTICALL3_CONTRACTS,
+  },
 })
