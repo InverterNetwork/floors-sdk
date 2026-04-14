@@ -184,7 +184,7 @@ export function useMarketAdmin(options: UseMarketAdminOptions) {
       return instance.getMarketState()
     },
     enabled: autoFetch && !!publicClient && !!marketAddress,
-    staleTime: 30_000, // 30 seconds
+    staleTime: 0, // Always refetch on mount — admin panel must reflect current on-chain state
   })
 
   // ===========================================================================
