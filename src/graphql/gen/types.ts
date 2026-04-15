@@ -3485,6 +3485,12 @@ export default {
             "maxLTV": [
                 392
             ],
+            "reserveBalanceFormatted": [
+                321
+            ],
+            "reserveBalanceRaw": [
+                392
+            ],
             "reserveToken": [
                 324
             ],
@@ -3965,6 +3971,9 @@ export default {
             "maxLTV": [
                 394
             ],
+            "reserveBalanceRaw": [
+                394
+            ],
             "sellFeeBps": [
                 394
             ],
@@ -4066,6 +4075,12 @@ export default {
             "maxLTV": [
                 393
             ],
+            "reserveBalanceFormatted": [
+                323
+            ],
+            "reserveBalanceRaw": [
+                393
+            ],
             "reserveToken": [
                 325
             ],
@@ -4161,6 +4176,12 @@ export default {
             "maxLTV": [
                 394
             ],
+            "reserveBalanceFormatted": [
+                394
+            ],
+            "reserveBalanceRaw": [
+                394
+            ],
             "reserveToken_id": [
                 394
             ],
@@ -4248,6 +4269,12 @@ export default {
                 394
             ],
             "maxLTV": [
+                394
+            ],
+            "reserveBalanceFormatted": [
+                394
+            ],
+            "reserveBalanceRaw": [
                 394
             ],
             "reserveToken_id": [
@@ -4351,6 +4378,12 @@ export default {
             "maxLTV": [
                 394
             ],
+            "reserveBalanceFormatted": [
+                394
+            ],
+            "reserveBalanceRaw": [
+                394
+            ],
             "reserveToken": [
                 326
             ],
@@ -4417,6 +4450,9 @@ export default {
             "maxLTV": [
                 394
             ],
+            "reserveBalanceRaw": [
+                394
+            ],
             "sellFeeBps": [
                 394
             ],
@@ -4467,6 +4503,9 @@ export default {
             "maxLTV": [
                 394
             ],
+            "reserveBalanceRaw": [
+                394
+            ],
             "sellFeeBps": [
                 394
             ],
@@ -4515,6 +4554,9 @@ export default {
                 394
             ],
             "maxLTV": [
+                394
+            ],
+            "reserveBalanceRaw": [
                 394
             ],
             "sellFeeBps": [
@@ -4614,6 +4656,12 @@ export default {
             "maxLTV": [
                 392
             ],
+            "reserveBalanceFormatted": [
+                321
+            ],
+            "reserveBalanceRaw": [
+                392
+            ],
             "reserveToken_id": [
                 321
             ],
@@ -4673,6 +4721,9 @@ export default {
             "maxLTV": [
                 394
             ],
+            "reserveBalanceRaw": [
+                394
+            ],
             "sellFeeBps": [
                 394
             ],
@@ -4721,6 +4772,9 @@ export default {
                 394
             ],
             "maxLTV": [
+                394
+            ],
+            "reserveBalanceRaw": [
                 394
             ],
             "sellFeeBps": [
@@ -4773,6 +4827,9 @@ export default {
             "maxLTV": [
                 394
             ],
+            "reserveBalanceRaw": [
+                394
+            ],
             "sellFeeBps": [
                 394
             ],
@@ -4821,6 +4878,9 @@ export default {
                 394
             ],
             "maxLTV": [
+                394
+            ],
+            "reserveBalanceRaw": [
                 394
             ],
             "sellFeeBps": [

@@ -25,8 +25,10 @@ export const marketsQuery = {
     marketSupplyFormatted: true,
     floorSupplyRaw: true,
     floorSupplyFormatted: true,
-    // floorSegmentSupplyRaw / floorSegmentSupplyFormatted are fetched automatically
-    // once the indexer schema includes them — no explicit select needed with Ponder.
+    floorSegmentSupplyRaw: true,
+    floorSegmentSupplyFormatted: true,
+    reserveBalanceRaw: true,
+    reserveBalanceFormatted: true,
     tradingFeeBps: true,
     buyFeeBps: true,
     sellFeeBps: true,
@@ -186,7 +188,6 @@ export interface TComputedAssetData {
     holders: number
     creditPositions: number
     totalValueLocked: number
-    isTvlApproximate: boolean
     marketCap: number
     floorAPR: number
     priceChange24h: number

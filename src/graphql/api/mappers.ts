@@ -152,11 +152,8 @@ export function mapMarketToFloorAssetData(
   const marketPrice = toNumber(market.currentPriceFormatted || market.currentPriceRaw)
   const totalSupply = toNumber(market.totalSupplyFormatted || market.totalSupplyRaw)
   const marketSupply = toNumber(market.marketSupplyFormatted || market.marketSupplyRaw)
-  // Floor segment capacity: available once the indexer exposes floorSegmentSupply fields.
-  // Access defensively since the fields may not exist in older indexer deployments.
-  const m = market as Record<string, unknown>
   const floorSegmentCapacity = toNumber(
-    (m.floorSegmentSupplyFormatted || m.floorSegmentSupplyRaw) as string | undefined
+    market.floorSegmentSupplyFormatted || market.floorSegmentSupplyRaw
   )
   const rawFloorSupply = toNumber(market.floorSupplyFormatted || market.floorSupplyRaw)
   const floorSupply =
@@ -275,10 +272,9 @@ export function mapMarketToFloorAssetData(
     transactionCount: trades.length,
     holders: new Set(trades.map((t) => t.user_id)).size,
     creditPositions: floorElevations.length,
-    // Approximate TVL: totalSupply × marketPrice. Accurate TVL requires an internal
-    // bonding curve reserve function not yet exposed in the contracts.
-    totalValueLocked: totalSupply * marketPrice,
-    isTvlApproximate: true,
+    totalValueLocked:
+      toNumber(market.reserveBalanceFormatted || market.reserveBalanceRaw) ||
+      floorSupply * floorPrice + marketSupply * marketPrice,
     marketCap: marketSupply * marketPrice,
     floorAPR,
     priceChange24h,

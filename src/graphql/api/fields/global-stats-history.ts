@@ -31,8 +31,16 @@ export const createGlobalStatsHistoryQuery = () => {
       totalSupplyFormatted: true,
       marketSupplyRaw: true,
       marketSupplyFormatted: true,
+      floorSupplyRaw: true,
+      floorSupplyFormatted: true,
+      floorSegmentSupplyRaw: true,
+      floorSegmentSupplyFormatted: true,
+      reserveBalanceRaw: true,
+      reserveBalanceFormatted: true,
       currentPriceRaw: true,
       currentPriceFormatted: true,
+      floorPriceRaw: true,
+      floorPriceFormatted: true,
     },
 
     // Market snapshots from ~24h ago for daily change
@@ -431,11 +439,20 @@ export function computeGlobalMetricsWithHistory(
   let currentMarketCap = 0
 
   for (const market of markets) {
-    const supply = parseFormatted(market.totalSupplyFormatted)
+    const reserveBalance = parseFormatted(market.reserveBalanceFormatted)
     const marketSupply = parseFormatted(market.marketSupplyFormatted)
     const price = parseFormatted(market.currentPriceFormatted)
 
-    currentTVL += supply * price
+    if (reserveBalance > 0) {
+      currentTVL += reserveBalance
+    } else {
+      const floorSupply = parseFormatted(market.floorSupplyFormatted)
+      const floorSegmentCap = parseFormatted(market.floorSegmentSupplyFormatted)
+      const cappedFloorSupply =
+        floorSegmentCap > 0 ? Math.min(floorSupply, floorSegmentCap) : floorSupply
+      const floorPrice = parseFormatted(market.floorPriceFormatted)
+      currentTVL += cappedFloorSupply * floorPrice + marketSupply * price
+    }
     currentMarketCap += marketSupply * price
   }
 

@@ -2125,6 +2125,8 @@ type Market {
   marketSupplyFormatted: String!
   marketSupplyRaw: numeric!
   maxLTV: numeric!
+  reserveBalanceFormatted: String!
+  reserveBalanceRaw: numeric!
 
   """An object relationship"""
   reserveToken: Token
@@ -2426,6 +2428,7 @@ input Market_avg_order_by {
   lastUpdatedAt: order_by
   marketSupplyRaw: order_by
   maxLTV: order_by
+  reserveBalanceRaw: order_by
   sellFeeBps: order_by
   totalSupplyRaw: order_by
   tradingFeeBps: order_by
@@ -2464,6 +2467,8 @@ input Market_bool_exp {
   marketSupplyFormatted: String_comparison_exp
   marketSupplyRaw: numeric_comparison_exp
   maxLTV: numeric_comparison_exp
+  reserveBalanceFormatted: String_comparison_exp
+  reserveBalanceRaw: numeric_comparison_exp
   reserveToken: Token_bool_exp
   reserveToken_id: String_comparison_exp
   sellFeeBps: numeric_comparison_exp
@@ -2500,6 +2505,8 @@ input Market_max_order_by {
   marketSupplyFormatted: order_by
   marketSupplyRaw: order_by
   maxLTV: order_by
+  reserveBalanceFormatted: order_by
+  reserveBalanceRaw: order_by
   reserveToken_id: order_by
   sellFeeBps: order_by
   status: order_by
@@ -2534,6 +2541,8 @@ input Market_min_order_by {
   marketSupplyFormatted: order_by
   marketSupplyRaw: order_by
   maxLTV: order_by
+  reserveBalanceFormatted: order_by
+  reserveBalanceRaw: order_by
   reserveToken_id: order_by
   sellFeeBps: order_by
   status: order_by
@@ -2570,6 +2579,8 @@ input Market_order_by {
   marketSupplyFormatted: order_by
   marketSupplyRaw: order_by
   maxLTV: order_by
+  reserveBalanceFormatted: order_by
+  reserveBalanceRaw: order_by
   reserveToken: Token_order_by
   reserveToken_id: order_by
   sellFeeBps: order_by
@@ -2657,6 +2668,12 @@ enum Market_select_column {
   maxLTV
 
   """column name"""
+  reserveBalanceFormatted
+
+  """column name"""
+  reserveBalanceRaw
+
+  """column name"""
   reserveToken_id
 
   """column name"""
@@ -2691,6 +2708,7 @@ input Market_stddev_order_by {
   lastUpdatedAt: order_by
   marketSupplyRaw: order_by
   maxLTV: order_by
+  reserveBalanceRaw: order_by
   sellFeeBps: order_by
   totalSupplyRaw: order_by
   tradingFeeBps: order_by
@@ -2712,6 +2730,7 @@ input Market_stddev_pop_order_by {
   lastUpdatedAt: order_by
   marketSupplyRaw: order_by
   maxLTV: order_by
+  reserveBalanceRaw: order_by
   sellFeeBps: order_by
   totalSupplyRaw: order_by
   tradingFeeBps: order_by
@@ -2733,6 +2752,7 @@ input Market_stddev_samp_order_by {
   lastUpdatedAt: order_by
   marketSupplyRaw: order_by
   maxLTV: order_by
+  reserveBalanceRaw: order_by
   sellFeeBps: order_by
   totalSupplyRaw: order_by
   tradingFeeBps: order_by
@@ -2775,6 +2795,8 @@ input Market_stream_cursor_value_input {
   marketSupplyFormatted: String
   marketSupplyRaw: numeric
   maxLTV: numeric
+  reserveBalanceFormatted: String
+  reserveBalanceRaw: numeric
   reserveToken_id: String
   sellFeeBps: numeric
   status: marketstatus
@@ -2799,6 +2821,7 @@ input Market_sum_order_by {
   lastUpdatedAt: order_by
   marketSupplyRaw: order_by
   maxLTV: order_by
+  reserveBalanceRaw: order_by
   sellFeeBps: order_by
   totalSupplyRaw: order_by
   tradingFeeBps: order_by
@@ -2820,6 +2843,7 @@ input Market_var_pop_order_by {
   lastUpdatedAt: order_by
   marketSupplyRaw: order_by
   maxLTV: order_by
+  reserveBalanceRaw: order_by
   sellFeeBps: order_by
   totalSupplyRaw: order_by
   tradingFeeBps: order_by
@@ -2841,6 +2865,7 @@ input Market_var_samp_order_by {
   lastUpdatedAt: order_by
   marketSupplyRaw: order_by
   maxLTV: order_by
+  reserveBalanceRaw: order_by
   sellFeeBps: order_by
   totalSupplyRaw: order_by
   tradingFeeBps: order_by
@@ -2862,6 +2887,7 @@ input Market_variance_order_by {
   lastUpdatedAt: order_by
   marketSupplyRaw: order_by
   maxLTV: order_by
+  reserveBalanceRaw: order_by
   sellFeeBps: order_by
   totalSupplyRaw: order_by
   tradingFeeBps: order_by

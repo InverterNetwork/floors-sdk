@@ -13,6 +13,12 @@ export const platformMetricsQuery = {
     totalSupplyFormatted: true,
     marketSupplyRaw: true,
     marketSupplyFormatted: true,
+    floorSupplyRaw: true,
+    floorSupplyFormatted: true,
+    floorSegmentSupplyRaw: true,
+    floorSegmentSupplyFormatted: true,
+    reserveBalanceRaw: true,
+    reserveBalanceFormatted: true,
     currentPriceRaw: true,
     currentPriceFormatted: true,
     floorPriceRaw: true,
@@ -87,11 +93,23 @@ export function computePlatformMetrics(
   // Use chain timestamp if provided, otherwise fall back to wall-clock
   const now = chainTimestamp ?? Math.floor(Date.now() / 1000)
 
-  // Calculate TVL from total supply and prices (includes locked tokens)
+  // Calculate TVL from actual reserve balance (balanceOf), fallback to formula
   const totalValueLocked = markets.reduce((sum, market) => {
-    const supply = parseFloat(market.totalSupplyFormatted || market.totalSupplyRaw || '0')
-    const price = parseFloat(market.currentPriceFormatted || market.currentPriceRaw || '0')
-    return sum + supply * price
+    const reserveBalance = parseFloat(
+      market.reserveBalanceFormatted || market.reserveBalanceRaw || '0'
+    )
+    if (reserveBalance > 0) return sum + reserveBalance
+
+    const floorSupply = parseFloat(market.floorSupplyFormatted || market.floorSupplyRaw || '0')
+    const floorSegmentCap = parseFloat(
+      market.floorSegmentSupplyFormatted || market.floorSegmentSupplyRaw || '0'
+    )
+    const cappedFloorSupply =
+      floorSegmentCap > 0 ? Math.min(floorSupply, floorSegmentCap) : floorSupply
+    const floorPrice = parseFloat(market.floorPriceFormatted || market.floorPriceRaw || '0')
+    const marketSupply = parseFloat(market.marketSupplyFormatted || market.marketSupplyRaw || '0')
+    const marketPrice = parseFloat(market.currentPriceFormatted || market.currentPriceRaw || '0')
+    return sum + cappedFloorSupply * floorPrice + marketSupply * marketPrice
   }, 0)
 
   // Calculate total market cap from market supply (circulating tokens only)

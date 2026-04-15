@@ -102,11 +102,3 @@ describe('mapMarketToFloorAssetData — floor supply capping', () => {
     expect(result.supply.protectedSupplyPercentage).toBeCloseTo(40, 0)
   })
 })
-
-describe('mapMarketToFloorAssetData — TVL approximate flag', () => {
-  it('marks TVL as approximate', () => {
-    const market = makeMarket()
-    const result = mapMarketToFloorAssetData(market)
-    expect(result.metrics.isTvlApproximate).toBe(true)
-  })
-})
