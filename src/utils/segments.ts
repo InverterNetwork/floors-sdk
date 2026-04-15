@@ -362,6 +362,25 @@ export function validateSegments(
 }
 
 /**
+ * @description Convert segment price fields from 18-decimal WAD (create-market form) to
+ * on-chain scale for the reserve collateral token. Matches `useLaunch` transformFormData.
+ */
+export function scaleSegmentPricesWadToReserve(
+  seg: { initialPrice: bigint; priceIncrease: bigint },
+  reserveTokenDecimals: number
+): { initialPrice: bigint; priceIncrease: bigint } {
+  const reserveDec = reserveTokenDecimals ?? 18
+  if (reserveDec < 18) {
+    const factor = BigInt(10) ** BigInt(18 - reserveDec)
+    return {
+      initialPrice: seg.initialPrice / factor,
+      priceIncrease: seg.priceIncrease / factor,
+    }
+  }
+  return { initialPrice: seg.initialPrice, priceIncrease: seg.priceIncrease }
+}
+
+/**
  * @description Generate default S-curve with custom floor price and supply
  */
 export function generateDefaultCurve(

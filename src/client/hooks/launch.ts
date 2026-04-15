@@ -20,6 +20,7 @@ import {
   type StakingConfig,
   type TreasuryConfig,
 } from '../../launch'
+import { scaleSegmentPricesWadToReserve } from '../../utils/segments'
 import { useFloors } from '../floors-context'
 
 // =============================================================================
@@ -352,17 +353,17 @@ export function useLaunch(options?: UseLaunchOptions) {
       }
 
       // Combine floor segment and premium segments.
-      // Segment prices (initialPrice, priceIncrease) are bound to the collateral
-      // token's decimals. The form stores them in WAD (1e18) for UI display, so
-      // we scale them here to match the reserve token's actual decimals.
+      // Segment prices are stored in 18-decimal WAD in the form; scale to reserve decimals
+      // for encoding (see scaleSegmentPricesWadToReserve).
       const reserveDec = formData.reserveTokenDecimals ?? 18
-      const priceScaleFactor = reserveDec < 18 ? BigInt(10) ** BigInt(18 - reserveDec) : BigInt(1)
 
       const rawSegments = [formData.floorSegment, ...formData.premiumSegments]
       const segments = rawSegments.map((seg) => ({
         ...seg,
-        initialPrice: seg.initialPrice / priceScaleFactor,
-        priceIncrease: seg.priceIncrease / priceScaleFactor,
+        ...scaleSegmentPricesWadToReserve(
+          { initialPrice: seg.initialPrice, priceIncrease: seg.priceIncrease },
+          reserveDec
+        ),
       }))
 
       const floorConfig: FloorConfig = {
