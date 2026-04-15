@@ -12,6 +12,8 @@ export type CandlePeriodKey = keyof TPriceCandlesByPeriod
 export interface TransformedCandleData {
   date: string
   timestamp: number
+  /** Bucket period (used to place open vs close along the x-axis). */
+  period?: TPriceCandle['period']
   floorPrice: number
   marketPrice: number
   open: number
@@ -20,6 +22,48 @@ export interface TransformedCandleData {
   close: number
   volume: number
   trades: number
+}
+
+/** Milliseconds per candle bucket (matches on-chain / indexer candle periods). */
+export function bucketDurationMs(period: TPriceCandle['period'] | undefined): number {
+  switch (period) {
+    case 'ONE_HOUR':
+      return 60 * 60 * 1000
+    case 'FOUR_HOURS':
+      return 4 * 60 * 60 * 1000
+    case 'ONE_DAY':
+    default:
+      return 24 * 60 * 60 * 1000
+  }
+}
+
+/**
+ * Each raw candle becomes two chart points: open at bucket start, close at bucket end.
+ * Plotting only `close` as marketPrice hides intra-period moves (e.g. floor → trade in one hour).
+ */
+export function expandCandlesToMarketPriceSteps(
+  data: TransformedCandleData[]
+): TransformedCandleData[] {
+  const out: TransformedCandleData[] = []
+  for (const row of data) {
+    const dur = bucketDurationMs(row.period)
+    const tOpen = row.timestamp
+    const tClose = row.timestamp + dur - 1
+
+    out.push({
+      ...row,
+      date: formatCandleDate(tOpen, row.period ?? 'ONE_DAY'),
+      timestamp: tOpen,
+      marketPrice: row.open,
+    })
+    out.push({
+      ...row,
+      date: formatCandleDate(tClose, row.period ?? 'ONE_DAY'),
+      timestamp: tClose,
+      marketPrice: row.close,
+    })
+  }
+  return out
 }
 
 /** Result from getBestAvailableCandles */
@@ -109,6 +153,7 @@ export function transformCandlesToChartData(candles: TPriceCandle[]): Transforme
     return {
       date: formatCandleDate(timestamp, candle.period),
       timestamp,
+      period: candle.period,
       marketPrice: close,
       floorPrice: 0, // Set by consumer from asset data
       open,
