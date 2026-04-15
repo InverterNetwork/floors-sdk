@@ -1173,6 +1173,9 @@ export {
   TREASURY_METADATA,
 } from './constants/metadata'
 export {
+  calculateFloorMarketCapUsd,
+  calculateFloorSupplyForTargetMarketCapUsd,
+  calculateSegmentsFromMarketCapUsd,
   calculateTotalSupply,
   DEFAULT_FLOOR_SEGMENT,
   DEFAULT_PREMIUM_SEGMENTS,
@@ -1180,5 +1183,10 @@ export {
   generateDefaultCurve,
   generatePriceBreakpoints,
   packSegments,
+  parseUsdPriceToWad,
+  REFERENCE_RESERVE_USD_PRICE_WAD,
+  scaleCurveSupplyForReserveUsdPrice,
+  scaleSegmentSupplyForReserveUsdPrice,
+  scaleSegmentSupplyForReserveUsdTransition,
   validateSegments,
 } from './utils/segments'

@@ -1,4 +1,5 @@
 import type { Address } from 'viem'
+import { formatUnits, parseUnits } from 'viem'
 
 import type {
   CreditFacilityConfig,
@@ -13,6 +14,141 @@ import type {
 
 export type { SegmentConfig } from '../schemas/launch.schema'
 import { PROTOCOL_LIMITS } from './validation'
+
+/** 1e18 — WAD scale for USD prices and segment price fields in the create-market form */
+const WAD = BigInt(10) ** BigInt(18)
+
+/**
+ * @description Baseline implicit in {@link DEFAULT_FLOOR_SEGMENT} / {@link DEFAULT_PREMIUM_SEGMENTS}:
+ * one unit of reserve token ≈ one USD (e.g. USDC). For reserves that are not ~$1/token (AVAX, WETH),
+ * use {@link scaleSegmentSupplyForReserveUsdPrice} so **supply** (not price) keeps the same USD curve.
+ */
+export const REFERENCE_RESERVE_USD_PRICE_WAD = WAD
+
+/**
+ * @description Convert a positive USD price (e.g. 9.5 for AVAX at $9.50) to 18-decimal WAD.
+ */
+export function parseUsdPriceToWad(usd: number): bigint {
+  if (!Number.isFinite(usd) || usd <= 0) {
+    throw new Error('USD price must be a positive finite number')
+  }
+  return parseUnits(usd.toFixed(18), 18)
+}
+
+/**
+ * @description Scale **issuance supply per step** so the same **USD** economics apply as the USDC ($1)
+ * template while keeping segment **prices** in WAD unchanged (floor stays `1.0` reserve per token, etc.).
+ *
+ * `supplyPerStep' = supplyPerStep * REFERENCE / reserveUsdPriceWad`
+ */
+export function scaleSegmentSupplyForReserveUsdPrice(
+  segment: SegmentConfig,
+  reserveUsdPriceWad: bigint
+): SegmentConfig {
+  if (reserveUsdPriceWad <= BigInt(0)) {
+    throw new Error('reserveUsdPriceWad must be positive')
+  }
+  return {
+    ...segment,
+    supplyPerStep: (segment.supplyPerStep * REFERENCE_RESERVE_USD_PRICE_WAD) / reserveUsdPriceWad,
+  }
+}
+
+/**
+ * @description Rescale **supply** when switching reserve asset (preserves USD liquidity at each price level).
+ * `supplyPerStep' = supplyPerStep * fromUsdWad / toUsdWad`
+ */
+export function scaleSegmentSupplyForReserveUsdTransition(
+  segment: SegmentConfig,
+  fromReserveUsdPriceWad: bigint,
+  toReserveUsdPriceWad: bigint
+): SegmentConfig {
+  if (fromReserveUsdPriceWad <= BigInt(0) || toReserveUsdPriceWad <= BigInt(0)) {
+    throw new Error('Reserve USD prices must be positive')
+  }
+  return {
+    ...segment,
+    supplyPerStep: (segment.supplyPerStep * fromReserveUsdPriceWad) / toReserveUsdPriceWad,
+  }
+}
+
+/**
+ * @description Apply {@link scaleSegmentSupplyForReserveUsdPrice} to floor + premium segments.
+ */
+export function scaleCurveSupplyForReserveUsdPrice(
+  floor: SegmentConfig,
+  premium: SegmentConfig[],
+  reserveUsdPriceWad: bigint
+): { floor: SegmentConfig; premium: SegmentConfig[] } {
+  return {
+    floor: scaleSegmentSupplyForReserveUsdPrice(floor, reserveUsdPriceWad),
+    premium: premium.map((s) => scaleSegmentSupplyForReserveUsdPrice(s, reserveUsdPriceWad)),
+  }
+}
+
+/**
+ * @description USD “market cap” of the floor segment: floor supply × reserve price × reserve USD price.
+ * `floorPriceWad` is the form’s 18-decimal WAD (reserve per issuance token); `reserveUsdPrice` is USD per 1 reserve token.
+ */
+export function calculateFloorMarketCapUsd(options: {
+  floorSupply: bigint
+  issuanceDecimals: number
+  floorPriceWad: bigint
+  reserveUsdPrice: number
+}): number {
+  if (!Number.isFinite(options.reserveUsdPrice) || options.reserveUsdPrice <= 0) {
+    throw new Error('reserveUsdPrice must be a positive finite number')
+  }
+  const supply = Number(formatUnits(options.floorSupply, options.issuanceDecimals))
+  const reservePerToken = Number(formatUnits(options.floorPriceWad, 18))
+  return supply * reservePerToken * options.reserveUsdPrice
+}
+
+/**
+ * @description Floor issuance supply for a target **USD** floor liquidity, given USD price per issuance token at the floor.
+ */
+export function calculateFloorSupplyForTargetMarketCapUsd(options: {
+  targetFloorMarketCapUsd: number
+  floorPriceUsdPerIssuanceToken: number
+  issuanceDecimals: number
+}): bigint {
+  const { targetFloorMarketCapUsd, floorPriceUsdPerIssuanceToken, issuanceDecimals } = options
+  if (
+    !Number.isFinite(targetFloorMarketCapUsd) ||
+    targetFloorMarketCapUsd <= 0 ||
+    !Number.isFinite(floorPriceUsdPerIssuanceToken) ||
+    floorPriceUsdPerIssuanceToken <= 0
+  ) {
+    throw new Error(
+      'Target market cap and floor USD price per token must be positive finite numbers'
+    )
+  }
+  const tokenCount = targetFloorMarketCapUsd / floorPriceUsdPerIssuanceToken
+  return parseUnits(tokenCount.toFixed(Math.min(18, issuanceDecimals)), issuanceDecimals)
+}
+
+/**
+ * @description Build the default S-curve from a **USD** floor market cap target, reserve token USD price,
+ * and optional USD floor price per issuance token (default $1). Scales **supply** (not price) for non-$1 reserves.
+ */
+export function calculateSegmentsFromMarketCapUsd(options: {
+  targetFloorMarketCapUsd: number
+  reserveUsdPrice: number
+  issuanceDecimals: number
+  /** USD per issuance token at the floor (default 1). */
+  floorPriceUsdPerIssuanceToken?: number
+}): { floor: SegmentConfig; premium: SegmentConfig[] } {
+  const floorPxUsd = options.floorPriceUsdPerIssuanceToken ?? 1
+  const floorSupply = calculateFloorSupplyForTargetMarketCapUsd({
+    targetFloorMarketCapUsd: options.targetFloorMarketCapUsd,
+    floorPriceUsdPerIssuanceToken: floorPxUsd,
+    issuanceDecimals: options.issuanceDecimals,
+  })
+  const floorPriceWad = parseUnits(floorPxUsd.toFixed(18), 18)
+  return generateDefaultCurve(floorPriceWad, floorSupply, {
+    reserveUsdPriceWad: parseUsdPriceToWad(options.reserveUsdPrice),
+  })
+}
 
 /**
  * @description Segment utilities for bonding curve configuration
@@ -528,11 +664,15 @@ export function transformLaunchFormDataToLaunchConfig(
 }
 
 /**
- * @description Generate default S-curve with custom floor price and supply
+ * @description Generate default S-curve with custom floor price and supply.
+ * @param options.reserveUsdPriceWad — USD per 1 whole reserve token (18-decimal WAD). When set, scales
+ *   **supplyPerStep** on every segment so the same **USD** economics apply as the USDC ($1) template;
+ *   segment **prices** stay in the same WAD shape (e.g. floor `1.0` reserve per token).
  */
 export function generateDefaultCurve(
   floorPrice: bigint = BigInt(1e18),
-  floorSupply: bigint = BigInt(100_000e18)
+  floorSupply: bigint = BigInt(100_000e18),
+  options?: { reserveUsdPriceWad?: bigint }
 ): { floor: SegmentConfig; premium: SegmentConfig[] } {
   const floor: SegmentConfig = {
     initialPrice: floorPrice,
@@ -550,6 +690,10 @@ export function generateDefaultCurve(
     supplyPerStep: seg.supplyPerStep,
     numberOfSteps: seg.numberOfSteps,
   }))
+
+  if (options?.reserveUsdPriceWad !== undefined) {
+    return scaleCurveSupplyForReserveUsdPrice(floor, premium, options.reserveUsdPriceWad)
+  }
 
   return { floor, premium }
 }
