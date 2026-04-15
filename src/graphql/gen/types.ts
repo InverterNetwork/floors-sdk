@@ -3434,6 +3434,12 @@ export default {
             "floorPriceRaw": [
                 392
             ],
+            "floorSegmentSupplyFormatted": [
+                321
+            ],
+            "floorSegmentSupplyRaw": [
+                392
+            ],
             "floorSupplyFormatted": [
                 321
             ],
@@ -3935,6 +3941,9 @@ export default {
             "floorPriceRaw": [
                 394
             ],
+            "floorSegmentSupplyRaw": [
+                394
+            ],
             "floorSupplyRaw": [
                 394
             ],
@@ -4004,6 +4013,12 @@ export default {
                 323
             ],
             "floorPriceRaw": [
+                393
+            ],
+            "floorSegmentSupplyFormatted": [
+                323
+            ],
+            "floorSegmentSupplyRaw": [
                 393
             ],
             "floorSupplyFormatted": [
@@ -4104,6 +4119,12 @@ export default {
             "floorPriceRaw": [
                 394
             ],
+            "floorSegmentSupplyFormatted": [
+                394
+            ],
+            "floorSegmentSupplyRaw": [
+                394
+            ],
             "floorSupplyFormatted": [
                 394
             ],
@@ -4185,6 +4206,12 @@ export default {
                 394
             ],
             "floorPriceRaw": [
+                394
+            ],
+            "floorSegmentSupplyFormatted": [
+                394
+            ],
+            "floorSegmentSupplyRaw": [
                 394
             ],
             "floorSupplyFormatted": [
@@ -4271,6 +4298,12 @@ export default {
                 394
             ],
             "floorPriceRaw": [
+                394
+            ],
+            "floorSegmentSupplyFormatted": [
+                394
+            ],
+            "floorSegmentSupplyRaw": [
                 394
             ],
             "floorSupplyFormatted": [
@@ -4360,6 +4393,9 @@ export default {
             "floorPriceRaw": [
                 394
             ],
+            "floorSegmentSupplyRaw": [
+                394
+            ],
             "floorSupplyRaw": [
                 394
             ],
@@ -4407,6 +4443,9 @@ export default {
             "floorPriceRaw": [
                 394
             ],
+            "floorSegmentSupplyRaw": [
+                394
+            ],
             "floorSupplyRaw": [
                 394
             ],
@@ -4452,6 +4491,9 @@ export default {
                 394
             ],
             "floorPriceRaw": [
+                394
+            ],
+            "floorSegmentSupplyRaw": [
                 394
             ],
             "floorSupplyRaw": [
@@ -4522,6 +4564,12 @@ export default {
                 321
             ],
             "floorPriceRaw": [
+                392
+            ],
+            "floorSegmentSupplyFormatted": [
+                321
+            ],
+            "floorSegmentSupplyRaw": [
                 392
             ],
             "floorSupplyFormatted": [
@@ -4601,6 +4649,9 @@ export default {
             "floorPriceRaw": [
                 394
             ],
+            "floorSegmentSupplyRaw": [
+                394
+            ],
             "floorSupplyRaw": [
                 394
             ],
@@ -4646,6 +4697,9 @@ export default {
                 394
             ],
             "floorPriceRaw": [
+                394
+            ],
+            "floorSegmentSupplyRaw": [
                 394
             ],
             "floorSupplyRaw": [
@@ -4695,6 +4749,9 @@ export default {
             "floorPriceRaw": [
                 394
             ],
+            "floorSegmentSupplyRaw": [
+                394
+            ],
             "floorSupplyRaw": [
                 394
             ],
@@ -4740,6 +4797,9 @@ export default {
                 394
             ],
             "floorPriceRaw": [
+                394
+            ],
+            "floorSegmentSupplyRaw": [
                 394
             ],
             "floorSupplyRaw": [
@@ -5152,6 +5212,12 @@ export default {
             "timeSafeguardTs": [
                 392
             ],
+            "totalMintedFormatted": [
+                321
+            ],
+            "totalMintedRaw": [
+                392
+            ],
             "totalParticipants": [
                 392
             ],
@@ -5268,6 +5334,12 @@ export default {
             "timeSafeguardTs": [
                 393
             ],
+            "totalMintedFormatted": [
+                323
+            ],
+            "totalMintedRaw": [
+                393
+            ],
             "totalParticipants": [
                 393
             ],
@@ -5375,6 +5447,12 @@ export default {
             "timeSafeguardTs": [
                 394
             ],
+            "totalMintedFormatted": [
+                394
+            ],
+            "totalMintedRaw": [
+                394
+            ],
             "totalParticipants": [
                 394
             ],
@@ -5480,6 +5558,12 @@ export default {
                 392
             ],
             "timeSafeguardTs": [
+                392
+            ],
+            "totalMintedFormatted": [
+                321
+            ],
+            "totalMintedRaw": [
                 392
             ],
             "totalParticipants": [
