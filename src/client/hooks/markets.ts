@@ -13,11 +13,13 @@ import { usePublicClient, useWalletClient } from 'wagmi'
 import {
   buildMarketsSubscription,
   buildMarketSubscription,
+  buildPriceCandlesSubscription,
   fetchMarketById,
   fetchMarkets,
   mapMarketToFloorAssetData,
   type TFloorAssetData,
   type TGraphQLMarket,
+  type TPriceCandle,
 } from '../../graphql/api'
 import {
   Market,
@@ -165,6 +167,15 @@ export const useMarketSubscription = <TData = TFloorAssetData | null>(
     enabled: enabled && subFields !== null,
   })
 
+  const candleSubFields = useMemo(
+    () => (marketId ? buildPriceCandlesSubscription(marketId) : null),
+    [marketId]
+  )
+  const candleSub = useSubscription({
+    fields: candleSubFields ?? ({} as NonNullable<typeof candleSubFields>),
+    enabled: enabled && candleSubFields !== null,
+  })
+
   useEffect(() => {
     const row = sub.data?.Market?.[0]
     if (!marketId || !row) return
@@ -194,6 +205,43 @@ export const useMarketSubscription = <TData = TFloorAssetData | null>(
     )
   }, [sub.data, marketId, queryClient])
 
+  useEffect(() => {
+    const incoming = candleSub.data?.PriceCandle as TPriceCandle[] | undefined
+    if (!marketId || !incoming?.length) return
+
+    // Ponder subscriptions may send only the updated candle(s), not the full history.
+    // Merge by id so we preserve all historical candles from the initial fetch.
+    const mergeCandles = (existing: TPriceCandle[], updates: TPriceCandle[]): TPriceCandle[] => {
+      const map = new Map(existing.map((c) => [c.id, c]))
+      for (const c of updates) map.set(c.id, c)
+      return [...map.values()].sort((a, b) => Number(a.timestamp) - Number(b.timestamp))
+    }
+
+    queryClient.setQueryData(
+      marketQueryKey(marketId),
+      (old: TFloorAssetData | null | undefined) => {
+        if (!old?.priceCandles) return old
+        return {
+          ...old,
+          priceCandles: {
+            hourly: mergeCandles(
+              old.priceCandles.hourly,
+              incoming.filter((c) => c.period === 'ONE_HOUR')
+            ),
+            fourHour: mergeCandles(
+              old.priceCandles.fourHour,
+              incoming.filter((c) => c.period === 'FOUR_HOURS')
+            ),
+            daily: mergeCandles(
+              old.priceCandles.daily,
+              incoming.filter((c) => c.period === 'ONE_DAY')
+            ),
+          },
+        } as TFloorAssetData
+      }
+    )
+  }, [candleSub.data, marketId, queryClient])
+
   return queryResult as UseQueryResult<TData, Error>
 }
 
@@ -201,15 +249,10 @@ export const useMarketSubscription = <TData = TFloorAssetData | null>(
  * @description Provides buy/sell/approve mutations backed by the pure Market class.
  */
 export const useMarketMutations = (): UseMarketMutationsReturnType => {
-  const queryClient = useQueryClient()
   const floorsContext = useFloors()
   const resolvedMarket = floorsContext.market.data ?? null
   const {
-    refetch: {
-      market: refetchMarket,
-      reserveBalance: refetchReserveBalance,
-      issuanceBalance: refetchIssuanceBalance,
-    },
+    refetch: { reserveBalance: refetchReserveBalance, issuanceBalance: refetchIssuanceBalance },
   } = floorsContext
   const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()
@@ -242,11 +285,10 @@ export const useMarketMutations = (): UseMarketMutationsReturnType => {
     [walletAddress]
   )
 
+  // Market data and candles are subscription-driven — only balances need explicit refresh.
   const refetchAfterMutation = useCallback(async () => {
-    // Invalidate market queries to force fresh data from the indexer
-    await queryClient.invalidateQueries({ queryKey: ['market'] })
-    await Promise.allSettled([refetchMarket(), refetchReserveBalance(), refetchIssuanceBalance()])
-  }, [queryClient, refetchIssuanceBalance, refetchMarket, refetchReserveBalance])
+    await Promise.allSettled([refetchReserveBalance(), refetchIssuanceBalance()])
+  }, [refetchIssuanceBalance, refetchReserveBalance])
 
   const buy = useMutation({
     mutationFn: (params: TMarketBuyParams) => ensureMarket().buy(params),

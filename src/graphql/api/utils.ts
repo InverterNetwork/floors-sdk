@@ -110,11 +110,12 @@ export const calculate24hPriceChangeFromTrades = (
     newPriceRaw?: string | number | null
     timestamp: string | number
   }>,
-  currentPrice: number
+  currentPrice: number,
+  chainTimestampMs?: number
 ): number => {
   if (trades.length === 0 || currentPrice <= 0) return 0
 
-  const now = Math.floor(Date.now() / 1000)
+  const now = Math.floor((chainTimestampMs ?? Date.now()) / 1000)
   const cutoff = now - 24 * 3600
 
   // Find the trade closest to 24h ago (must be older than 24h)

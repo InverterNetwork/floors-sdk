@@ -254,8 +254,10 @@ export function mapMarketToFloorAssetData(
     creditGrowthRate: 0.2,
   }
 
+  // Anchor to chain time so devnet / testnet clock skew doesn't zero out 24h volume
+  const chainTimestampMs = market.lastUpdatedAt ? toNumber(market.lastUpdatedAt) * 1000 : Date.now()
   const volume24h = sumBy(
-    trades.filter((t) => toNumber(t.timestamp) * 1000 > Date.now() - 24 * 60 * 60 * 1000),
+    trades.filter((t) => toNumber(t.timestamp) * 1000 > chainTimestampMs - 24 * 60 * 60 * 1000),
     (trade) => toNumber(trade.reserveAmountFormatted || trade.reserveAmountRaw)
   )
   const volumeTotal = totalVolume
@@ -264,7 +266,7 @@ export function mapMarketToFloorAssetData(
   const floorAPR = calculateFloorAPR(sortedElevations, floorPrice)
 
   // 24h price change from trades
-  const priceChange24h = calculate24hPriceChangeFromTrades(trades, marketPrice)
+  const priceChange24h = calculate24hPriceChangeFromTrades(trades, marketPrice, chainTimestampMs)
 
   const metrics = {
     volume24h,

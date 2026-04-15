@@ -1,4 +1,5 @@
-import type { GraphQLQueryArgs, GraphQLQueryResult } from '../..'
+import type { GraphQLQueryArgs, GraphQLQueryResult, GraphQLSubscriptionArgs } from '../..'
+import { cloneQuery, type ExtendableQueryArgs, mergeFieldArgs } from '../utils'
 
 /**
  * Query for MarketSnapshot - provides historical price and floor price data
@@ -58,3 +59,21 @@ export const priceCandleQuery = {
 
 export type PriceCandleQueryType = typeof priceCandleQuery
 export type PriceCandleQueryResultType = GraphQLQueryResult<typeof priceCandleQuery>
+
+/**
+ * @description Live subscription for price candles of a single market across all periods.
+ * Enables real-time chart updates without requiring explicit refetches after trades.
+ * Limit covers max historical fetch: 168 hourly + 84 four-hour + 365 daily + buffer.
+ */
+export const buildPriceCandlesSubscription = (marketId: string) => {
+  const selection = cloneQuery(priceCandleQuery) as Record<string, unknown>
+  return mergeFieldArgs(selection, 'PriceCandle', {
+    where: { market_id: { _eq: marketId } },
+    order_by: [{ timestamp: 'desc' }],
+    limit: 620,
+  } as ExtendableQueryArgs<
+    PriceCandleQueryType['PriceCandle']['__args']
+  >) as GraphQLSubscriptionArgs
+}
+
+export type PriceCandlesSubscriptionFields = ReturnType<typeof buildPriceCandlesSubscription>
