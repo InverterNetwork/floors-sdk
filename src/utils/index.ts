@@ -7,6 +7,7 @@ export * from './permission-map'
 export * from './safe-write'
 
 // Bonding curve utilities
+export * from './floor-liquidity'
 export * from './segments'
 
 // Credit facility utilities

@@ -13,7 +13,7 @@ import { AddressSchema } from './base.schema'
  * MUST use the issuance token’s **native decimals** (not WAD).
  *
  * **`LaunchFormData`** segment prices and presale `priceBreakpoints` are **18-decimal WAD** (same as the
- * web wizard). **`transformLaunchFormDataToLaunchConfig`** always scales those to reserve native decimals via
+ * web form). **`transformLaunchFormDataToLaunchConfig`** always scales those to reserve native decimals via
  * `scaleSegmentPricesWadToReserve`. Issuance amounts may still be corrected from mistaken WAD-style values when
  * `issuanceTokenDecimals < 18` (see `normalizeIssuanceAmountFromWadOrNative`).
  *
@@ -180,7 +180,7 @@ export type CreditFacilityConfig = typeof CreditFacilityConfigSchema.Type
 // Presale Configuration
 // =============================================================================
 
-/** Fields shared by {@link PresaleConfigSchema} (on-chain) and {@link PresaleFormSchema} (wizard). */
+/** Fields shared by {@link PresaleConfigSchema} (on-chain) and {@link PresaleFormSchema} (form). */
 const PresaleCurveParamsSchema = Schema.Struct({
   /** Commission schedule - array of fees per leverage level in basis points (index 0 = direct, 1+ = leverage) */
   baseCommissionBps: Schema.Array(Schema.BigIntFromSelf).pipe(Schema.minItems(1)),
@@ -287,7 +287,7 @@ export const LaunchResultSchema = Schema.Struct({
 export type LaunchResult = typeof LaunchResultSchema.Type
 
 // =============================================================================
-// Wizard / API form input (pre-normalization) — inferred from schemas below
+// Form / API input (pre-normalization) — inferred from schemas below
 // =============================================================================
 
 /** Nested new-token fields when `issuanceToken.mode === 'create'`. */
@@ -306,7 +306,7 @@ export const IssuanceTokenFormSchema = Schema.Struct({
 
 export type IssuanceTokenFormData = typeof IssuanceTokenFormSchema.Type
 
-/** Wizard presale block — extends {@link PresaleCurveParamsSchema} with UI-only fields. */
+/** Presale form block — extends {@link PresaleCurveParamsSchema} with UI-only fields. */
 export const PresaleFormSchema = Schema.Struct({
   enabled: Schema.Boolean,
   creditFacilityAddress: Schema.String,
@@ -317,7 +317,7 @@ export const PresaleFormSchema = Schema.Struct({
 
 export type PresaleFormData = typeof PresaleFormSchema.Type
 
-/** Wizard credit facility — extends {@link CreditFacilityParamsSchema} with `enabled`. */
+/** Credit facility form — extends {@link CreditFacilityParamsSchema} with `enabled`. */
 export const CreditFacilityFormSchema = Schema.Struct({
   enabled: Schema.Boolean,
 })
@@ -326,7 +326,7 @@ export const CreditFacilityFormSchema = Schema.Struct({
 
 export type CreditFacilityFormData = typeof CreditFacilityFormSchema.Type
 
-/** Wizard staking — extends {@link StakingConfigSchema} with `enabled` and optional strategy. */
+/** Staking form — extends {@link StakingConfigSchema} with `enabled` and optional strategy. */
 export const StakingFormSchema = Schema.Struct({
   enabled: Schema.Boolean,
   strategyAddress: Schema.optional(Schema.String),
@@ -345,7 +345,7 @@ export const ConfigurationFormSchema = Schema.Struct({
 
 export type ConfigurationFormData = typeof ConfigurationFormSchema.Type
 
-/** Wizard treasury row — same `shares` as {@link TreasuryRecipientSchema}, loose `address` string. */
+/** Treasury form row — same `shares` as {@link TreasuryRecipientSchema}, loose `address` string. */
 export const TreasuryRecipientFormSchema = Schema.Struct({
   address: Schema.String,
 })
@@ -355,7 +355,7 @@ export const TreasuryRecipientFormSchema = Schema.Struct({
 export type TreasuryRecipientFormData = typeof TreasuryRecipientFormSchema.Type
 
 /**
- * Create-market wizard / API payload. Numeric fields may mix WAD-style values; use
+ * Create-market form / API payload. Numeric fields may mix WAD-style values; use
  * {@link transformLaunchFormDataToLaunchConfig} in `utils/segments.ts` to produce canonical {@link LaunchConfig}.
  */
 export const LaunchFormSchema = Schema.Struct({
@@ -375,7 +375,7 @@ export const LaunchFormSchema = Schema.Struct({
   .pipe(Schema.extend(FloorFeePercentageSchema))
   .annotations({
     title: 'LaunchForm',
-    description: 'Create-market wizard payload before normalization to LaunchConfig',
+    description: 'Create-market form payload before normalization to LaunchConfig',
   })
 
 export type LaunchFormData = typeof LaunchFormSchema.Type
@@ -387,3 +387,88 @@ export const CreateMarketFromFormParamsSchema = Schema.Struct({
 }).annotations({ title: 'CreateMarketFromFormParams' })
 
 export type CreateMarketFromFormParams = typeof CreateMarketFromFormParamsSchema.Type
+
+// =============================================================================
+// Market creation (web + CLI) — extends launch form with reserve metadata & UI fields
+// =============================================================================
+
+/** New-token row with optional metadata (blob URL, description, socials). */
+export const IssuanceTokenNewTokenExtendedSchema = IssuanceTokenNewTokenFormSchema.pipe(
+  Schema.extend(
+    Schema.Struct({
+      imageUrl: Schema.optional(Schema.NullOr(Schema.String)),
+      description: Schema.optional(Schema.String),
+      socialMediaUrls: Schema.optional(
+        Schema.Struct({
+          x: Schema.optional(Schema.String),
+          website: Schema.optional(Schema.String),
+        })
+      ),
+    }).annotations({ title: 'IssuanceTokenNewTokenExtendedFields' })
+  )
+).annotations({ title: 'IssuanceTokenNewTokenExtended' })
+
+export const IssuanceTokenExtendedFormSchema = Schema.Struct({
+  mode: Schema.Literal('existing', 'create'),
+  existingAddress: Schema.String,
+  newToken: IssuanceTokenNewTokenExtendedSchema,
+}).annotations({ title: 'IssuanceTokenExtendedForm' })
+
+export type IssuanceTokenExtendedFormData = typeof IssuanceTokenExtendedFormSchema.Type
+
+export const PresaleExtendedFormSchema = Schema.Struct({
+  enabled: Schema.Boolean,
+  creditFacilityAddress: Schema.String,
+  maxLeverage: Schema.Number.pipe(Schema.int(), Schema.between(0, 255)),
+  unlockMode: Schema.Literal('priceGrowth', 'atPresaleEnd'),
+})
+  .pipe(Schema.extend(PresaleCurveParamsSchema))
+  .annotations({ title: 'PresaleExtendedForm' })
+
+export type PresaleExtendedFormData = typeof PresaleExtendedFormSchema.Type
+
+export const StakingExtendedFormSchema = Schema.Struct({
+  enabled: Schema.Boolean,
+  strategyAddress: Schema.optional(Schema.String),
+  strategyName: Schema.optional(Schema.String),
+})
+  .pipe(Schema.extend(StakingConfigSchema))
+  .annotations({ title: 'StakingExtendedForm' })
+
+export type StakingExtendedFormData = typeof StakingExtendedFormSchema.Type
+
+/**
+ * Full market-creation payload (app, CLI, tests). Superset of {@link LaunchFormData}.
+ * Segment prices use 18-decimal WAD in the form; {@link transformLaunchFormDataToLaunchConfig} normalizes.
+ */
+export const MarketCreationFormSchema = Schema.Struct({
+  issuanceToken: IssuanceTokenExtendedFormSchema,
+  reserveTokenAddress: Schema.String,
+  reserveTokenSymbol: Schema.String,
+  reserveTokenDecimals: TokenDecimals0_255,
+  reserveTokenUsdPrice: Schema.Number,
+  issuanceTokenDecimals: Schema.optional(TokenDecimals0_255),
+  floorSegment: SegmentConfigSchema,
+  premiumSegments: Schema.Array(SegmentConfigSchema).pipe(Schema.minItems(1)),
+  recipients: Schema.Array(TreasuryRecipientFormSchema).pipe(Schema.minItems(1)),
+  creditFacility: CreditFacilityFormSchema,
+  staking: StakingExtendedFormSchema,
+  presale: PresaleExtendedFormSchema,
+  configuration: ConfigurationFormSchema,
+})
+  .pipe(Schema.extend(FloorFeesSchema))
+  .pipe(Schema.extend(FloorFeePercentageSchema))
+  .annotations({
+    title: 'MarketCreationForm',
+    description: 'Market creation payload (app + CLI) with reserve metadata and UI-only fields',
+  })
+
+export type MarketCreationFormData = typeof MarketCreationFormSchema.Type
+
+export const MarketCreationParamsSchema = Schema.Struct({
+  formData: MarketCreationFormSchema,
+  floorFactoryAddress: Schema.optional(AddressSchema),
+  creatorAddress: Schema.optional(AddressSchema),
+}).annotations({ title: 'MarketCreationParams' })
+
+export type MarketCreationParams = typeof MarketCreationParamsSchema.Type

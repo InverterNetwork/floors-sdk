@@ -563,7 +563,7 @@ export function normalizeIssuanceAmountFromWadOrNative(
 }
 
 /**
- * Build canonical {@link LaunchConfig} from wizard/API {@link LaunchFormData} (server-safe, no React).
+ * Build canonical {@link LaunchConfig} from form/API {@link LaunchFormData} (server-safe, no React).
  */
 export function transformLaunchFormDataToLaunchConfig(
   formData: LaunchFormData,
