@@ -80,11 +80,10 @@ export type {
   LaunchConfig,
   LaunchResult,
   PresaleConfig,
+  SegmentConfig,
   StakingConfig,
   TreasuryConfig,
 } from './schemas/launch.schema'
-
-// Note: SegmentConfig is already exported from ./utils/segments
 export { SegmentConfigSchema } from './schemas/launch.schema'
 
 // =============================================================================

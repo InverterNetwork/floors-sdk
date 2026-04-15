@@ -11,17 +11,26 @@ import { TESTNET_STRATEGY_METADATA } from '../../constants/metadata'
 import {
   type ConfigureParams,
   type ConfigureResult,
-  type CreditFacilityConfig,
-  type FloorConfig,
   Launch,
   type LaunchConfig,
   type LaunchResult,
-  type PresaleConfig,
-  type StakingConfig,
-  type TreasuryConfig,
 } from '../../launch'
-import { scaleSegmentPricesWadToReserve } from '../../utils/segments'
+import type { CreateMarketFromFormParams, LaunchFormData } from '../../schemas/launch.schema'
+import { transformLaunchFormDataToLaunchConfig } from '../../utils/segments'
 import { useFloors } from '../floors-context'
+
+export type {
+  ConfigurationFormData,
+  CreateMarketFromFormParams,
+  CreditFacilityFormData,
+  IssuanceTokenFormData,
+  LaunchFormData,
+  PresaleFormData,
+  SegmentConfig,
+  StakingFormData,
+  TreasuryRecipientFormData,
+} from '../../schemas/launch.schema'
+export { transformLaunchFormDataToLaunchConfig } from '../../utils/segments'
 
 // =============================================================================
 // Transaction Progress Types
@@ -139,141 +148,6 @@ export function extractModuleAddressesFromLogs(
 
 export type { ConfigureParams, ConfigureResult, LaunchConfig, LaunchResult }
 
-/**
- * @description Form-friendly segment configuration
- * Uses the same structure as the UI form
- */
-export type SegmentFormData = {
-  initialPrice: bigint
-  priceIncrease: bigint
-  supplyPerStep: bigint
-  numberOfSteps: number
-}
-
-/**
- * @description Form-friendly treasury recipient
- */
-export type TreasuryRecipientFormData = {
-  address: string
-  shares: bigint
-}
-
-/**
- * @description Form-friendly presale configuration
- */
-export type PresaleFormData = {
-  enabled: boolean
-  creditFacilityAddress: string
-  maxLeverage: number
-  baseCommissionBps: bigint[]
-  endTimestamp: bigint
-  globalIssuanceCap: bigint
-  perAddressIssuanceCap: bigint
-  priceBreakpoints: bigint[][]
-  /** Initial fee multiplier in BPS (10000 = 1x, 20000 = 2x) */
-  initialMultiplier: bigint
-  /** Decay duration in seconds (0 = no decay) */
-  decayDuration: bigint
-}
-
-/**
- * @description Form-friendly credit facility configuration
- */
-export type CreditFacilityFormData = {
-  enabled: boolean
-  /** Loan-to-value ratio in basis points (e.g., 9900 = 99%) */
-  loanToValueRatio: number
-  /** Maximum leverage multiplier (e.g., 25) */
-  maxLeverage: number
-  /** Borrowing fee rate in basis points (e.g., 600 = 6%) */
-  borrowingFeeRate: number
-}
-
-/**
- * @description Form-friendly staking configuration
- */
-export type StakingFormData = {
-  enabled: boolean
-  /** Performance fee on harvested yield in basis points (e.g., 1000 = 10%) */
-  performanceFeeBps: number
-  /** Optional ERC-4626 strategy address to configure during setup */
-  strategyAddress?: string
-}
-
-/**
- * @description Form-friendly configuration options for post-deployment setup
- */
-export type ConfigurationFormData = {
-  /** Grant minter role to Floor contract (required for buying) */
-  grantMinterRole: boolean
-  /** Open buy immediately after creation */
-  openBuy: boolean
-  /** Open sell immediately after creation */
-  openSell: boolean
-  /** Open public borrowing immediately after creation */
-  openBorrow?: boolean
-}
-
-/**
- * @description Form-friendly issuance token configuration
- */
-export type IssuanceTokenFormData = {
-  mode: 'existing' | 'create'
-  existingAddress: string
-  newToken: {
-    name: string
-    symbol: string
-    decimals: number
-    maxSupply: bigint
-  }
-}
-
-/**
- * @description Form data structure matching the create-market wizard
- */
-export type LaunchFormData = {
-  // Step 1: Tokens
-  issuanceToken: IssuanceTokenFormData
-  reserveTokenAddress: string
-  /** Reserve token decimals — used to scale segment prices for the bonding curve */
-  reserveTokenDecimals: number
-
-  // Step 2: Curve
-  floorSegment: SegmentFormData
-  premiumSegments: SegmentFormData[]
-
-  // Step 3: Fees
-  buyFeeBps: number
-  sellFeeBps: number
-
-  // Step 4: Treasury
-  recipients: TreasuryRecipientFormData[]
-  floorFeePercentage: number
-
-  // Step 5: Credit Facility (Optional)
-  creditFacility: CreditFacilityFormData
-
-  // Step 6: Staking (Optional)
-  staking: StakingFormData
-
-  // Step 7: Presale (Optional)
-  presale: PresaleFormData
-
-  // Step 7: Configuration (post-deployment)
-  configuration: ConfigurationFormData
-}
-
-/**
- * @description Parameters for creating a market from form data
- */
-export type CreateMarketFromFormParams = {
-  formData: LaunchFormData
-  /** Override the floor factory address (uses context by default) */
-  floorFactoryAddress?: Address
-  /** Override the creator address (uses connected wallet by default) */
-  creatorAddress?: Address
-}
-
 // =============================================================================
 // Hook
 // =============================================================================
@@ -341,92 +215,9 @@ export function useLaunch(options?: UseLaunchOptions) {
     [publicClient, walletClient, config.floorFactoryAddress]
   )
 
-  /**
-   * @description Transform form data to SDK LaunchConfig
-   */
   const transformFormData = useCallback(
-    (formData: LaunchFormData, creatorAddress: Address): LaunchConfig => {
-      // Validate issuance token address
-      const issuanceTokenAddress = formData.issuanceToken.existingAddress as Address
-      if (!issuanceTokenAddress || issuanceTokenAddress.length !== 42) {
-        throw new Error('Issuance token address is required')
-      }
-
-      // Combine floor segment and premium segments.
-      // Segment prices are stored in 18-decimal WAD in the form; scale to reserve decimals
-      // for encoding (see scaleSegmentPricesWadToReserve).
-      const reserveDec = formData.reserveTokenDecimals ?? 18
-
-      const rawSegments = [formData.floorSegment, ...formData.premiumSegments]
-      const segments = rawSegments.map((seg) => ({
-        ...seg,
-        ...scaleSegmentPricesWadToReserve(
-          { initialPrice: seg.initialPrice, priceIncrease: seg.priceIncrease },
-          reserveDec
-        ),
-      }))
-
-      const floorConfig: FloorConfig = {
-        issuanceTokenAddress,
-        reserveTokenAddress: formData.reserveTokenAddress as Address,
-        segments,
-        buyFeeBps: formData.buyFeeBps,
-        sellFeeBps: formData.sellFeeBps,
-      }
-
-      const treasuryConfig: TreasuryConfig = {
-        recipients: formData.recipients.map((r) => ({
-          address: r.address as Address,
-          shares: r.shares,
-        })),
-        floorFeePercentage: formData.floorFeePercentage,
-        floorFeeTreasury: creatorAddress,
-      }
-
-      // Credit facility configuration (optional)
-      let creditFacilityConfig: CreditFacilityConfig | undefined
-      if (formData.creditFacility?.enabled) {
-        creditFacilityConfig = {
-          loanToValueRatio: formData.creditFacility.loanToValueRatio,
-          maxLeverage: formData.creditFacility.maxLeverage,
-          borrowingFeeRate: formData.creditFacility.borrowingFeeRate,
-        }
-      }
-
-      // Presale configuration (optional)
-      let presaleConfig: PresaleConfig | undefined
-      if (formData.presale?.enabled) {
-        presaleConfig = {
-          creditFacilityAddress: formData.presale.creditFacilityAddress
-            ? (formData.presale.creditFacilityAddress as Address)
-            : undefined,
-          baseCommissionBps: formData.presale.baseCommissionBps,
-          endTimestamp: formData.presale.endTimestamp,
-          globalIssuanceCap: formData.presale.globalIssuanceCap,
-          perAddressIssuanceCap: formData.presale.perAddressIssuanceCap,
-          priceBreakpoints: formData.presale.priceBreakpoints,
-          initialMultiplier: formData.presale.initialMultiplier,
-          decayDuration: formData.presale.decayDuration,
-        }
-      }
-
-      // Staking configuration (optional)
-      let stakingConfig: StakingConfig | undefined
-      if (formData.staking?.enabled) {
-        stakingConfig = {
-          performanceFeeBps: formData.staking.performanceFeeBps,
-        }
-      }
-
-      return {
-        floor: floorConfig,
-        initialAdmin: creatorAddress,
-        treasury: treasuryConfig,
-        creditFacility: creditFacilityConfig,
-        presale: presaleConfig,
-        staking: stakingConfig,
-      }
-    },
+    (formData: LaunchFormData, creatorAddress: Address): LaunchConfig =>
+      transformLaunchFormDataToLaunchConfig(formData, creatorAddress),
     []
   )
 

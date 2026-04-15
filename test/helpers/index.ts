@@ -17,7 +17,7 @@ export {
 } from './config'
 
 // Fixtures
-export type { SegmentConfig } from './fixtures'
+export type { SegmentConfig } from '../../src/schemas/launch.schema'
 export {
   createTestCreditFacilityConfig,
   createTestFloorConfig,

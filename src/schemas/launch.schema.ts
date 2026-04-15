@@ -2,6 +2,49 @@ import { Schema } from 'effect'
 
 import { AddressSchema } from './base.schema'
 
+/**
+ * ## Decimal conventions (on-chain `LaunchConfig` / `FloorConfig` / `PresaleConfig`)
+ *
+ * **Reserve (collateral) token — prices:** `initialPrice`, `priceIncrease`, and presale
+ * `priceBreakpoints` MUST use the reserve token’s **native decimals** (e.g. USDC → 6, WETH → 18).
+ * They are **not** 18-decimal WAD unless the reserve token itself has 18 decimals.
+ *
+ * **Issuance (sale) token — amounts:** `supplyPerStep`, `globalIssuanceCap`, `perAddressIssuanceCap`
+ * MUST use the issuance token’s **native decimals** (not WAD).
+ *
+ * **`LaunchFormData`** segment prices and presale `priceBreakpoints` are **18-decimal WAD** (same as the
+ * web wizard). **`transformLaunchFormDataToLaunchConfig`** always scales those to reserve native decimals via
+ * `scaleSegmentPricesWadToReserve`. Issuance amounts may still be corrected from mistaken WAD-style values when
+ * `issuanceTokenDecimals < 18` (see `normalizeIssuanceAmountFromWadOrNative`).
+ *
+ * For **`LaunchConfig`** built without the form transform, pass prices already in reserve native decimals.
+ */
+
+// =============================================================================
+// Shared field schemas (single definition per validation rule)
+// =============================================================================
+
+const Bps0_10000 = Schema.Number.pipe(Schema.int(), Schema.between(0, 10_000))
+const Bps1_10000 = Schema.Number.pipe(Schema.int(), Schema.between(1, 10_000))
+const TokenDecimals0_255 = Schema.Number.pipe(Schema.int(), Schema.between(0, 255))
+const MaxLeverage1_255 = Schema.Number.pipe(Schema.int(), Schema.between(1, 255))
+
+/** Buy/sell fee fields shared by {@link FloorConfigSchema} and {@link LaunchFormSchema}. */
+const FloorFeesSchema = Schema.Struct({
+  buyFeeBps: Bps0_10000,
+  sellFeeBps: Bps0_10000,
+}).annotations({ title: 'FloorFees' })
+
+/** `floorFeePercentage` shared by {@link TreasuryConfigSchema} and {@link LaunchFormSchema}. */
+const FloorFeePercentageSchema = Schema.Struct({
+  floorFeePercentage: Bps0_10000,
+}).annotations({ title: 'FloorFeePercentage' })
+
+/** Shared `shares` field for treasury recipients (form vs on-chain address typing). */
+const TreasuryRecipientSharesSchema = Schema.Struct({
+  shares: Schema.BigIntFromSelf,
+}).annotations({ title: 'TreasuryRecipientShares' })
+
 // =============================================================================
 // Segment Configuration
 // =============================================================================
@@ -11,11 +54,19 @@ import { AddressSchema } from './base.schema'
  * Matches PackedSegmentLib._create() parameters from Solidity
  */
 export const SegmentConfigSchema = Schema.Struct({
-  /** Starting price in 18 decimal format (e.g., 1e18 = 1 token) */
+  /**
+   * Starting price in **reserve token native decimals** (must match `reserveTokenAddress` on the Floor).
+   * Example: `1_000_000n` = 1 USDC when the reserve is 6 decimals.
+   */
   initialPrice: Schema.BigIntFromSelf,
-  /** Price increase per step in 18 decimal format (0 for flat floor segment) */
+  /**
+   * Price increase per step in **reserve token native decimals** (0 for flat floor segment).
+   */
   priceIncrease: Schema.BigIntFromSelf,
-  /** Token supply per step in 18 decimal format */
+  /**
+   * Token supply per step in **issuance token native decimals** (not 18-decimal WAD unless the
+   * issuance token has 18 decimals).
+   */
   supplyPerStep: Schema.BigIntFromSelf,
   /** Number of steps in this segment (must be >= 1) */
   numberOfSteps: Schema.Number.pipe(Schema.int(), Schema.greaterThan(0)),
@@ -24,29 +75,32 @@ export const SegmentConfigSchema = Schema.Struct({
   description: 'Bonding curve segment configuration matching PackedSegmentLib',
 })
 
-// Note: SegmentConfig type is exported from utils/segments.ts to avoid duplicate exports
+export type SegmentConfig = typeof SegmentConfigSchema.Type
 
 // =============================================================================
 // Floor Configuration
 // =============================================================================
+
+const FloorTokensAndSegmentsSchema = Schema.Struct({
+  /** Address of the issuance token (fToken) */
+  issuanceTokenAddress: AddressSchema,
+  /** Address of the reserve/collateral token */
+  reserveTokenAddress: AddressSchema,
+  /**
+   * Bonding curve segments (at least 1 required). Segment prices use **reserve** token decimals;
+   * `supplyPerStep` uses **issuance** token decimals (see module docstring above).
+   */
+  segments: Schema.Array(SegmentConfigSchema).pipe(Schema.minItems(1)),
+}).annotations({ title: 'FloorTokensAndSegments' })
 
 /**
  * @description Floor module configuration
  * Encoding order matches floorSetup.s.sol:
  * abi.encode(issuanceToken, collateralToken, segments, buyFeeBps, sellFeeBps)
  */
-export const FloorConfigSchema = Schema.Struct({
-  /** Address of the issuance token (fToken) */
-  issuanceTokenAddress: AddressSchema,
-  /** Address of the reserve/collateral token */
-  reserveTokenAddress: AddressSchema,
-  /** Bonding curve segments (at least 1 required) */
-  segments: Schema.Array(SegmentConfigSchema).pipe(Schema.minItems(1)),
-  /** Buy fee in basis points (0-10000) */
-  buyFeeBps: Schema.Number.pipe(Schema.int(), Schema.between(0, 10_000)),
-  /** Sell fee in basis points (0-10000) */
-  sellFeeBps: Schema.Number.pipe(Schema.int(), Schema.between(0, 10_000)),
-}).annotations({
+export const FloorConfigSchema = FloorTokensAndSegmentsSchema.pipe(
+  Schema.extend(FloorFeesSchema)
+).annotations({
   title: 'FloorConfig',
   description: 'Floor module configuration for bonding curve initialization',
 })
@@ -63,12 +117,12 @@ export type FloorConfig = typeof FloorConfigSchema.Type
 export const TreasuryRecipientSchema = Schema.Struct({
   /** Recipient address */
   address: AddressSchema,
-  /** Share amount (relative to total shares) */
-  shares: Schema.BigIntFromSelf,
-}).annotations({
-  title: 'TreasuryRecipient',
-  description: 'Treasury recipient with share allocation',
 })
+  .pipe(Schema.extend(TreasuryRecipientSharesSchema))
+  .annotations({
+    title: 'TreasuryRecipient',
+    description: 'Treasury recipient with share allocation',
+  })
 
 export type TreasuryRecipient = typeof TreasuryRecipientSchema.Type
 
@@ -80,14 +134,20 @@ export type TreasuryRecipient = typeof TreasuryRecipientSchema.Type
 export const TreasuryConfigSchema = Schema.Struct({
   /** Array of recipients with their shares */
   recipients: Schema.Array(TreasuryRecipientSchema).pipe(Schema.minItems(1)),
-  /** Floor fee percentage in basis points (e.g., 6800 = 68%) */
-  floorFeePercentage: Schema.Number.pipe(Schema.int(), Schema.between(0, 10_000)),
-  /** Address receiving floor fees (typically the Floor contract itself) */
-  floorFeeTreasury: AddressSchema,
-}).annotations({
-  title: 'TreasuryConfig',
-  description: 'Treasury module configuration for fee splitting',
 })
+  .pipe(Schema.extend(FloorFeePercentageSchema))
+  .pipe(
+    Schema.extend(
+      Schema.Struct({
+        /** Address receiving floor fees (typically the Floor contract itself) */
+        floorFeeTreasury: AddressSchema,
+      })
+    )
+  )
+  .annotations({
+    title: 'TreasuryConfig',
+    description: 'Treasury module configuration for fee splitting',
+  })
 
 export type TreasuryConfig = typeof TreasuryConfigSchema.Type
 
@@ -95,19 +155,21 @@ export type TreasuryConfig = typeof TreasuryConfigSchema.Type
 // Credit Facility Configuration
 // =============================================================================
 
+const CreditFacilityParamsSchema = Schema.Struct({
+  /** Loan-to-value ratio in basis points (e.g., 10000 = 100%) */
+  loanToValueRatio: Bps1_10000,
+  /** Maximum leverage multiplier (e.g., 25) */
+  maxLeverage: MaxLeverage1_255,
+  /** Borrowing fee rate in basis points (e.g., 600 = 6%) */
+  borrowingFeeRate: Bps0_10000,
+}).annotations({ title: 'CreditFacilityParams' })
+
 /**
  * @description Credit facility module configuration
  * Encoding order matches creditFacilitySetup.s.sol:
  * abi.encode(loanToValueRatio, maxLeverage, borrowingFeeRate)
  */
-export const CreditFacilityConfigSchema = Schema.Struct({
-  /** Loan-to-value ratio in basis points (e.g., 10000 = 100%) */
-  loanToValueRatio: Schema.Number.pipe(Schema.int(), Schema.between(1, 10_000)),
-  /** Maximum leverage multiplier (e.g., 25) */
-  maxLeverage: Schema.Number.pipe(Schema.int(), Schema.between(1, 255)),
-  /** Borrowing fee rate in basis points (e.g., 600 = 6%) */
-  borrowingFeeRate: Schema.Number.pipe(Schema.int(), Schema.between(0, 10_000)),
-}).annotations({
+export const CreditFacilityConfigSchema = CreditFacilityParamsSchema.annotations({
   title: 'CreditFacilityConfig',
   description: 'Credit facility module configuration for lending',
 })
@@ -118,6 +180,27 @@ export type CreditFacilityConfig = typeof CreditFacilityConfigSchema.Type
 // Presale Configuration
 // =============================================================================
 
+/** Fields shared by {@link PresaleConfigSchema} (on-chain) and {@link PresaleFormSchema} (wizard). */
+const PresaleCurveParamsSchema = Schema.Struct({
+  /** Commission schedule - array of fees per leverage level in basis points (index 0 = direct, 1+ = leverage) */
+  baseCommissionBps: Schema.Array(Schema.BigIntFromSelf).pipe(Schema.minItems(1)),
+  /** Presale end timestamp (unix seconds) */
+  endTimestamp: Schema.BigIntFromSelf,
+  /** Global issuance cap in **issuance token native decimals** (0 = unlimited) */
+  globalIssuanceCap: Schema.BigIntFromSelf,
+  /** Per-address issuance cap in **issuance token native decimals** (0 = unlimited) */
+  perAddressIssuanceCap: Schema.BigIntFromSelf,
+  /**
+   * Tranche unlock prices: same scale as bonding-curve spot price — **reserve token native decimals**
+   * (not WAD unless reserve is 18 decimals). 2D: `[leverage level][tranche]`.
+   */
+  priceBreakpoints: Schema.Array(Schema.Array(Schema.BigIntFromSelf)),
+  /** Initial fee multiplier in BPS (10000 = 1x, 20000 = 2x). Used with DecayingFeeMultiplier */
+  initialMultiplier: Schema.BigIntFromSelf,
+  /** Decay duration in seconds (0 = no decay). Multiplier decays from initial to 1x over this period */
+  decayDuration: Schema.BigIntFromSelf,
+}).annotations({ title: 'PresaleCurveParams' })
+
 /**
  * @description Presale module configuration
  * Encoding order matches Presale_v1.sol init:
@@ -127,24 +210,12 @@ export type CreditFacilityConfig = typeof CreditFacilityConfigSchema.Type
 export const PresaleConfigSchema = Schema.Struct({
   /** Credit facility address (or zero address if none) */
   creditFacilityAddress: Schema.optional(AddressSchema),
-  /** Commission schedule - array of fees per leverage level in basis points (index 0 = direct, 1+ = leverage) */
-  baseCommissionBps: Schema.Array(Schema.BigIntFromSelf).pipe(Schema.minItems(1)),
-  /** Presale end timestamp (unix seconds) */
-  endTimestamp: Schema.BigIntFromSelf,
-  /** Global issuance cap in issuance tokens (0 = unlimited) */
-  globalIssuanceCap: Schema.BigIntFromSelf,
-  /** Per-address issuance cap in issuance tokens (0 = unlimited) */
-  perAddressIssuanceCap: Schema.BigIntFromSelf,
-  /** Price breakpoints - 2D array: [leverage level][tranche unlock price]. Length must be baseCommissionBps.length - 1 */
-  priceBreakpoints: Schema.Array(Schema.Array(Schema.BigIntFromSelf)),
-  /** Initial fee multiplier in BPS (10000 = 1x, 20000 = 2x). Used with DecayingFeeMultiplier */
-  initialMultiplier: Schema.BigIntFromSelf,
-  /** Decay duration in seconds (0 = no decay). Multiplier decays from initial to 1x over this period */
-  decayDuration: Schema.BigIntFromSelf,
-}).annotations({
-  title: 'PresaleConfig',
-  description: 'Presale module configuration for leveraged presales with decaying fee multiplier',
 })
+  .pipe(Schema.extend(PresaleCurveParamsSchema))
+  .annotations({
+    title: 'PresaleConfig',
+    description: 'Presale module configuration for leveraged presales with decaying fee multiplier',
+  })
 
 export type PresaleConfig = typeof PresaleConfigSchema.Type
 
@@ -159,7 +230,7 @@ export type PresaleConfig = typeof PresaleConfigSchema.Type
  */
 export const StakingConfigSchema = Schema.Struct({
   /** Performance fee on harvested yield in basis points (e.g., 1000 = 10%) */
-  performanceFeeBps: Schema.Number.pipe(Schema.int(), Schema.between(0, 10_000)),
+  performanceFeeBps: Bps0_10000,
 }).annotations({
   title: 'StakingConfig',
   description: 'StakingManager module configuration for yield staking',
@@ -214,3 +285,105 @@ export const LaunchResultSchema = Schema.Struct({
 })
 
 export type LaunchResult = typeof LaunchResultSchema.Type
+
+// =============================================================================
+// Wizard / API form input (pre-normalization) — inferred from schemas below
+// =============================================================================
+
+/** Nested new-token fields when `issuanceToken.mode === 'create'`. */
+export const IssuanceTokenNewTokenFormSchema = Schema.Struct({
+  name: Schema.String,
+  symbol: Schema.String,
+  decimals: TokenDecimals0_255,
+  maxSupply: Schema.BigIntFromSelf,
+}).annotations({ title: 'IssuanceTokenNewTokenForm' })
+
+export const IssuanceTokenFormSchema = Schema.Struct({
+  mode: Schema.Literal('existing', 'create'),
+  existingAddress: Schema.String,
+  newToken: IssuanceTokenNewTokenFormSchema,
+}).annotations({ title: 'IssuanceTokenForm' })
+
+export type IssuanceTokenFormData = typeof IssuanceTokenFormSchema.Type
+
+/** Wizard presale block — extends {@link PresaleCurveParamsSchema} with UI-only fields. */
+export const PresaleFormSchema = Schema.Struct({
+  enabled: Schema.Boolean,
+  creditFacilityAddress: Schema.String,
+  maxLeverage: Schema.Number.pipe(Schema.int(), Schema.between(0, 255)),
+})
+  .pipe(Schema.extend(PresaleCurveParamsSchema))
+  .annotations({ title: 'PresaleForm' })
+
+export type PresaleFormData = typeof PresaleFormSchema.Type
+
+/** Wizard credit facility — extends {@link CreditFacilityParamsSchema} with `enabled`. */
+export const CreditFacilityFormSchema = Schema.Struct({
+  enabled: Schema.Boolean,
+})
+  .pipe(Schema.extend(CreditFacilityParamsSchema))
+  .annotations({ title: 'CreditFacilityForm' })
+
+export type CreditFacilityFormData = typeof CreditFacilityFormSchema.Type
+
+/** Wizard staking — extends {@link StakingConfigSchema} with `enabled` and optional strategy. */
+export const StakingFormSchema = Schema.Struct({
+  enabled: Schema.Boolean,
+  strategyAddress: Schema.optional(Schema.String),
+})
+  .pipe(Schema.extend(StakingConfigSchema))
+  .annotations({ title: 'StakingForm' })
+
+export type StakingFormData = typeof StakingFormSchema.Type
+
+export const ConfigurationFormSchema = Schema.Struct({
+  grantMinterRole: Schema.Boolean,
+  openBuy: Schema.Boolean,
+  openSell: Schema.Boolean,
+  openBorrow: Schema.optional(Schema.Boolean),
+}).annotations({ title: 'ConfigurationForm' })
+
+export type ConfigurationFormData = typeof ConfigurationFormSchema.Type
+
+/** Wizard treasury row — same `shares` as {@link TreasuryRecipientSchema}, loose `address` string. */
+export const TreasuryRecipientFormSchema = Schema.Struct({
+  address: Schema.String,
+})
+  .pipe(Schema.extend(TreasuryRecipientSharesSchema))
+  .annotations({ title: 'TreasuryRecipientForm' })
+
+export type TreasuryRecipientFormData = typeof TreasuryRecipientFormSchema.Type
+
+/**
+ * Create-market wizard / API payload. Numeric fields may mix WAD-style values; use
+ * {@link transformLaunchFormDataToLaunchConfig} in `utils/segments.ts` to produce canonical {@link LaunchConfig}.
+ */
+export const LaunchFormSchema = Schema.Struct({
+  issuanceToken: IssuanceTokenFormSchema,
+  reserveTokenAddress: Schema.String,
+  reserveTokenDecimals: TokenDecimals0_255,
+  issuanceTokenDecimals: Schema.optional(TokenDecimals0_255),
+  floorSegment: SegmentConfigSchema,
+  premiumSegments: Schema.Array(SegmentConfigSchema).pipe(Schema.minItems(1)),
+  recipients: Schema.Array(TreasuryRecipientFormSchema).pipe(Schema.minItems(1)),
+  creditFacility: CreditFacilityFormSchema,
+  staking: StakingFormSchema,
+  presale: PresaleFormSchema,
+  configuration: ConfigurationFormSchema,
+})
+  .pipe(Schema.extend(FloorFeesSchema))
+  .pipe(Schema.extend(FloorFeePercentageSchema))
+  .annotations({
+    title: 'LaunchForm',
+    description: 'Create-market wizard payload before normalization to LaunchConfig',
+  })
+
+export type LaunchFormData = typeof LaunchFormSchema.Type
+
+export const CreateMarketFromFormParamsSchema = Schema.Struct({
+  formData: LaunchFormSchema,
+  floorFactoryAddress: Schema.optional(AddressSchema),
+  creatorAddress: Schema.optional(AddressSchema),
+}).annotations({ title: 'CreateMarketFromFormParams' })
+
+export type CreateMarketFromFormParams = typeof CreateMarketFromFormParamsSchema.Type

@@ -10,6 +10,7 @@ import type {
   FloorConfig,
   LaunchConfig,
   PresaleConfig,
+  SegmentConfig,
   TreasuryConfig,
 } from '../../../src/schemas/launch.schema'
 import { ANVIL_ADDRESSES } from './config'
@@ -17,16 +18,6 @@ import { ANVIL_ADDRESSES } from './config'
 // =============================================================================
 // Segment Fixtures
 // =============================================================================
-
-/**
- * Segment configuration for testing
- */
-export interface SegmentConfig {
-  initialPrice: bigint
-  priceIncrease: bigint
-  supplyPerStep: bigint
-  numberOfSteps: number
-}
 
 /**
  * Creates test segments with native BigInt values

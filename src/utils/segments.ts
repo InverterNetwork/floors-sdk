@@ -1,3 +1,19 @@
+import type { Address } from 'viem'
+
+import type {
+  CreditFacilityConfig,
+  FloorConfig,
+  LaunchConfig,
+  LaunchFormData,
+  PresaleConfig,
+  SegmentConfig,
+  StakingConfig,
+  TreasuryConfig,
+} from '../schemas/launch.schema'
+
+export type { SegmentConfig } from '../schemas/launch.schema'
+import { PROTOCOL_LIMITS } from './validation'
+
 /**
  * @description Segment utilities for bonding curve configuration
  * PackedSegment format: bytes32 containing [initialPrice | priceIncrease | supplyPerStep | numberOfSteps]
@@ -8,8 +24,6 @@
  * - supplyPerStep:   96 bits  (offset 144) - Token amount per step
  * - numberOfSteps:   16 bits  (offset 240) - Steps in segment (1–65,535)
  */
-
-import { PROTOCOL_LIMITS } from './validation'
 
 /**
  * @description Packed segment type (bytes32 hex string)
@@ -97,20 +111,6 @@ export function encodeToPackedSegment(segment: DecodedSegment): PackedSegment {
   value |= (segment.supplyPerStep & MASK_96) << BigInt(144)
   value |= (BigInt(segment.numberOfSteps) & MASK_16) << BigInt(240)
   return `0x${value.toString(16).padStart(64, '0')}` as PackedSegment
-}
-
-/**
- * @description Segment configuration for bonding curve
- */
-export type SegmentConfig = {
-  /** Starting price in 18 decimal format (e.g., 1e18 = 1 token) */
-  initialPrice: bigint
-  /** Price increase per step in 18 decimal format (0 for flat floor segment) */
-  priceIncrease: bigint
-  /** Token supply per step in 18 decimal format */
-  supplyPerStep: bigint
-  /** Number of steps in this segment */
-  numberOfSteps: number
 }
 
 /**
@@ -378,6 +378,153 @@ export function scaleSegmentPricesWadToReserve(
     }
   }
   return { initialPrice: seg.initialPrice, priceIncrease: seg.priceIncrease }
+}
+
+/** Values ≥ this are treated as 18-decimal WAD when collateral has fewer than 18 decimals. */
+const WAD_LINE = BigInt(10) ** BigInt(18)
+
+/**
+ * Normalize a reserve-denominated price: accepts either 18-decimal WAD or native reserve units.
+ */
+export function normalizeReservePriceFromWadOrNative(
+  price: bigint,
+  reserveTokenDecimals: number
+): bigint {
+  const d = reserveTokenDecimals ?? 18
+  if (d >= 18) return price
+  if (price >= WAD_LINE) {
+    return scaleSegmentPricesWadToReserve({ initialPrice: price, priceIncrease: BigInt(0) }, d)
+      .initialPrice
+  }
+  return price
+}
+
+/** Normalize segment price fields from WAD or native reserve units (each field independently). */
+export function normalizeSegmentReservePricesFromWadOrNative(
+  seg: { initialPrice: bigint; priceIncrease: bigint },
+  reserveTokenDecimals: number
+): { initialPrice: bigint; priceIncrease: bigint } {
+  const d = reserveTokenDecimals ?? 18
+  return {
+    initialPrice: normalizeReservePriceFromWadOrNative(seg.initialPrice, d),
+    priceIncrease: normalizeReservePriceFromWadOrNative(seg.priceIncrease, d),
+  }
+}
+
+/**
+ * Normalize issuance-token amounts: native units, or WAD-style scaling when issuance &lt; 18 decimals.
+ */
+export function normalizeIssuanceAmountFromWadOrNative(
+  amount: bigint,
+  issuanceTokenDecimals: number
+): bigint {
+  const d = issuanceTokenDecimals ?? 18
+  if (d >= 18 || amount === BigInt(0)) return amount
+  if (amount < WAD_LINE) return amount
+  if (amount % WAD_LINE !== BigInt(0)) return amount
+  const factor = BigInt(10) ** BigInt(18 - d)
+  return amount / factor
+}
+
+/**
+ * Build canonical {@link LaunchConfig} from wizard/API {@link LaunchFormData} (server-safe, no React).
+ */
+export function transformLaunchFormDataToLaunchConfig(
+  formData: LaunchFormData,
+  creatorAddress: Address
+): LaunchConfig {
+  const issuanceTokenAddress = formData.issuanceToken.existingAddress as Address
+  if (!issuanceTokenAddress || issuanceTokenAddress.length !== 42) {
+    throw new Error('Issuance token address is required')
+  }
+
+  const reserveDec = formData.reserveTokenDecimals ?? 18
+  const issuanceDec = formData.issuanceTokenDecimals ?? 18
+
+  const rawSegments = [formData.floorSegment, ...formData.premiumSegments]
+  // Segment prices in LaunchFormData are 18-decimal WAD (see create-market SEGMENT_PRICE_WAD_DECIMALS).
+  // Always scale to reserve native decimals — do not use WAD-vs-native heuristics here: sub-1e18 WAD
+  // values (e.g. 0.01e18) must still scale or DiscreteCurveMathLib__InvalidPriceProgression can revert.
+  const segments = rawSegments.map((seg) => ({
+    ...seg,
+    supplyPerStep: normalizeIssuanceAmountFromWadOrNative(seg.supplyPerStep, issuanceDec),
+    ...scaleSegmentPricesWadToReserve(
+      { initialPrice: seg.initialPrice, priceIncrease: seg.priceIncrease },
+      reserveDec
+    ),
+  }))
+
+  const floorConfig: FloorConfig = {
+    issuanceTokenAddress,
+    reserveTokenAddress: formData.reserveTokenAddress as Address,
+    segments,
+    buyFeeBps: formData.buyFeeBps,
+    sellFeeBps: formData.sellFeeBps,
+  }
+
+  const treasuryConfig: TreasuryConfig = {
+    recipients: formData.recipients.map((r) => ({
+      address: r.address as Address,
+      shares: r.shares,
+    })),
+    floorFeePercentage: formData.floorFeePercentage,
+    floorFeeTreasury: creatorAddress,
+  }
+
+  let creditFacilityConfig: CreditFacilityConfig | undefined
+  if (formData.creditFacility?.enabled) {
+    creditFacilityConfig = {
+      loanToValueRatio: formData.creditFacility.loanToValueRatio,
+      maxLeverage: formData.creditFacility.maxLeverage,
+      borrowingFeeRate: formData.creditFacility.borrowingFeeRate,
+    }
+  }
+
+  let presaleConfig: PresaleConfig | undefined
+  if (formData.presale?.enabled) {
+    presaleConfig = {
+      creditFacilityAddress: formData.presale.creditFacilityAddress
+        ? (formData.presale.creditFacilityAddress as Address)
+        : undefined,
+      baseCommissionBps: formData.presale.baseCommissionBps,
+      endTimestamp: formData.presale.endTimestamp,
+      globalIssuanceCap: normalizeIssuanceAmountFromWadOrNative(
+        formData.presale.globalIssuanceCap,
+        issuanceDec
+      ),
+      perAddressIssuanceCap: normalizeIssuanceAmountFromWadOrNative(
+        formData.presale.perAddressIssuanceCap,
+        issuanceDec
+      ),
+      priceBreakpoints: formData.presale.priceBreakpoints.map((row) =>
+        row.map(
+          (price) =>
+            scaleSegmentPricesWadToReserve(
+              { initialPrice: price, priceIncrease: BigInt(0) },
+              reserveDec
+            ).initialPrice
+        )
+      ),
+      initialMultiplier: formData.presale.initialMultiplier,
+      decayDuration: formData.presale.decayDuration,
+    }
+  }
+
+  let stakingConfig: StakingConfig | undefined
+  if (formData.staking?.enabled) {
+    stakingConfig = {
+      performanceFeeBps: formData.staking.performanceFeeBps,
+    }
+  }
+
+  return {
+    floor: floorConfig,
+    initialAdmin: creatorAddress,
+    treasury: treasuryConfig,
+    creditFacility: creditFacilityConfig,
+    presale: presaleConfig,
+    staking: stakingConfig,
+  }
 }
 
 /**
