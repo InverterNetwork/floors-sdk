@@ -505,8 +505,8 @@ export type TPresaleContractLiveData = {
   totalMintedFormatted: string
   totalParticipants: number
   currentState: number
-  globalDepositCapRaw: string
-  globalDepositCapFormatted: string
+  globalIssuanceCapRaw: string
+  globalIssuanceCapFormatted: string
 }
 
 export type UsePresaleContractSubscriptionParams = {

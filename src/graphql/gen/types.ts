@@ -5193,10 +5193,10 @@ export default {
             "feeTreasury": [
                 321
             ],
-            "globalDepositCapFormatted": [
+            "globalIssuanceCapFormatted": [
                 321
             ],
-            "globalDepositCapRaw": [
+            "globalIssuanceCapRaw": [
                 392
             ],
             "id": [
@@ -5242,10 +5242,10 @@ export default {
                     ]
                 }
             ],
-            "perAddressDepositCapFormatted": [
+            "perAddressIssuanceCapFormatted": [
                 321
             ],
-            "perAddressDepositCapRaw": [
+            "perAddressIssuanceCapRaw": [
                 392
             ],
             "priceBreakpointOffsets": [
@@ -5334,10 +5334,10 @@ export default {
             "feeTreasury": [
                 323
             ],
-            "globalDepositCapFormatted": [
+            "globalIssuanceCapFormatted": [
                 323
             ],
-            "globalDepositCapRaw": [
+            "globalIssuanceCapRaw": [
                 393
             ],
             "id": [
@@ -5364,10 +5364,10 @@ export default {
             "participations": [
                 193
             ],
-            "perAddressDepositCapFormatted": [
+            "perAddressIssuanceCapFormatted": [
                 323
             ],
-            "perAddressDepositCapRaw": [
+            "perAddressIssuanceCapRaw": [
                 393
             ],
             "priceBreakpointOffsets": [
@@ -5447,10 +5447,10 @@ export default {
             "feeTreasury": [
                 394
             ],
-            "globalDepositCapFormatted": [
+            "globalIssuanceCapFormatted": [
                 394
             ],
-            "globalDepositCapRaw": [
+            "globalIssuanceCapRaw": [
                 394
             ],
             "id": [
@@ -5477,10 +5477,10 @@ export default {
             "participations_aggregate": [
                 191
             ],
-            "perAddressDepositCapFormatted": [
+            "perAddressIssuanceCapFormatted": [
                 394
             ],
-            "perAddressDepositCapRaw": [
+            "perAddressIssuanceCapRaw": [
                 394
             ],
             "priceBreakpointOffsets": [
@@ -5569,10 +5569,10 @@ export default {
             "feeTreasury": [
                 321
             ],
-            "globalDepositCapFormatted": [
+            "globalIssuanceCapFormatted": [
                 321
             ],
-            "globalDepositCapRaw": [
+            "globalIssuanceCapRaw": [
                 392
             ],
             "id": [
@@ -5596,10 +5596,10 @@ export default {
             "merkleRoot": [
                 321
             ],
-            "perAddressDepositCapFormatted": [
+            "perAddressIssuanceCapFormatted": [
                 321
             ],
-            "perAddressDepositCapRaw": [
+            "perAddressIssuanceCapRaw": [
                 392
             ],
             "priceBreakpointOffsets": [

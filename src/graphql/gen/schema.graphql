@@ -3099,8 +3099,8 @@ type PreSaleContract {
   decayStartTime: numeric
   endTime: numeric!
   feeTreasury: String
-  globalDepositCapFormatted: String!
-  globalDepositCapRaw: numeric!
+  globalIssuanceCapFormatted: String!
+  globalIssuanceCapRaw: numeric!
   id: String!
   initialMultiplier: numeric
   lastUpdatedAt: numeric!
@@ -3126,8 +3126,8 @@ type PreSaleContract {
     """filter the rows returned"""
     where: PresaleParticipation_bool_exp
   ): [PresaleParticipation!]!
-  perAddressDepositCapFormatted: String!
-  perAddressDepositCapRaw: numeric!
+  perAddressIssuanceCapFormatted: String!
+  perAddressIssuanceCapRaw: numeric!
   priceBreakpointOffsets: [Int!]
   priceBreakpointsFlat: [String!]
 
@@ -3165,8 +3165,8 @@ input PreSaleContract_bool_exp {
   decayStartTime: numeric_comparison_exp
   endTime: numeric_comparison_exp
   feeTreasury: String_comparison_exp
-  globalDepositCapFormatted: String_comparison_exp
-  globalDepositCapRaw: numeric_comparison_exp
+  globalIssuanceCapFormatted: String_comparison_exp
+  globalIssuanceCapRaw: numeric_comparison_exp
   id: String_comparison_exp
   initialMultiplier: numeric_comparison_exp
   lastUpdatedAt: numeric_comparison_exp
@@ -3175,8 +3175,8 @@ input PreSaleContract_bool_exp {
   maxLeverage: numeric_comparison_exp
   merkleRoot: String_comparison_exp
   participations: PresaleParticipation_bool_exp
-  perAddressDepositCapFormatted: String_comparison_exp
-  perAddressDepositCapRaw: numeric_comparison_exp
+  perAddressIssuanceCapFormatted: String_comparison_exp
+  perAddressIssuanceCapRaw: numeric_comparison_exp
   priceBreakpointOffsets: Int_array_comparison_exp
   priceBreakpointsFlat: String_array_comparison_exp
   purchaseToken: Token_bool_exp
@@ -3205,8 +3205,8 @@ input PreSaleContract_order_by {
   decayStartTime: order_by
   endTime: order_by
   feeTreasury: order_by
-  globalDepositCapFormatted: order_by
-  globalDepositCapRaw: order_by
+  globalIssuanceCapFormatted: order_by
+  globalIssuanceCapRaw: order_by
   id: order_by
   initialMultiplier: order_by
   lastUpdatedAt: order_by
@@ -3215,8 +3215,8 @@ input PreSaleContract_order_by {
   maxLeverage: order_by
   merkleRoot: order_by
   participations_aggregate: PresaleParticipation_aggregate_order_by
-  perAddressDepositCapFormatted: order_by
-  perAddressDepositCapRaw: order_by
+  perAddressIssuanceCapFormatted: order_by
+  perAddressIssuanceCapRaw: order_by
   priceBreakpointOffsets: order_by
   priceBreakpointsFlat: order_by
   purchaseToken: Token_order_by
@@ -3263,10 +3263,10 @@ enum PreSaleContract_select_column {
   feeTreasury
 
   """column name"""
-  globalDepositCapFormatted
+  globalIssuanceCapFormatted
 
   """column name"""
-  globalDepositCapRaw
+  globalIssuanceCapRaw
 
   """column name"""
   id
@@ -3290,10 +3290,10 @@ enum PreSaleContract_select_column {
   merkleRoot
 
   """column name"""
-  perAddressDepositCapFormatted
+  perAddressIssuanceCapFormatted
 
   """column name"""
-  perAddressDepositCapRaw
+  perAddressIssuanceCapRaw
 
   """column name"""
   priceBreakpointOffsets
@@ -3356,8 +3356,8 @@ input PreSaleContract_stream_cursor_value_input {
   decayStartTime: numeric
   endTime: numeric
   feeTreasury: String
-  globalDepositCapFormatted: String
-  globalDepositCapRaw: numeric
+  globalIssuanceCapFormatted: String
+  globalIssuanceCapRaw: numeric
   id: String
   initialMultiplier: numeric
   lastUpdatedAt: numeric
@@ -3365,8 +3365,8 @@ input PreSaleContract_stream_cursor_value_input {
   market_id: String
   maxLeverage: numeric
   merkleRoot: String
-  perAddressDepositCapFormatted: String
-  perAddressDepositCapRaw: numeric
+  perAddressIssuanceCapFormatted: String
+  perAddressIssuanceCapRaw: numeric
   priceBreakpointOffsets: [Int!]
   priceBreakpointsFlat: [String!]
   purchaseToken_id: String

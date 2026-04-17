@@ -396,8 +396,8 @@ export interface PreSaleContract {
     decayStartTime: (Scalars['numeric'] | null)
     endTime: Scalars['numeric']
     feeTreasury: (Scalars['String'] | null)
-    globalDepositCapFormatted: Scalars['String']
-    globalDepositCapRaw: Scalars['numeric']
+    globalIssuanceCapFormatted: Scalars['String']
+    globalIssuanceCapRaw: Scalars['numeric']
     id: Scalars['String']
     initialMultiplier: (Scalars['numeric'] | null)
     lastUpdatedAt: Scalars['numeric']
@@ -407,8 +407,8 @@ export interface PreSaleContract {
     merkleRoot: (Scalars['String'] | null)
     /** An array relationship */
     participations: PresaleParticipation[]
-    perAddressDepositCapFormatted: Scalars['String']
-    perAddressDepositCapRaw: Scalars['numeric']
+    perAddressIssuanceCapFormatted: Scalars['String']
+    perAddressIssuanceCapRaw: Scalars['numeric']
     priceBreakpointOffsets: (Scalars['Int'][] | null)
     priceBreakpointsFlat: (Scalars['String'][] | null)
     /** An object relationship */
@@ -431,7 +431,7 @@ export interface PreSaleContract {
 
 
 /** select columns of table "PreSaleContract" */
-export type PreSaleContract_select_column = 'authorizer' | 'commissionBps' | 'createdAt' | 'currentState' | 'decayDuration' | 'decayStartTime' | 'endTime' | 'feeTreasury' | 'globalDepositCapFormatted' | 'globalDepositCapRaw' | 'id' | 'initialMultiplier' | 'lastUpdatedAt' | 'lendingFacility' | 'market_id' | 'maxLeverage' | 'merkleRoot' | 'perAddressDepositCapFormatted' | 'perAddressDepositCapRaw' | 'priceBreakpointOffsets' | 'priceBreakpointsFlat' | 'purchaseToken_id' | 'saleToken_id' | 'startTime' | 'timeSafeguardTs' | 'totalMintedFormatted' | 'totalMintedRaw' | 'totalParticipants' | 'totalRaisedFormatted' | 'totalRaisedRaw' | 'whitelistSize' | 'whitelistedAddresses'
+export type PreSaleContract_select_column = 'authorizer' | 'commissionBps' | 'createdAt' | 'currentState' | 'decayDuration' | 'decayStartTime' | 'endTime' | 'feeTreasury' | 'globalIssuanceCapFormatted' | 'globalIssuanceCapRaw' | 'id' | 'initialMultiplier' | 'lastUpdatedAt' | 'lendingFacility' | 'market_id' | 'maxLeverage' | 'merkleRoot' | 'perAddressIssuanceCapFormatted' | 'perAddressIssuanceCapRaw' | 'priceBreakpointOffsets' | 'priceBreakpointsFlat' | 'purchaseToken_id' | 'saleToken_id' | 'startTime' | 'timeSafeguardTs' | 'totalMintedFormatted' | 'totalMintedRaw' | 'totalParticipants' | 'totalRaisedFormatted' | 'totalRaisedRaw' | 'whitelistSize' | 'whitelistedAddresses'
 
 
 /** columns and relationships of "PresaleClaim" */
@@ -2215,8 +2215,8 @@ export interface PreSaleContractGenqlSelection{
     decayStartTime?: boolean | number
     endTime?: boolean | number
     feeTreasury?: boolean | number
-    globalDepositCapFormatted?: boolean | number
-    globalDepositCapRaw?: boolean | number
+    globalIssuanceCapFormatted?: boolean | number
+    globalIssuanceCapRaw?: boolean | number
     id?: boolean | number
     initialMultiplier?: boolean | number
     lastUpdatedAt?: boolean | number
@@ -2236,8 +2236,8 @@ export interface PreSaleContractGenqlSelection{
     order_by?: (PresaleParticipation_order_by[] | null), 
     /** filter the rows returned */
     where?: (PresaleParticipation_bool_exp | null)} })
-    perAddressDepositCapFormatted?: boolean | number
-    perAddressDepositCapRaw?: boolean | number
+    perAddressIssuanceCapFormatted?: boolean | number
+    perAddressIssuanceCapRaw?: boolean | number
     priceBreakpointOffsets?: boolean | number
     priceBreakpointsFlat?: boolean | number
     /** An object relationship */
@@ -2261,11 +2261,11 @@ export interface PreSaleContractGenqlSelection{
 
 
 /** Boolean expression to filter rows from the table "PreSaleContract". All fields are combined with a logical 'AND'. */
-export interface PreSaleContract_bool_exp {_and?: (PreSaleContract_bool_exp[] | null),_not?: (PreSaleContract_bool_exp | null),_or?: (PreSaleContract_bool_exp[] | null),authorizer?: (String_comparison_exp | null),claims?: (PresaleClaim_bool_exp | null),commissionBps?: (String_array_comparison_exp | null),createdAt?: (numeric_comparison_exp | null),currentState?: (Int_comparison_exp | null),decayDuration?: (numeric_comparison_exp | null),decayStartTime?: (numeric_comparison_exp | null),endTime?: (numeric_comparison_exp | null),feeTreasury?: (String_comparison_exp | null),globalDepositCapFormatted?: (String_comparison_exp | null),globalDepositCapRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),initialMultiplier?: (numeric_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),lendingFacility?: (String_comparison_exp | null),market_id?: (String_comparison_exp | null),maxLeverage?: (numeric_comparison_exp | null),merkleRoot?: (String_comparison_exp | null),participations?: (PresaleParticipation_bool_exp | null),perAddressDepositCapFormatted?: (String_comparison_exp | null),perAddressDepositCapRaw?: (numeric_comparison_exp | null),priceBreakpointOffsets?: (Int_array_comparison_exp | null),priceBreakpointsFlat?: (String_array_comparison_exp | null),purchaseToken?: (Token_bool_exp | null),purchaseToken_id?: (String_comparison_exp | null),saleToken?: (Token_bool_exp | null),saleToken_id?: (String_comparison_exp | null),startTime?: (numeric_comparison_exp | null),timeSafeguardTs?: (numeric_comparison_exp | null),totalMintedFormatted?: (String_comparison_exp | null),totalMintedRaw?: (numeric_comparison_exp | null),totalParticipants?: (numeric_comparison_exp | null),totalRaisedFormatted?: (String_comparison_exp | null),totalRaisedRaw?: (numeric_comparison_exp | null),whitelistSize?: (numeric_comparison_exp | null),whitelistedAddresses?: (String_array_comparison_exp | null)}
+export interface PreSaleContract_bool_exp {_and?: (PreSaleContract_bool_exp[] | null),_not?: (PreSaleContract_bool_exp | null),_or?: (PreSaleContract_bool_exp[] | null),authorizer?: (String_comparison_exp | null),claims?: (PresaleClaim_bool_exp | null),commissionBps?: (String_array_comparison_exp | null),createdAt?: (numeric_comparison_exp | null),currentState?: (Int_comparison_exp | null),decayDuration?: (numeric_comparison_exp | null),decayStartTime?: (numeric_comparison_exp | null),endTime?: (numeric_comparison_exp | null),feeTreasury?: (String_comparison_exp | null),globalIssuanceCapFormatted?: (String_comparison_exp | null),globalIssuanceCapRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),initialMultiplier?: (numeric_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),lendingFacility?: (String_comparison_exp | null),market_id?: (String_comparison_exp | null),maxLeverage?: (numeric_comparison_exp | null),merkleRoot?: (String_comparison_exp | null),participations?: (PresaleParticipation_bool_exp | null),perAddressIssuanceCapFormatted?: (String_comparison_exp | null),perAddressIssuanceCapRaw?: (numeric_comparison_exp | null),priceBreakpointOffsets?: (Int_array_comparison_exp | null),priceBreakpointsFlat?: (String_array_comparison_exp | null),purchaseToken?: (Token_bool_exp | null),purchaseToken_id?: (String_comparison_exp | null),saleToken?: (Token_bool_exp | null),saleToken_id?: (String_comparison_exp | null),startTime?: (numeric_comparison_exp | null),timeSafeguardTs?: (numeric_comparison_exp | null),totalMintedFormatted?: (String_comparison_exp | null),totalMintedRaw?: (numeric_comparison_exp | null),totalParticipants?: (numeric_comparison_exp | null),totalRaisedFormatted?: (String_comparison_exp | null),totalRaisedRaw?: (numeric_comparison_exp | null),whitelistSize?: (numeric_comparison_exp | null),whitelistedAddresses?: (String_array_comparison_exp | null)}
 
 
 /** Ordering options when selecting data from "PreSaleContract". */
-export interface PreSaleContract_order_by {authorizer?: (order_by | null),claims_aggregate?: (PresaleClaim_aggregate_order_by | null),commissionBps?: (order_by | null),createdAt?: (order_by | null),currentState?: (order_by | null),decayDuration?: (order_by | null),decayStartTime?: (order_by | null),endTime?: (order_by | null),feeTreasury?: (order_by | null),globalDepositCapFormatted?: (order_by | null),globalDepositCapRaw?: (order_by | null),id?: (order_by | null),initialMultiplier?: (order_by | null),lastUpdatedAt?: (order_by | null),lendingFacility?: (order_by | null),market_id?: (order_by | null),maxLeverage?: (order_by | null),merkleRoot?: (order_by | null),participations_aggregate?: (PresaleParticipation_aggregate_order_by | null),perAddressDepositCapFormatted?: (order_by | null),perAddressDepositCapRaw?: (order_by | null),priceBreakpointOffsets?: (order_by | null),priceBreakpointsFlat?: (order_by | null),purchaseToken?: (Token_order_by | null),purchaseToken_id?: (order_by | null),saleToken?: (Token_order_by | null),saleToken_id?: (order_by | null),startTime?: (order_by | null),timeSafeguardTs?: (order_by | null),totalMintedFormatted?: (order_by | null),totalMintedRaw?: (order_by | null),totalParticipants?: (order_by | null),totalRaisedFormatted?: (order_by | null),totalRaisedRaw?: (order_by | null),whitelistSize?: (order_by | null),whitelistedAddresses?: (order_by | null)}
+export interface PreSaleContract_order_by {authorizer?: (order_by | null),claims_aggregate?: (PresaleClaim_aggregate_order_by | null),commissionBps?: (order_by | null),createdAt?: (order_by | null),currentState?: (order_by | null),decayDuration?: (order_by | null),decayStartTime?: (order_by | null),endTime?: (order_by | null),feeTreasury?: (order_by | null),globalIssuanceCapFormatted?: (order_by | null),globalIssuanceCapRaw?: (order_by | null),id?: (order_by | null),initialMultiplier?: (order_by | null),lastUpdatedAt?: (order_by | null),lendingFacility?: (order_by | null),market_id?: (order_by | null),maxLeverage?: (order_by | null),merkleRoot?: (order_by | null),participations_aggregate?: (PresaleParticipation_aggregate_order_by | null),perAddressIssuanceCapFormatted?: (order_by | null),perAddressIssuanceCapRaw?: (order_by | null),priceBreakpointOffsets?: (order_by | null),priceBreakpointsFlat?: (order_by | null),purchaseToken?: (Token_order_by | null),purchaseToken_id?: (order_by | null),saleToken?: (Token_order_by | null),saleToken_id?: (order_by | null),startTime?: (order_by | null),timeSafeguardTs?: (order_by | null),totalMintedFormatted?: (order_by | null),totalMintedRaw?: (order_by | null),totalParticipants?: (order_by | null),totalRaisedFormatted?: (order_by | null),totalRaisedRaw?: (order_by | null),whitelistSize?: (order_by | null),whitelistedAddresses?: (order_by | null)}
 
 
 /** Streaming cursor of the table "PreSaleContract" */
@@ -2277,7 +2277,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface PreSaleContract_stream_cursor_value_input {authorizer?: (Scalars['String'] | null),commissionBps?: (Scalars['String'][] | null),createdAt?: (Scalars['numeric'] | null),currentState?: (Scalars['Int'] | null),decayDuration?: (Scalars['numeric'] | null),decayStartTime?: (Scalars['numeric'] | null),endTime?: (Scalars['numeric'] | null),feeTreasury?: (Scalars['String'] | null),globalDepositCapFormatted?: (Scalars['String'] | null),globalDepositCapRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),initialMultiplier?: (Scalars['numeric'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),lendingFacility?: (Scalars['String'] | null),market_id?: (Scalars['String'] | null),maxLeverage?: (Scalars['numeric'] | null),merkleRoot?: (Scalars['String'] | null),perAddressDepositCapFormatted?: (Scalars['String'] | null),perAddressDepositCapRaw?: (Scalars['numeric'] | null),priceBreakpointOffsets?: (Scalars['Int'][] | null),priceBreakpointsFlat?: (Scalars['String'][] | null),purchaseToken_id?: (Scalars['String'] | null),saleToken_id?: (Scalars['String'] | null),startTime?: (Scalars['numeric'] | null),timeSafeguardTs?: (Scalars['numeric'] | null),totalMintedFormatted?: (Scalars['String'] | null),totalMintedRaw?: (Scalars['numeric'] | null),totalParticipants?: (Scalars['numeric'] | null),totalRaisedFormatted?: (Scalars['String'] | null),totalRaisedRaw?: (Scalars['numeric'] | null),whitelistSize?: (Scalars['numeric'] | null),whitelistedAddresses?: (Scalars['String'][] | null)}
+export interface PreSaleContract_stream_cursor_value_input {authorizer?: (Scalars['String'] | null),commissionBps?: (Scalars['String'][] | null),createdAt?: (Scalars['numeric'] | null),currentState?: (Scalars['Int'] | null),decayDuration?: (Scalars['numeric'] | null),decayStartTime?: (Scalars['numeric'] | null),endTime?: (Scalars['numeric'] | null),feeTreasury?: (Scalars['String'] | null),globalIssuanceCapFormatted?: (Scalars['String'] | null),globalIssuanceCapRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),initialMultiplier?: (Scalars['numeric'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),lendingFacility?: (Scalars['String'] | null),market_id?: (Scalars['String'] | null),maxLeverage?: (Scalars['numeric'] | null),merkleRoot?: (Scalars['String'] | null),perAddressIssuanceCapFormatted?: (Scalars['String'] | null),perAddressIssuanceCapRaw?: (Scalars['numeric'] | null),priceBreakpointOffsets?: (Scalars['Int'][] | null),priceBreakpointsFlat?: (Scalars['String'][] | null),purchaseToken_id?: (Scalars['String'] | null),saleToken_id?: (Scalars['String'] | null),startTime?: (Scalars['numeric'] | null),timeSafeguardTs?: (Scalars['numeric'] | null),totalMintedFormatted?: (Scalars['String'] | null),totalMintedRaw?: (Scalars['numeric'] | null),totalParticipants?: (Scalars['numeric'] | null),totalRaisedFormatted?: (Scalars['String'] | null),totalRaisedRaw?: (Scalars['numeric'] | null),whitelistSize?: (Scalars['numeric'] | null),whitelistedAddresses?: (Scalars['String'][] | null)}
 
 
 /** columns and relationships of "PresaleClaim" */
@@ -5316,8 +5316,8 @@ export const enumPreSaleContractSelectColumn = {
    decayStartTime: 'decayStartTime' as const,
    endTime: 'endTime' as const,
    feeTreasury: 'feeTreasury' as const,
-   globalDepositCapFormatted: 'globalDepositCapFormatted' as const,
-   globalDepositCapRaw: 'globalDepositCapRaw' as const,
+   globalIssuanceCapFormatted: 'globalIssuanceCapFormatted' as const,
+   globalIssuanceCapRaw: 'globalIssuanceCapRaw' as const,
    id: 'id' as const,
    initialMultiplier: 'initialMultiplier' as const,
    lastUpdatedAt: 'lastUpdatedAt' as const,
@@ -5325,8 +5325,8 @@ export const enumPreSaleContractSelectColumn = {
    market_id: 'market_id' as const,
    maxLeverage: 'maxLeverage' as const,
    merkleRoot: 'merkleRoot' as const,
-   perAddressDepositCapFormatted: 'perAddressDepositCapFormatted' as const,
-   perAddressDepositCapRaw: 'perAddressDepositCapRaw' as const,
+   perAddressIssuanceCapFormatted: 'perAddressIssuanceCapFormatted' as const,
+   perAddressIssuanceCapRaw: 'perAddressIssuanceCapRaw' as const,
    priceBreakpointOffsets: 'priceBreakpointOffsets' as const,
    priceBreakpointsFlat: 'priceBreakpointsFlat' as const,
    purchaseToken_id: 'purchaseToken_id' as const,
