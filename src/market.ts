@@ -66,6 +66,15 @@ export interface TMarketRepayParams {
   lifecycle?: TransactionLifecycleCallbacks
 }
 
+export interface TLoan {
+  id: bigint
+  borrower: Address
+  lockedIssuanceTokens: bigint
+  remainingLoanAmount: bigint
+  timestamp: bigint
+  isActive: boolean
+}
+
 export type TMarketMutationResult = TransactionReceipt
 
 interface MarketConstructorArgs {
@@ -526,6 +535,48 @@ export class Market {
     })) as bigint
 
     return Number(feeRate)
+  }
+
+  /**
+   * @description Fetch loan details by loan ID from the Credit Facility.
+   * @param loanId ID of the loan to fetch
+   * @returns Loan struct with collateral and remaining debt
+   */
+  public async getLoan(loanId: bigint): Promise<TLoan> {
+    const creditFacility = this.requireCreditFacility()
+
+    return (await this.publicClient.readContract({
+      address: creditFacility,
+      abi: CreditFacility_v1,
+      functionName: 'getLoan',
+      args: [loanId],
+    })) as TLoan
+  }
+
+  /**
+   * @description Fetch multiple loans by ID using multicall. Failed reads are skipped.
+   * @param loanIds Array of loan IDs to fetch
+   * @returns Array of loans in the same order (undefined for failed reads)
+   */
+  public async getLoans(loanIds: bigint[]): Promise<(TLoan | undefined)[]> {
+    if (loanIds.length === 0) return []
+    const creditFacility = this.requireCreditFacility()
+
+    try {
+      const contracts = loanIds.map((id) => ({
+        address: creditFacility,
+        abi: CreditFacility_v1,
+        functionName: 'getLoan' as const,
+        args: [id] as const,
+      }))
+
+      const results = await this.publicClient.multicall({ contracts })
+
+      return results.map((r) => (r.status === 'success' ? (r.result as TLoan) : undefined))
+    } catch {
+      const settled = await Promise.allSettled(loanIds.map((id) => this.getLoan(id)))
+      return settled.map((s) => (s.status === 'fulfilled' ? s.value : undefined))
+    }
   }
 
   /**

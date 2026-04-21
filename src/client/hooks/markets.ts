@@ -23,6 +23,7 @@ import {
 } from '../../graphql/api'
 import {
   Market,
+  type TLoan,
   type TMarketApproveParams,
   type TMarketBorrowParams,
   type TMarketBuyAndBorrowParams,
@@ -64,6 +65,7 @@ type UseMarketMutationsReturnType = {
   getLoanToValueRatio: UseMutationResult<number, Error, void>
   getBorrowingFeeRate: UseMutationResult<number, Error, void>
   getMaxLeverage: UseMutationResult<number, Error, void>
+  getLoans: UseMutationResult<(TLoan | undefined)[], Error, bigint[]>
   approveReserveForCredit: UseMutationResult<TMarketMutationResult, Error, TMarketApproveParams>
   buyFor: UseMutationResult<TMarketMutationResult, Error, TMarketBuyForParams>
   getFloorSection: UseMutationResult<`0x${string}`, Error, void>
@@ -400,6 +402,10 @@ export const useMarketMutations = (): UseMarketMutationsReturnType => {
     mutationFn: async () => ensureMarket().getMaxLeverage(),
   })
 
+  const getLoans = useMutation({
+    mutationFn: async (loanIds: bigint[]) => ensureMarket().getLoans(loanIds),
+  })
+
   const buyFor = useMutation({
     mutationFn: (params: TMarketBuyForParams) => ensureMarket().buyFor(params),
     onSuccess: async () => {
@@ -434,6 +440,7 @@ export const useMarketMutations = (): UseMarketMutationsReturnType => {
     getLoanToValueRatio,
     getBorrowingFeeRate,
     getMaxLeverage,
+    getLoans,
     buyFor,
     getFloorSection,
     getPremiumSections,
