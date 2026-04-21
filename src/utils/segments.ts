@@ -632,14 +632,12 @@ export function transformLaunchFormDataToLaunchConfig(
         formData.presale.perAddressIssuanceCap,
         issuanceDec
       ),
-      priceBreakpoints: formData.presale.priceBreakpoints.map((row) =>
-        row.map(
-          (price) =>
-            scaleSegmentPricesWadToReserve(
-              { initialPrice: price, priceIncrease: BigInt(0) },
-              reserveDec
-            ).initialPrice
-        )
+      priceBreakpoints: formData.presale.priceBreakpoints.map(
+        (price) =>
+          scaleSegmentPricesWadToReserve(
+            { initialPrice: price, priceIncrease: BigInt(0) },
+            reserveDec
+          ).initialPrice
       ),
       initialMultiplier: formData.presale.initialMultiplier,
       decayDuration: formData.presale.decayDuration,

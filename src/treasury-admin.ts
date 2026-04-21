@@ -42,6 +42,18 @@ export interface TSetFloorFeeTreasuryParams extends TTreasuryAdminParams {
   treasuryAddress: Address
 }
 
+export interface TSetFloorRaiseParams extends TTreasuryAdminParams {
+  /** FloorRaiseTreasury contract address (receives floor-raise cut before recipient split) */
+  treasury: Address
+  /** Shares assigned to the floor-raise slot (relative to total shares) */
+  shares: bigint
+}
+
+export interface TFloorRaiseConfig {
+  treasury: Address
+  shares: bigint
+}
+
 export interface TGetFundsParams {
   /** Token address to query funds for */
   token: Address
@@ -299,6 +311,47 @@ export class TreasuryAdmin {
       lifecycle,
     })
     return receipt
+  }
+
+  /**
+   * @description Wire a FloorRaiseTreasury + share count to the splitter. The floor-raise
+   * slot is distributed *before* the regular recipient split.
+   */
+  public async setFloorRaise({
+    treasury,
+    shares,
+    lifecycle,
+  }: TSetFloorRaiseParams): Promise<TransactionReceipt> {
+    validateAddress(treasury, 'treasury')
+    if (shares <= BigInt(0)) throw new Error('Floor-raise shares must be > 0')
+
+    const { receipt } = await this.requireSafeWrite().write({
+      address: this.address,
+      abi: SplitterTreasury_v1,
+      functionName: 'setFloorRaise',
+      args: [treasury, shares],
+      lifecycle,
+    })
+    return receipt
+  }
+
+  /**
+   * @description Read the current floor-raise slot (treasury + shares).
+   */
+  public async getFloorRaise(): Promise<TFloorRaiseConfig> {
+    const [treasury, shares] = await Promise.all([
+      this.publicClient.readContract({
+        address: this.address,
+        abi: SplitterTreasury_v1,
+        functionName: 'getFloorRaiseTreasury',
+      }) as Promise<Address>,
+      this.publicClient.readContract({
+        address: this.address,
+        abi: SplitterTreasury_v1,
+        functionName: 'getFloorRaiseShares',
+      }) as Promise<bigint>,
+    ])
+    return { treasury, shares }
   }
 
   // ===========================================================================

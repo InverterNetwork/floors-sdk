@@ -607,44 +607,6 @@ export default [
   },
   {
     type: 'event',
-    name: 'IssuanceTokensLocked',
-    inputs: [
-      {
-        name: 'user_',
-        type: 'address',
-        indexed: true,
-        internalType: 'address',
-      },
-      {
-        name: 'amount_',
-        type: 'uint256',
-        indexed: false,
-        internalType: 'uint256',
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: 'event',
-    name: 'IssuanceTokensUnlocked',
-    inputs: [
-      {
-        name: 'user_',
-        type: 'address',
-        indexed: true,
-        internalType: 'address',
-      },
-      {
-        name: 'amount_',
-        type: 'uint256',
-        indexed: false,
-        internalType: 'uint256',
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: 'event',
     name: 'LoanClosed',
     inputs: [
       {
@@ -684,6 +646,12 @@ export default [
         indexed: false,
         internalType: 'uint256',
       },
+      {
+        name: 'lockedIssuanceTokens_',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
     ],
     anonymous: false,
   },
@@ -699,6 +667,12 @@ export default [
       },
       {
         name: 'releasedCollateralAmount_',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+      {
+        name: 'newRemainingLoanAmount_',
         type: 'uint256',
         indexed: false,
         internalType: 'uint256',
@@ -730,6 +704,18 @@ export default [
       },
       {
         name: 'issuanceTokensUnlocked_',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+      {
+        name: 'remainingLoanAmount_',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+      {
+        name: 'remainingLockedTokens_',
         type: 'uint256',
         indexed: false,
         internalType: 'uint256',

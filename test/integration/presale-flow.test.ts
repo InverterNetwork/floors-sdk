@@ -99,7 +99,7 @@ describe('Presale Flow - Integration', () => {
       await expect(
         presaleAdmin.setBaseCommissionAndPriceBreakpoints({
           baseCommissionBps: [100, 200, 450],
-          priceBreakpoints: [[BigInt(1e18)], [BigInt(1e18), BigInt(1.5e18)]],
+          priceBreakpoints: [BigInt(1e18), BigInt(1.5e18)],
         })
       ).rejects.toThrow()
 
@@ -117,7 +117,7 @@ describe('Presale Flow - Integration', () => {
       await expect(
         presaleAdmin.setBaseCommissionAndPriceBreakpoints({
           baseCommissionBps: [100, 200, 400],
-          priceBreakpoints: [[BigInt(1e18)], [BigInt(1e18)]],
+          priceBreakpoints: [BigInt(1e18)],
         })
       ).rejects.toThrow()
 
@@ -132,7 +132,7 @@ describe('Presale Flow - Integration', () => {
       await expect(
         presaleAdmin.setBaseCommissionAndPriceBreakpoints({
           baseCommissionBps: [100, 200],
-          priceBreakpoints: [[BigInt(1e18), BigInt(1.5e18), BigInt(2e18)]],
+          priceBreakpoints: [BigInt(1e18), BigInt(1.5e18), BigInt(2e18)],
         })
       ).rejects.toThrow()
 
@@ -228,7 +228,7 @@ describe('Presale Flow - Integration', () => {
       expect(merkleRoot).toMatch(/^0x[a-fA-F0-9]+$/)
     })
 
-    it('should update merkle root', async () => {
+    it('should update merkle root (allowed in all phases as of PR #126)', async () => {
       const oldRoot = ('0x' + '00'.repeat(32)) as `0x${string}`
       const newRoot = ('0x' + 'ff'.repeat(32)) as `0x${string}`
 

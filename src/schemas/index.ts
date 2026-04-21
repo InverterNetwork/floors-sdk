@@ -2,5 +2,6 @@
 export * from './base.schema'
 export * from './launch.schema'
 export * from './session.schema'
+export * from './token-metadata.schema'
 export * from './user.schema'
 export * from './users.schema'

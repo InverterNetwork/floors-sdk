@@ -9,6 +9,9 @@ import { AddressSchema } from './base.schema'
  * `priceBreakpoints` MUST use the reserve token’s **native decimals** (e.g. USDC → 6, WETH → 18).
  * They are **not** 18-decimal WAD unless the reserve token itself has 18 decimals.
  *
+ * **Presale `priceBreakpoints`:** flat `uint256[]` shared across all leverage levels
+ * (non-decreasing per contract validation).
+ *
  * **Issuance (sale) token — amounts:** `supplyPerStep`, `globalIssuanceCap`, `perAddressIssuanceCap`
  * MUST use the issuance token’s **native decimals** (not WAD).
  *
@@ -192,9 +195,10 @@ const PresaleCurveParamsSchema = Schema.Struct({
   perAddressIssuanceCap: Schema.BigIntFromSelf,
   /**
    * Tranche unlock prices: same scale as bonding-curve spot price — **reserve token native decimals**
-   * (not WAD unless reserve is 18 decimals). 2D: `[leverage level][tranche]`.
+   * (not WAD unless reserve is 18 decimals). Flat `uint256[]` shared across all leverage levels;
+   * must be non-decreasing.
    */
-  priceBreakpoints: Schema.Array(Schema.Array(Schema.BigIntFromSelf)),
+  priceBreakpoints: Schema.Array(Schema.BigIntFromSelf),
   /** Initial fee multiplier in BPS (10000 = 1x, 20000 = 2x). Used with DecayingFeeMultiplier */
   initialMultiplier: Schema.BigIntFromSelf,
   /** Decay duration in seconds (0 = no decay). Multiplier decays from initial to 1x over this period */
@@ -205,7 +209,7 @@ const PresaleCurveParamsSchema = Schema.Struct({
  * @description Presale module configuration
  * Encoding order matches Presale_v1.sol init:
  * abi.encode(creditFacility, baseCommissionBps[], endTimestamp, globalIssuanceCap,
- *            perAddressIssuanceCap, priceBreakpoints[][], initialMultiplier, decayDuration)
+ *            perAddressIssuanceCap, priceBreakpoints[], initialMultiplier, decayDuration)
  */
 export const PresaleConfigSchema = Schema.Struct({
   /** Credit facility address (or zero address if none) */

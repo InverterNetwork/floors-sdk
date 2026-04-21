@@ -83,7 +83,7 @@ describe('transformLaunchFormDataToLaunchConfig', () => {
         endTimestamp: 0n,
         globalIssuanceCap: 0n,
         perAddressIssuanceCap: 0n,
-        priceBreakpoints: [[parseUnits('1', 18)]],
+        priceBreakpoints: [parseUnits('1', 18)],
         initialMultiplier: 10000n,
         decayDuration: 0n,
       },
@@ -100,6 +100,6 @@ describe('transformLaunchFormDataToLaunchConfig', () => {
     expect(cfg.floor.segments[0].initialPrice).toBe(parseUnits('1', 6))
     expect(cfg.floor.segments[1].initialPrice).toBe(parseUnits('2', 6))
     expect(cfg.floor.segments[1].priceIncrease).toBe(parseUnits('0.1', 6))
-    expect(cfg.presale?.priceBreakpoints[0][0]).toBe(parseUnits('1', 6))
+    expect(cfg.presale?.priceBreakpoints[0]).toBe(parseUnits('1', 6))
   })
 })

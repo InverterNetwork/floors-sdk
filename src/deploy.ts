@@ -26,6 +26,11 @@ export type TokenConfig = {
   decimals: number
   /** Maximum supply in human-readable format (0 = unlimited, e.g., 100000000 for 100M tokens) */
   maxSupply: bigint
+  /**
+   * ERC-7572 initial `contractURI`. URL pointing at the token metadata JSON.
+   * Pass `''` to deploy without metadata and set it later via `setContractURI`.
+   */
+  initialContractURI?: string
 }
 
 /**
@@ -139,7 +144,14 @@ export class Deploy {
     const hash = await this.walletClient.deployContract({
       abi: ERC20Issuance_v1,
       bytecode: ERC20_ISSUANCE_BYTECODE,
-      args: [config.name, config.symbol, config.decimals, maxSupply, trustedForwarderAddress],
+      args: [
+        config.name,
+        config.symbol,
+        config.decimals,
+        maxSupply,
+        config.initialContractURI ?? '',
+        trustedForwarderAddress,
+      ],
       account: ownerAddress,
     })
 

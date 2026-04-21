@@ -527,14 +527,14 @@ export class Presale {
 
   /**
    * @description Get price breakpoints for tranche unlocks
-   * @returns 2D array of price breakpoints (by leverage level)
+   * @returns Flat array of breakpoints shared across all leverage levels (non-decreasing).
    */
-  public async getPriceBreakpoints(): Promise<bigint[][]> {
+  public async getPriceBreakpoints(): Promise<bigint[]> {
     return (await this.publicClient.readContract({
       address: this.address,
       abi: Presale_v1,
       functionName: 'getPriceBreakpoints',
-    })) as bigint[][]
+    })) as bigint[]
   }
 
   /**

@@ -974,7 +974,7 @@ export class Launch {
    * @description Encode Presale module configData
    * Format matches Presale_v1.sol init:
    * abi.encode(creditFacility, baseCommissionBps[], endTimestamp, globalIssuanceCap,
-   *            perAddressIssuanceCap, priceBreakpoints[][], initialMultiplier, decayDuration)
+   *            perAddressIssuanceCap, priceBreakpoints[], initialMultiplier, decayDuration)
    *
    * Note: creditFacility uses address(1) as placeholder when not provided.
    * The actual credit facility address must be set post-deployment via setCreditFacility().
@@ -987,7 +987,7 @@ export class Launch {
 
     return encodeAbiParameters(
       parseAbiParameters(
-        'address creditFacility, uint16[] baseCommissionBps, uint64 endTimestamp, uint256 globalIssuanceCap, uint256 perAddressIssuanceCap, uint256[][] priceBreakpoints, uint32 initialMultiplier, uint64 decayDuration'
+        'address creditFacility, uint16[] baseCommissionBps, uint64 endTimestamp, uint256 globalIssuanceCap, uint256 perAddressIssuanceCap, uint256[] priceBreakpoints, uint32 initialMultiplier, uint64 decayDuration'
       ),
       [
         (config.creditFacilityAddress as Address) || placeholderAddress,

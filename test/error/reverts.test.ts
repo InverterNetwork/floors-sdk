@@ -443,20 +443,20 @@ describe('Contract Revert Reasons', () => {
     })
 
     describe('Commission and Price Breakpoint Errors', () => {
-      it('should throw when array lengths do not match', async () => {
+      it('should throw when commission array is empty', async () => {
         await expect(
           presaleAdmin.setBaseCommissionAndPriceBreakpoints({
-            baseCommissionBps: [100, 200],
-            priceBreakpoints: [[BigInt(1e18)]], // Mismatched length
+            baseCommissionBps: [],
+            priceBreakpoints: [BigInt(1e18)],
           })
         ).rejects.toThrow()
       })
 
-      it('should throw for commission above 10000 bps', async () => {
+      it('should throw for commission above MAX_COMMISSION_BPS (9000)', async () => {
         await expect(
           presaleAdmin.setBaseCommissionAndPriceBreakpoints({
-            baseCommissionBps: [10001],
-            priceBreakpoints: [[BigInt(1e18)]],
+            baseCommissionBps: [9001],
+            priceBreakpoints: [BigInt(1e18)],
           })
         ).rejects.toThrow()
       })
@@ -562,11 +562,11 @@ describe('Contract Revert Reasons', () => {
       ).rejects.toThrow()
     })
 
-    it('should throw when commission and price breakpoint arrays mismatch', async () => {
+    it('should throw when price breakpoints are strictly decreasing', async () => {
       await expect(
         presaleAdmin.setBaseCommissionAndPriceBreakpoints({
           baseCommissionBps: [100, 200, 300],
-          priceBreakpoints: [[BigInt(1e18)], [BigInt(1.5e18)]], // Length mismatch
+          priceBreakpoints: [BigInt(2e18), BigInt(1e18)], // Non-monotonic
         })
       ).rejects.toThrow()
     })

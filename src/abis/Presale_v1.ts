@@ -455,8 +455,8 @@ export default [
     outputs: [
       {
         name: 'priceBreakpoints_',
-        type: 'uint256[][]',
-        internalType: 'uint256[][]',
+        type: 'uint256[]',
+        internalType: 'uint256[]',
       },
     ],
     stateMutability: 'view',
@@ -606,8 +606,8 @@ export default [
       },
       {
         name: 'priceBreakpoints_',
-        type: 'uint256[][]',
-        internalType: 'uint256[][]',
+        type: 'uint256[]',
+        internalType: 'uint256[]',
       },
     ],
     outputs: [],
@@ -1076,9 +1076,9 @@ export default [
     inputs: [
       {
         name: 'priceBreakpoints_',
-        type: 'uint256[][]',
+        type: 'uint256[]',
         indexed: false,
-        internalType: 'uint256[][]',
+        internalType: 'uint256[]',
       },
     ],
     anonymous: false,

@@ -55,7 +55,7 @@ async function deployToken(
   const hash = await walletClient.deployContract({
     abi: ERC20Issuance_v1,
     bytecode: ERC20_ISSUANCE_BYTECODE,
-    args: [config.name, config.symbol, config.decimals, scaledMaxSupply, trustedForwarder],
+    args: [config.name, config.symbol, config.decimals, scaledMaxSupply, '', trustedForwarder],
     account: owner,
   })
 
@@ -207,7 +207,7 @@ describe('FEES-01: Fee Management Integration Tests', () => {
       ...baseConfig,
       presale: createTestPresaleConfig(collateralToken, {
         baseCommissionBps: [BigInt(100), BigInt(200), BigInt(450)],
-        priceBreakpoints: [[BigInt(1e18)], [BigInt(1e18), BigInt(1.5e18)]],
+        priceBreakpoints: [BigInt(1e18), BigInt(1.5e18)],
         initialMultiplier: BigInt(10000), // 1x (no premium)
         decayDuration: BigInt(3600), // 1 hour (contract requires nonzero)
       }),
@@ -272,7 +272,7 @@ describe('FEES-01: Fee Management Integration Tests', () => {
 
       // Update commission schedule with new rates
       const newCommissionBps = [150, 300, 600] // 1.5%, 3%, 6%
-      const newBreakpoints = [[BigInt(1.2e18)], [BigInt(1.2e18), BigInt(2e18)]]
+      const newBreakpoints = [BigInt(1.2e18), BigInt(2e18)]
 
       const receipt = await presaleAdmin.setBaseCommissionAndPriceBreakpoints({
         baseCommissionBps: newCommissionBps,
@@ -301,7 +301,7 @@ describe('FEES-01: Fee Management Integration Tests', () => {
 
       // Change again to verify re-editing works
       const updatedBps = [200, 400, 800]
-      const updatedBreakpoints = [[BigInt(1.5e18)], [BigInt(1.5e18), BigInt(2.5e18)]]
+      const updatedBreakpoints = [BigInt(1.5e18), BigInt(2.5e18)]
 
       const receipt = await presaleAdmin.setBaseCommissionAndPriceBreakpoints({
         baseCommissionBps: updatedBps,

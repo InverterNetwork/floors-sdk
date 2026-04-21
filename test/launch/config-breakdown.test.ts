@@ -301,7 +301,7 @@ describe('Configuration Breakdown Analysis', () => {
                     : ('0x0000000000000000000000000000000000000001' as Address),
                   {
                     baseCommissionBps: [BigInt(100), BigInt(200), BigInt(450)],
-                    priceBreakpoints: [[BigInt(1e18)], [BigInt(1e18), BigInt(1e18)]],
+                    priceBreakpoints: [BigInt(1e18), BigInt(1e18)],
                   }
                 ),
               }

@@ -55,8 +55,8 @@ export interface TPresaleAdminSetMerkleRootParams extends TPresaleAdminParams {
 export interface TPresaleAdminSetCommissionParams extends TPresaleAdminParams {
   /** Array of commission rates in basis points per leverage level */
   baseCommissionBps: number[]
-  /** 2D array of price breakpoints per leverage level */
-  priceBreakpoints: bigint[][]
+  /** Price breakpoints shared across all leverage levels (non-decreasing, WAD) */
+  priceBreakpoints: bigint[]
 }
 
 export interface TPresaleAdminSetCreditFacilityParams extends TPresaleAdminParams {
@@ -94,8 +94,8 @@ export interface TPresaleAdminState {
   merkleRoot: `0x${string}`
   /** Commission rates per leverage level */
   baseCommissionBps: number[]
-  /** Price breakpoints per leverage level */
-  priceBreakpoints: bigint[][]
+  /** Price breakpoints shared across all leverage levels (non-decreasing, WAD) */
+  priceBreakpoints: bigint[]
 }
 
 interface PresaleAdminConstructorArgs {
@@ -203,7 +203,7 @@ export class PresaleAdmin {
         address: this.address,
         abi: Presale_v1,
         functionName: 'getPriceBreakpoints',
-      }) as Promise<bigint[][]>,
+      }) as Promise<bigint[]>,
     ])
 
     return {
@@ -397,11 +397,10 @@ export class PresaleAdmin {
     priceBreakpoints,
     lifecycle,
   }: TPresaleAdminSetCommissionParams): Promise<TransactionReceipt> {
-    // Validate commission values are within uint16 range (0-65535)
-    // and also within valid basis points range (0-10000)
+    // Contract caps commission at MAX_COMMISSION_BPS = 9000 (90%). Fail early on the client.
     for (const bps of baseCommissionBps) {
-      if (bps < 0 || bps > 10_000) {
-        throw new Error(`Commission must be between 0 and 10000 bps (got ${bps})`)
+      if (bps < 0 || bps > 9000) {
+        throw new Error(`Commission must be between 0 and 9000 bps (got ${bps})`)
       }
       if (!Number.isInteger(bps)) {
         throw new Error(`Commission must be a whole number (got ${bps})`)

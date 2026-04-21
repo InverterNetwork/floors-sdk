@@ -182,28 +182,23 @@ describe('Contract Parameter Validation', () => {
       })
     })
 
-    describe('Price Breakpoint Arrays (2D)', () => {
-      it('should handle 2D array of price breakpoints', () => {
-        const priceBreakpoints: bigint[][] = [
-          [BigInt(1e18)],
-          [BigInt(1e18), BigInt(1.5e18)],
-          [BigInt(1e18), BigInt(1.5e18), BigInt(2e18)],
-        ]
+    describe('Price Breakpoint Arrays (flat)', () => {
+      it('should handle a non-decreasing price breakpoint array', () => {
+        const priceBreakpoints: bigint[] = [BigInt(1e18), BigInt(1.5e18), BigInt(2e18)]
         expect(priceBreakpoints.length).toBe(3)
-        expect(priceBreakpoints[0]?.length).toBe(1)
-        expect(priceBreakpoints[1]?.length).toBe(2)
-        expect(priceBreakpoints[2]?.length).toBe(3)
+        expect(priceBreakpoints[0]).toBeLessThanOrEqual(priceBreakpoints[1]!)
+        expect(priceBreakpoints[1]).toBeLessThanOrEqual(priceBreakpoints[2]!)
       })
 
-      it('should handle empty 2D array', () => {
-        const priceBreakpoints: bigint[][] = []
+      it('should handle empty breakpoint array', () => {
+        const priceBreakpoints: bigint[] = []
         expect(priceBreakpoints.length).toBe(0)
       })
 
-      it('should handle array of empty arrays', () => {
-        const priceBreakpoints: bigint[][] = [[], [], []]
+      it('should allow equal breakpoints (PR #126 relaxed validation)', () => {
+        const priceBreakpoints: bigint[] = [BigInt(1e18), BigInt(1e18), BigInt(2e18)]
         expect(priceBreakpoints.length).toBe(3)
-        expect(priceBreakpoints.every((arr) => arr.length === 0)).toBe(true)
+        expect(priceBreakpoints[0]).toBe(priceBreakpoints[1]!)
       })
     })
 

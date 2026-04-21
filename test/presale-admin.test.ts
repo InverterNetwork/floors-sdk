@@ -331,7 +331,7 @@ describe('PresaleAdmin', () => {
       await expect(
         adminWithoutWallet.setBaseCommissionAndPriceBreakpoints({
           baseCommissionBps: [100],
-          priceBreakpoints: [[BigInt(1e18)]],
+          priceBreakpoints: [BigInt(1e18)],
         })
       ).rejects.toThrow('Wallet not connected')
     })
@@ -340,18 +340,14 @@ describe('PresaleAdmin', () => {
       const configs = [
         {
           baseCommissionBps: [100, 200, 450],
-          priceBreakpoints: [[BigInt(1e18)], [BigInt(1e18), BigInt(1.5e18)]],
+          priceBreakpoints: [BigInt(1e18), BigInt(1.5e18)],
         },
         { baseCommissionBps: [], priceBreakpoints: [] },
-        { baseCommissionBps: [100], priceBreakpoints: [[BigInt(1e18)]] },
-        { baseCommissionBps: [5000], priceBreakpoints: [[BigInt(1e18)]] },
+        { baseCommissionBps: [100], priceBreakpoints: [BigInt(1e18)] },
+        { baseCommissionBps: [5000], priceBreakpoints: [BigInt(1e18)] },
         {
           baseCommissionBps: [50, 100, 200, 400, 800],
-          priceBreakpoints: [
-            [BigInt(1e18)],
-            [BigInt(1e18), BigInt(1.2e18)],
-            [BigInt(1e18), BigInt(1.2e18), BigInt(1.5e18)],
-          ],
+          priceBreakpoints: [BigInt(1e18), BigInt(1.2e18), BigInt(1.5e18)],
         },
       ]
 

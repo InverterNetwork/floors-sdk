@@ -7,7 +7,15 @@ import type { Abi, AbiFunction, ExtractAbiFunctionNames } from 'abitype'
 import type { Address } from 'viem'
 import { toFunctionSelector } from 'viem'
 
-import { CreditFacility_v1, Floor_v1, SplitterTreasury_v1 } from '../abis'
+import {
+  CreditFacility_v1,
+  ERC20Issuance_v1,
+  Floor_v1,
+  FloorFactory_v1,
+  FloorRaiseTreasury_v1,
+  ModuleFactory_v1,
+  SplitterTreasury_v1,
+} from '../abis'
 import Presale_v1 from '../abis/Presale_v1'
 
 // =============================================================================
@@ -165,7 +173,50 @@ export const TREASURY_SELECTORS = {
   setFloorFeePercentage: getSelector(SplitterTreasury_v1, 'setFloorFeePercentage'),
   setFloorFeeTreasury: getSelector(SplitterTreasury_v1, 'setFloorFeeTreasury'),
   setRecipients: getSelector(SplitterTreasury_v1, 'setRecipients'),
+  setFloorRaise: getSelector(SplitterTreasury_v1, 'setFloorRaise'),
   getFunds: getSelector(SplitterTreasury_v1, 'getFunds'),
+} as const
+
+// =============================================================================
+// FloorRaiseTreasury Selectors
+// =============================================================================
+
+/**
+ * @description FloorRaiseTreasury function selectors for permission granting
+ */
+export const FLOOR_RAISE_TREASURY_SELECTORS = {
+  setThreshold: getSelector(FloorRaiseTreasury_v1, 'setThreshold'),
+} as const
+
+// =============================================================================
+// Factory Selectors
+// =============================================================================
+
+/**
+ * @description FloorFactory_v1 admin selectors for the deployer allowlist (testnet phase 1 fixes).
+ */
+export const FLOOR_FACTORY_SELECTORS = {
+  setAllowedDeployer: getSelector(FloorFactory_v1, 'setAllowedDeployer'),
+  setOpenDeployment: getSelector(FloorFactory_v1, 'setOpenDeployment'),
+} as const
+
+/**
+ * @description ModuleFactory_v1 admin selectors for the deployer allowlist.
+ */
+export const MODULE_FACTORY_SELECTORS = {
+  setAllowedDeployer: getSelector(ModuleFactory_v1, 'setAllowedDeployer'),
+  setOpenDeployment: getSelector(ModuleFactory_v1, 'setOpenDeployment'),
+} as const
+
+// =============================================================================
+// ERC20Issuance Selectors (ERC-7572 contractURI)
+// =============================================================================
+
+/**
+ * @description ERC20Issuance_v1 admin selectors introduced alongside ERC-7572 support.
+ */
+export const ERC20_ISSUANCE_SELECTORS = {
+  setContractURI: getSelector(ERC20Issuance_v1, 'setContractURI'),
 } as const
 
 // =============================================================================
@@ -182,6 +233,9 @@ export type SelectorModuleType =
   | 'staking'
   | 'strategyBase'
   | 'treasury'
+  | 'floorRaiseTreasury'
+  | 'factory'
+  | 'issuanceToken'
 
 /**
  * @description A registered function selector with metadata
@@ -457,6 +511,54 @@ export const SELECTOR_REGISTRY: RegisteredSelector[] = [
     module: 'treasury',
     description: 'Distribute funds to recipients',
   },
+  {
+    name: 'setFloorRaise',
+    selector: TREASURY_SELECTORS.setFloorRaise,
+    module: 'treasury',
+    description: 'Wire a FloorRaiseTreasury + share to the splitter',
+  },
+
+  // FloorRaiseTreasury functions
+  {
+    name: 'setThreshold',
+    selector: FLOOR_RAISE_TREASURY_SELECTORS.setThreshold,
+    module: 'floorRaiseTreasury',
+    description: 'Set accumulation threshold that triggers Floor.raiseFloor()',
+  },
+
+  // Factory admin functions (deployer allowlist)
+  {
+    name: 'floorFactory.setAllowedDeployer',
+    selector: FLOOR_FACTORY_SELECTORS.setAllowedDeployer,
+    module: 'factory',
+    description: 'Toggle a deployer in the FloorFactory allowlist',
+  },
+  {
+    name: 'floorFactory.setOpenDeployment',
+    selector: FLOOR_FACTORY_SELECTORS.setOpenDeployment,
+    module: 'factory',
+    description: 'Toggle FloorFactory open-deployment gate',
+  },
+  {
+    name: 'moduleFactory.setAllowedDeployer',
+    selector: MODULE_FACTORY_SELECTORS.setAllowedDeployer,
+    module: 'factory',
+    description: 'Toggle a deployer in the ModuleFactory allowlist',
+  },
+  {
+    name: 'moduleFactory.setOpenDeployment',
+    selector: MODULE_FACTORY_SELECTORS.setOpenDeployment,
+    module: 'factory',
+    description: 'Toggle ModuleFactory open-deployment gate',
+  },
+
+  // IssuanceToken (ERC-7572) admin functions
+  {
+    name: 'setContractURI',
+    selector: ERC20_ISSUANCE_SELECTORS.setContractURI,
+    module: 'issuanceToken',
+    description: 'Point the token at its ERC-7572 metadata JSON URL',
+  },
 ] as const
 
 /**
@@ -496,6 +598,9 @@ export function getSelectorsByModule(): Record<SelectorModuleType, RegisteredSel
     staking: SELECTOR_REGISTRY.filter((s) => s.module === 'staking'),
     strategyBase: SELECTOR_REGISTRY.filter((s) => s.module === 'strategyBase'),
     treasury: SELECTOR_REGISTRY.filter((s) => s.module === 'treasury'),
+    floorRaiseTreasury: SELECTOR_REGISTRY.filter((s) => s.module === 'floorRaiseTreasury'),
+    factory: SELECTOR_REGISTRY.filter((s) => s.module === 'factory'),
+    issuanceToken: SELECTOR_REGISTRY.filter((s) => s.module === 'issuanceToken'),
   }
 }
 
@@ -509,6 +614,9 @@ export const MODULE_DISPLAY_NAMES: Record<SelectorModuleType, string> = {
   staking: 'Staking Manager',
   strategyBase: 'Strategy Base',
   treasury: 'Fee Treasury',
+  floorRaiseTreasury: 'Floor Raise Treasury',
+  factory: 'Factory',
+  issuanceToken: 'Issuance Token',
 }
 
 /**

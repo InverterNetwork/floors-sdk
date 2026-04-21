@@ -23,6 +23,11 @@ export default [
         internalType: 'uint256',
       },
       {
+        name: 'initialContractURI_',
+        type: 'string',
+        internalType: 'string',
+      },
+      {
         name: 'trustedForwarder_',
         type: 'address',
         internalType: 'address',
@@ -149,6 +154,19 @@ export default [
   },
   {
     type: 'function',
+    name: 'contractURI',
+    inputs: [],
+    outputs: [
+      {
+        name: 'contractURI_',
+        type: 'string',
+        internalType: 'string',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     name: 'decimals',
     inputs: [],
     outputs: [
@@ -227,6 +245,19 @@ export default [
     type: 'function',
     name: 'renounceOwnership',
     inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setContractURI',
+    inputs: [
+      {
+        name: 'newURI_',
+        type: 'string',
+        internalType: 'string',
+      },
+    ],
     outputs: [],
     stateMutability: 'nonpayable',
   },
@@ -399,6 +430,12 @@ export default [
         internalType: 'uint256',
       },
     ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'ContractURIUpdated',
+    inputs: [],
     anonymous: false,
   },
   {

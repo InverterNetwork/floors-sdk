@@ -266,7 +266,7 @@ export type UsePresaleMutationsReturnType = {
   getPosition: UseMutationResult<any, Error, bigint>
   getPositionState: UseMutationResult<any, Error, bigint>
   getBaseCommissionBps: UseMutationResult<bigint[], Error, void>
-  getPriceBreakpoints: UseMutationResult<bigint[][], Error, void>
+  getPriceBreakpoints: UseMutationResult<bigint[], Error, void>
   // Multiplier/Fee Decay queries
   getMultiplier: UseMutationResult<bigint, Error, void>
   getInitialMultiplier: UseMutationResult<bigint, Error, void>
