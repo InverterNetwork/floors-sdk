@@ -77,7 +77,6 @@ export const presaleQuery = {
       symbol: true,
     },
     priceBreakpointsFlat: true,
-    priceBreakpointOffsets: true,
     perAddressIssuanceCapRaw: true,
     perAddressIssuanceCapFormatted: true,
     maxLeverage: true,
