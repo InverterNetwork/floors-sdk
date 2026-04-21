@@ -8,6 +8,7 @@ export type Scalars = {
     Int: number,
     String: string,
     candleperiod: any,
+    factorykind: any,
     jsonb: any,
     loanstatus: any,
     marketstatus: any,
@@ -89,6 +90,38 @@ export interface CreditFacilityContract {
 export type CreditFacilityContract_select_column = 'borrowToken_id' | 'borrowingFeeRate' | 'collateralToken_id' | 'createdAt' | 'id' | 'lastUpdatedAt' | 'loanToValueRatio' | 'market_id' | 'maxLeverage' | 'totalDebtFormatted' | 'totalDebtRaw' | 'totalLoans' | 'totalLockedCollateralFormatted' | 'totalLockedCollateralRaw' | 'totalVolumeFormatted' | 'totalVolumeRaw'
 
 
+/** columns and relationships of "FactoryDeployerPermission" */
+export interface FactoryDeployerPermission {
+    allowed: Scalars['Boolean']
+    deployer: Scalars['String']
+    factory_id: Scalars['String']
+    id: Scalars['String']
+    transactionHash: Scalars['String']
+    updatedAt: Scalars['numeric']
+    __typename: 'FactoryDeployerPermission'
+}
+
+
+/** select columns of table "FactoryDeployerPermission" */
+export type FactoryDeployerPermission_select_column = 'allowed' | 'deployer' | 'factory_id' | 'id' | 'transactionHash' | 'updatedAt'
+
+
+/** columns and relationships of "FactoryDeploymentConfig" */
+export interface FactoryDeploymentConfig {
+    /** An array relationship */
+    deployers: FactoryDeployerPermission[]
+    id: Scalars['String']
+    kind: Scalars['factorykind']
+    lastUpdatedAt: Scalars['numeric']
+    openDeployment: Scalars['Boolean']
+    __typename: 'FactoryDeploymentConfig'
+}
+
+
+/** select columns of table "FactoryDeploymentConfig" */
+export type FactoryDeploymentConfig_select_column = 'id' | 'kind' | 'lastUpdatedAt' | 'openDeployment'
+
+
 /** columns and relationships of "FeeSplitterPayment" */
 export interface FeeSplitterPayment {
     amountFormatted: Scalars['String']
@@ -146,6 +179,49 @@ export interface FloorElevation {
 
 /** select columns of table "FloorElevation" */
 export type FloorElevation_select_column = 'deployedAmountFormatted' | 'deployedAmountRaw' | 'id' | 'market_id' | 'newFloorPriceFormatted' | 'newFloorPriceRaw' | 'oldFloorPriceFormatted' | 'oldFloorPriceRaw' | 'timestamp' | 'transactionHash'
+
+
+/** columns and relationships of "FloorRaiseAttempt" */
+export interface FloorRaiseAttempt {
+    amountFormatted: Scalars['String']
+    amountRaw: Scalars['numeric']
+    id: Scalars['String']
+    market_id: Scalars['String']
+    success: Scalars['Boolean']
+    timestamp: Scalars['numeric']
+    transactionHash: Scalars['String']
+    treasury_id: Scalars['String']
+    __typename: 'FloorRaiseAttempt'
+}
+
+
+/** select columns of table "FloorRaiseAttempt" */
+export type FloorRaiseAttempt_select_column = 'amountFormatted' | 'amountRaw' | 'id' | 'market_id' | 'success' | 'timestamp' | 'transactionHash' | 'treasury_id'
+
+
+/** columns and relationships of "FloorRaiseTreasury" */
+export interface FloorRaiseTreasury {
+    accumulatedFormatted: Scalars['String']
+    accumulatedRaw: Scalars['numeric']
+    address: Scalars['String']
+    createdAt: Scalars['numeric']
+    floor: Scalars['String']
+    id: Scalars['String']
+    lastRaiseAttemptAt: (Scalars['numeric'] | null)
+    lastRaiseAttemptSuccess: (Scalars['Boolean'] | null)
+    lastUpdatedAt: Scalars['numeric']
+    market_id: Scalars['String']
+    /** An array relationship */
+    raiseAttempts: FloorRaiseAttempt[]
+    thresholdFormatted: Scalars['String']
+    thresholdRaw: Scalars['numeric']
+    totalRaisedCount: Scalars['numeric']
+    __typename: 'FloorRaiseTreasury'
+}
+
+
+/** select columns of table "FloorRaiseTreasury" */
+export type FloorRaiseTreasury_select_column = 'accumulatedFormatted' | 'accumulatedRaw' | 'address' | 'createdAt' | 'floor' | 'id' | 'lastRaiseAttemptAt' | 'lastRaiseAttemptSuccess' | 'lastUpdatedAt' | 'market_id' | 'thresholdFormatted' | 'thresholdRaw' | 'totalRaisedCount'
 
 
 /** columns and relationships of "GlobalRegistry" */
@@ -409,7 +485,6 @@ export interface PreSaleContract {
     participations: PresaleParticipation[]
     perAddressIssuanceCapFormatted: Scalars['String']
     perAddressIssuanceCapRaw: Scalars['numeric']
-    priceBreakpointOffsets: (Scalars['Int'][] | null)
     priceBreakpointsFlat: (Scalars['String'][] | null)
     /** An object relationship */
     purchaseToken: (Token | null)
@@ -431,7 +506,7 @@ export interface PreSaleContract {
 
 
 /** select columns of table "PreSaleContract" */
-export type PreSaleContract_select_column = 'authorizer' | 'commissionBps' | 'createdAt' | 'currentState' | 'decayDuration' | 'decayStartTime' | 'endTime' | 'feeTreasury' | 'globalIssuanceCapFormatted' | 'globalIssuanceCapRaw' | 'id' | 'initialMultiplier' | 'lastUpdatedAt' | 'lendingFacility' | 'market_id' | 'maxLeverage' | 'merkleRoot' | 'perAddressIssuanceCapFormatted' | 'perAddressIssuanceCapRaw' | 'priceBreakpointOffsets' | 'priceBreakpointsFlat' | 'purchaseToken_id' | 'saleToken_id' | 'startTime' | 'timeSafeguardTs' | 'totalMintedFormatted' | 'totalMintedRaw' | 'totalParticipants' | 'totalRaisedFormatted' | 'totalRaisedRaw' | 'whitelistSize' | 'whitelistedAddresses'
+export type PreSaleContract_select_column = 'authorizer' | 'commissionBps' | 'createdAt' | 'currentState' | 'decayDuration' | 'decayStartTime' | 'endTime' | 'feeTreasury' | 'globalIssuanceCapFormatted' | 'globalIssuanceCapRaw' | 'id' | 'initialMultiplier' | 'lastUpdatedAt' | 'lendingFacility' | 'market_id' | 'maxLeverage' | 'merkleRoot' | 'perAddressIssuanceCapFormatted' | 'perAddressIssuanceCapRaw' | 'priceBreakpointsFlat' | 'purchaseToken_id' | 'saleToken_id' | 'startTime' | 'timeSafeguardTs' | 'totalMintedFormatted' | 'totalMintedRaw' | 'totalParticipants' | 'totalRaisedFormatted' | 'totalRaisedRaw' | 'whitelistSize' | 'whitelistedAddresses'
 
 
 /** columns and relationships of "PresaleClaim" */
@@ -665,6 +740,7 @@ export type Strategy_select_column = 'addedAt' | 'collateralToken_id' | 'id' | '
 
 /** columns and relationships of "Token" */
 export interface Token {
+    contractURI: (Scalars['String'] | null)
     decimals: Scalars['Int']
     id: Scalars['String']
     maxSupplyFormatted: Scalars['String']
@@ -676,7 +752,7 @@ export interface Token {
 
 
 /** select columns of table "Token" */
-export type Token_select_column = 'decimals' | 'id' | 'maxSupplyFormatted' | 'maxSupplyRaw' | 'name' | 'symbol'
+export type Token_select_column = 'contractURI' | 'decimals' | 'id' | 'maxSupplyFormatted' | 'maxSupplyRaw' | 'name' | 'symbol'
 
 
 /** columns and relationships of "Trade" */
@@ -710,6 +786,8 @@ export interface Treasury {
     feeSplitterPayments: FeeSplitterPayment[]
     /** An array relationship */
     feeSplitterReceipts: FeeSplitterReceipt[]
+    floorRaiseShares: (Scalars['numeric'] | null)
+    floorRaiseTreasury_id: (Scalars['String'] | null)
     id: Scalars['String']
     lastUpdatedAt: Scalars['numeric']
     market_id: Scalars['String']
@@ -723,7 +801,7 @@ export interface Treasury {
 
 
 /** select columns of table "Treasury" */
-export type Treasury_select_column = 'createdAt' | 'id' | 'lastUpdatedAt' | 'market_id' | 'totalFeesDistributedFormatted' | 'totalFeesDistributedRaw' | 'totalFeesReceivedFormatted' | 'totalFeesReceivedRaw' | 'treasuryAddress'
+export type Treasury_select_column = 'createdAt' | 'floorRaiseShares' | 'floorRaiseTreasury_id' | 'id' | 'lastUpdatedAt' | 'market_id' | 'totalFeesDistributedFormatted' | 'totalFeesDistributedRaw' | 'totalFeesReceivedFormatted' | 'totalFeesReceivedRaw' | 'treasuryAddress'
 
 
 /** columns and relationships of "UserMarketPosition" */
@@ -814,6 +892,14 @@ export interface query_root {
     CreditFacilityContract: CreditFacilityContract[]
     /** fetch data from the table: "CreditFacilityContract" using primary key columns */
     CreditFacilityContract_by_pk: (CreditFacilityContract | null)
+    /** fetch data from the table: "FactoryDeployerPermission" */
+    FactoryDeployerPermission: FactoryDeployerPermission[]
+    /** fetch data from the table: "FactoryDeployerPermission" using primary key columns */
+    FactoryDeployerPermission_by_pk: (FactoryDeployerPermission | null)
+    /** fetch data from the table: "FactoryDeploymentConfig" */
+    FactoryDeploymentConfig: FactoryDeploymentConfig[]
+    /** fetch data from the table: "FactoryDeploymentConfig" using primary key columns */
+    FactoryDeploymentConfig_by_pk: (FactoryDeploymentConfig | null)
     /** fetch data from the table: "FeeSplitterPayment" */
     FeeSplitterPayment: FeeSplitterPayment[]
     /** fetch data from the table: "FeeSplitterPayment" using primary key columns */
@@ -826,6 +912,14 @@ export interface query_root {
     FloorElevation: FloorElevation[]
     /** fetch data from the table: "FloorElevation" using primary key columns */
     FloorElevation_by_pk: (FloorElevation | null)
+    /** fetch data from the table: "FloorRaiseAttempt" */
+    FloorRaiseAttempt: FloorRaiseAttempt[]
+    /** fetch data from the table: "FloorRaiseAttempt" using primary key columns */
+    FloorRaiseAttempt_by_pk: (FloorRaiseAttempt | null)
+    /** fetch data from the table: "FloorRaiseTreasury" */
+    FloorRaiseTreasury: FloorRaiseTreasury[]
+    /** fetch data from the table: "FloorRaiseTreasury" using primary key columns */
+    FloorRaiseTreasury_by_pk: (FloorRaiseTreasury | null)
     /** fetch data from the table: "GlobalRegistry" */
     GlobalRegistry: GlobalRegistry[]
     /** fetch data from the table: "GlobalRegistry" using primary key columns */
@@ -979,6 +1073,18 @@ export interface subscription_root {
     CreditFacilityContract_by_pk: (CreditFacilityContract | null)
     /** fetch data from the table in a streaming manner: "CreditFacilityContract" */
     CreditFacilityContract_stream: CreditFacilityContract[]
+    /** fetch data from the table: "FactoryDeployerPermission" */
+    FactoryDeployerPermission: FactoryDeployerPermission[]
+    /** fetch data from the table: "FactoryDeployerPermission" using primary key columns */
+    FactoryDeployerPermission_by_pk: (FactoryDeployerPermission | null)
+    /** fetch data from the table in a streaming manner: "FactoryDeployerPermission" */
+    FactoryDeployerPermission_stream: FactoryDeployerPermission[]
+    /** fetch data from the table: "FactoryDeploymentConfig" */
+    FactoryDeploymentConfig: FactoryDeploymentConfig[]
+    /** fetch data from the table: "FactoryDeploymentConfig" using primary key columns */
+    FactoryDeploymentConfig_by_pk: (FactoryDeploymentConfig | null)
+    /** fetch data from the table in a streaming manner: "FactoryDeploymentConfig" */
+    FactoryDeploymentConfig_stream: FactoryDeploymentConfig[]
     /** fetch data from the table: "FeeSplitterPayment" */
     FeeSplitterPayment: FeeSplitterPayment[]
     /** fetch data from the table: "FeeSplitterPayment" using primary key columns */
@@ -997,6 +1103,18 @@ export interface subscription_root {
     FloorElevation_by_pk: (FloorElevation | null)
     /** fetch data from the table in a streaming manner: "FloorElevation" */
     FloorElevation_stream: FloorElevation[]
+    /** fetch data from the table: "FloorRaiseAttempt" */
+    FloorRaiseAttempt: FloorRaiseAttempt[]
+    /** fetch data from the table: "FloorRaiseAttempt" using primary key columns */
+    FloorRaiseAttempt_by_pk: (FloorRaiseAttempt | null)
+    /** fetch data from the table in a streaming manner: "FloorRaiseAttempt" */
+    FloorRaiseAttempt_stream: FloorRaiseAttempt[]
+    /** fetch data from the table: "FloorRaiseTreasury" */
+    FloorRaiseTreasury: FloorRaiseTreasury[]
+    /** fetch data from the table: "FloorRaiseTreasury" using primary key columns */
+    FloorRaiseTreasury_by_pk: (FloorRaiseTreasury | null)
+    /** fetch data from the table in a streaming manner: "FloorRaiseTreasury" */
+    FloorRaiseTreasury_stream: FloorRaiseTreasury[]
     /** fetch data from the table: "GlobalRegistry" */
     GlobalRegistry: GlobalRegistry[]
     /** fetch data from the table: "GlobalRegistry" using primary key columns */
@@ -1371,6 +1489,126 @@ ordering?: (cursor_ordering | null)}
 export interface CreditFacilityContract_stream_cursor_value_input {borrowToken_id?: (Scalars['String'] | null),borrowingFeeRate?: (Scalars['numeric'] | null),collateralToken_id?: (Scalars['String'] | null),createdAt?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),loanToValueRatio?: (Scalars['numeric'] | null),market_id?: (Scalars['String'] | null),maxLeverage?: (Scalars['numeric'] | null),totalDebtFormatted?: (Scalars['String'] | null),totalDebtRaw?: (Scalars['numeric'] | null),totalLoans?: (Scalars['numeric'] | null),totalLockedCollateralFormatted?: (Scalars['String'] | null),totalLockedCollateralRaw?: (Scalars['numeric'] | null),totalVolumeFormatted?: (Scalars['String'] | null),totalVolumeRaw?: (Scalars['numeric'] | null)}
 
 
+/** columns and relationships of "FactoryDeployerPermission" */
+export interface FactoryDeployerPermissionGenqlSelection{
+    allowed?: boolean | number
+    deployer?: boolean | number
+    factory_id?: boolean | number
+    id?: boolean | number
+    transactionHash?: boolean | number
+    updatedAt?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+
+/** order by aggregate values of table "FactoryDeployerPermission" */
+export interface FactoryDeployerPermission_aggregate_order_by {avg?: (FactoryDeployerPermission_avg_order_by | null),count?: (order_by | null),max?: (FactoryDeployerPermission_max_order_by | null),min?: (FactoryDeployerPermission_min_order_by | null),stddev?: (FactoryDeployerPermission_stddev_order_by | null),stddev_pop?: (FactoryDeployerPermission_stddev_pop_order_by | null),stddev_samp?: (FactoryDeployerPermission_stddev_samp_order_by | null),sum?: (FactoryDeployerPermission_sum_order_by | null),var_pop?: (FactoryDeployerPermission_var_pop_order_by | null),var_samp?: (FactoryDeployerPermission_var_samp_order_by | null),variance?: (FactoryDeployerPermission_variance_order_by | null)}
+
+
+/** order by avg() on columns of table "FactoryDeployerPermission" */
+export interface FactoryDeployerPermission_avg_order_by {updatedAt?: (order_by | null)}
+
+
+/** Boolean expression to filter rows from the table "FactoryDeployerPermission". All fields are combined with a logical 'AND'. */
+export interface FactoryDeployerPermission_bool_exp {_and?: (FactoryDeployerPermission_bool_exp[] | null),_not?: (FactoryDeployerPermission_bool_exp | null),_or?: (FactoryDeployerPermission_bool_exp[] | null),allowed?: (Boolean_comparison_exp | null),deployer?: (String_comparison_exp | null),factory_id?: (String_comparison_exp | null),id?: (String_comparison_exp | null),transactionHash?: (String_comparison_exp | null),updatedAt?: (numeric_comparison_exp | null)}
+
+
+/** order by max() on columns of table "FactoryDeployerPermission" */
+export interface FactoryDeployerPermission_max_order_by {deployer?: (order_by | null),factory_id?: (order_by | null),id?: (order_by | null),transactionHash?: (order_by | null),updatedAt?: (order_by | null)}
+
+
+/** order by min() on columns of table "FactoryDeployerPermission" */
+export interface FactoryDeployerPermission_min_order_by {deployer?: (order_by | null),factory_id?: (order_by | null),id?: (order_by | null),transactionHash?: (order_by | null),updatedAt?: (order_by | null)}
+
+
+/** Ordering options when selecting data from "FactoryDeployerPermission". */
+export interface FactoryDeployerPermission_order_by {allowed?: (order_by | null),deployer?: (order_by | null),factory_id?: (order_by | null),id?: (order_by | null),transactionHash?: (order_by | null),updatedAt?: (order_by | null)}
+
+
+/** order by stddev() on columns of table "FactoryDeployerPermission" */
+export interface FactoryDeployerPermission_stddev_order_by {updatedAt?: (order_by | null)}
+
+
+/** order by stddev_pop() on columns of table "FactoryDeployerPermission" */
+export interface FactoryDeployerPermission_stddev_pop_order_by {updatedAt?: (order_by | null)}
+
+
+/** order by stddev_samp() on columns of table "FactoryDeployerPermission" */
+export interface FactoryDeployerPermission_stddev_samp_order_by {updatedAt?: (order_by | null)}
+
+
+/** Streaming cursor of the table "FactoryDeployerPermission" */
+export interface FactoryDeployerPermission_stream_cursor_input {
+/** Stream column input with initial value */
+initial_value: FactoryDeployerPermission_stream_cursor_value_input,
+/** cursor ordering */
+ordering?: (cursor_ordering | null)}
+
+
+/** Initial value of the column from where the streaming should start */
+export interface FactoryDeployerPermission_stream_cursor_value_input {allowed?: (Scalars['Boolean'] | null),deployer?: (Scalars['String'] | null),factory_id?: (Scalars['String'] | null),id?: (Scalars['String'] | null),transactionHash?: (Scalars['String'] | null),updatedAt?: (Scalars['numeric'] | null)}
+
+
+/** order by sum() on columns of table "FactoryDeployerPermission" */
+export interface FactoryDeployerPermission_sum_order_by {updatedAt?: (order_by | null)}
+
+
+/** order by var_pop() on columns of table "FactoryDeployerPermission" */
+export interface FactoryDeployerPermission_var_pop_order_by {updatedAt?: (order_by | null)}
+
+
+/** order by var_samp() on columns of table "FactoryDeployerPermission" */
+export interface FactoryDeployerPermission_var_samp_order_by {updatedAt?: (order_by | null)}
+
+
+/** order by variance() on columns of table "FactoryDeployerPermission" */
+export interface FactoryDeployerPermission_variance_order_by {updatedAt?: (order_by | null)}
+
+
+/** columns and relationships of "FactoryDeploymentConfig" */
+export interface FactoryDeploymentConfigGenqlSelection{
+    /** An array relationship */
+    deployers?: (FactoryDeployerPermissionGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (FactoryDeployerPermission_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (FactoryDeployerPermission_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (FactoryDeployerPermission_bool_exp | null)} })
+    id?: boolean | number
+    kind?: boolean | number
+    lastUpdatedAt?: boolean | number
+    openDeployment?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+
+/** Boolean expression to filter rows from the table "FactoryDeploymentConfig". All fields are combined with a logical 'AND'. */
+export interface FactoryDeploymentConfig_bool_exp {_and?: (FactoryDeploymentConfig_bool_exp[] | null),_not?: (FactoryDeploymentConfig_bool_exp | null),_or?: (FactoryDeploymentConfig_bool_exp[] | null),deployers?: (FactoryDeployerPermission_bool_exp | null),id?: (String_comparison_exp | null),kind?: (factorykind_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),openDeployment?: (Boolean_comparison_exp | null)}
+
+
+/** Ordering options when selecting data from "FactoryDeploymentConfig". */
+export interface FactoryDeploymentConfig_order_by {deployers_aggregate?: (FactoryDeployerPermission_aggregate_order_by | null),id?: (order_by | null),kind?: (order_by | null),lastUpdatedAt?: (order_by | null),openDeployment?: (order_by | null)}
+
+
+/** Streaming cursor of the table "FactoryDeploymentConfig" */
+export interface FactoryDeploymentConfig_stream_cursor_input {
+/** Stream column input with initial value */
+initial_value: FactoryDeploymentConfig_stream_cursor_value_input,
+/** cursor ordering */
+ordering?: (cursor_ordering | null)}
+
+
+/** Initial value of the column from where the streaming should start */
+export interface FactoryDeploymentConfig_stream_cursor_value_input {id?: (Scalars['String'] | null),kind?: (Scalars['factorykind'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),openDeployment?: (Scalars['Boolean'] | null)}
+
+
 /** columns and relationships of "FeeSplitterPayment" */
 export interface FeeSplitterPaymentGenqlSelection{
     amountFormatted?: boolean | number
@@ -1613,6 +1851,137 @@ export interface FloorElevation_var_samp_order_by {deployedAmountRaw?: (order_by
 export interface FloorElevation_variance_order_by {deployedAmountRaw?: (order_by | null),newFloorPriceRaw?: (order_by | null),oldFloorPriceRaw?: (order_by | null),timestamp?: (order_by | null)}
 
 
+/** columns and relationships of "FloorRaiseAttempt" */
+export interface FloorRaiseAttemptGenqlSelection{
+    amountFormatted?: boolean | number
+    amountRaw?: boolean | number
+    id?: boolean | number
+    market_id?: boolean | number
+    success?: boolean | number
+    timestamp?: boolean | number
+    transactionHash?: boolean | number
+    treasury_id?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+
+/** order by aggregate values of table "FloorRaiseAttempt" */
+export interface FloorRaiseAttempt_aggregate_order_by {avg?: (FloorRaiseAttempt_avg_order_by | null),count?: (order_by | null),max?: (FloorRaiseAttempt_max_order_by | null),min?: (FloorRaiseAttempt_min_order_by | null),stddev?: (FloorRaiseAttempt_stddev_order_by | null),stddev_pop?: (FloorRaiseAttempt_stddev_pop_order_by | null),stddev_samp?: (FloorRaiseAttempt_stddev_samp_order_by | null),sum?: (FloorRaiseAttempt_sum_order_by | null),var_pop?: (FloorRaiseAttempt_var_pop_order_by | null),var_samp?: (FloorRaiseAttempt_var_samp_order_by | null),variance?: (FloorRaiseAttempt_variance_order_by | null)}
+
+
+/** order by avg() on columns of table "FloorRaiseAttempt" */
+export interface FloorRaiseAttempt_avg_order_by {amountRaw?: (order_by | null),timestamp?: (order_by | null)}
+
+
+/** Boolean expression to filter rows from the table "FloorRaiseAttempt". All fields are combined with a logical 'AND'. */
+export interface FloorRaiseAttempt_bool_exp {_and?: (FloorRaiseAttempt_bool_exp[] | null),_not?: (FloorRaiseAttempt_bool_exp | null),_or?: (FloorRaiseAttempt_bool_exp[] | null),amountFormatted?: (String_comparison_exp | null),amountRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),market_id?: (String_comparison_exp | null),success?: (Boolean_comparison_exp | null),timestamp?: (numeric_comparison_exp | null),transactionHash?: (String_comparison_exp | null),treasury_id?: (String_comparison_exp | null)}
+
+
+/** order by max() on columns of table "FloorRaiseAttempt" */
+export interface FloorRaiseAttempt_max_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),treasury_id?: (order_by | null)}
+
+
+/** order by min() on columns of table "FloorRaiseAttempt" */
+export interface FloorRaiseAttempt_min_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),treasury_id?: (order_by | null)}
+
+
+/** Ordering options when selecting data from "FloorRaiseAttempt". */
+export interface FloorRaiseAttempt_order_by {amountFormatted?: (order_by | null),amountRaw?: (order_by | null),id?: (order_by | null),market_id?: (order_by | null),success?: (order_by | null),timestamp?: (order_by | null),transactionHash?: (order_by | null),treasury_id?: (order_by | null)}
+
+
+/** order by stddev() on columns of table "FloorRaiseAttempt" */
+export interface FloorRaiseAttempt_stddev_order_by {amountRaw?: (order_by | null),timestamp?: (order_by | null)}
+
+
+/** order by stddev_pop() on columns of table "FloorRaiseAttempt" */
+export interface FloorRaiseAttempt_stddev_pop_order_by {amountRaw?: (order_by | null),timestamp?: (order_by | null)}
+
+
+/** order by stddev_samp() on columns of table "FloorRaiseAttempt" */
+export interface FloorRaiseAttempt_stddev_samp_order_by {amountRaw?: (order_by | null),timestamp?: (order_by | null)}
+
+
+/** Streaming cursor of the table "FloorRaiseAttempt" */
+export interface FloorRaiseAttempt_stream_cursor_input {
+/** Stream column input with initial value */
+initial_value: FloorRaiseAttempt_stream_cursor_value_input,
+/** cursor ordering */
+ordering?: (cursor_ordering | null)}
+
+
+/** Initial value of the column from where the streaming should start */
+export interface FloorRaiseAttempt_stream_cursor_value_input {amountFormatted?: (Scalars['String'] | null),amountRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),market_id?: (Scalars['String'] | null),success?: (Scalars['Boolean'] | null),timestamp?: (Scalars['numeric'] | null),transactionHash?: (Scalars['String'] | null),treasury_id?: (Scalars['String'] | null)}
+
+
+/** order by sum() on columns of table "FloorRaiseAttempt" */
+export interface FloorRaiseAttempt_sum_order_by {amountRaw?: (order_by | null),timestamp?: (order_by | null)}
+
+
+/** order by var_pop() on columns of table "FloorRaiseAttempt" */
+export interface FloorRaiseAttempt_var_pop_order_by {amountRaw?: (order_by | null),timestamp?: (order_by | null)}
+
+
+/** order by var_samp() on columns of table "FloorRaiseAttempt" */
+export interface FloorRaiseAttempt_var_samp_order_by {amountRaw?: (order_by | null),timestamp?: (order_by | null)}
+
+
+/** order by variance() on columns of table "FloorRaiseAttempt" */
+export interface FloorRaiseAttempt_variance_order_by {amountRaw?: (order_by | null),timestamp?: (order_by | null)}
+
+
+/** columns and relationships of "FloorRaiseTreasury" */
+export interface FloorRaiseTreasuryGenqlSelection{
+    accumulatedFormatted?: boolean | number
+    accumulatedRaw?: boolean | number
+    address?: boolean | number
+    createdAt?: boolean | number
+    floor?: boolean | number
+    id?: boolean | number
+    lastRaiseAttemptAt?: boolean | number
+    lastRaiseAttemptSuccess?: boolean | number
+    lastUpdatedAt?: boolean | number
+    market_id?: boolean | number
+    /** An array relationship */
+    raiseAttempts?: (FloorRaiseAttemptGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (FloorRaiseAttempt_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (FloorRaiseAttempt_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (FloorRaiseAttempt_bool_exp | null)} })
+    thresholdFormatted?: boolean | number
+    thresholdRaw?: boolean | number
+    totalRaisedCount?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+
+/** Boolean expression to filter rows from the table "FloorRaiseTreasury". All fields are combined with a logical 'AND'. */
+export interface FloorRaiseTreasury_bool_exp {_and?: (FloorRaiseTreasury_bool_exp[] | null),_not?: (FloorRaiseTreasury_bool_exp | null),_or?: (FloorRaiseTreasury_bool_exp[] | null),accumulatedFormatted?: (String_comparison_exp | null),accumulatedRaw?: (numeric_comparison_exp | null),address?: (String_comparison_exp | null),createdAt?: (numeric_comparison_exp | null),floor?: (String_comparison_exp | null),id?: (String_comparison_exp | null),lastRaiseAttemptAt?: (numeric_comparison_exp | null),lastRaiseAttemptSuccess?: (Boolean_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),market_id?: (String_comparison_exp | null),raiseAttempts?: (FloorRaiseAttempt_bool_exp | null),thresholdFormatted?: (String_comparison_exp | null),thresholdRaw?: (numeric_comparison_exp | null),totalRaisedCount?: (numeric_comparison_exp | null)}
+
+
+/** Ordering options when selecting data from "FloorRaiseTreasury". */
+export interface FloorRaiseTreasury_order_by {accumulatedFormatted?: (order_by | null),accumulatedRaw?: (order_by | null),address?: (order_by | null),createdAt?: (order_by | null),floor?: (order_by | null),id?: (order_by | null),lastRaiseAttemptAt?: (order_by | null),lastRaiseAttemptSuccess?: (order_by | null),lastUpdatedAt?: (order_by | null),market_id?: (order_by | null),raiseAttempts_aggregate?: (FloorRaiseAttempt_aggregate_order_by | null),thresholdFormatted?: (order_by | null),thresholdRaw?: (order_by | null),totalRaisedCount?: (order_by | null)}
+
+
+/** Streaming cursor of the table "FloorRaiseTreasury" */
+export interface FloorRaiseTreasury_stream_cursor_input {
+/** Stream column input with initial value */
+initial_value: FloorRaiseTreasury_stream_cursor_value_input,
+/** cursor ordering */
+ordering?: (cursor_ordering | null)}
+
+
+/** Initial value of the column from where the streaming should start */
+export interface FloorRaiseTreasury_stream_cursor_value_input {accumulatedFormatted?: (Scalars['String'] | null),accumulatedRaw?: (Scalars['numeric'] | null),address?: (Scalars['String'] | null),createdAt?: (Scalars['numeric'] | null),floor?: (Scalars['String'] | null),id?: (Scalars['String'] | null),lastRaiseAttemptAt?: (Scalars['numeric'] | null),lastRaiseAttemptSuccess?: (Scalars['Boolean'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),market_id?: (Scalars['String'] | null),thresholdFormatted?: (Scalars['String'] | null),thresholdRaw?: (Scalars['numeric'] | null),totalRaisedCount?: (Scalars['numeric'] | null)}
+
+
 /** columns and relationships of "GlobalRegistry" */
 export interface GlobalRegistryGenqlSelection{
     createdAt?: boolean | number
@@ -1721,14 +2090,6 @@ ordering?: (cursor_ordering | null)}
 
 /** Initial value of the column from where the streaming should start */
 export interface GlobalStats_stream_cursor_value_input {activeMarkets?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),totalLockedCollateralFormatted?: (Scalars['String'] | null),totalLockedCollateralRaw?: (Scalars['numeric'] | null),totalMarkets?: (Scalars['numeric'] | null),totalOutstandingDebtFormatted?: (Scalars['String'] | null),totalOutstandingDebtRaw?: (Scalars['numeric'] | null),totalVolumeFormatted?: (Scalars['String'] | null),totalVolumeRaw?: (Scalars['numeric'] | null)}
-
-
-/** Boolean expression to compare columns of type "Int". All fields are combined with logical 'AND'. */
-export interface Int_array_comparison_exp {
-/** is the array contained in the given array value */
-_contained_in?: (Scalars['Int'][] | null),
-/** does the array contain the given value */
-_contains?: (Scalars['Int'][] | null),_eq?: (Scalars['Int'][] | null),_gt?: (Scalars['Int'][] | null),_gte?: (Scalars['Int'][] | null),_in?: (Scalars['Int'][][] | null),_is_null?: (Scalars['Boolean'] | null),_lt?: (Scalars['Int'][] | null),_lte?: (Scalars['Int'][] | null),_neq?: (Scalars['Int'][] | null),_nin?: (Scalars['Int'][][] | null)}
 
 
 /** Boolean expression to compare columns of type "Int". All fields are combined with logical 'AND'. */
@@ -2238,7 +2599,6 @@ export interface PreSaleContractGenqlSelection{
     where?: (PresaleParticipation_bool_exp | null)} })
     perAddressIssuanceCapFormatted?: boolean | number
     perAddressIssuanceCapRaw?: boolean | number
-    priceBreakpointOffsets?: boolean | number
     priceBreakpointsFlat?: boolean | number
     /** An object relationship */
     purchaseToken?: TokenGenqlSelection
@@ -2261,11 +2621,11 @@ export interface PreSaleContractGenqlSelection{
 
 
 /** Boolean expression to filter rows from the table "PreSaleContract". All fields are combined with a logical 'AND'. */
-export interface PreSaleContract_bool_exp {_and?: (PreSaleContract_bool_exp[] | null),_not?: (PreSaleContract_bool_exp | null),_or?: (PreSaleContract_bool_exp[] | null),authorizer?: (String_comparison_exp | null),claims?: (PresaleClaim_bool_exp | null),commissionBps?: (String_array_comparison_exp | null),createdAt?: (numeric_comparison_exp | null),currentState?: (Int_comparison_exp | null),decayDuration?: (numeric_comparison_exp | null),decayStartTime?: (numeric_comparison_exp | null),endTime?: (numeric_comparison_exp | null),feeTreasury?: (String_comparison_exp | null),globalIssuanceCapFormatted?: (String_comparison_exp | null),globalIssuanceCapRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),initialMultiplier?: (numeric_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),lendingFacility?: (String_comparison_exp | null),market_id?: (String_comparison_exp | null),maxLeverage?: (numeric_comparison_exp | null),merkleRoot?: (String_comparison_exp | null),participations?: (PresaleParticipation_bool_exp | null),perAddressIssuanceCapFormatted?: (String_comparison_exp | null),perAddressIssuanceCapRaw?: (numeric_comparison_exp | null),priceBreakpointOffsets?: (Int_array_comparison_exp | null),priceBreakpointsFlat?: (String_array_comparison_exp | null),purchaseToken?: (Token_bool_exp | null),purchaseToken_id?: (String_comparison_exp | null),saleToken?: (Token_bool_exp | null),saleToken_id?: (String_comparison_exp | null),startTime?: (numeric_comparison_exp | null),timeSafeguardTs?: (numeric_comparison_exp | null),totalMintedFormatted?: (String_comparison_exp | null),totalMintedRaw?: (numeric_comparison_exp | null),totalParticipants?: (numeric_comparison_exp | null),totalRaisedFormatted?: (String_comparison_exp | null),totalRaisedRaw?: (numeric_comparison_exp | null),whitelistSize?: (numeric_comparison_exp | null),whitelistedAddresses?: (String_array_comparison_exp | null)}
+export interface PreSaleContract_bool_exp {_and?: (PreSaleContract_bool_exp[] | null),_not?: (PreSaleContract_bool_exp | null),_or?: (PreSaleContract_bool_exp[] | null),authorizer?: (String_comparison_exp | null),claims?: (PresaleClaim_bool_exp | null),commissionBps?: (String_array_comparison_exp | null),createdAt?: (numeric_comparison_exp | null),currentState?: (Int_comparison_exp | null),decayDuration?: (numeric_comparison_exp | null),decayStartTime?: (numeric_comparison_exp | null),endTime?: (numeric_comparison_exp | null),feeTreasury?: (String_comparison_exp | null),globalIssuanceCapFormatted?: (String_comparison_exp | null),globalIssuanceCapRaw?: (numeric_comparison_exp | null),id?: (String_comparison_exp | null),initialMultiplier?: (numeric_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),lendingFacility?: (String_comparison_exp | null),market_id?: (String_comparison_exp | null),maxLeverage?: (numeric_comparison_exp | null),merkleRoot?: (String_comparison_exp | null),participations?: (PresaleParticipation_bool_exp | null),perAddressIssuanceCapFormatted?: (String_comparison_exp | null),perAddressIssuanceCapRaw?: (numeric_comparison_exp | null),priceBreakpointsFlat?: (String_array_comparison_exp | null),purchaseToken?: (Token_bool_exp | null),purchaseToken_id?: (String_comparison_exp | null),saleToken?: (Token_bool_exp | null),saleToken_id?: (String_comparison_exp | null),startTime?: (numeric_comparison_exp | null),timeSafeguardTs?: (numeric_comparison_exp | null),totalMintedFormatted?: (String_comparison_exp | null),totalMintedRaw?: (numeric_comparison_exp | null),totalParticipants?: (numeric_comparison_exp | null),totalRaisedFormatted?: (String_comparison_exp | null),totalRaisedRaw?: (numeric_comparison_exp | null),whitelistSize?: (numeric_comparison_exp | null),whitelistedAddresses?: (String_array_comparison_exp | null)}
 
 
 /** Ordering options when selecting data from "PreSaleContract". */
-export interface PreSaleContract_order_by {authorizer?: (order_by | null),claims_aggregate?: (PresaleClaim_aggregate_order_by | null),commissionBps?: (order_by | null),createdAt?: (order_by | null),currentState?: (order_by | null),decayDuration?: (order_by | null),decayStartTime?: (order_by | null),endTime?: (order_by | null),feeTreasury?: (order_by | null),globalIssuanceCapFormatted?: (order_by | null),globalIssuanceCapRaw?: (order_by | null),id?: (order_by | null),initialMultiplier?: (order_by | null),lastUpdatedAt?: (order_by | null),lendingFacility?: (order_by | null),market_id?: (order_by | null),maxLeverage?: (order_by | null),merkleRoot?: (order_by | null),participations_aggregate?: (PresaleParticipation_aggregate_order_by | null),perAddressIssuanceCapFormatted?: (order_by | null),perAddressIssuanceCapRaw?: (order_by | null),priceBreakpointOffsets?: (order_by | null),priceBreakpointsFlat?: (order_by | null),purchaseToken?: (Token_order_by | null),purchaseToken_id?: (order_by | null),saleToken?: (Token_order_by | null),saleToken_id?: (order_by | null),startTime?: (order_by | null),timeSafeguardTs?: (order_by | null),totalMintedFormatted?: (order_by | null),totalMintedRaw?: (order_by | null),totalParticipants?: (order_by | null),totalRaisedFormatted?: (order_by | null),totalRaisedRaw?: (order_by | null),whitelistSize?: (order_by | null),whitelistedAddresses?: (order_by | null)}
+export interface PreSaleContract_order_by {authorizer?: (order_by | null),claims_aggregate?: (PresaleClaim_aggregate_order_by | null),commissionBps?: (order_by | null),createdAt?: (order_by | null),currentState?: (order_by | null),decayDuration?: (order_by | null),decayStartTime?: (order_by | null),endTime?: (order_by | null),feeTreasury?: (order_by | null),globalIssuanceCapFormatted?: (order_by | null),globalIssuanceCapRaw?: (order_by | null),id?: (order_by | null),initialMultiplier?: (order_by | null),lastUpdatedAt?: (order_by | null),lendingFacility?: (order_by | null),market_id?: (order_by | null),maxLeverage?: (order_by | null),merkleRoot?: (order_by | null),participations_aggregate?: (PresaleParticipation_aggregate_order_by | null),perAddressIssuanceCapFormatted?: (order_by | null),perAddressIssuanceCapRaw?: (order_by | null),priceBreakpointsFlat?: (order_by | null),purchaseToken?: (Token_order_by | null),purchaseToken_id?: (order_by | null),saleToken?: (Token_order_by | null),saleToken_id?: (order_by | null),startTime?: (order_by | null),timeSafeguardTs?: (order_by | null),totalMintedFormatted?: (order_by | null),totalMintedRaw?: (order_by | null),totalParticipants?: (order_by | null),totalRaisedFormatted?: (order_by | null),totalRaisedRaw?: (order_by | null),whitelistSize?: (order_by | null),whitelistedAddresses?: (order_by | null)}
 
 
 /** Streaming cursor of the table "PreSaleContract" */
@@ -2277,7 +2637,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface PreSaleContract_stream_cursor_value_input {authorizer?: (Scalars['String'] | null),commissionBps?: (Scalars['String'][] | null),createdAt?: (Scalars['numeric'] | null),currentState?: (Scalars['Int'] | null),decayDuration?: (Scalars['numeric'] | null),decayStartTime?: (Scalars['numeric'] | null),endTime?: (Scalars['numeric'] | null),feeTreasury?: (Scalars['String'] | null),globalIssuanceCapFormatted?: (Scalars['String'] | null),globalIssuanceCapRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),initialMultiplier?: (Scalars['numeric'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),lendingFacility?: (Scalars['String'] | null),market_id?: (Scalars['String'] | null),maxLeverage?: (Scalars['numeric'] | null),merkleRoot?: (Scalars['String'] | null),perAddressIssuanceCapFormatted?: (Scalars['String'] | null),perAddressIssuanceCapRaw?: (Scalars['numeric'] | null),priceBreakpointOffsets?: (Scalars['Int'][] | null),priceBreakpointsFlat?: (Scalars['String'][] | null),purchaseToken_id?: (Scalars['String'] | null),saleToken_id?: (Scalars['String'] | null),startTime?: (Scalars['numeric'] | null),timeSafeguardTs?: (Scalars['numeric'] | null),totalMintedFormatted?: (Scalars['String'] | null),totalMintedRaw?: (Scalars['numeric'] | null),totalParticipants?: (Scalars['numeric'] | null),totalRaisedFormatted?: (Scalars['String'] | null),totalRaisedRaw?: (Scalars['numeric'] | null),whitelistSize?: (Scalars['numeric'] | null),whitelistedAddresses?: (Scalars['String'][] | null)}
+export interface PreSaleContract_stream_cursor_value_input {authorizer?: (Scalars['String'] | null),commissionBps?: (Scalars['String'][] | null),createdAt?: (Scalars['numeric'] | null),currentState?: (Scalars['Int'] | null),decayDuration?: (Scalars['numeric'] | null),decayStartTime?: (Scalars['numeric'] | null),endTime?: (Scalars['numeric'] | null),feeTreasury?: (Scalars['String'] | null),globalIssuanceCapFormatted?: (Scalars['String'] | null),globalIssuanceCapRaw?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),initialMultiplier?: (Scalars['numeric'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),lendingFacility?: (Scalars['String'] | null),market_id?: (Scalars['String'] | null),maxLeverage?: (Scalars['numeric'] | null),merkleRoot?: (Scalars['String'] | null),perAddressIssuanceCapFormatted?: (Scalars['String'] | null),perAddressIssuanceCapRaw?: (Scalars['numeric'] | null),priceBreakpointsFlat?: (Scalars['String'][] | null),purchaseToken_id?: (Scalars['String'] | null),saleToken_id?: (Scalars['String'] | null),startTime?: (Scalars['numeric'] | null),timeSafeguardTs?: (Scalars['numeric'] | null),totalMintedFormatted?: (Scalars['String'] | null),totalMintedRaw?: (Scalars['numeric'] | null),totalParticipants?: (Scalars['numeric'] | null),totalRaisedFormatted?: (Scalars['String'] | null),totalRaisedRaw?: (Scalars['numeric'] | null),whitelistSize?: (Scalars['numeric'] | null),whitelistedAddresses?: (Scalars['String'][] | null)}
 
 
 /** columns and relationships of "PresaleClaim" */
@@ -3125,6 +3485,7 @@ _similar?: (Scalars['String'] | null)}
 
 /** columns and relationships of "Token" */
 export interface TokenGenqlSelection{
+    contractURI?: boolean | number
     decimals?: boolean | number
     id?: boolean | number
     maxSupplyFormatted?: boolean | number
@@ -3137,11 +3498,11 @@ export interface TokenGenqlSelection{
 
 
 /** Boolean expression to filter rows from the table "Token". All fields are combined with a logical 'AND'. */
-export interface Token_bool_exp {_and?: (Token_bool_exp[] | null),_not?: (Token_bool_exp | null),_or?: (Token_bool_exp[] | null),decimals?: (Int_comparison_exp | null),id?: (String_comparison_exp | null),maxSupplyFormatted?: (String_comparison_exp | null),maxSupplyRaw?: (numeric_comparison_exp | null),name?: (String_comparison_exp | null),symbol?: (String_comparison_exp | null)}
+export interface Token_bool_exp {_and?: (Token_bool_exp[] | null),_not?: (Token_bool_exp | null),_or?: (Token_bool_exp[] | null),contractURI?: (String_comparison_exp | null),decimals?: (Int_comparison_exp | null),id?: (String_comparison_exp | null),maxSupplyFormatted?: (String_comparison_exp | null),maxSupplyRaw?: (numeric_comparison_exp | null),name?: (String_comparison_exp | null),symbol?: (String_comparison_exp | null)}
 
 
 /** Ordering options when selecting data from "Token". */
-export interface Token_order_by {decimals?: (order_by | null),id?: (order_by | null),maxSupplyFormatted?: (order_by | null),maxSupplyRaw?: (order_by | null),name?: (order_by | null),symbol?: (order_by | null)}
+export interface Token_order_by {contractURI?: (order_by | null),decimals?: (order_by | null),id?: (order_by | null),maxSupplyFormatted?: (order_by | null),maxSupplyRaw?: (order_by | null),name?: (order_by | null),symbol?: (order_by | null)}
 
 
 /** Streaming cursor of the table "Token" */
@@ -3153,7 +3514,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface Token_stream_cursor_value_input {decimals?: (Scalars['Int'] | null),id?: (Scalars['String'] | null),maxSupplyFormatted?: (Scalars['String'] | null),maxSupplyRaw?: (Scalars['numeric'] | null),name?: (Scalars['String'] | null),symbol?: (Scalars['String'] | null)}
+export interface Token_stream_cursor_value_input {contractURI?: (Scalars['String'] | null),decimals?: (Scalars['Int'] | null),id?: (Scalars['String'] | null),maxSupplyFormatted?: (Scalars['String'] | null),maxSupplyRaw?: (Scalars['numeric'] | null),name?: (Scalars['String'] | null),symbol?: (Scalars['String'] | null)}
 
 
 /** columns and relationships of "Trade" */
@@ -3268,6 +3629,8 @@ export interface TreasuryGenqlSelection{
     order_by?: (FeeSplitterReceipt_order_by[] | null), 
     /** filter the rows returned */
     where?: (FeeSplitterReceipt_bool_exp | null)} })
+    floorRaiseShares?: boolean | number
+    floorRaiseTreasury_id?: boolean | number
     id?: boolean | number
     lastUpdatedAt?: boolean | number
     market_id?: boolean | number
@@ -3282,11 +3645,11 @@ export interface TreasuryGenqlSelection{
 
 
 /** Boolean expression to filter rows from the table "Treasury". All fields are combined with a logical 'AND'. */
-export interface Treasury_bool_exp {_and?: (Treasury_bool_exp[] | null),_not?: (Treasury_bool_exp | null),_or?: (Treasury_bool_exp[] | null),createdAt?: (numeric_comparison_exp | null),feeSplitterPayments?: (FeeSplitterPayment_bool_exp | null),feeSplitterReceipts?: (FeeSplitterReceipt_bool_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),market_id?: (String_comparison_exp | null),totalFeesDistributedFormatted?: (String_comparison_exp | null),totalFeesDistributedRaw?: (numeric_comparison_exp | null),totalFeesReceivedFormatted?: (String_comparison_exp | null),totalFeesReceivedRaw?: (numeric_comparison_exp | null),treasuryAddress?: (String_comparison_exp | null)}
+export interface Treasury_bool_exp {_and?: (Treasury_bool_exp[] | null),_not?: (Treasury_bool_exp | null),_or?: (Treasury_bool_exp[] | null),createdAt?: (numeric_comparison_exp | null),feeSplitterPayments?: (FeeSplitterPayment_bool_exp | null),feeSplitterReceipts?: (FeeSplitterReceipt_bool_exp | null),floorRaiseShares?: (numeric_comparison_exp | null),floorRaiseTreasury_id?: (String_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),market_id?: (String_comparison_exp | null),totalFeesDistributedFormatted?: (String_comparison_exp | null),totalFeesDistributedRaw?: (numeric_comparison_exp | null),totalFeesReceivedFormatted?: (String_comparison_exp | null),totalFeesReceivedRaw?: (numeric_comparison_exp | null),treasuryAddress?: (String_comparison_exp | null)}
 
 
 /** Ordering options when selecting data from "Treasury". */
-export interface Treasury_order_by {createdAt?: (order_by | null),feeSplitterPayments_aggregate?: (FeeSplitterPayment_aggregate_order_by | null),feeSplitterReceipts_aggregate?: (FeeSplitterReceipt_aggregate_order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),market_id?: (order_by | null),totalFeesDistributedFormatted?: (order_by | null),totalFeesDistributedRaw?: (order_by | null),totalFeesReceivedFormatted?: (order_by | null),totalFeesReceivedRaw?: (order_by | null),treasuryAddress?: (order_by | null)}
+export interface Treasury_order_by {createdAt?: (order_by | null),feeSplitterPayments_aggregate?: (FeeSplitterPayment_aggregate_order_by | null),feeSplitterReceipts_aggregate?: (FeeSplitterReceipt_aggregate_order_by | null),floorRaiseShares?: (order_by | null),floorRaiseTreasury_id?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),market_id?: (order_by | null),totalFeesDistributedFormatted?: (order_by | null),totalFeesDistributedRaw?: (order_by | null),totalFeesReceivedFormatted?: (order_by | null),totalFeesReceivedRaw?: (order_by | null),treasuryAddress?: (order_by | null)}
 
 
 /** Streaming cursor of the table "Treasury" */
@@ -3298,7 +3661,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface Treasury_stream_cursor_value_input {createdAt?: (Scalars['numeric'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),market_id?: (Scalars['String'] | null),totalFeesDistributedFormatted?: (Scalars['String'] | null),totalFeesDistributedRaw?: (Scalars['numeric'] | null),totalFeesReceivedFormatted?: (Scalars['String'] | null),totalFeesReceivedRaw?: (Scalars['numeric'] | null),treasuryAddress?: (Scalars['String'] | null)}
+export interface Treasury_stream_cursor_value_input {createdAt?: (Scalars['numeric'] | null),floorRaiseShares?: (Scalars['numeric'] | null),floorRaiseTreasury_id?: (Scalars['String'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),market_id?: (Scalars['String'] | null),totalFeesDistributedFormatted?: (Scalars['String'] | null),totalFeesDistributedRaw?: (Scalars['numeric'] | null),totalFeesReceivedFormatted?: (Scalars['String'] | null),totalFeesReceivedRaw?: (Scalars['numeric'] | null),treasuryAddress?: (Scalars['String'] | null)}
 
 
 /** columns and relationships of "UserMarketPosition" */
@@ -3467,6 +3830,10 @@ ordering?: (cursor_ordering | null)}
 /** Initial value of the column from where the streaming should start */
 export interface chain_metadata_stream_cursor_value_input {block_height?: (Scalars['Int'] | null),chain_id?: (Scalars['Int'] | null),end_block?: (Scalars['Int'] | null),first_event_block_number?: (Scalars['Int'] | null),is_hyper_sync?: (Scalars['Boolean'] | null),latest_fetched_block_number?: (Scalars['Int'] | null),latest_processed_block?: (Scalars['Int'] | null),num_batches_fetched?: (Scalars['Int'] | null),num_events_processed?: (Scalars['Int'] | null),start_block?: (Scalars['Int'] | null),timestamp_caught_up_to_head_or_endblock?: (Scalars['timestamptz'] | null)}
 
+
+/** Boolean expression to compare columns of type "factorykind". All fields are combined with logical 'AND'. */
+export interface factorykind_comparison_exp {_eq?: (Scalars['factorykind'] | null),_gt?: (Scalars['factorykind'] | null),_gte?: (Scalars['factorykind'] | null),_in?: (Scalars['factorykind'][] | null),_is_null?: (Scalars['Boolean'] | null),_lt?: (Scalars['factorykind'] | null),_lte?: (Scalars['factorykind'] | null),_neq?: (Scalars['factorykind'] | null),_nin?: (Scalars['factorykind'][] | null)}
+
 export interface jsonb_cast_exp {String?: (String_comparison_exp | null)}
 
 
@@ -3542,6 +3909,34 @@ export interface query_rootGenqlSelection{
     where?: (CreditFacilityContract_bool_exp | null)} })
     /** fetch data from the table: "CreditFacilityContract" using primary key columns */
     CreditFacilityContract_by_pk?: (CreditFacilityContractGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table: "FactoryDeployerPermission" */
+    FactoryDeployerPermission?: (FactoryDeployerPermissionGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (FactoryDeployerPermission_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (FactoryDeployerPermission_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (FactoryDeployerPermission_bool_exp | null)} })
+    /** fetch data from the table: "FactoryDeployerPermission" using primary key columns */
+    FactoryDeployerPermission_by_pk?: (FactoryDeployerPermissionGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table: "FactoryDeploymentConfig" */
+    FactoryDeploymentConfig?: (FactoryDeploymentConfigGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (FactoryDeploymentConfig_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (FactoryDeploymentConfig_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (FactoryDeploymentConfig_bool_exp | null)} })
+    /** fetch data from the table: "FactoryDeploymentConfig" using primary key columns */
+    FactoryDeploymentConfig_by_pk?: (FactoryDeploymentConfigGenqlSelection & { __args: {id: Scalars['String']} })
     /** fetch data from the table: "FeeSplitterPayment" */
     FeeSplitterPayment?: (FeeSplitterPaymentGenqlSelection & { __args?: {
     /** distinct select on columns */
@@ -3584,6 +3979,34 @@ export interface query_rootGenqlSelection{
     where?: (FloorElevation_bool_exp | null)} })
     /** fetch data from the table: "FloorElevation" using primary key columns */
     FloorElevation_by_pk?: (FloorElevationGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table: "FloorRaiseAttempt" */
+    FloorRaiseAttempt?: (FloorRaiseAttemptGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (FloorRaiseAttempt_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (FloorRaiseAttempt_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (FloorRaiseAttempt_bool_exp | null)} })
+    /** fetch data from the table: "FloorRaiseAttempt" using primary key columns */
+    FloorRaiseAttempt_by_pk?: (FloorRaiseAttemptGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table: "FloorRaiseTreasury" */
+    FloorRaiseTreasury?: (FloorRaiseTreasuryGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (FloorRaiseTreasury_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (FloorRaiseTreasury_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (FloorRaiseTreasury_bool_exp | null)} })
+    /** fetch data from the table: "FloorRaiseTreasury" using primary key columns */
+    FloorRaiseTreasury_by_pk?: (FloorRaiseTreasuryGenqlSelection & { __args: {id: Scalars['String']} })
     /** fetch data from the table: "GlobalRegistry" */
     GlobalRegistry?: (GlobalRegistryGenqlSelection & { __args?: {
     /** distinct select on columns */
@@ -4101,6 +4524,50 @@ export interface subscription_rootGenqlSelection{
     cursor: (CreditFacilityContract_stream_cursor_input | null)[], 
     /** filter the rows returned */
     where?: (CreditFacilityContract_bool_exp | null)} })
+    /** fetch data from the table: "FactoryDeployerPermission" */
+    FactoryDeployerPermission?: (FactoryDeployerPermissionGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (FactoryDeployerPermission_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (FactoryDeployerPermission_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (FactoryDeployerPermission_bool_exp | null)} })
+    /** fetch data from the table: "FactoryDeployerPermission" using primary key columns */
+    FactoryDeployerPermission_by_pk?: (FactoryDeployerPermissionGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table in a streaming manner: "FactoryDeployerPermission" */
+    FactoryDeployerPermission_stream?: (FactoryDeployerPermissionGenqlSelection & { __args: {
+    /** maximum number of rows returned in a single batch */
+    batch_size: Scalars['Int'], 
+    /** cursor to stream the results returned by the query */
+    cursor: (FactoryDeployerPermission_stream_cursor_input | null)[], 
+    /** filter the rows returned */
+    where?: (FactoryDeployerPermission_bool_exp | null)} })
+    /** fetch data from the table: "FactoryDeploymentConfig" */
+    FactoryDeploymentConfig?: (FactoryDeploymentConfigGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (FactoryDeploymentConfig_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (FactoryDeploymentConfig_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (FactoryDeploymentConfig_bool_exp | null)} })
+    /** fetch data from the table: "FactoryDeploymentConfig" using primary key columns */
+    FactoryDeploymentConfig_by_pk?: (FactoryDeploymentConfigGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table in a streaming manner: "FactoryDeploymentConfig" */
+    FactoryDeploymentConfig_stream?: (FactoryDeploymentConfigGenqlSelection & { __args: {
+    /** maximum number of rows returned in a single batch */
+    batch_size: Scalars['Int'], 
+    /** cursor to stream the results returned by the query */
+    cursor: (FactoryDeploymentConfig_stream_cursor_input | null)[], 
+    /** filter the rows returned */
+    where?: (FactoryDeploymentConfig_bool_exp | null)} })
     /** fetch data from the table: "FeeSplitterPayment" */
     FeeSplitterPayment?: (FeeSplitterPaymentGenqlSelection & { __args?: {
     /** distinct select on columns */
@@ -4167,6 +4634,50 @@ export interface subscription_rootGenqlSelection{
     cursor: (FloorElevation_stream_cursor_input | null)[], 
     /** filter the rows returned */
     where?: (FloorElevation_bool_exp | null)} })
+    /** fetch data from the table: "FloorRaiseAttempt" */
+    FloorRaiseAttempt?: (FloorRaiseAttemptGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (FloorRaiseAttempt_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (FloorRaiseAttempt_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (FloorRaiseAttempt_bool_exp | null)} })
+    /** fetch data from the table: "FloorRaiseAttempt" using primary key columns */
+    FloorRaiseAttempt_by_pk?: (FloorRaiseAttemptGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table in a streaming manner: "FloorRaiseAttempt" */
+    FloorRaiseAttempt_stream?: (FloorRaiseAttemptGenqlSelection & { __args: {
+    /** maximum number of rows returned in a single batch */
+    batch_size: Scalars['Int'], 
+    /** cursor to stream the results returned by the query */
+    cursor: (FloorRaiseAttempt_stream_cursor_input | null)[], 
+    /** filter the rows returned */
+    where?: (FloorRaiseAttempt_bool_exp | null)} })
+    /** fetch data from the table: "FloorRaiseTreasury" */
+    FloorRaiseTreasury?: (FloorRaiseTreasuryGenqlSelection & { __args?: {
+    /** distinct select on columns */
+    distinct_on?: (FloorRaiseTreasury_select_column[] | null), 
+    /** limit the number of rows returned */
+    limit?: (Scalars['Int'] | null), 
+    /** skip the first n rows. Use only with order_by */
+    offset?: (Scalars['Int'] | null), 
+    /** sort the rows by one or more columns */
+    order_by?: (FloorRaiseTreasury_order_by[] | null), 
+    /** filter the rows returned */
+    where?: (FloorRaiseTreasury_bool_exp | null)} })
+    /** fetch data from the table: "FloorRaiseTreasury" using primary key columns */
+    FloorRaiseTreasury_by_pk?: (FloorRaiseTreasuryGenqlSelection & { __args: {id: Scalars['String']} })
+    /** fetch data from the table in a streaming manner: "FloorRaiseTreasury" */
+    FloorRaiseTreasury_stream?: (FloorRaiseTreasuryGenqlSelection & { __args: {
+    /** maximum number of rows returned in a single batch */
+    batch_size: Scalars['Int'], 
+    /** cursor to stream the results returned by the query */
+    cursor: (FloorRaiseTreasury_stream_cursor_input | null)[], 
+    /** filter the rows returned */
+    where?: (FloorRaiseTreasury_bool_exp | null)} })
     /** fetch data from the table: "GlobalRegistry" */
     GlobalRegistry?: (GlobalRegistryGenqlSelection & { __args?: {
     /** distinct select on columns */
@@ -4819,6 +5330,22 @@ export type SubscriptionGenqlSelection = subscription_rootGenqlSelection
     
 
 
+    const FactoryDeployerPermission_possibleTypes: string[] = ['FactoryDeployerPermission']
+    export const isFactoryDeployerPermission = (obj?: { __typename?: any } | null): obj is FactoryDeployerPermission => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isFactoryDeployerPermission"')
+      return FactoryDeployerPermission_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const FactoryDeploymentConfig_possibleTypes: string[] = ['FactoryDeploymentConfig']
+    export const isFactoryDeploymentConfig = (obj?: { __typename?: any } | null): obj is FactoryDeploymentConfig => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isFactoryDeploymentConfig"')
+      return FactoryDeploymentConfig_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
     const FeeSplitterPayment_possibleTypes: string[] = ['FeeSplitterPayment']
     export const isFeeSplitterPayment = (obj?: { __typename?: any } | null): obj is FeeSplitterPayment => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isFeeSplitterPayment"')
@@ -4839,6 +5366,22 @@ export type SubscriptionGenqlSelection = subscription_rootGenqlSelection
     export const isFloorElevation = (obj?: { __typename?: any } | null): obj is FloorElevation => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isFloorElevation"')
       return FloorElevation_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const FloorRaiseAttempt_possibleTypes: string[] = ['FloorRaiseAttempt']
+    export const isFloorRaiseAttempt = (obj?: { __typename?: any } | null): obj is FloorRaiseAttempt => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isFloorRaiseAttempt"')
+      return FloorRaiseAttempt_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const FloorRaiseTreasury_possibleTypes: string[] = ['FloorRaiseTreasury']
+    export const isFloorRaiseTreasury = (obj?: { __typename?: any } | null): obj is FloorRaiseTreasury => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isFloorRaiseTreasury"')
+      return FloorRaiseTreasury_possibleTypes.includes(obj.__typename)
     }
     
 
@@ -5113,6 +5656,22 @@ export const enumCreditFacilityContractSelectColumn = {
    totalVolumeRaw: 'totalVolumeRaw' as const
 }
 
+export const enumFactoryDeployerPermissionSelectColumn = {
+   allowed: 'allowed' as const,
+   deployer: 'deployer' as const,
+   factory_id: 'factory_id' as const,
+   id: 'id' as const,
+   transactionHash: 'transactionHash' as const,
+   updatedAt: 'updatedAt' as const
+}
+
+export const enumFactoryDeploymentConfigSelectColumn = {
+   id: 'id' as const,
+   kind: 'kind' as const,
+   lastUpdatedAt: 'lastUpdatedAt' as const,
+   openDeployment: 'openDeployment' as const
+}
+
 export const enumFeeSplitterPaymentSelectColumn = {
    amountFormatted: 'amountFormatted' as const,
    amountRaw: 'amountRaw' as const,
@@ -5149,6 +5708,33 @@ export const enumFloorElevationSelectColumn = {
    oldFloorPriceRaw: 'oldFloorPriceRaw' as const,
    timestamp: 'timestamp' as const,
    transactionHash: 'transactionHash' as const
+}
+
+export const enumFloorRaiseAttemptSelectColumn = {
+   amountFormatted: 'amountFormatted' as const,
+   amountRaw: 'amountRaw' as const,
+   id: 'id' as const,
+   market_id: 'market_id' as const,
+   success: 'success' as const,
+   timestamp: 'timestamp' as const,
+   transactionHash: 'transactionHash' as const,
+   treasury_id: 'treasury_id' as const
+}
+
+export const enumFloorRaiseTreasurySelectColumn = {
+   accumulatedFormatted: 'accumulatedFormatted' as const,
+   accumulatedRaw: 'accumulatedRaw' as const,
+   address: 'address' as const,
+   createdAt: 'createdAt' as const,
+   floor: 'floor' as const,
+   id: 'id' as const,
+   lastRaiseAttemptAt: 'lastRaiseAttemptAt' as const,
+   lastRaiseAttemptSuccess: 'lastRaiseAttemptSuccess' as const,
+   lastUpdatedAt: 'lastUpdatedAt' as const,
+   market_id: 'market_id' as const,
+   thresholdFormatted: 'thresholdFormatted' as const,
+   thresholdRaw: 'thresholdRaw' as const,
+   totalRaisedCount: 'totalRaisedCount' as const
 }
 
 export const enumGlobalRegistrySelectColumn = {
@@ -5327,7 +5913,6 @@ export const enumPreSaleContractSelectColumn = {
    merkleRoot: 'merkleRoot' as const,
    perAddressIssuanceCapFormatted: 'perAddressIssuanceCapFormatted' as const,
    perAddressIssuanceCapRaw: 'perAddressIssuanceCapRaw' as const,
-   priceBreakpointOffsets: 'priceBreakpointOffsets' as const,
    priceBreakpointsFlat: 'priceBreakpointsFlat' as const,
    purchaseToken_id: 'purchaseToken_id' as const,
    saleToken_id: 'saleToken_id' as const,
@@ -5488,6 +6073,7 @@ export const enumStrategySelectColumn = {
 }
 
 export const enumTokenSelectColumn = {
+   contractURI: 'contractURI' as const,
    decimals: 'decimals' as const,
    id: 'id' as const,
    maxSupplyFormatted: 'maxSupplyFormatted' as const,
@@ -5515,6 +6101,8 @@ export const enumTradeSelectColumn = {
 
 export const enumTreasurySelectColumn = {
    createdAt: 'createdAt' as const,
+   floorRaiseShares: 'floorRaiseShares' as const,
+   floorRaiseTreasury_id: 'floorRaiseTreasury_id' as const,
    id: 'id' as const,
    lastUpdatedAt: 'lastUpdatedAt' as const,
    market_id: 'market_id' as const,

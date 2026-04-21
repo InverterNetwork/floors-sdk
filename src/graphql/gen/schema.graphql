@@ -459,6 +459,268 @@ input CreditFacilityContract_stream_cursor_value_input {
 }
 
 """
+columns and relationships of "FactoryDeployerPermission"
+"""
+type FactoryDeployerPermission {
+  allowed: Boolean!
+  deployer: String!
+  factory_id: String!
+  id: String!
+  transactionHash: String!
+  updatedAt: numeric!
+}
+
+"""
+order by aggregate values of table "FactoryDeployerPermission"
+"""
+input FactoryDeployerPermission_aggregate_order_by {
+  avg: FactoryDeployerPermission_avg_order_by
+  count: order_by
+  max: FactoryDeployerPermission_max_order_by
+  min: FactoryDeployerPermission_min_order_by
+  stddev: FactoryDeployerPermission_stddev_order_by
+  stddev_pop: FactoryDeployerPermission_stddev_pop_order_by
+  stddev_samp: FactoryDeployerPermission_stddev_samp_order_by
+  sum: FactoryDeployerPermission_sum_order_by
+  var_pop: FactoryDeployerPermission_var_pop_order_by
+  var_samp: FactoryDeployerPermission_var_samp_order_by
+  variance: FactoryDeployerPermission_variance_order_by
+}
+
+"""
+order by avg() on columns of table "FactoryDeployerPermission"
+"""
+input FactoryDeployerPermission_avg_order_by {
+  updatedAt: order_by
+}
+
+"""
+Boolean expression to filter rows from the table "FactoryDeployerPermission". All fields are combined with a logical 'AND'.
+"""
+input FactoryDeployerPermission_bool_exp {
+  _and: [FactoryDeployerPermission_bool_exp!]
+  _not: FactoryDeployerPermission_bool_exp
+  _or: [FactoryDeployerPermission_bool_exp!]
+  allowed: Boolean_comparison_exp
+  deployer: String_comparison_exp
+  factory_id: String_comparison_exp
+  id: String_comparison_exp
+  transactionHash: String_comparison_exp
+  updatedAt: numeric_comparison_exp
+}
+
+"""
+order by max() on columns of table "FactoryDeployerPermission"
+"""
+input FactoryDeployerPermission_max_order_by {
+  deployer: order_by
+  factory_id: order_by
+  id: order_by
+  transactionHash: order_by
+  updatedAt: order_by
+}
+
+"""
+order by min() on columns of table "FactoryDeployerPermission"
+"""
+input FactoryDeployerPermission_min_order_by {
+  deployer: order_by
+  factory_id: order_by
+  id: order_by
+  transactionHash: order_by
+  updatedAt: order_by
+}
+
+"""Ordering options when selecting data from "FactoryDeployerPermission"."""
+input FactoryDeployerPermission_order_by {
+  allowed: order_by
+  deployer: order_by
+  factory_id: order_by
+  id: order_by
+  transactionHash: order_by
+  updatedAt: order_by
+}
+
+"""
+select columns of table "FactoryDeployerPermission"
+"""
+enum FactoryDeployerPermission_select_column {
+  """column name"""
+  allowed
+
+  """column name"""
+  deployer
+
+  """column name"""
+  factory_id
+
+  """column name"""
+  id
+
+  """column name"""
+  transactionHash
+
+  """column name"""
+  updatedAt
+}
+
+"""
+order by stddev() on columns of table "FactoryDeployerPermission"
+"""
+input FactoryDeployerPermission_stddev_order_by {
+  updatedAt: order_by
+}
+
+"""
+order by stddev_pop() on columns of table "FactoryDeployerPermission"
+"""
+input FactoryDeployerPermission_stddev_pop_order_by {
+  updatedAt: order_by
+}
+
+"""
+order by stddev_samp() on columns of table "FactoryDeployerPermission"
+"""
+input FactoryDeployerPermission_stddev_samp_order_by {
+  updatedAt: order_by
+}
+
+"""
+Streaming cursor of the table "FactoryDeployerPermission"
+"""
+input FactoryDeployerPermission_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: FactoryDeployerPermission_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input FactoryDeployerPermission_stream_cursor_value_input {
+  allowed: Boolean
+  deployer: String
+  factory_id: String
+  id: String
+  transactionHash: String
+  updatedAt: numeric
+}
+
+"""
+order by sum() on columns of table "FactoryDeployerPermission"
+"""
+input FactoryDeployerPermission_sum_order_by {
+  updatedAt: order_by
+}
+
+"""
+order by var_pop() on columns of table "FactoryDeployerPermission"
+"""
+input FactoryDeployerPermission_var_pop_order_by {
+  updatedAt: order_by
+}
+
+"""
+order by var_samp() on columns of table "FactoryDeployerPermission"
+"""
+input FactoryDeployerPermission_var_samp_order_by {
+  updatedAt: order_by
+}
+
+"""
+order by variance() on columns of table "FactoryDeployerPermission"
+"""
+input FactoryDeployerPermission_variance_order_by {
+  updatedAt: order_by
+}
+
+"""
+columns and relationships of "FactoryDeploymentConfig"
+"""
+type FactoryDeploymentConfig {
+  """An array relationship"""
+  deployers(
+    """distinct select on columns"""
+    distinct_on: [FactoryDeployerPermission_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [FactoryDeployerPermission_order_by!]
+
+    """filter the rows returned"""
+    where: FactoryDeployerPermission_bool_exp
+  ): [FactoryDeployerPermission!]!
+  id: String!
+  kind: factorykind!
+  lastUpdatedAt: numeric!
+  openDeployment: Boolean!
+}
+
+"""
+Boolean expression to filter rows from the table "FactoryDeploymentConfig". All fields are combined with a logical 'AND'.
+"""
+input FactoryDeploymentConfig_bool_exp {
+  _and: [FactoryDeploymentConfig_bool_exp!]
+  _not: FactoryDeploymentConfig_bool_exp
+  _or: [FactoryDeploymentConfig_bool_exp!]
+  deployers: FactoryDeployerPermission_bool_exp
+  id: String_comparison_exp
+  kind: factorykind_comparison_exp
+  lastUpdatedAt: numeric_comparison_exp
+  openDeployment: Boolean_comparison_exp
+}
+
+"""Ordering options when selecting data from "FactoryDeploymentConfig"."""
+input FactoryDeploymentConfig_order_by {
+  deployers_aggregate: FactoryDeployerPermission_aggregate_order_by
+  id: order_by
+  kind: order_by
+  lastUpdatedAt: order_by
+  openDeployment: order_by
+}
+
+"""
+select columns of table "FactoryDeploymentConfig"
+"""
+enum FactoryDeploymentConfig_select_column {
+  """column name"""
+  id
+
+  """column name"""
+  kind
+
+  """column name"""
+  lastUpdatedAt
+
+  """column name"""
+  openDeployment
+}
+
+"""
+Streaming cursor of the table "FactoryDeploymentConfig"
+"""
+input FactoryDeploymentConfig_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: FactoryDeploymentConfig_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input FactoryDeploymentConfig_stream_cursor_value_input {
+  id: String
+  kind: factorykind
+  lastUpdatedAt: numeric
+  openDeployment: Boolean
+}
+
+"""
 columns and relationships of "FeeSplitterPayment"
 """
 type FeeSplitterPayment {
@@ -1130,6 +1392,358 @@ input FloorElevation_variance_order_by {
 }
 
 """
+columns and relationships of "FloorRaiseAttempt"
+"""
+type FloorRaiseAttempt {
+  amountFormatted: String!
+  amountRaw: numeric!
+  id: String!
+  market_id: String!
+  success: Boolean!
+  timestamp: numeric!
+  transactionHash: String!
+  treasury_id: String!
+}
+
+"""
+order by aggregate values of table "FloorRaiseAttempt"
+"""
+input FloorRaiseAttempt_aggregate_order_by {
+  avg: FloorRaiseAttempt_avg_order_by
+  count: order_by
+  max: FloorRaiseAttempt_max_order_by
+  min: FloorRaiseAttempt_min_order_by
+  stddev: FloorRaiseAttempt_stddev_order_by
+  stddev_pop: FloorRaiseAttempt_stddev_pop_order_by
+  stddev_samp: FloorRaiseAttempt_stddev_samp_order_by
+  sum: FloorRaiseAttempt_sum_order_by
+  var_pop: FloorRaiseAttempt_var_pop_order_by
+  var_samp: FloorRaiseAttempt_var_samp_order_by
+  variance: FloorRaiseAttempt_variance_order_by
+}
+
+"""
+order by avg() on columns of table "FloorRaiseAttempt"
+"""
+input FloorRaiseAttempt_avg_order_by {
+  amountRaw: order_by
+  timestamp: order_by
+}
+
+"""
+Boolean expression to filter rows from the table "FloorRaiseAttempt". All fields are combined with a logical 'AND'.
+"""
+input FloorRaiseAttempt_bool_exp {
+  _and: [FloorRaiseAttempt_bool_exp!]
+  _not: FloorRaiseAttempt_bool_exp
+  _or: [FloorRaiseAttempt_bool_exp!]
+  amountFormatted: String_comparison_exp
+  amountRaw: numeric_comparison_exp
+  id: String_comparison_exp
+  market_id: String_comparison_exp
+  success: Boolean_comparison_exp
+  timestamp: numeric_comparison_exp
+  transactionHash: String_comparison_exp
+  treasury_id: String_comparison_exp
+}
+
+"""
+order by max() on columns of table "FloorRaiseAttempt"
+"""
+input FloorRaiseAttempt_max_order_by {
+  amountFormatted: order_by
+  amountRaw: order_by
+  id: order_by
+  market_id: order_by
+  timestamp: order_by
+  transactionHash: order_by
+  treasury_id: order_by
+}
+
+"""
+order by min() on columns of table "FloorRaiseAttempt"
+"""
+input FloorRaiseAttempt_min_order_by {
+  amountFormatted: order_by
+  amountRaw: order_by
+  id: order_by
+  market_id: order_by
+  timestamp: order_by
+  transactionHash: order_by
+  treasury_id: order_by
+}
+
+"""Ordering options when selecting data from "FloorRaiseAttempt"."""
+input FloorRaiseAttempt_order_by {
+  amountFormatted: order_by
+  amountRaw: order_by
+  id: order_by
+  market_id: order_by
+  success: order_by
+  timestamp: order_by
+  transactionHash: order_by
+  treasury_id: order_by
+}
+
+"""
+select columns of table "FloorRaiseAttempt"
+"""
+enum FloorRaiseAttempt_select_column {
+  """column name"""
+  amountFormatted
+
+  """column name"""
+  amountRaw
+
+  """column name"""
+  id
+
+  """column name"""
+  market_id
+
+  """column name"""
+  success
+
+  """column name"""
+  timestamp
+
+  """column name"""
+  transactionHash
+
+  """column name"""
+  treasury_id
+}
+
+"""
+order by stddev() on columns of table "FloorRaiseAttempt"
+"""
+input FloorRaiseAttempt_stddev_order_by {
+  amountRaw: order_by
+  timestamp: order_by
+}
+
+"""
+order by stddev_pop() on columns of table "FloorRaiseAttempt"
+"""
+input FloorRaiseAttempt_stddev_pop_order_by {
+  amountRaw: order_by
+  timestamp: order_by
+}
+
+"""
+order by stddev_samp() on columns of table "FloorRaiseAttempt"
+"""
+input FloorRaiseAttempt_stddev_samp_order_by {
+  amountRaw: order_by
+  timestamp: order_by
+}
+
+"""
+Streaming cursor of the table "FloorRaiseAttempt"
+"""
+input FloorRaiseAttempt_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: FloorRaiseAttempt_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input FloorRaiseAttempt_stream_cursor_value_input {
+  amountFormatted: String
+  amountRaw: numeric
+  id: String
+  market_id: String
+  success: Boolean
+  timestamp: numeric
+  transactionHash: String
+  treasury_id: String
+}
+
+"""
+order by sum() on columns of table "FloorRaiseAttempt"
+"""
+input FloorRaiseAttempt_sum_order_by {
+  amountRaw: order_by
+  timestamp: order_by
+}
+
+"""
+order by var_pop() on columns of table "FloorRaiseAttempt"
+"""
+input FloorRaiseAttempt_var_pop_order_by {
+  amountRaw: order_by
+  timestamp: order_by
+}
+
+"""
+order by var_samp() on columns of table "FloorRaiseAttempt"
+"""
+input FloorRaiseAttempt_var_samp_order_by {
+  amountRaw: order_by
+  timestamp: order_by
+}
+
+"""
+order by variance() on columns of table "FloorRaiseAttempt"
+"""
+input FloorRaiseAttempt_variance_order_by {
+  amountRaw: order_by
+  timestamp: order_by
+}
+
+"""
+columns and relationships of "FloorRaiseTreasury"
+"""
+type FloorRaiseTreasury {
+  accumulatedFormatted: String!
+  accumulatedRaw: numeric!
+  address: String!
+  createdAt: numeric!
+  floor: String!
+  id: String!
+  lastRaiseAttemptAt: numeric
+  lastRaiseAttemptSuccess: Boolean
+  lastUpdatedAt: numeric!
+  market_id: String!
+
+  """An array relationship"""
+  raiseAttempts(
+    """distinct select on columns"""
+    distinct_on: [FloorRaiseAttempt_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [FloorRaiseAttempt_order_by!]
+
+    """filter the rows returned"""
+    where: FloorRaiseAttempt_bool_exp
+  ): [FloorRaiseAttempt!]!
+  thresholdFormatted: String!
+  thresholdRaw: numeric!
+  totalRaisedCount: numeric!
+}
+
+"""
+Boolean expression to filter rows from the table "FloorRaiseTreasury". All fields are combined with a logical 'AND'.
+"""
+input FloorRaiseTreasury_bool_exp {
+  _and: [FloorRaiseTreasury_bool_exp!]
+  _not: FloorRaiseTreasury_bool_exp
+  _or: [FloorRaiseTreasury_bool_exp!]
+  accumulatedFormatted: String_comparison_exp
+  accumulatedRaw: numeric_comparison_exp
+  address: String_comparison_exp
+  createdAt: numeric_comparison_exp
+  floor: String_comparison_exp
+  id: String_comparison_exp
+  lastRaiseAttemptAt: numeric_comparison_exp
+  lastRaiseAttemptSuccess: Boolean_comparison_exp
+  lastUpdatedAt: numeric_comparison_exp
+  market_id: String_comparison_exp
+  raiseAttempts: FloorRaiseAttempt_bool_exp
+  thresholdFormatted: String_comparison_exp
+  thresholdRaw: numeric_comparison_exp
+  totalRaisedCount: numeric_comparison_exp
+}
+
+"""Ordering options when selecting data from "FloorRaiseTreasury"."""
+input FloorRaiseTreasury_order_by {
+  accumulatedFormatted: order_by
+  accumulatedRaw: order_by
+  address: order_by
+  createdAt: order_by
+  floor: order_by
+  id: order_by
+  lastRaiseAttemptAt: order_by
+  lastRaiseAttemptSuccess: order_by
+  lastUpdatedAt: order_by
+  market_id: order_by
+  raiseAttempts_aggregate: FloorRaiseAttempt_aggregate_order_by
+  thresholdFormatted: order_by
+  thresholdRaw: order_by
+  totalRaisedCount: order_by
+}
+
+"""
+select columns of table "FloorRaiseTreasury"
+"""
+enum FloorRaiseTreasury_select_column {
+  """column name"""
+  accumulatedFormatted
+
+  """column name"""
+  accumulatedRaw
+
+  """column name"""
+  address
+
+  """column name"""
+  createdAt
+
+  """column name"""
+  floor
+
+  """column name"""
+  id
+
+  """column name"""
+  lastRaiseAttemptAt
+
+  """column name"""
+  lastRaiseAttemptSuccess
+
+  """column name"""
+  lastUpdatedAt
+
+  """column name"""
+  market_id
+
+  """column name"""
+  thresholdFormatted
+
+  """column name"""
+  thresholdRaw
+
+  """column name"""
+  totalRaisedCount
+}
+
+"""
+Streaming cursor of the table "FloorRaiseTreasury"
+"""
+input FloorRaiseTreasury_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: FloorRaiseTreasury_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input FloorRaiseTreasury_stream_cursor_value_input {
+  accumulatedFormatted: String
+  accumulatedRaw: numeric
+  address: String
+  createdAt: numeric
+  floor: String
+  id: String
+  lastRaiseAttemptAt: numeric
+  lastRaiseAttemptSuccess: Boolean
+  lastUpdatedAt: numeric
+  market_id: String
+  thresholdFormatted: String
+  thresholdRaw: numeric
+  totalRaisedCount: numeric
+}
+
+"""
 columns and relationships of "GlobalRegistry"
 """
 type GlobalRegistry {
@@ -1447,26 +2061,6 @@ input GlobalStats_stream_cursor_value_input {
   totalOutstandingDebtRaw: numeric
   totalVolumeFormatted: String
   totalVolumeRaw: numeric
-}
-
-"""
-Boolean expression to compare columns of type "Int". All fields are combined with logical 'AND'.
-"""
-input Int_array_comparison_exp {
-  """is the array contained in the given array value"""
-  _contained_in: [Int!]
-
-  """does the array contain the given value"""
-  _contains: [Int!]
-  _eq: [Int!]
-  _gt: [Int!]
-  _gte: [Int!]
-  _in: [[Int!]!]
-  _is_null: Boolean
-  _lt: [Int!]
-  _lte: [Int!]
-  _neq: [Int!]
-  _nin: [[Int!]!]
 }
 
 """
@@ -3128,7 +3722,6 @@ type PreSaleContract {
   ): [PresaleParticipation!]!
   perAddressIssuanceCapFormatted: String!
   perAddressIssuanceCapRaw: numeric!
-  priceBreakpointOffsets: [Int!]
   priceBreakpointsFlat: [String!]
 
   """An object relationship"""
@@ -3177,7 +3770,6 @@ input PreSaleContract_bool_exp {
   participations: PresaleParticipation_bool_exp
   perAddressIssuanceCapFormatted: String_comparison_exp
   perAddressIssuanceCapRaw: numeric_comparison_exp
-  priceBreakpointOffsets: Int_array_comparison_exp
   priceBreakpointsFlat: String_array_comparison_exp
   purchaseToken: Token_bool_exp
   purchaseToken_id: String_comparison_exp
@@ -3217,7 +3809,6 @@ input PreSaleContract_order_by {
   participations_aggregate: PresaleParticipation_aggregate_order_by
   perAddressIssuanceCapFormatted: order_by
   perAddressIssuanceCapRaw: order_by
-  priceBreakpointOffsets: order_by
   priceBreakpointsFlat: order_by
   purchaseToken: Token_order_by
   purchaseToken_id: order_by
@@ -3296,9 +3887,6 @@ enum PreSaleContract_select_column {
   perAddressIssuanceCapRaw
 
   """column name"""
-  priceBreakpointOffsets
-
-  """column name"""
   priceBreakpointsFlat
 
   """column name"""
@@ -3367,7 +3955,6 @@ input PreSaleContract_stream_cursor_value_input {
   merkleRoot: String
   perAddressIssuanceCapFormatted: String
   perAddressIssuanceCapRaw: numeric
-  priceBreakpointOffsets: [Int!]
   priceBreakpointsFlat: [String!]
   purchaseToken_id: String
   saleToken_id: String
@@ -5796,6 +6383,7 @@ input String_comparison_exp {
 columns and relationships of "Token"
 """
 type Token {
+  contractURI: String
   decimals: Int!
   id: String!
   maxSupplyFormatted: String!
@@ -5811,6 +6399,7 @@ input Token_bool_exp {
   _and: [Token_bool_exp!]
   _not: Token_bool_exp
   _or: [Token_bool_exp!]
+  contractURI: String_comparison_exp
   decimals: Int_comparison_exp
   id: String_comparison_exp
   maxSupplyFormatted: String_comparison_exp
@@ -5821,6 +6410,7 @@ input Token_bool_exp {
 
 """Ordering options when selecting data from "Token"."""
 input Token_order_by {
+  contractURI: order_by
   decimals: order_by
   id: order_by
   maxSupplyFormatted: order_by
@@ -5833,6 +6423,9 @@ input Token_order_by {
 select columns of table "Token"
 """
 enum Token_select_column {
+  """column name"""
+  contractURI
+
   """column name"""
   decimals
 
@@ -5865,6 +6458,7 @@ input Token_stream_cursor_input {
 
 """Initial value of the column from where the streaming should start"""
 input Token_stream_cursor_value_input {
+  contractURI: String
   decimals: Int
   id: String
   maxSupplyFormatted: String
@@ -6196,6 +6790,8 @@ type Treasury {
     """filter the rows returned"""
     where: FeeSplitterReceipt_bool_exp
   ): [FeeSplitterReceipt!]!
+  floorRaiseShares: numeric
+  floorRaiseTreasury_id: String
   id: String!
   lastUpdatedAt: numeric!
   market_id: String!
@@ -6216,6 +6812,8 @@ input Treasury_bool_exp {
   createdAt: numeric_comparison_exp
   feeSplitterPayments: FeeSplitterPayment_bool_exp
   feeSplitterReceipts: FeeSplitterReceipt_bool_exp
+  floorRaiseShares: numeric_comparison_exp
+  floorRaiseTreasury_id: String_comparison_exp
   id: String_comparison_exp
   lastUpdatedAt: numeric_comparison_exp
   market_id: String_comparison_exp
@@ -6231,6 +6829,8 @@ input Treasury_order_by {
   createdAt: order_by
   feeSplitterPayments_aggregate: FeeSplitterPayment_aggregate_order_by
   feeSplitterReceipts_aggregate: FeeSplitterReceipt_aggregate_order_by
+  floorRaiseShares: order_by
+  floorRaiseTreasury_id: order_by
   id: order_by
   lastUpdatedAt: order_by
   market_id: order_by
@@ -6247,6 +6847,12 @@ select columns of table "Treasury"
 enum Treasury_select_column {
   """column name"""
   createdAt
+
+  """column name"""
+  floorRaiseShares
+
+  """column name"""
+  floorRaiseTreasury_id
 
   """column name"""
   id
@@ -6287,6 +6893,8 @@ input Treasury_stream_cursor_input {
 """Initial value of the column from where the streaming should start"""
 input Treasury_stream_cursor_value_input {
   createdAt: numeric
+  floorRaiseShares: numeric
+  floorRaiseTreasury_id: String
   id: String
   lastUpdatedAt: numeric
   market_id: String
@@ -6881,6 +7489,23 @@ enum cursor_ordering {
   DESC
 }
 
+scalar factorykind
+
+"""
+Boolean expression to compare columns of type "factorykind". All fields are combined with logical 'AND'.
+"""
+input factorykind_comparison_exp {
+  _eq: factorykind
+  _gt: factorykind
+  _gte: factorykind
+  _in: [factorykind!]
+  _is_null: Boolean
+  _lt: factorykind
+  _lte: factorykind
+  _neq: factorykind
+  _nin: [factorykind!]
+}
+
 scalar jsonb
 
 input jsonb_cast_exp {
@@ -7082,6 +7707,56 @@ type query_root {
   CreditFacilityContract_by_pk(id: String!): CreditFacilityContract
 
   """
+  fetch data from the table: "FactoryDeployerPermission"
+  """
+  FactoryDeployerPermission(
+    """distinct select on columns"""
+    distinct_on: [FactoryDeployerPermission_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [FactoryDeployerPermission_order_by!]
+
+    """filter the rows returned"""
+    where: FactoryDeployerPermission_bool_exp
+  ): [FactoryDeployerPermission!]!
+
+  """
+  fetch data from the table: "FactoryDeployerPermission" using primary key columns
+  """
+  FactoryDeployerPermission_by_pk(id: String!): FactoryDeployerPermission
+
+  """
+  fetch data from the table: "FactoryDeploymentConfig"
+  """
+  FactoryDeploymentConfig(
+    """distinct select on columns"""
+    distinct_on: [FactoryDeploymentConfig_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [FactoryDeploymentConfig_order_by!]
+
+    """filter the rows returned"""
+    where: FactoryDeploymentConfig_bool_exp
+  ): [FactoryDeploymentConfig!]!
+
+  """
+  fetch data from the table: "FactoryDeploymentConfig" using primary key columns
+  """
+  FactoryDeploymentConfig_by_pk(id: String!): FactoryDeploymentConfig
+
+  """
   fetch data from the table: "FeeSplitterPayment"
   """
   FeeSplitterPayment(
@@ -7153,6 +7828,56 @@ type query_root {
 
   """fetch data from the table: "FloorElevation" using primary key columns"""
   FloorElevation_by_pk(id: String!): FloorElevation
+
+  """
+  fetch data from the table: "FloorRaiseAttempt"
+  """
+  FloorRaiseAttempt(
+    """distinct select on columns"""
+    distinct_on: [FloorRaiseAttempt_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [FloorRaiseAttempt_order_by!]
+
+    """filter the rows returned"""
+    where: FloorRaiseAttempt_bool_exp
+  ): [FloorRaiseAttempt!]!
+
+  """
+  fetch data from the table: "FloorRaiseAttempt" using primary key columns
+  """
+  FloorRaiseAttempt_by_pk(id: String!): FloorRaiseAttempt
+
+  """
+  fetch data from the table: "FloorRaiseTreasury"
+  """
+  FloorRaiseTreasury(
+    """distinct select on columns"""
+    distinct_on: [FloorRaiseTreasury_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [FloorRaiseTreasury_order_by!]
+
+    """filter the rows returned"""
+    where: FloorRaiseTreasury_bool_exp
+  ): [FloorRaiseTreasury!]!
+
+  """
+  fetch data from the table: "FloorRaiseTreasury" using primary key columns
+  """
+  FloorRaiseTreasury_by_pk(id: String!): FloorRaiseTreasury
 
   """
   fetch data from the table: "GlobalRegistry"
@@ -8110,6 +8835,84 @@ type subscription_root {
   ): [CreditFacilityContract!]!
 
   """
+  fetch data from the table: "FactoryDeployerPermission"
+  """
+  FactoryDeployerPermission(
+    """distinct select on columns"""
+    distinct_on: [FactoryDeployerPermission_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [FactoryDeployerPermission_order_by!]
+
+    """filter the rows returned"""
+    where: FactoryDeployerPermission_bool_exp
+  ): [FactoryDeployerPermission!]!
+
+  """
+  fetch data from the table: "FactoryDeployerPermission" using primary key columns
+  """
+  FactoryDeployerPermission_by_pk(id: String!): FactoryDeployerPermission
+
+  """
+  fetch data from the table in a streaming manner: "FactoryDeployerPermission"
+  """
+  FactoryDeployerPermission_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [FactoryDeployerPermission_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: FactoryDeployerPermission_bool_exp
+  ): [FactoryDeployerPermission!]!
+
+  """
+  fetch data from the table: "FactoryDeploymentConfig"
+  """
+  FactoryDeploymentConfig(
+    """distinct select on columns"""
+    distinct_on: [FactoryDeploymentConfig_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [FactoryDeploymentConfig_order_by!]
+
+    """filter the rows returned"""
+    where: FactoryDeploymentConfig_bool_exp
+  ): [FactoryDeploymentConfig!]!
+
+  """
+  fetch data from the table: "FactoryDeploymentConfig" using primary key columns
+  """
+  FactoryDeploymentConfig_by_pk(id: String!): FactoryDeploymentConfig
+
+  """
+  fetch data from the table in a streaming manner: "FactoryDeploymentConfig"
+  """
+  FactoryDeploymentConfig_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [FactoryDeploymentConfig_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: FactoryDeploymentConfig_bool_exp
+  ): [FactoryDeploymentConfig!]!
+
+  """
   fetch data from the table: "FeeSplitterPayment"
   """
   FeeSplitterPayment(
@@ -8223,6 +9026,84 @@ type subscription_root {
     """filter the rows returned"""
     where: FloorElevation_bool_exp
   ): [FloorElevation!]!
+
+  """
+  fetch data from the table: "FloorRaiseAttempt"
+  """
+  FloorRaiseAttempt(
+    """distinct select on columns"""
+    distinct_on: [FloorRaiseAttempt_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [FloorRaiseAttempt_order_by!]
+
+    """filter the rows returned"""
+    where: FloorRaiseAttempt_bool_exp
+  ): [FloorRaiseAttempt!]!
+
+  """
+  fetch data from the table: "FloorRaiseAttempt" using primary key columns
+  """
+  FloorRaiseAttempt_by_pk(id: String!): FloorRaiseAttempt
+
+  """
+  fetch data from the table in a streaming manner: "FloorRaiseAttempt"
+  """
+  FloorRaiseAttempt_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [FloorRaiseAttempt_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: FloorRaiseAttempt_bool_exp
+  ): [FloorRaiseAttempt!]!
+
+  """
+  fetch data from the table: "FloorRaiseTreasury"
+  """
+  FloorRaiseTreasury(
+    """distinct select on columns"""
+    distinct_on: [FloorRaiseTreasury_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [FloorRaiseTreasury_order_by!]
+
+    """filter the rows returned"""
+    where: FloorRaiseTreasury_bool_exp
+  ): [FloorRaiseTreasury!]!
+
+  """
+  fetch data from the table: "FloorRaiseTreasury" using primary key columns
+  """
+  FloorRaiseTreasury_by_pk(id: String!): FloorRaiseTreasury
+
+  """
+  fetch data from the table in a streaming manner: "FloorRaiseTreasury"
+  """
+  FloorRaiseTreasury_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [FloorRaiseTreasury_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: FloorRaiseTreasury_bool_exp
+  ): [FloorRaiseTreasury!]!
 
   """
   fetch data from the table: "GlobalRegistry"
