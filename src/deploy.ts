@@ -9,6 +9,7 @@ import { ERC20Issuance_v1 } from './abis'
 import { ERC20_ISSUANCE_BYTECODE } from './constants'
 import { query } from './graphql'
 import type { PopPublicClient, PopWalletClient } from './types'
+import { validateAddress } from './utils/validation'
 
 // =============================================================================
 // Types
@@ -100,8 +101,12 @@ export class Deploy {
   // ===========================================================================
 
   /**
-   * @description Fetch the trusted forwarder address from GlobalRegistry
+   * @description Fetch the trusted forwarder address from GlobalRegistry.
+   *              The value is validated as a real address so a misconfigured
+   *              indexer cannot silently supply garbage that would end up
+   *              baked into a token's immutable forwarder slot.
    * @returns The trusted forwarder address
+   * @throws  If the registry value is missing or not a valid non-zero address.
    */
   public async getTrustedForwarderAddress(): Promise<Address> {
     const response = await query({
@@ -116,7 +121,10 @@ export class Deploy {
       throw new Error('GlobalRegistry not found or missing trustedForwarderAddress')
     }
 
-    return registry.trustedForwarderAddress as Address
+    return validateAddress(
+      registry.trustedForwarderAddress,
+      'GlobalRegistry.trustedForwarderAddress'
+    )
   }
 
   /**

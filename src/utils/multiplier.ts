@@ -198,22 +198,34 @@ export function multiplierToDisplay(multiplier: bigint): number {
 }
 
 /**
- * @description Get derived multiplier state with all computed values
+ * @description Get derived multiplier state with all computed values.
+ *              When `currentState` is provided and != `Public` (2), the
+ *              multiplier is clamped to `BPS` (1x) — the on-chain Presale_v1
+ *              only applies the decay multiplier during the Public phase.
+ *              Without this clamp, fee previews during Whitelist would show
+ *              an inflated fee that won't match what the buy tx actually
+ *              charges.
  * @param state Multiplier state from contract
  * @param timestamp Current timestamp in seconds (REQUIRED - must use chain block time)
+ * @param currentState Optional presale phase (0=NotOpen, 1=Whitelist, 2=Public, 3=Closed).
+ *                     Omit on non-presale callers where decay applies unconditionally.
  * @returns Derived state with computed values
  */
 export function getDerivedMultiplierState(
   state: MultiplierState,
-  timestamp: bigint
+  timestamp: bigint,
+  currentState?: number
 ): DerivedMultiplierState {
-  const calculatedMultiplier = calculateMultiplier(state, timestamp)
+  const PUBLIC_PHASE = 2
+  const appliesMultiplier = currentState === undefined || currentState === PUBLIC_PHASE
+
+  const calculatedMultiplier = appliesMultiplier ? calculateMultiplier(state, timestamp) : BPS
 
   return {
     ...state,
     calculatedMultiplier,
     hasStarted: hasDecayStarted(state, timestamp),
-    isActive: isDecayActive(state, timestamp),
+    isActive: appliesMultiplier && isDecayActive(state, timestamp),
     isEnded: isDecayEnded(state, timestamp),
     decayProgress: getMultiplierProgress(state, timestamp),
     timeRemaining: getTimeUntilDecayEnd(state, timestamp),
