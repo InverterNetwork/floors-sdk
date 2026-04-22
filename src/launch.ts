@@ -30,6 +30,7 @@ import {
   type ModuleMetadata,
   PRESALE_METADATA,
   STAKING_MANAGER_METADATA,
+  TESTNET_STRATEGY_METADATA,
   TREASURY_METADATA,
 } from './constants/metadata'
 import type { TransactionLifecycleCallbacks } from './presale'
@@ -250,6 +251,16 @@ export class Launch {
           this.encodeStakingConfig(validated.staking)
         )
       )
+
+      // Bundle a TestnetStrategy when the caller opted into auto-deploy.
+      // FloorFactory is the only allowlisted deployer on ModuleFactory, so
+      // the strategy must ride along with createFloor — not be deployed in
+      // a follow-up tx from the user's EOA.
+      // TestnetStrategy.init takes no configData (collateral is read from
+      // the floor).
+      if (validated.staking.autoDeployTestnetStrategy) {
+        optionalModules.push(this.buildModuleConfig(TESTNET_STRATEGY_METADATA, '0x'))
+      }
     }
 
     // Execute transaction via SafeWrite (simulate → write → receipt)

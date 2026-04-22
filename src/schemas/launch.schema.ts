@@ -235,6 +235,13 @@ export type PresaleConfig = typeof PresaleConfigSchema.Type
 export const StakingConfigSchema = Schema.Struct({
   /** Performance fee on harvested yield in basis points (e.g., 1000 = 10%) */
   performanceFeeBps: Bps0_10000,
+  /**
+   * Bundle a fresh `TestnetStrategy_v1` into the same `createFloor` tx.
+   * Set when the user picks "auto-deploy" and no strategy address is given.
+   * Deploys through the already-allowlisted FloorFactory → ModuleFactory path,
+   * avoiding a separate post-create tx that would need EOA allowlisting.
+   */
+  autoDeployTestnetStrategy: Schema.optional(Schema.Boolean),
 }).annotations({
   title: 'StakingConfig',
   description: 'StakingManager module configuration for yield staking',

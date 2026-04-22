@@ -7,7 +7,6 @@ import { decodeEventLog, isAddress } from 'viem'
 import { useAccount, usePublicClient, useWalletClient } from 'wagmi'
 
 import { Floor_v1, ModuleFactory_v1 } from '../../abis'
-import { TESTNET_STRATEGY_METADATA } from '../../constants/metadata'
 import {
   type ConfigureParams,
   type ConfigureResult,
@@ -43,7 +42,7 @@ export type TransactionProgressStatus =
   | 'confirmed'
   | 'failed'
 
-export type TransactionStepId = 'create-floor' | 'deploy-strategy' | 'configure-market'
+export type TransactionStepId = 'create-floor' | 'configure-market'
 
 export interface TransactionStep {
   id: TransactionStepId
@@ -295,20 +294,17 @@ export function useLaunch(options?: UseLaunchOptions) {
       const steps: TransactionStep[] = [
         {
           id: 'create-floor',
-          label: 'Deploy Floor Contract',
-          description: 'Creating the base Floor contract with bonding curve',
+          label:
+            needsStaking && needsStrategy
+              ? 'Deploy Floor & Yield Strategy'
+              : 'Deploy Floor Contract',
+          description:
+            needsStaking && needsStrategy
+              ? 'Creating the Floor, modules, and a bundled TestnetStrategy'
+              : 'Creating the base Floor contract with bonding curve',
           status: 'pending' as const,
         },
       ]
-
-      if (needsStaking) {
-        steps.push({
-          id: 'deploy-strategy',
-          label: 'Deploy Yield Strategy',
-          description: 'Deploying TestnetStrategy vault for yield generation',
-          status: 'waiting' as const,
-        })
-      }
 
       if (needsConfiguration) {
         steps.push({
@@ -378,10 +374,14 @@ export function useLaunch(options?: UseLaunchOptions) {
           }) as Promise<Address>,
         ])
 
-        // Determine module addresses if enabled
+        // Determine module addresses if enabled.
+        // All optional modules — including the bundled TestnetStrategy when
+        // auto-deploy was requested — are created inside createFloor, so a
+        // single receipt read is enough.
         let creditFacilityAddress: Address | undefined
         let presaleAddress: Address | undefined
         let stakingManagerAddress: Address | undefined
+        let bundledStrategyAddress: Address | undefined
 
         if (
           params.formData.creditFacility?.enabled ||
@@ -396,15 +396,15 @@ export function useLaunch(options?: UseLaunchOptions) {
             needsCreditFacility: params.formData.creditFacility?.enabled,
             needsPresale: params.formData.presale?.enabled,
             needsStaking: params.formData.staking?.enabled,
+            needsStrategy,
           })
           creditFacilityAddress = extracted.creditFacilityAddress
           presaleAddress = extracted.presaleAddress
           stakingManagerAddress = extracted.stakingManagerAddress
+          bundledStrategyAddress = extracted.strategyAddress
         }
 
         let userProvidedStrategyAddress: Address | undefined
-        let autoDeployedStrategyAddress: Address | undefined
-
         if (needsStaking) {
           const strategyAddress = params.formData.staking.strategyAddress?.trim()
           if (strategyAddress) {
@@ -412,83 +412,18 @@ export function useLaunch(options?: UseLaunchOptions) {
               throw new Error('Invalid staking strategy address')
             }
             userProvidedStrategyAddress = strategyAddress as Address
-          } else if (stakingManagerAddress && needsStrategy) {
-            // Update deploy-strategy step to pending
-            const deployStep = steps.find((s) => s.id === 'deploy-strategy')
-            if (deployStep) {
-              deployStep.status = 'pending'
-            }
-            reportProgress(steps, 'deploy-strategy')
-
-            const moduleFactoryAddress = await launch.getModuleFactory()
-            const feeTreasuryAddress = (await publicClient.readContract({
-              address: floorAddress,
-              abi: Floor_v1,
-              functionName: 'feeTreasury',
-            })) as Address
-
-            const deployStrategyHash = await walletClient.writeContract({
-              address: moduleFactoryAddress,
-              abi: ModuleFactory_v1,
-              functionName: 'createAndInitModule',
-              args: [
-                TESTNET_STRATEGY_METADATA,
-                floorAddress,
-                authorizerAddress,
-                feeTreasuryAddress,
-                '0x',
-              ],
-              account: creatorAddress,
-            })
-
-            // Update to confirming
-            if (deployStep) {
-              deployStep.status = 'confirming'
-              deployStep.txHash = deployStrategyHash
-            }
-            reportProgress(steps, 'deploy-strategy')
-
-            const deployStrategyReceipt = await publicClient.waitForTransactionReceipt({
-              hash: deployStrategyHash,
-            })
-            if (deployStrategyReceipt.status === 'reverted') {
-              if (deployStep) {
-                deployStep.status = 'failed'
-                deployStep.error = 'Strategy deployment reverted'
-              }
-              reportProgress(steps)
-              throw new Error(
-                `TestnetStrategy deployment reverted. Hash: ${deployStrategyHash}. Check the transaction for details.`
-              )
-            }
-
-            // Update to confirmed
-            if (deployStep) {
-              deployStep.status = 'confirmed'
-            }
-
-            autoDeployedStrategyAddress = extractModuleAddressesFromLogs(
-              deployStrategyReceipt.logs,
-              { needsStrategy: true }
-            ).strategyAddress
-
-            if (!autoDeployedStrategyAddress) {
-              if (deployStep) {
-                deployStep.status = 'failed'
-                deployStep.error = 'Strategy address not found in logs'
-              }
-              reportProgress(steps)
-              throw new Error(
-                `TestnetStrategy deployment succeeded but strategy address was not found in logs. Hash: ${deployStrategyHash}`
-              )
-            }
+          } else if (needsStrategy && !bundledStrategyAddress) {
+            throw new Error(
+              'Auto-deployed TestnetStrategy address not found in createFloor logs. ' +
+                'The strategy module config may not have been included in the launch tx.'
+            )
           }
         }
 
         const strategyAddresses = userProvidedStrategyAddress
           ? [userProvidedStrategyAddress]
-          : autoDeployedStrategyAddress
-            ? [autoDeployedStrategyAddress]
+          : bundledStrategyAddress
+            ? [bundledStrategyAddress]
             : undefined
 
         // Update configure-market step to pending
