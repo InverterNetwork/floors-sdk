@@ -235,13 +235,6 @@ export type PresaleConfig = typeof PresaleConfigSchema.Type
 export const StakingConfigSchema = Schema.Struct({
   /** Performance fee on harvested yield in basis points (e.g., 1000 = 10%) */
   performanceFeeBps: Bps0_10000,
-  /**
-   * Bundle a fresh `TestnetStrategy_v1` into the same `createFloor` tx.
-   * Set when the user picks "auto-deploy" and no strategy address is given.
-   * Deploys through the already-allowlisted FloorFactory → ModuleFactory path,
-   * avoiding a separate post-create tx that would need EOA allowlisting.
-   */
-  autoDeployTestnetStrategy: Schema.optional(Schema.Boolean),
 }).annotations({
   title: 'StakingConfig',
   description: 'StakingManager module configuration for yield staking',
@@ -337,10 +330,9 @@ export const CreditFacilityFormSchema = Schema.Struct({
 
 export type CreditFacilityFormData = typeof CreditFacilityFormSchema.Type
 
-/** Staking form — extends {@link StakingConfigSchema} with `enabled` and optional strategy. */
+/** Staking form — extends {@link StakingConfigSchema} with `enabled`. */
 export const StakingFormSchema = Schema.Struct({
   enabled: Schema.Boolean,
-  strategyAddress: Schema.optional(Schema.String),
 })
   .pipe(Schema.extend(StakingConfigSchema))
   .annotations({ title: 'StakingForm' })
@@ -438,16 +430,6 @@ export const PresaleExtendedFormSchema = Schema.Struct({
 
 export type PresaleExtendedFormData = typeof PresaleExtendedFormSchema.Type
 
-export const StakingExtendedFormSchema = Schema.Struct({
-  enabled: Schema.Boolean,
-  strategyAddress: Schema.optional(Schema.String),
-  strategyName: Schema.optional(Schema.String),
-})
-  .pipe(Schema.extend(StakingConfigSchema))
-  .annotations({ title: 'StakingExtendedForm' })
-
-export type StakingExtendedFormData = typeof StakingExtendedFormSchema.Type
-
 /**
  * Full market-creation payload (app, CLI, tests). Superset of {@link LaunchFormData}.
  * Segment prices use 18-decimal WAD in the form; {@link transformLaunchFormDataToLaunchConfig} normalizes.
@@ -463,7 +445,7 @@ export const MarketCreationFormSchema = Schema.Struct({
   premiumSegments: Schema.Array(SegmentConfigSchema).pipe(Schema.minItems(1)),
   recipients: Schema.Array(TreasuryRecipientFormSchema).pipe(Schema.minItems(1)),
   creditFacility: CreditFacilityFormSchema,
-  staking: StakingExtendedFormSchema,
+  staking: StakingFormSchema,
   presale: PresaleExtendedFormSchema,
   configuration: ConfigurationFormSchema,
 })

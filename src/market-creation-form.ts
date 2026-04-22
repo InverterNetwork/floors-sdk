@@ -10,7 +10,7 @@ import type {
   CreditFacilityFormData,
   MarketCreationFormData,
   PresaleExtendedFormData,
-  StakingExtendedFormData,
+  StakingFormData,
 } from './schemas/launch.schema'
 
 export const SEGMENT_PRICE_WAD_DECIMALS = 18 as const
@@ -25,7 +25,7 @@ export type PresaleFormConfig = PresaleExtendedFormData
 
 export type CreditFacilityFormConfig = CreditFacilityFormData
 
-export type StakingFormConfig = StakingExtendedFormData
+export type StakingFormConfig = StakingFormData
 
 export type MarketConfigurationOptions = ConfigurationFormData
 

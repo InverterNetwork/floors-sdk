@@ -1753,7 +1753,6 @@ type GlobalRegistry {
   id: String!
   lastUpdatedAt: numeric!
   moduleFactoryAddress: String!
-  registeredStrategies: [String!]!
   trustedForwarderAddress: String!
 }
 
@@ -1770,7 +1769,6 @@ input GlobalRegistry_bool_exp {
   id: String_comparison_exp
   lastUpdatedAt: numeric_comparison_exp
   moduleFactoryAddress: String_comparison_exp
-  registeredStrategies: String_array_comparison_exp
   trustedForwarderAddress: String_comparison_exp
 }
 
@@ -1782,7 +1780,6 @@ input GlobalRegistry_order_by {
   id: order_by
   lastUpdatedAt: order_by
   moduleFactoryAddress: order_by
-  registeredStrategies: order_by
   trustedForwarderAddress: order_by
 }
 
@@ -1809,9 +1806,6 @@ enum GlobalRegistry_select_column {
   moduleFactoryAddress
 
   """column name"""
-  registeredStrategies
-
-  """column name"""
   trustedForwarderAddress
 }
 
@@ -1834,7 +1828,6 @@ input GlobalRegistry_stream_cursor_value_input {
   id: String
   lastUpdatedAt: numeric
   moduleFactoryAddress: String
-  registeredStrategies: [String!]
   trustedForwarderAddress: String
 }
 

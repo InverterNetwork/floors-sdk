@@ -232,14 +232,13 @@ export interface GlobalRegistry {
     id: Scalars['String']
     lastUpdatedAt: Scalars['numeric']
     moduleFactoryAddress: Scalars['String']
-    registeredStrategies: Scalars['String'][]
     trustedForwarderAddress: Scalars['String']
     __typename: 'GlobalRegistry'
 }
 
 
 /** select columns of table "GlobalRegistry" */
-export type GlobalRegistry_select_column = 'createdAt' | 'floorFactoryAddress' | 'governorAddress' | 'id' | 'lastUpdatedAt' | 'moduleFactoryAddress' | 'registeredStrategies' | 'trustedForwarderAddress'
+export type GlobalRegistry_select_column = 'createdAt' | 'floorFactoryAddress' | 'governorAddress' | 'id' | 'lastUpdatedAt' | 'moduleFactoryAddress' | 'trustedForwarderAddress'
 
 
 /** columns and relationships of "GlobalStats" */
@@ -1990,7 +1989,6 @@ export interface GlobalRegistryGenqlSelection{
     id?: boolean | number
     lastUpdatedAt?: boolean | number
     moduleFactoryAddress?: boolean | number
-    registeredStrategies?: boolean | number
     trustedForwarderAddress?: boolean | number
     __typename?: boolean | number
     __scalar?: boolean | number
@@ -1998,11 +1996,11 @@ export interface GlobalRegistryGenqlSelection{
 
 
 /** Boolean expression to filter rows from the table "GlobalRegistry". All fields are combined with a logical 'AND'. */
-export interface GlobalRegistry_bool_exp {_and?: (GlobalRegistry_bool_exp[] | null),_not?: (GlobalRegistry_bool_exp | null),_or?: (GlobalRegistry_bool_exp[] | null),createdAt?: (numeric_comparison_exp | null),floorFactoryAddress?: (String_comparison_exp | null),governorAddress?: (String_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),moduleFactoryAddress?: (String_comparison_exp | null),registeredStrategies?: (String_array_comparison_exp | null),trustedForwarderAddress?: (String_comparison_exp | null)}
+export interface GlobalRegistry_bool_exp {_and?: (GlobalRegistry_bool_exp[] | null),_not?: (GlobalRegistry_bool_exp | null),_or?: (GlobalRegistry_bool_exp[] | null),createdAt?: (numeric_comparison_exp | null),floorFactoryAddress?: (String_comparison_exp | null),governorAddress?: (String_comparison_exp | null),id?: (String_comparison_exp | null),lastUpdatedAt?: (numeric_comparison_exp | null),moduleFactoryAddress?: (String_comparison_exp | null),trustedForwarderAddress?: (String_comparison_exp | null)}
 
 
 /** Ordering options when selecting data from "GlobalRegistry". */
-export interface GlobalRegistry_order_by {createdAt?: (order_by | null),floorFactoryAddress?: (order_by | null),governorAddress?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),moduleFactoryAddress?: (order_by | null),registeredStrategies?: (order_by | null),trustedForwarderAddress?: (order_by | null)}
+export interface GlobalRegistry_order_by {createdAt?: (order_by | null),floorFactoryAddress?: (order_by | null),governorAddress?: (order_by | null),id?: (order_by | null),lastUpdatedAt?: (order_by | null),moduleFactoryAddress?: (order_by | null),trustedForwarderAddress?: (order_by | null)}
 
 
 /** Streaming cursor of the table "GlobalRegistry" */
@@ -2014,7 +2012,7 @@ ordering?: (cursor_ordering | null)}
 
 
 /** Initial value of the column from where the streaming should start */
-export interface GlobalRegistry_stream_cursor_value_input {createdAt?: (Scalars['numeric'] | null),floorFactoryAddress?: (Scalars['String'] | null),governorAddress?: (Scalars['String'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),moduleFactoryAddress?: (Scalars['String'] | null),registeredStrategies?: (Scalars['String'][] | null),trustedForwarderAddress?: (Scalars['String'] | null)}
+export interface GlobalRegistry_stream_cursor_value_input {createdAt?: (Scalars['numeric'] | null),floorFactoryAddress?: (Scalars['String'] | null),governorAddress?: (Scalars['String'] | null),id?: (Scalars['String'] | null),lastUpdatedAt?: (Scalars['numeric'] | null),moduleFactoryAddress?: (Scalars['String'] | null),trustedForwarderAddress?: (Scalars['String'] | null)}
 
 
 /** columns and relationships of "GlobalStats" */
@@ -5744,7 +5742,6 @@ export const enumGlobalRegistrySelectColumn = {
    id: 'id' as const,
    lastUpdatedAt: 'lastUpdatedAt' as const,
    moduleFactoryAddress: 'moduleFactoryAddress' as const,
-   registeredStrategies: 'registeredStrategies' as const,
    trustedForwarderAddress: 'trustedForwarderAddress' as const
 }
 

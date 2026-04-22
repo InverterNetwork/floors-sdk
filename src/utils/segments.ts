@@ -646,10 +646,8 @@ export function transformLaunchFormDataToLaunchConfig(
 
   let stakingConfig: StakingConfig | undefined
   if (formData.staking?.enabled) {
-    const hasExistingStrategy = Boolean(formData.staking.strategyAddress?.trim())
     stakingConfig = {
       performanceFeeBps: formData.staking.performanceFeeBps,
-      autoDeployTestnetStrategy: !hasExistingStrategy,
     }
   }
 

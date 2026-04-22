@@ -252,15 +252,13 @@ export class Launch {
         )
       )
 
-      // Bundle a TestnetStrategy when the caller opted into auto-deploy.
-      // FloorFactory is the only allowlisted deployer on ModuleFactory, so
-      // the strategy must ride along with createFloor — not be deployed in
-      // a follow-up tx from the user's EOA.
-      // TestnetStrategy.init takes no configData (collateral is read from
-      // the floor).
-      if (validated.staking.autoDeployTestnetStrategy) {
-        optionalModules.push(this.buildModuleConfig(TESTNET_STRATEGY_METADATA, '0x'))
-      }
+      // Always bundle a fresh TestnetStrategy with the StakingManager. Strategy
+      // deposits are exclusive to a single Floor (collateral is pulled from the
+      // owning floor at init), so strategies cannot be shared across markets —
+      // every staking-enabled market gets its own. Riding along in createFloor
+      // is the only path that goes through ModuleFactory's allowlist.
+      // TestnetStrategy.init takes no configData.
+      optionalModules.push(this.buildModuleConfig(TESTNET_STRATEGY_METADATA, '0x'))
     }
 
     // Execute transaction via SafeWrite (simulate → write → receipt)

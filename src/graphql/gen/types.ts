@@ -2727,9 +2727,6 @@ export default {
             "moduleFactoryAddress": [
                 366
             ],
-            "registeredStrategies": [
-                366
-            ],
             "trustedForwarderAddress": [
                 366
             ],
@@ -2765,9 +2762,6 @@ export default {
             "moduleFactoryAddress": [
                 368
             ],
-            "registeredStrategies": [
-                367
-            ],
             "trustedForwarderAddress": [
                 368
             ],
@@ -2792,9 +2786,6 @@ export default {
                 441
             ],
             "moduleFactoryAddress": [
-                441
-            ],
-            "registeredStrategies": [
                 441
             ],
             "trustedForwarderAddress": [
@@ -2833,9 +2824,6 @@ export default {
                 439
             ],
             "moduleFactoryAddress": [
-                366
-            ],
-            "registeredStrategies": [
                 366
             ],
             "trustedForwarderAddress": [

@@ -3,7 +3,7 @@
 import { useMutation, type UseMutationOptions } from '@tanstack/react-query'
 import { useCallback, useState } from 'react'
 import type { Address } from 'viem'
-import { decodeEventLog, isAddress } from 'viem'
+import { decodeEventLog } from 'viem'
 import { useAccount, usePublicClient, useWalletClient } from 'wagmi'
 
 import { Floor_v1, ModuleFactory_v1 } from '../../abis'
@@ -282,9 +282,9 @@ export function useLaunch(options?: UseLaunchOptions) {
         options?.onProgress?.(progress)
       }
 
-      // Initialize steps based on form data
-      const needsStaking = params.formData.staking?.enabled
-      const needsStrategy = needsStaking && !params.formData.staking.strategyAddress
+      // Initialize steps based on form data. Staking always bundles a fresh
+      // TestnetStrategy into createFloor — strategies are exclusive per market.
+      const needsStaking = Boolean(params.formData.staking?.enabled)
       const needsConfiguration =
         params.formData.configuration?.grantMinterRole !== false ||
         params.formData.configuration?.openBuy !== false ||
@@ -294,14 +294,10 @@ export function useLaunch(options?: UseLaunchOptions) {
       const steps: TransactionStep[] = [
         {
           id: 'create-floor',
-          label:
-            needsStaking && needsStrategy
-              ? 'Deploy Floor & Yield Strategy'
-              : 'Deploy Floor Contract',
-          description:
-            needsStaking && needsStrategy
-              ? 'Creating the Floor, modules, and a bundled TestnetStrategy'
-              : 'Creating the base Floor contract with bonding curve',
+          label: needsStaking ? 'Deploy Floor & Yield Strategy' : 'Deploy Floor Contract',
+          description: needsStaking
+            ? 'Creating the Floor, modules, and a bundled TestnetStrategy'
+            : 'Creating the base Floor contract with bonding curve',
           status: 'pending' as const,
         },
       ]
@@ -309,8 +305,8 @@ export function useLaunch(options?: UseLaunchOptions) {
       if (needsConfiguration) {
         steps.push({
           id: 'configure-market',
-          label: needsStrategy ? 'Configure Market & Register Strategy' : 'Configure Market',
-          description: needsStrategy
+          label: needsStaking ? 'Configure Market & Register Strategy' : 'Configure Market',
+          description: needsStaking
             ? 'Setting up roles, permissions, and registering strategy'
             : 'Setting up roles, permissions, and modules',
           status: 'waiting' as const,
@@ -374,10 +370,8 @@ export function useLaunch(options?: UseLaunchOptions) {
           }) as Promise<Address>,
         ])
 
-        // Determine module addresses if enabled.
-        // All optional modules — including the bundled TestnetStrategy when
-        // auto-deploy was requested — are created inside createFloor, so a
-        // single receipt read is enough.
+        // All optional modules — including the bundled TestnetStrategy — are
+        // created inside createFloor, so a single receipt read is enough.
         let creditFacilityAddress: Address | undefined
         let presaleAddress: Address | undefined
         let stakingManagerAddress: Address | undefined
@@ -386,7 +380,7 @@ export function useLaunch(options?: UseLaunchOptions) {
         if (
           params.formData.creditFacility?.enabled ||
           params.formData.presale?.enabled ||
-          params.formData.staking?.enabled
+          needsStaking
         ) {
           const receipt = await publicClient.getTransactionReceipt({
             hash: launchResult.transactionHash as `0x${string}`,
@@ -395,8 +389,8 @@ export function useLaunch(options?: UseLaunchOptions) {
           const extracted = extractModuleAddressesFromLogs(receipt.logs, {
             needsCreditFacility: params.formData.creditFacility?.enabled,
             needsPresale: params.formData.presale?.enabled,
-            needsStaking: params.formData.staking?.enabled,
-            needsStrategy,
+            needsStaking,
+            needsStrategy: needsStaking,
           })
           creditFacilityAddress = extracted.creditFacilityAddress
           presaleAddress = extracted.presaleAddress
@@ -404,27 +398,14 @@ export function useLaunch(options?: UseLaunchOptions) {
           bundledStrategyAddress = extracted.strategyAddress
         }
 
-        let userProvidedStrategyAddress: Address | undefined
-        if (needsStaking) {
-          const strategyAddress = params.formData.staking.strategyAddress?.trim()
-          if (strategyAddress) {
-            if (!isAddress(strategyAddress)) {
-              throw new Error('Invalid staking strategy address')
-            }
-            userProvidedStrategyAddress = strategyAddress as Address
-          } else if (needsStrategy && !bundledStrategyAddress) {
-            throw new Error(
-              'Auto-deployed TestnetStrategy address not found in createFloor logs. ' +
-                'The strategy module config may not have been included in the launch tx.'
-            )
-          }
+        if (needsStaking && !bundledStrategyAddress) {
+          throw new Error(
+            'Bundled TestnetStrategy address not found in createFloor logs. ' +
+              'The strategy module config may not have been included in the launch tx.'
+          )
         }
 
-        const strategyAddresses = userProvidedStrategyAddress
-          ? [userProvidedStrategyAddress]
-          : bundledStrategyAddress
-            ? [bundledStrategyAddress]
-            : undefined
+        const strategyAddresses = bundledStrategyAddress ? [bundledStrategyAddress] : undefined
 
         // Update configure-market step to pending
         const configureStep = steps.find((s) => s.id === 'configure-market')
