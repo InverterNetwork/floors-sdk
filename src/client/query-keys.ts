@@ -82,6 +82,13 @@ export const marketActivityQueryKey = (marketId: string | null | undefined) =>
   ['market-activity', marketId ?? ''] as const
 
 /**
+ * @description Parameterized query key for the local trade simulator's
+ *              on-chain context (segments + supply + fees + LTV).
+ */
+export const marketSimulationContextQueryKey = (marketId: string | null | undefined) =>
+  ['market-sim-ctx', marketId ?? ''] as const
+
+/**
  * @description Parameterized subscription key for market activity (trades + loans + floor elevations).
  */
 export const marketActivitySubKey = (marketId: string | null | undefined) =>

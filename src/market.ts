@@ -5,6 +5,24 @@ import type { TFloorAssetData } from './graphql/api'
 import type { TransactionLifecycleCallbacks } from './presale'
 import type { PopPublicClient, PopWalletClient } from './types'
 import { SafeWrite } from './utils/safe-write'
+import { type DecodedSegment, decodePackedSegments, type PackedSegment } from './utils/segments'
+import {
+  simulateBorrow,
+  simulateBuy,
+  simulateBuyAndBorrow,
+  simulateRepay,
+  simulateSell,
+  type TSimulateBorrowInput,
+  type TSimulateBorrowResult,
+  type TSimulateBuyAndBorrowInput,
+  type TSimulateBuyAndBorrowResult,
+  type TSimulateBuyInput,
+  type TSimulateBuyResult,
+  type TSimulateRepayInput,
+  type TSimulateRepayResult,
+  type TSimulateSellInput,
+  type TSimulateSellResult,
+} from './utils/trade-simulation'
 import { BASIS_POINTS, validateAddress, validateLoopCount } from './utils/validation'
 
 export interface TMarketBuyParams {
@@ -77,6 +95,25 @@ export interface TLoan {
 
 export type TMarketMutationResult = TransactionReceipt
 
+/**
+ * @description Pre-fetched on-chain inputs the local simulator needs to
+ *              produce a quote without further RPC calls. Returned by
+ *              {@link Market.fetchSimulationContext}.
+ */
+export interface TMarketSimulationContext {
+  segments: DecodedSegment[]
+  /** `Floor.getFloorMetrics().currentSupply` — the floor's `totalIssuanceSupply`. */
+  totalSupply: bigint
+  /** `Floor.getFloorPrice()` — the protective floor segment price. */
+  currentFloorPrice: bigint
+  buyFeeBps: bigint
+  sellFeeBps: bigint
+  /** Loan-to-value ratio in bps; absent for markets without a credit facility. */
+  loanToValueRatio?: bigint
+  /** Borrowing fee rate in bps; absent for markets without a credit facility. */
+  borrowingFeeBps?: bigint
+}
+
 interface MarketConstructorArgs {
   data: TFloorAssetData
   publicClient: PopPublicClient
@@ -133,6 +170,120 @@ export class Market {
       functionName: 'calculateSaleReturn',
       args: [depositAmount],
     })) as bigint
+  }
+
+  // -------------------------------------------------------------------------
+  // Local simulators — sync, no RPC. Caller passes pre-fetched context from
+  // `fetchSimulationContext`. These mirror the on-chain math bit-for-bit and
+  // surface tuple values the on-chain RPC views truncate (collateralSpent,
+  // tokensBurned, refund, per-loop debt). See `utils/trade-simulation.ts`.
+
+  public simulateBuy(input: TSimulateBuyInput): TSimulateBuyResult {
+    return simulateBuy(input)
+  }
+
+  public simulateSell(input: TSimulateSellInput): TSimulateSellResult {
+    return simulateSell(input)
+  }
+
+  public simulateBorrow(input: TSimulateBorrowInput): TSimulateBorrowResult {
+    return simulateBorrow(input)
+  }
+
+  public simulateRepay(input: TSimulateRepayInput): TSimulateRepayResult {
+    return simulateRepay(input)
+  }
+
+  public simulateBuyAndBorrow(input: TSimulateBuyAndBorrowInput): TSimulateBuyAndBorrowResult {
+    return simulateBuyAndBorrow(input)
+  }
+
+  /**
+   * @description Multicall the on-chain reads the local simulator needs.
+   *              One round-trip; cache and reuse via the
+   *              `useMarketSimulationContext` hook.
+   */
+  public async fetchSimulationContext(): Promise<TMarketSimulationContext> {
+    const baseContracts = [
+      {
+        address: this.address,
+        abi: Floor_v1,
+        functionName: 'getSegments' as const,
+        args: [] as const,
+      },
+      {
+        address: this.address,
+        abi: Floor_v1,
+        functionName: 'getFloorMetrics' as const,
+        args: [] as const,
+      },
+      {
+        address: this.address,
+        abi: Floor_v1,
+        functionName: 'getFloorPrice' as const,
+        args: [] as const,
+      },
+      {
+        address: this.address,
+        abi: Floor_v1,
+        functionName: 'getBuyFee' as const,
+        args: [] as const,
+      },
+      {
+        address: this.address,
+        abi: Floor_v1,
+        functionName: 'getSellFee' as const,
+        args: [] as const,
+      },
+    ]
+
+    const cf = this.creditFacilityAddress
+    const cfContracts = cf
+      ? [
+          {
+            address: cf,
+            abi: CreditFacility_v1,
+            functionName: 'getLoanToValueRatio' as const,
+            args: [] as const,
+          },
+          {
+            address: cf,
+            abi: CreditFacility_v1,
+            functionName: 'getBorrowingFeeRate' as const,
+            args: [] as const,
+          },
+        ]
+      : []
+
+    const results = (await this.publicClient.multicall({
+      contracts: [...baseContracts, ...cfContracts],
+      allowFailure: false,
+    })) as unknown[]
+
+    const packedSegments = results[0] as PackedSegment[]
+    const floorMetrics = results[1] as readonly [bigint, bigint, bigint, bigint]
+    const floorPrice = results[2] as bigint
+    const buyFee = results[3] as bigint
+    const sellFee = results[4] as bigint
+
+    const ctx: TMarketSimulationContext = {
+      segments: decodePackedSegments(packedSegments),
+      totalSupply: floorMetrics[2],
+      currentFloorPrice: floorPrice,
+      buyFeeBps: buyFee,
+      sellFeeBps: sellFee,
+    }
+
+    if (cf) {
+      ctx.loanToValueRatio = results[5] as bigint
+      ctx.borrowingFeeBps = results[6] as bigint
+    }
+
+    return ctx
+  }
+
+  public hasCreditFacility(): boolean {
+    return this.creditFacilityAddress !== undefined
   }
 
   public async getFTokenAllowance(ownerAddress: Address): Promise<bigint> {

@@ -32,9 +32,10 @@ import {
   type TMarketMutationResult,
   type TMarketRepayParams,
   type TMarketSellParams,
+  type TMarketSimulationContext,
 } from '../../market'
 import { useFloors } from '../floors-context'
-import { marketQueryKey, marketsQueryKey } from '../query-keys'
+import { marketQueryKey, marketSimulationContextQueryKey, marketsQueryKey } from '../query-keys'
 import { useSubscription } from './subscriptions'
 
 export type UseMarketsQueryOptions<TData = TFloorAssetData[]> = Omit<
@@ -247,6 +248,49 @@ export const useMarketSubscription = <TData = TFloorAssetData | null>(
   return queryResult as UseQueryResult<TData, Error>
 }
 
+export type UseMarketSimulationContextOptions = Omit<
+  UseQueryOptions<
+    TMarketSimulationContext,
+    Error,
+    TMarketSimulationContext,
+    ReturnType<typeof marketSimulationContextQueryKey>
+  >,
+  'queryKey' | 'queryFn'
+>
+
+/**
+ * @description Fetches the on-chain inputs the local trade simulator needs
+ *              (segments, totalSupply, fees, LTV, borrowing fee). Cached for
+ *              30 s by default and invalidated by `useMarketMutations` after
+ *              successful trades. Reads from the active `useFloors()` market;
+ *              disabled when no market is resolved.
+ */
+export const useMarketSimulationContext = (
+  options?: UseMarketSimulationContextOptions
+): UseQueryResult<TMarketSimulationContext, Error> => {
+  const floorsContext = useFloors()
+  const resolvedMarket = floorsContext.market.data ?? null
+  const publicClient = usePublicClient()
+  const marketId = resolvedMarket?.contractAddress ?? resolvedMarket?.id ?? null
+
+  const enabled = options?.enabled ?? Boolean(marketId && publicClient)
+  const staleTime = options?.staleTime ?? 30_000
+
+  return useQuery({
+    queryKey: marketSimulationContextQueryKey(marketId),
+    queryFn: () => {
+      if (!resolvedMarket || !publicClient) {
+        throw new Error('Cannot fetch simulation context: market or publicClient unavailable.')
+      }
+      const market = new Market({ data: resolvedMarket, publicClient })
+      return market.fetchSimulationContext()
+    },
+    ...options,
+    enabled,
+    staleTime,
+  })
+}
+
 /**
  * @description Provides buy/sell/approve mutations backed by the pure Market class.
  */
@@ -259,6 +303,8 @@ export const useMarketMutations = (): UseMarketMutationsReturnType => {
   const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()
   const walletAddress = walletClient?.account?.address as Address | undefined
+  const queryClient = useQueryClient()
+  const marketId = resolvedMarket?.contractAddress ?? resolvedMarket?.id ?? null
 
   const marketClient = useMemo(() => {
     if (!resolvedMarket || !publicClient) return null
@@ -287,10 +333,20 @@ export const useMarketMutations = (): UseMarketMutationsReturnType => {
     [walletAddress]
   )
 
+  const invalidateSimulationContext = useCallback(async () => {
+    await queryClient.invalidateQueries({
+      queryKey: marketSimulationContextQueryKey(marketId),
+    })
+  }, [queryClient, marketId])
+
   // Market data and candles are subscription-driven — only balances need explicit refresh.
   const refetchAfterMutation = useCallback(async () => {
-    await Promise.allSettled([refetchReserveBalance(), refetchIssuanceBalance()])
-  }, [refetchIssuanceBalance, refetchReserveBalance])
+    await Promise.allSettled([
+      refetchReserveBalance(),
+      refetchIssuanceBalance(),
+      invalidateSimulationContext(),
+    ])
+  }, [refetchIssuanceBalance, refetchReserveBalance, invalidateSimulationContext])
 
   const buy = useMutation({
     mutationFn: (params: TMarketBuyParams) => ensureMarket().buy(params),

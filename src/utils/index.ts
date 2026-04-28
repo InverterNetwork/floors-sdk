@@ -7,8 +7,10 @@ export * from './permission-map'
 export * from './safe-write'
 
 // Bonding curve utilities
+export * from './discrete-curve-math'
 export * from './floor-liquidity'
 export * from './segments'
+export * from './trade-simulation'
 
 // Credit facility utilities
 export * from './credit-facility'

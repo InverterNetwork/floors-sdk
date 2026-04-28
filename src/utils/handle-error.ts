@@ -48,6 +48,30 @@ import type {
 import { ERROR_UX_MAPPINGS, hasUXMapping } from './error-ux-mappings'
 import { getPermissionErrorMessage } from './permission-map'
 
+/**
+ * @description Reverse index from Solidity error name to its 4-byte signature.
+ *              Built once at module load from {@link ERROR_METADATA}; used by
+ *              {@link findSignatureByErrorName} and {@link toUxError} so the
+ *              local trade simulator's JS errors (whose `name` mirrors the
+ *              Solidity custom error name) can resolve to the same UX record
+ *              the selector-hash path uses.
+ */
+const ERROR_NAME_TO_SIGNATURE: Record<string, KnownErrorSignature> = (() => {
+  const out: Record<string, KnownErrorSignature> = {}
+  for (const [sig, meta] of Object.entries(ERROR_METADATA)) {
+    out[meta.name] = sig as KnownErrorSignature
+  }
+  return out
+})()
+
+/**
+ * @description Looks up a 4-byte signature from a Solidity error name, e.g.
+ *              `'DiscreteCurveMathLib__ZeroCollateralInput' → '0x73937fff'`.
+ */
+export function findSignatureByErrorName(name: string): KnownErrorSignature | null {
+  return ERROR_NAME_TO_SIGNATURE[name] ?? null
+}
+
 // ============================================================================
 // Constants
 // ============================================================================
@@ -602,6 +626,13 @@ function parseError(params: HandleErrorParams): EnhancedParsedError {
     return defaultResult
   }
 
+  // Local simulator errors: plain `Error` instances whose `name` mirrors a
+  // Solidity custom error (`DiscreteCurveMathLib__...`, `Module__...`).
+  // Resolve to the same UX record the on-chain selector-hash path uses so
+  // both surfaces produce identical messages.
+  const simulatorRecord = toUxError(error, context)
+  if (simulatorRecord) return simulatorRecord
+
   // Check for wallet/network patterns first
   const walletMatch = matchWalletErrorPattern(error)
   if (walletMatch) {
@@ -1107,6 +1138,92 @@ export function isErrorType(error: unknown, errorName: string): boolean {
 export function isPermissionError(error: unknown): boolean {
   const parsed = parseError({ error })
   return parsed.category === 'permission'
+}
+
+/**
+ * @description Resolve an `Error` (typically thrown by the local trade
+ *              simulator) whose `name` mirrors a Solidity custom error to the
+ *              same UX record the on-chain selector path returns. Returns
+ *              `null` when the error doesn't carry a recognised Solidity name
+ *              so callers can fall back to the existing flow.
+ *
+ *              The error may also expose `args?: readonly bigint[]` matching
+ *              the order of `ERROR_METADATA[sig].inputs`; when present, those
+ *              feed the UX mapping's `dynamicMessage` / `dynamicSuggestion`.
+ */
+export function toUxError(error: unknown, context?: ErrorContext): EnhancedParsedError | null {
+  if (!(error instanceof Error)) return null
+
+  const sig = findSignatureByErrorName(error.name)
+  if (!sig) return null
+
+  const metadata = ERROR_METADATA[sig]
+  const rawArgs = (error as Error & { args?: readonly unknown[] }).args
+  const decodedArgs: Record<string, unknown> | undefined = (() => {
+    if (!Array.isArray(rawArgs)) return undefined
+    const out: Record<string, unknown> = {}
+    metadata.inputs.forEach((input, i) => {
+      out[input.name] = rawArgs[i]
+    })
+    return out
+  })()
+
+  const formatted = formatErrorNameWithSource(metadata.name).formatted
+
+  if (hasUXMapping(sig)) {
+    const uxMapping = ERROR_UX_MAPPINGS[sig]
+
+    let prettyMessage = uxMapping.prettyMessage
+    let suggestion = uxMapping.suggestion
+    if (decodedArgs) {
+      if (uxMapping.dynamicMessage) {
+        try {
+          prettyMessage = uxMapping.dynamicMessage(decodedArgs)
+        } catch {
+          // fall back to static
+        }
+      }
+      if (uxMapping.dynamicSuggestion) {
+        try {
+          suggestion = uxMapping.dynamicSuggestion(decodedArgs)
+        } catch {
+          // fall back to static
+        }
+      }
+    }
+
+    return {
+      message: error.message,
+      prettyMessage,
+      errorName: metadata.name,
+      isUserRejection: false,
+      category: uxMapping.category,
+      severity: uxMapping.severity,
+      suggestion,
+      recoveryActions: uxMapping.recoveryActions,
+      originalError: error,
+      signature: sig,
+      decodedArgs,
+      context,
+      formattedErrorName: formatted,
+    }
+  }
+
+  return {
+    message: error.message,
+    prettyMessage: parseErrorNameToPrettyMessage(metadata.name),
+    errorName: metadata.name,
+    isUserRejection: false,
+    category: 'unknown',
+    severity: 'error',
+    suggestion: 'This error is not yet documented. Please report it.',
+    recoveryActions: [{ label: 'Report issue', type: 'contact_support' }],
+    originalError: error,
+    signature: sig,
+    decodedArgs,
+    context,
+    formattedErrorName: formatted,
+  }
 }
 
 // ============================================================================
