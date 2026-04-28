@@ -383,6 +383,46 @@ export function packSegments(segments: SegmentConfig[]): Array<{
 }
 
 /**
+ * @description Pack a {@link SegmentConfig} into bytes32 hex for `Floor.reconfigureSegments`.
+ * Mirrors the layout produced by {@link encodeToPackedSegment} but accepts the form/SDK
+ * `SegmentConfig` shape directly.
+ */
+export function packSegmentToBytes32(segment: SegmentConfig): PackedSegment {
+  const initialPrice = segment.initialPrice
+  const priceIncrease = segment.priceIncrease
+  const supplyPerStep = segment.supplyPerStep
+  const numberOfSteps = BigInt(segment.numberOfSteps)
+
+  if (initialPrice < BigInt(0) || initialPrice > MASK_72) {
+    throw new Error('initialPrice exceeds 72-bit max')
+  }
+  if (priceIncrease < BigInt(0) || priceIncrease > MASK_72) {
+    throw new Error('priceIncrease exceeds 72-bit max')
+  }
+  if (supplyPerStep <= BigInt(0) || supplyPerStep > MASK_96) {
+    throw new Error('supplyPerStep must be positive and fit in 96 bits')
+  }
+  if (numberOfSteps < BigInt(1) || numberOfSteps > MASK_16) {
+    throw new Error('numberOfSteps must be 1..65535')
+  }
+
+  const value =
+    initialPrice |
+    (priceIncrease << BigInt(72)) |
+    (supplyPerStep << BigInt(144)) |
+    (numberOfSteps << BigInt(240))
+
+  return `0x${value.toString(16).padStart(64, '0')}` as PackedSegment
+}
+
+/**
+ * @description Pack an array of {@link SegmentConfig} into bytes32[] for `reconfigureSegments`.
+ */
+export function packSegmentsToBytes32(segments: readonly SegmentConfig[]): PackedSegment[] {
+  return segments.map(packSegmentToBytes32)
+}
+
+/**
  * @description Calculate end price of a segment
  */
 export function calculateSegmentEndPrice(segment: SegmentConfig): bigint {

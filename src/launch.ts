@@ -1182,19 +1182,48 @@ export {
   TREASURY_METADATA,
 } from './constants/metadata'
 export {
+  CURVE_PRESET_JSON_VERSION,
+  type CurvePresetJson,
+  type CurvePresetJsonEncoded,
+  CurvePresetJsonSchema,
+  type SegmentJson,
+  type SegmentJsonEncoded,
+} from './schemas/curve-preset.schema'
+export {
+  CurveImportError,
+  type CurveImportErrorCode,
+  type ExportCurveOptions,
+  exportCurveToJson,
+  importCurveFromJson,
+  type ImportCurveOptions,
+  type ImportCurveResult,
+} from './utils/curve-preset'
+export {
+  type BuildPresetOptions,
+  CURVE_PRESETS,
+  type CurvePreset,
+  floorPriceUsdToWad,
+  getCurvePreset,
+} from './utils/curve-presets'
+export {
   calculateFloorMarketCapUsd,
   calculateFloorSupplyForTargetMarketCapUsd,
   calculateSegmentsFromMarketCapUsd,
   calculateTotalSupply,
+  decodePackedSegment,
+  decodePackedSegments,
   DEFAULT_FLOOR_SEGMENT,
   DEFAULT_PREMIUM_SEGMENTS,
   generateCommissionSchedule,
   generateDefaultCurve,
   generatePriceBreakpoints,
   packSegments,
+  packSegmentsToBytes32,
+  packSegmentToBytes32,
   parseUsdPriceToWad,
   REFERENCE_RESERVE_USD_PRICE_WAD,
   scaleCurveSupplyForReserveUsdPrice,
+  scaleSegmentPricesWadToReserve,
   scaleSegmentSupplyForReserveUsdPrice,
   scaleSegmentSupplyForReserveUsdTransition,
   validateSegments,
