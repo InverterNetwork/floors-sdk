@@ -14,7 +14,6 @@ Out of 38 issues originally flagged, the critical slippage bug has been fixed al
 
 ## COMPLETED (No Action Needed)
 
-
 | #   | Issue                                               | Severity     | File                       | Notes                                                                                                              |
 | --- | --------------------------------------------------- | ------------ | -------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | 1   | `buyAndBorrow` missing `minAmountOut`               | **Critical** | `market.ts`                | Fixed. Now accepts optional `minAmountOut` param (defaults to `BigInt(0)`), passed through to contract.            |
@@ -29,7 +28,6 @@ Out of 38 issues originally flagged, the critical slippage bug has been fixed al
 | 10  | `setPerformanceFeeBps` BigInt wrapping              | Medium       | `presale-admin.ts`         | False positive — param is passed through.                                                                          |
 | 11  | Credit facility config validation                   | High         | `utils/credit-facility.ts` | `validateCreditFacilityConfig()` exists with LTV/leverage/fee validation.                                          |
 
-
 **Summary:** ~7 false positives confirmed + 4 critical/high fixes already shipped. The only critical issue (`buyAndBorrow` slippage) is resolved.
 
 ---
@@ -38,7 +36,6 @@ Out of 38 issues originally flagged, the critical slippage bug has been fixed al
 
 ### Priority 1: High (Security)
 
-
 | #   | Task                                                                                                      | Severity | Files Affected                                             | Description                                                                                                                                           |
 | --- | --------------------------------------------------------------------------------------------------------- | -------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1   | Create `validation.ts` utility                                                                            | High     | `src/utils/validation.ts` (new)                            | No centralized validation utility exists. Need `validateAddress()` and `validateBigint()` helpers. Currently validation is scattered inline.          |
@@ -46,18 +43,14 @@ Out of 38 issues originally flagged, the critical slippage bug has been fixed al
 | 3   | Admin function input validation                                                                           | High     | Multiple (71 admin functions)                              | Most admin functions don't validate inputs before sending transactions. Need range checks for numerics, address checks for address params.            |
 | 4   | Address validation on `buyFor`, `sellTo`, `borrowFor`, `buyAndBorrowFor`, `harvestYield`, `withdrawFunds` | Medium   | `market.ts`, `credit-facility.ts`, `governor.ts`           | These functions accept address params (`to`/`receiver`) without zero-address checks.                                                                  |
 
-
 ### Priority 2: Medium (Robustness)
-
 
 | #   | Task                      | Severity | Files Affected                                                    | Description                                                                                                                                                        |
 | --- | ------------------------- | -------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 5   | Loop count validation     | Medium   | Functions using leverage/loops                                    | 7 loop-related calls lack max-loop validation. Should enforce `PROTOCOL_LIMITS.MAX_LOOPS`.                                                                         |
 | 6   | Fee parameter consistency | Low      | `market-admin.ts`, `credit-facility-admin.ts`, `presale-admin.ts` | 10 fee-related calls — standardize basis points constants and range validation. `market-admin.ts` already has `validateFeeBps`, but this pattern should be shared. |
 
-
 ### Priority 3: Low (Maintainability)
-
 
 | #   | Task                  | Severity | Files Affected                                                    | Description                                                                                                                                      |
 | --- | --------------------- | -------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -65,11 +58,9 @@ Out of 38 issues originally flagged, the critical slippage bug has been fixed al
 | 8   | Remove debug log      | Low      | `presale.ts:928`                                                  | Leftover `console.log('error happends')` in `buyPresale`.                                                                                        |
 | 9   | Protocol risk reviews | Low      | Multiple                                                          | Broader review of presale security (84 calls), credit risk (21 calls), staking rewards (19 calls). Not code bugs — just recommended audit items. |
 
-
 ---
 
 ## Scorecard
-
 
 | Category     | Original | Resolved            | Remaining                 |
 | ------------ | -------- | ------------------- | ------------------------- |
@@ -78,7 +69,6 @@ Out of 38 issues originally flagged, the critical slippage bug has been fixed al
 | **Medium**   | 23       | 7 (false positives) | **~6** (validation tasks) |
 | **Low**      | 6        | 0                   | **~3** (maintainability)  |
 | **Total**    | **38**   | **12**              | **~13 actionable items**  |
-
 
 > ~12 issues were either false positives or already fixed. ~13 remain as real work items.
 
@@ -99,4 +89,3 @@ Out of 38 issues originally flagged, the critical slippage bug has been fixed al
 - All `BigInt(param)` wrapper usages are **correct** — they convert JS numbers to bigint for contract calls. These are not bugs.
 - The `minAmountOut` defaults to `BigInt(0)` intentionally for backward compatibility. Callers should pass a real value for slippage protection.
 - Address validation via `getAddress()` (viem) is already used in `authorizer.ts`, `presale.ts`, and the GraphQL layer — just needs to be extended to market/admin classes.
-
