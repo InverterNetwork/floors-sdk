@@ -1,11 +1,10 @@
 /**
  * Server-safe SDK surface (CLI, scripts, API routes): no React, Node-only.
- * Includes server primitives (RPC retry, rate limit, logger, fs) and
- * market-creation/launch helpers shared with the web app.
+ * Owns ONLY server primitives — RPC retry, rate limit, logger, fs, IPFS
+ * (pinata). Isomorphic helpers (market-creation forms, launch schemas,
+ * floor-liquidity math) belong in the SDK root barrel; `/server` must not
+ * re-export across tiers.
  */
-export * from '../market-creation-form'
-export * from '../schemas/launch.schema'
-export * from '../utils/floor-liquidity'
 export * from './fs'
 export * from './logger'
 export * from './pinata'
