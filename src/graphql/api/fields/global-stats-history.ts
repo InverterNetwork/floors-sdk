@@ -1,4 +1,4 @@
-import type { GraphQLQueryArgs, GraphQLQueryResult } from '../..'
+import type { GraphQLQueryArgs, GraphQLQueryResult } from '../../query'
 
 // Time constants in seconds
 const DAY = 86400

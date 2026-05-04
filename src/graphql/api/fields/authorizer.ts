@@ -1,4 +1,4 @@
-import type { GraphQLQueryArgs, GraphQLQueryResult } from '../..'
+import type { GraphQLQueryArgs, GraphQLQueryResult } from '../../query'
 import type { ExtendableQueryArgs } from '../utils'
 import { cloneQuery, mergeFieldArgs } from '../utils'
 
