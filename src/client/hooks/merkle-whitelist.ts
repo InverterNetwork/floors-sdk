@@ -7,6 +7,7 @@ import { usePublicClient, useWalletClient } from 'wagmi'
 
 import { generateMerkleTree, type MerkleTreeData } from '../../merkle-tree'
 import { Presale } from '../../presale'
+// eslint-disable-next-line no-restricted-imports -- pre-existing tier violation; pinata helpers use only `fetch` and are isomorphic, but live in server/ for historical reasons. Move to a root-tier or shared module in a follow-up. Tracked in issue #208.
 import {
   fetchMerkleProof as fetchMerkleProofFromIPFS,
   type PinataConfig,
