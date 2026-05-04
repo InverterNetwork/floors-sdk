@@ -11,8 +11,6 @@ import type {
   StakingConfig,
   TreasuryConfig,
 } from '../schemas/launch.schema'
-
-export type { SegmentConfig } from '../schemas/launch.schema'
 import { PROTOCOL_LIMITS } from './validation'
 
 /** 1e18 — WAD scale for USD prices and segment price fields in the create-market form */

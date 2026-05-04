@@ -226,4 +226,5 @@ export type {
   TTokenBalanceContextValue,
   TTokenBalanceMetadata,
 } from './floors-context'
-export { useFloors } from './floors-context'
+// `useFloors` is exported from `floors-context.ts` (its source) and surfaced
+// via the directory barrel at `client/index.ts`. No further re-export here.

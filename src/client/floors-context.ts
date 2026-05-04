@@ -5,7 +5,7 @@ import { createContext, useContext } from 'react'
 import type { Address } from 'viem'
 import type { UseBalanceReturnType } from 'wagmi'
 
-import type { TFloorAssetData, TPresale } from '../graphql/api'
+import type { TFloorAssetData, TPresale } from '../graphql/api/fields'
 import type { TUserMarketPositionData } from '../graphql/api/mappers'
 
 export type TTokenBalanceMetadata = {

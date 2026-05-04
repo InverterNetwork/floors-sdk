@@ -1,3 +1,7 @@
+// Re-exports: sibling FILES + sub-directory barrels (each sub-dir owns its
+// own index.ts). NO `export { x } from` named re-exports — those force the
+// reader to chase symbols. NO climbing-up re-exports — barrels only re-export
+// their own subtree.
 export * from './abis'
 export * from './authorizer'
 export * from './constants'

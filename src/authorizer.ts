@@ -2,7 +2,7 @@ import type { Abi, Address, Hex, TransactionReceipt } from 'viem'
 import { getAddress } from 'viem'
 
 import { AUT_Roles_v2 } from './abis'
-import type { TAuthorizerRole } from './graphql/api'
+import type { TAuthorizerRole } from './graphql/api/fields'
 import type { TransactionLifecycleCallbacks } from './presale'
 import type { PopPublicClient, PopWalletClient } from './types'
 import { SafeWrite } from './utils/safe-write'

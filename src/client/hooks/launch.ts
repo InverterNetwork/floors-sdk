@@ -29,7 +29,6 @@ export type {
   StakingFormData,
   TreasuryRecipientFormData,
 } from '../../schemas/launch.schema'
-export { transformLaunchFormDataToLaunchConfig } from '../../utils/segments'
 
 // =============================================================================
 // Transaction Progress Types

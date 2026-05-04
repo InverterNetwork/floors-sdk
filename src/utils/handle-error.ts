@@ -1323,12 +1323,7 @@ export async function getParsedErrorAsync(params: HandleErrorParams): Promise<En
   return result
 }
 
-// ============================================================================
-// Re-exports
-// ============================================================================
-
+// Local types defined in this file:
 export type { EnhancedParsedError, ErrorCategory, ErrorContext, HandleErrorParams, RecoveryAction }
-export type { KnownErrorSignature } from './error-signatures.generated'
-export { ERROR_METADATA, isKnownErrorSignature } from './error-signatures.generated'
-export { ERROR_UX_MAPPINGS, hasUXMapping } from './error-ux-mappings'
-export { getPermissionErrorMessage, getPermissionInfo, PERMISSION_MAP } from './permission-map'
+// Sibling re-exports removed — consumers import directly from the source file
+// (or via the `utils/` directory barrel at `@floorsfi/sdk/utils`).

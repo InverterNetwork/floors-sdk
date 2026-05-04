@@ -163,6 +163,3 @@ export const useMarketActivityData = ({
     isLoading: queryResult.isLoading && !subscriptionActivity,
   }
 }
-
-// Re-export types for convenience
-export type { TActivityType, TMarketActivityData } from '../../graphql/api/fields/activity'

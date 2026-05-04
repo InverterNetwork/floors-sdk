@@ -85,7 +85,6 @@ export type {
   StakingConfig,
   TreasuryConfig,
 } from './schemas/launch.schema'
-export { SegmentConfigSchema } from './schemas/launch.schema'
 
 // =============================================================================
 // Configure Types
