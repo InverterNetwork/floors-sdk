@@ -1,4 +1,4 @@
-import type { Address, Hex, TransactionReceipt } from 'viem'
+import type { Abi, Address, Hex, TransactionReceipt } from 'viem'
 import { getAddress } from 'viem'
 
 import { AUT_Roles_v2 } from './abis'
@@ -309,4 +309,47 @@ export class Authorizer {
     }
     return walletAddress as Address
   }
+}
+
+interface CheckPermissionForTargetParams {
+  publicClient: PopPublicClient
+  /** Module being called (its ABI must include the standard `authorizer()` view). */
+  target: Address
+  /** ABI of `target` — exposes `authorizer()` so we can resolve which Authorizer to query. */
+  targetAbi: Abi
+  /** Wallet address being checked. */
+  caller: Address
+  /** 4-byte function selector on `target`. */
+  selector: Hex
+}
+
+/**
+ * Resolve the authorizer attached to `target` and check whether `caller` has
+ * permission to invoke the function identified by `selector`. Two RPC reads:
+ *  1. `target.authorizer()` → authorizer address.
+ *  2. `authorizer.hasPermission(caller, target, selector)` → boolean.
+ *
+ * Use from imperative code paths (event handlers, form submission) where the
+ * `useAuthorizerChecks` hook would be heavyweight. For declarative reads at
+ * mount time, prefer the hook.
+ */
+export async function checkAuthorizerPermissionForTarget({
+  publicClient,
+  target,
+  targetAbi,
+  caller,
+  selector,
+}: CheckPermissionForTargetParams): Promise<boolean> {
+  const authorizerAddress = (await publicClient.readContract({
+    address: target,
+    abi: targetAbi,
+    functionName: 'authorizer',
+  })) as Address
+
+  return (await publicClient.readContract({
+    address: authorizerAddress,
+    abi: AUT_Roles_v2,
+    functionName: 'hasPermission',
+    args: [caller, target, selector],
+  })) as boolean
 }
