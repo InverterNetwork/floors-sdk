@@ -17,6 +17,7 @@ import {
   type TStakingHarvestYieldParams,
   type TStakingInjectYieldParams,
   type TStakingMutationResult,
+  type TStakingPosition,
   type TStakingRebalanceParams,
   type TStakingRemoveStrategyParams,
   type TStakingSetPerformanceFeeParams,
@@ -33,7 +34,7 @@ type UseStakingMutationsReturnType = {
   rebalance: UseMutationResult<TStakingMutationResult, Error, TStakingRebalanceParams>
   approveIssuanceToken: UseMutationResult<TStakingMutationResult, Error, TStakingApproveParams>
   getPosition: UseMutationResult<
-    { lockedIssuanceTokens: bigint; deployedCollateral: bigint; lastFloorPrice: bigint },
+    TStakingPosition,
     Error,
     { userAddress: Address; strategyAddress: Address }
   >

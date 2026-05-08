@@ -83,6 +83,12 @@ export interface TStakingApproveCollateralForStrategyParams {
 
 export type TStakingMutationResult = TransactionReceipt
 
+export interface TStakingPosition {
+  lockedIssuanceTokens: bigint
+  deployedCollateral: bigint
+  lastFloorPrice: bigint
+}
+
 interface StakingConstructorArgs {
   stakingManagerAddress: Address
   issuanceTokenAddress: Address
@@ -128,13 +134,13 @@ export class Staking {
   public async getPosition(
     userAddress: Address,
     strategyAddress: Address
-  ): Promise<{ lockedIssuanceTokens: bigint; deployedCollateral: bigint; lastFloorPrice: bigint }> {
+  ): Promise<TStakingPosition> {
     const position = (await this.publicClient.readContract({
       address: this.stakingManagerAddress,
       abi: StakingManager_v1,
       functionName: 'getPosition',
       args: [userAddress, strategyAddress],
-    })) as { lockedIssuanceTokens: bigint; deployedCollateral: bigint; lastFloorPrice: bigint }
+    })) as TStakingPosition
 
     return position
   }
