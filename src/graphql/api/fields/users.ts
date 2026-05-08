@@ -1,6 +1,6 @@
 import { getAddress } from 'viem'
 
-import type { GraphQLQueryArgs, GraphQLQueryResult, GraphQLSubscriptionArgs } from '../..'
+import type { GraphQLQueryArgs, GraphQLQueryResult, GraphQLSubscriptionArgs } from '../../query'
 import { cloneQuery, mergeFieldArgs } from '../utils'
 import type { TFloorAssetData } from './assets'
 

@@ -1,4 +1,4 @@
-import type { GraphQLQueryArgs, GraphQLQueryResult, GraphQLSubscriptionArgs } from '../..'
+import type { GraphQLQueryArgs, GraphQLQueryResult, GraphQLSubscriptionArgs } from '../../query'
 
 // ============================================================================
 // Shared Field Definitions (reusable for both queries and subscriptions)

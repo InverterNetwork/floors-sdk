@@ -1,4 +1,4 @@
-import type { GraphQLQueryArgs, GraphQLQueryResult } from '../..'
+import type { GraphQLQueryArgs, GraphQLQueryResult } from '../../query'
 
 // StakingManager query
 export const stakingManagersQuery = {

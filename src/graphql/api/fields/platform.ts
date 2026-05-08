@@ -1,4 +1,4 @@
-import type { GraphQLQueryArgs, GraphQLQueryResult } from '../..'
+import type { GraphQLQueryArgs, GraphQLQueryResult } from '../../query'
 
 // GraphQL Query Args for Platform Metrics (aggregated from multiple entities)
 export const platformMetricsQuery = {

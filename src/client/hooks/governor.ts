@@ -262,6 +262,8 @@ export function useGovernor(governorAddress?: Address) {
   }
 }
 
+export type UseGovernorReturn = ReturnType<typeof useGovernor>
+
 // =============================================================================
 // useGovernorEvents Hook
 // =============================================================================

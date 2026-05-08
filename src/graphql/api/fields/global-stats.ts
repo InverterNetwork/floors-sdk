@@ -1,4 +1,4 @@
-import type { GraphQLQueryArgs, GraphQLQueryResult, GraphQLSubscriptionArgs } from '../..'
+import type { GraphQLQueryArgs, GraphQLQueryResult, GraphQLSubscriptionArgs } from '../../query'
 
 export const globalStatsQuery = {
   GlobalStats: {

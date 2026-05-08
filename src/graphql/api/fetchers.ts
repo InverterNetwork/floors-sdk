@@ -1,6 +1,6 @@
 import { type Address, getAddress } from 'viem'
 
-import { query } from '..'
+import { query } from '../query'
 import {
   accountsQuery,
   type AccountsQueryType,

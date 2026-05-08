@@ -1,4 +1,4 @@
-import type { GraphQLQueryArgs, GraphQLQueryResult, GraphQLSubscriptionArgs } from '../..'
+import type { GraphQLQueryArgs, GraphQLQueryResult, GraphQLSubscriptionArgs } from '../../query'
 import type { TFloorAssetData } from './assets'
 import type { TTokenData } from './tokens'
 

@@ -1,4 +1,4 @@
-import type { GraphQLQueryArgs, GraphQLQueryResult, GraphQLSubscriptionArgs } from '../..'
+import type { GraphQLQueryArgs, GraphQLQueryResult, GraphQLSubscriptionArgs } from '../../query'
 import { cloneQuery, type ExtendableQueryArgs, mergeFieldArgs } from '../utils'
 import type { TUserAssetPosition } from './users'
 
