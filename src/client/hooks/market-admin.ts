@@ -188,6 +188,23 @@ export function useMarketAdmin(options: UseMarketAdminOptions) {
   })
 
   // ===========================================================================
+  // Query - Bonding curve segments (packed bytes32[] from chain)
+  // ===========================================================================
+
+  const segmentsQuery = useQuery({
+    queryKey: ['marketAdmin', 'segments', marketAddress],
+    queryFn: async (): Promise<`0x${string}`[]> => {
+      const instance = getReadOnlyInstance()
+      if (!instance) {
+        throw new Error('Public client not available')
+      }
+      return instance.getSegments()
+    },
+    enabled: autoFetch && !!publicClient && !!marketAddress,
+    staleTime: 0,
+  })
+
+  // ===========================================================================
   // Query - Raise Floor Context (balance, allowance, last event)
   // ===========================================================================
 
@@ -318,7 +335,7 @@ export function useMarketAdmin(options: UseMarketAdminOptions) {
       return admin.reconfigureSegments(params)
     },
     onSuccess: async () => {
-      await marketStateQuery.refetch()
+      await Promise.all([marketStateQuery.refetch(), segmentsQuery.refetch()])
     },
     ...options.reconfigureSegmentsOptions,
   })
@@ -380,6 +397,12 @@ export function useMarketAdmin(options: UseMarketAdminOptions) {
     isLoadingState: marketStateQuery.isLoading,
     stateError: marketStateQuery.error,
     refetchState: marketStateQuery.refetch,
+
+    // Bonding curve segments (packed bytes32[]; decode with decodePackedSegments)
+    segments: segmentsQuery.data ?? null,
+    isLoadingSegments: segmentsQuery.isLoading,
+    segmentsError: segmentsQuery.error,
+    refetchSegments: segmentsQuery.refetch,
 
     // Trading status mutations
     openBuy: openBuyMutation,

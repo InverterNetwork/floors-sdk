@@ -315,6 +315,19 @@ export class MarketAdmin {
     return Number(fee)
   }
 
+  /**
+   * @description Read the market's current bonding-curve segments as packed bytes32[].
+   * Use {@link decodePackedSegments} to decode into {@link SegmentConfig}.
+   */
+  public async getSegments(): Promise<`0x${string}`[]> {
+    const result = (await this.publicClient.readContract({
+      address: this.address,
+      abi: Floor_v1,
+      functionName: 'getSegments',
+    })) as readonly `0x${string}`[]
+    return [...result]
+  }
+
   // ===========================================================================
   // Read Methods - Raise Floor Context
   // ===========================================================================

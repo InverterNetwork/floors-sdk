@@ -1,5 +1,6 @@
 // auth.schema removed - NextAuth handles all session management
 export * from './base.schema'
+export * from './curve-preset.schema'
 export * from './launch.schema'
 export * from './session.schema'
 export * from './token-metadata.schema'
