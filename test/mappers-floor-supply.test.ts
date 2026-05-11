@@ -56,6 +56,7 @@ function makeMarket(overrides: Record<string, unknown> = {}) {
 describe('mapMarketToFloorAssetData — floor supply capping', () => {
   it('caps floorSupply at floorSegmentCapacity when floorSupply exceeds it', () => {
     const market = makeMarket({
+      marketSupplyFormatted: '900000',
       floorSupplyFormatted: '500000',
       floorSegmentSupplyFormatted: '400000',
     })
@@ -65,6 +66,7 @@ describe('mapMarketToFloorAssetData — floor supply capping', () => {
 
   it('passes through floorSupply when it is below floorSegmentCapacity', () => {
     const market = makeMarket({
+      marketSupplyFormatted: '900000',
       floorSupplyFormatted: '200000',
       floorSegmentSupplyFormatted: '400000',
     })
@@ -74,6 +76,7 @@ describe('mapMarketToFloorAssetData — floor supply capping', () => {
 
   it('passes through floorSupply when floorSegmentCapacity is 0 (not populated)', () => {
     const market = makeMarket({
+      marketSupplyFormatted: '900000',
       floorSupplyFormatted: '500000',
       floorSegmentSupplyFormatted: '0',
     })
@@ -83,6 +86,7 @@ describe('mapMarketToFloorAssetData — floor supply capping', () => {
 
   it('passes through floorSupply when floorSegmentCapacity fields are missing', () => {
     const market = makeMarket({
+      marketSupplyFormatted: '900000',
       floorSupplyFormatted: '500000',
       floorSegmentSupplyFormatted: undefined,
       floorSegmentSupplyRaw: undefined,
@@ -93,6 +97,7 @@ describe('mapMarketToFloorAssetData — floor supply capping', () => {
 
   it('uses capped floorSupply in protectedSupplyPercentage', () => {
     const market = makeMarket({
+      marketSupplyFormatted: '900000',
       floorSupplyFormatted: '500000',
       floorSegmentSupplyFormatted: '400000',
       totalSupplyFormatted: '1000000',
@@ -100,5 +105,52 @@ describe('mapMarketToFloorAssetData — floor supply capping', () => {
     const result = mapMarketToFloorAssetData(market)
     // protectedSupplyPercentage = (400000 / 1000000) * 100 = 40
     expect(result.supply.protectedSupplyPercentage).toBeCloseTo(40, 0)
+  })
+})
+
+describe('mapMarketToFloorAssetData — floorSupply <= circulatingSupply invariant', () => {
+  it('floorSupply never exceeds marketSupply (the circulating supply shown in UI)', () => {
+    // Indexer reported floorSupply=600 but only 500 tokens in circulation —
+    // this is the violation the monitor agent caught.
+    const market = makeMarket({
+      marketSupplyFormatted: '500',
+      floorSupplyFormatted: '600',
+      floorSegmentSupplyFormatted: '0',
+      totalSupplyFormatted: '1000',
+    })
+    const result = mapMarketToFloorAssetData(market)
+    expect(result.supply.floorSupply).toBeLessThanOrEqual(result.supply.marketSupply)
+  })
+
+  it('still applies the floorSegmentCapacity cap when both bounds would clamp', () => {
+    // floorSegmentCapacity is the tightest, should win.
+    const market = makeMarket({
+      marketSupplyFormatted: '800',
+      floorSupplyFormatted: '900',
+      floorSegmentSupplyFormatted: '300',
+    })
+    const result = mapMarketToFloorAssetData(market)
+    expect(result.supply.floorSupply).toBe(300)
+  })
+
+  it('keeps floorSupply unchanged when it is already <= marketSupply', () => {
+    const market = makeMarket({
+      marketSupplyFormatted: '800',
+      floorSupplyFormatted: '500',
+      floorSegmentSupplyFormatted: '0',
+    })
+    const result = mapMarketToFloorAssetData(market)
+    expect(result.supply.floorSupply).toBe(500)
+  })
+
+  it('marketToFloorRatio stays within [0, 1] once invariant holds', () => {
+    const market = makeMarket({
+      marketSupplyFormatted: '500',
+      floorSupplyFormatted: '700',
+      floorSegmentSupplyFormatted: '0',
+    })
+    const result = mapMarketToFloorAssetData(market)
+    expect(result.supply.marketToFloorRatio).toBeGreaterThanOrEqual(0)
+    expect(result.supply.marketToFloorRatio).toBeLessThanOrEqual(1)
   })
 })

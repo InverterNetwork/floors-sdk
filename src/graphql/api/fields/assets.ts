@@ -127,7 +127,6 @@ export interface TComputedAssetData {
     marketSupply: number
     floorSupply: number
     totalIssuanceSupply: number
-    nonRedeemableFloorSupply: number
     marketToFloorRatio: number
     protectedSupplyPercentage: number
   }

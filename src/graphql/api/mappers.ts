@@ -156,8 +156,12 @@ export function mapMarketToFloorAssetData(
     market.floorSegmentSupplyFormatted || market.floorSegmentSupplyRaw
   )
   const rawFloorSupply = toNumber(market.floorSupplyFormatted || market.floorSupplyRaw)
-  const floorSupply =
-    floorSegmentCapacity > 0 ? Math.min(rawFloorSupply, floorSegmentCapacity) : rawFloorSupply
+  // Floor supply can never exceed circulating (market) supply — you can't have
+  // more tokens parked at the floor than tokens that actually exist in users'
+  // hands. Also cap at floorSegmentCapacity when populated.
+  const upperBounds = [rawFloorSupply, marketSupply]
+  if (floorSegmentCapacity > 0) upperBounds.push(floorSegmentCapacity)
+  const floorSupply = Math.min(...upperBounds)
   const trades = market.trades ?? []
   const floorElevations = market.floorElevations ?? []
 
@@ -228,7 +232,6 @@ export function mapMarketToFloorAssetData(
     marketSupply,
     floorSupply,
     totalIssuanceSupply: totalSupply,
-    nonRedeemableFloorSupply: Math.max(0, floorSupply - marketSupply),
     marketToFloorRatio: safePercentage(marketSupply / Math.max(floorSupply, 1)),
     protectedSupplyPercentage: safePercentage(floorSupply / Math.max(totalSupply, 1)) * 100,
   }
