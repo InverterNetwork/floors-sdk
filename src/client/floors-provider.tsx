@@ -2,13 +2,15 @@
 
 import { useQueryClient } from '@tanstack/react-query'
 import { type ReactElement, type ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
-import type { Address } from 'viem'
-import { useAccount, useBalance, usePublicClient } from 'wagmi'
+import { type Address, erc20Abi, formatUnits } from 'viem'
+import { useAccount, usePublicClient, useReadContract, type UseReadContractReturnType } from 'wagmi'
 
 import {
   FloorsContext,
   type TFloorsConfig,
   type TFloorsTokenBalances,
+  type TTokenBalanceContextValue,
+  type TTokenBalanceData,
   type TTokenBalanceMetadata,
   useFloors,
 } from './floors-context'
@@ -36,6 +38,29 @@ type FloorsProviderProps = {
 const toAddress = (value?: string | null): Address | null => {
   if (!value) return null
   return value as Address
+}
+
+const buildTokenBalance = (
+  token: TTokenBalanceMetadata,
+  read: UseReadContractReturnType<typeof erc20Abi, 'balanceOf'>
+): TTokenBalanceContextValue => {
+  const value = read.data as bigint | undefined
+  const decimals = token.decimals
+  const data: TTokenBalanceData | undefined =
+    value !== undefined && decimals !== undefined
+      ? { value, decimals, formatted: formatUnits(value, decimals) }
+      : undefined
+
+  return {
+    token,
+    data,
+    isLoading: read.isLoading,
+    isError: read.isError,
+    error: read.error,
+    refetch: read.refetch,
+    status: read.status,
+    fetchStatus: read.fetchStatus,
+  }
 }
 
 /**
@@ -87,9 +112,11 @@ export const FloorsProvider = ({
     [activeMarket]
   )
 
-  const reserveBalance = useBalance({
-    address: walletAddress,
-    token: reserveTokenMetadata.address ?? undefined,
+  const reserveBalanceRead = useReadContract({
+    address: reserveTokenMetadata.address ?? undefined,
+    abi: erc20Abi,
+    functionName: 'balanceOf',
+    args: walletAddress ? [walletAddress] : undefined,
     chainId,
     query: {
       enabled: Boolean(walletAddress && reserveTokenMetadata.address),
@@ -97,9 +124,11 @@ export const FloorsProvider = ({
     },
   })
 
-  const issuanceBalance = useBalance({
-    address: walletAddress,
-    token: issuanceTokenMetadata.address ?? undefined,
+  const issuanceBalanceRead = useReadContract({
+    address: issuanceTokenMetadata.address ?? undefined,
+    abi: erc20Abi,
+    functionName: 'balanceOf',
+    args: walletAddress ? [walletAddress] : undefined,
     chainId,
     query: {
       enabled: Boolean(walletAddress && issuanceTokenMetadata.address),
@@ -109,16 +138,10 @@ export const FloorsProvider = ({
 
   const balances = useMemo<TFloorsTokenBalances>(
     () => ({
-      reserve: {
-        token: reserveTokenMetadata,
-        ...reserveBalance,
-      },
-      issuance: {
-        token: issuanceTokenMetadata,
-        ...issuanceBalance,
-      },
+      reserve: buildTokenBalance(reserveTokenMetadata, reserveBalanceRead),
+      issuance: buildTokenBalance(issuanceTokenMetadata, issuanceBalanceRead),
     }),
-    [reserveTokenMetadata, reserveBalance, issuanceTokenMetadata, issuanceBalance]
+    [reserveTokenMetadata, reserveBalanceRead, issuanceTokenMetadata, issuanceBalanceRead]
   )
 
   const { refetch: refetchMarkets } = marketsQuery
@@ -141,10 +164,10 @@ export const FloorsProvider = ({
         await refetchMarket()
       },
       reserveBalance: async () => {
-        await reserveBalance.refetch()
+        await reserveBalanceRead.refetch()
       },
       issuanceBalance: async () => {
-        await issuanceBalance.refetch()
+        await issuanceBalanceRead.refetch()
       },
       presales: async () => {
         await refetchPresales()
@@ -160,8 +183,8 @@ export const FloorsProvider = ({
       refetchAll,
       refetchMarkets,
       refetchMarket,
-      reserveBalance,
-      issuanceBalance,
+      reserveBalanceRead,
+      issuanceBalanceRead,
       refetchPresales,
       refetchPresale,
       refetchUserPosition,
@@ -224,6 +247,7 @@ export type {
   TFloorsContextValue,
   TFloorsTokenBalances,
   TTokenBalanceContextValue,
+  TTokenBalanceData,
   TTokenBalanceMetadata,
 } from './floors-context'
 // `useFloors` is exported from `floors-context.ts` (its source) and surfaced
